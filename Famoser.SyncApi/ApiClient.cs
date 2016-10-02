@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Famoser.SyncApi
 {
-    public class Class1
+    public class ApiClient
     {
     }
 }
