@@ -17,5 +17,6 @@ namespace Famoser.SyncApi.Interfaces
         Task<bool> Sync();
         Task<bool> Save(TModel model);
         Task<bool> Remove(TModel model);
+        Task<bool> EraseData();
     }
 }

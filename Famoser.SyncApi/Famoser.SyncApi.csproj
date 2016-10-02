@@ -35,17 +35,19 @@
   </PropertyGroup>
   <ItemGroup>
     <!-- A reference to the entire .NET Framework is automatically included -->
-    <Folder Include="Repositories\" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ApiClient.cs" />
+    <Compile Include="Entities\ApiConfigurationEntity.cs" />
     <Compile Include="Entities\CollectionEntity.cs" />
     <Compile Include="Entities\SyncEntity.cs" />
     <Compile Include="Entities\UserEntity.cs" />
-    <Compile Include="Interfaces\IApiClient.cs" />
+    <Compile Include="Interfaces\IApiConfiguration.cs" />
     <Compile Include="Interfaces\IApiRepository.cs" />
+    <Compile Include="Managers\Interfaces\IModelManager.cs" />
     <Compile Include="Models\Interfaces\ISyncModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Repositories\ApiRepository.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="Famoser.FrameworkEssentials, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
@@ -54,6 +56,10 @@
     </Reference>
     <Reference Include="Famoser.SqliteWrapper, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Famoser.SqliteWrapper.1.1.5\lib\portable-net45+win8+wpa81+wp8\Famoser.SqliteWrapper.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Newtonsoft.Json, Version=9.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.9.0.1\lib\portable-net45+wp80+win8+wpa81\Newtonsoft.Json.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Nito.AsyncEx, Version=3.0.1.0, Culture=neutral, processorArchitecture=MSIL">
