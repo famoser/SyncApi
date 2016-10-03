@@ -4,15 +4,14 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Famoser.SyncApi.Enums;
-using Newtonsoft.Json;
 
-namespace Famoser.SyncApi.Entities.Storage
+namespace Famoser.SyncApi.Entities.Api.Base
 {
-    internal class ModelInformation
+    public class BaseEntity
     {
         public Guid Id { get; set; }
         public Guid VersionId { get; set; }
-        public Guid CollectionId { get; set; }
-        public PendingAction PendingAction { get; set; }
+        public OnlineAction OnlineAction { get; set; }
+        public string Content { get; set; }
     }
 }

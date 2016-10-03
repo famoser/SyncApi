@@ -1,12 +1,12 @@
 ﻿using System;
+using Famoser.SyncApi.Entities.Api.Base;
+using Famoser.SyncApi.Enums;
 
 namespace Famoser.SyncApi.Entities.Api
 {
-    public class SyncEntity
+    public class SyncEntity : BaseEntity
     {
-        public Guid Id { get; set; }
         public Guid CollectionId { get; set; }
-        public string Content { get; set; }
         public string Identifier { get; set; }
         public string GroupIdentifier { get; set; }
     }

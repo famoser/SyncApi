@@ -6,6 +6,8 @@ using System.Text;
 using System.Threading.Tasks;
 using Famoser.FrameworkEssentials.Helpers;
 using Famoser.FrameworkEssentials.Services.Interfaces.Storage;
+using Famoser.SyncApi.Entities;
+using Famoser.SyncApi.Entities.Api;
 using Famoser.SyncApi.Entities.Storage;
 using Famoser.SyncApi.Enums;
 using Famoser.SyncApi.Interfaces;
@@ -75,14 +77,20 @@ namespace Famoser.SyncApi.Repositories
             });
         }
 
+        private Task<bool> SaveCacheAsync()
+        {
+            var json = JsonConvert.SerializeObject(_cacheModel);
+            return _cacheStorageService.SetCachedTextFileAsync(GetCacheFilePath(), json);
+        }
+
         private ApiClient<TModel> _apiClient;
 
-        private ApiClient<TModel> GetApiClient()
+        private async Task<ApiClient<TModel>> GetApiClient()
         {
             if (_apiClient != null)
                 return _apiClient;
 
-            _apiClient = new ApiClient<TModel>(_apiConfiguration.GetApiUri());
+            _apiClient = new ApiClient<TModel>(_apiConfiguration.GetApiUri(), await _apiConfiguration.GetUserIdAsync());
             return _apiClient;
         }
 
@@ -93,7 +101,27 @@ namespace Famoser.SyncApi.Repositories
             {
                 await Initialize();
 
+                var request = new RequestEntity { OnlineAction = OnlineAction.Various };
+                foreach (var modelInformation in _cacheModel.ModelInformations)
+                {
+                    request.SyncEntities.Add(new SyncEntity()
+                    {
+                        VersionId = modelInformation.VersionId,
+                        CollectionId = modelInformation.CollectionId,
+                        Id = modelInformation.Id
+                    });
+                }
 
+                var client = await GetApiClient();
+                var resp = await client.DoRequestAsync(request);
+                if (resp.RequestFailed)
+                    return false;
+
+                //all entities in here are updated
+                foreach (var syncEntity in resp.SyncEntities)
+                {
+
+                }
 
 
                 return true;
@@ -113,7 +141,6 @@ namespace Famoser.SyncApi.Repositories
                     model.SetId(new Guid());
 
                 var objInfo = GetModelInfos(model);
-                // CASE 1: Model is new
                 if (objInfo == null)
                 {
                     var collectionId = await _apiConfiguration.GetPrimaryGroupIdAsync(model.GetGroupIdentifier());
@@ -135,7 +162,8 @@ namespace Famoser.SyncApi.Repositories
 
                 if (objInfo.PendingAction == PendingAction.Create)
                 {
-                    var client = GetApiClient();
+                    objInfo.VersionId = Guid.NewGuid();
+                    var client = await GetApiClient();
                     if (await client.CreateAsync(model, objInfo.CollectionId))
                     {
                         objInfo.PendingAction = PendingAction.None;
@@ -143,13 +171,14 @@ namespace Famoser.SyncApi.Repositories
                 }
                 else if (objInfo.PendingAction == PendingAction.Update)
                 {
-
-                    var client = GetApiClient();
+                    objInfo.VersionId = Guid.NewGuid();
+                    var client = await GetApiClient();
                     if (await client.UpdateAsync(model, objInfo.CollectionId))
                     {
                         objInfo.PendingAction = PendingAction.None;
                     }
                 }
+                await SaveCacheAsync();
                 return objInfo.PendingAction == PendingAction.None;
             });
         }

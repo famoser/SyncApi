@@ -40,11 +40,16 @@
   <ItemGroup>
     <Compile Include="ApiClient.cs" />
     <Compile Include="Entities\ApiConfigurationEntity.cs" />
+    <Compile Include="Entities\Api\Base\BaseEntity.cs" />
     <Compile Include="Entities\Api\CollectionEntity.cs" />
+    <Compile Include="Entities\RequestEntity.cs" />
+    <Compile Include="Entities\ResponseEntity.cs" />
     <Compile Include="Entities\Storage\CacheStorageEntity.cs" />
     <Compile Include="Entities\Api\SyncEntity.cs" />
     <Compile Include="Entities\Api\UserEntity.cs" />
     <Compile Include="Entities\Storage\ModelInformation.cs" />
+    <Compile Include="Enums\ApiError.cs" />
+    <Compile Include="Enums\OnlineAction.cs" />
     <Compile Include="Enums\PendingAction.cs" />
     <Compile Include="Interfaces\IApiConfiguration.cs" />
     <Compile Include="Interfaces\IApiRepository.cs" />
@@ -56,10 +61,6 @@
   <ItemGroup>
     <Reference Include="Famoser.FrameworkEssentials, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Famoser.FrameworkEssentials.2.7.5\lib\portable-net45+win8+wpa81+wp8\Famoser.FrameworkEssentials.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="Famoser.SqliteWrapper, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Famoser.SqliteWrapper.1.1.5\lib\portable-net45+win8+wpa81+wp8\Famoser.SqliteWrapper.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Newtonsoft.Json, Version=9.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
