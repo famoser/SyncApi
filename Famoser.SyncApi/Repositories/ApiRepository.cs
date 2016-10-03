@@ -111,7 +111,7 @@ namespace Famoser.SyncApi.Repositories
             {
                 if (model.GetId() == Guid.Empty)
                     model.SetId(new Guid());
-                
+
                 var objInfo = GetModelInfos(model);
                 // CASE 1: Model is new
                 if (objInfo == null)
@@ -127,18 +127,30 @@ namespace Famoser.SyncApi.Repositories
                     _cacheModel.ModelInformations.Add(objInfo);
                     _cacheModel.Models.Add(model);
                     _modelManager.Add(model);
+                }
+                else
+                {
+                    objInfo.PendingAction = PendingAction.Update;
+                }
 
-
+                if (objInfo.PendingAction == PendingAction.Create)
+                {
                     var client = GetApiClient();
-                    if (await client.CreateAsync(model, collectionId))
+                    if (await client.CreateAsync(model, objInfo.CollectionId))
                     {
                         objInfo.PendingAction = PendingAction.None;
                     }
                 }
+                else if (objInfo.PendingAction == PendingAction.Update)
+                {
 
-                // CASE 2: Model is updated
-
-                return true;
+                    var client = GetApiClient();
+                    if (await client.UpdateAsync(model, objInfo.CollectionId))
+                    {
+                        objInfo.PendingAction = PendingAction.None;
+                    }
+                }
+                return objInfo.PendingAction == PendingAction.None;
             });
         }
 

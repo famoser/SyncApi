@@ -26,5 +26,10 @@ namespace Famoser.SyncApi
         {
             throw new NotImplementedException();
         }
+
+        public Task<bool> UpdateAsync(ISyncModel model, Guid collectionId)
+        {
+            throw new NotImplementedException();
+        }
     }
 }
