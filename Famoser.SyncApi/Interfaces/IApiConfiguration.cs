@@ -13,7 +13,18 @@ namespace Famoser.SyncApi.Interfaces
         Uri GetApiUri();
 
         Task<Guid> GetUserIdAsync();
+        /// <summary>
+        /// "read access"
+        /// </summary>
+        /// <param name="groupIdentifier"></param>
+        /// <returns></returns>
         Task<List<Guid>> GetGroupIdAsync(string groupIdentifier);
-        Task AddGroupIdAsync(string groupIdentifier, Guid id);
+        /// <summary>
+        /// "write access"
+        /// </summary>
+        /// <param name="groupIdentifier"></param>
+        /// <returns></returns>
+        Task<Guid> GetPrimaryGroupIdAsync(string groupIdentifier);
+        Task<bool> AddGroupIdAsync(string groupIdentifier, Guid id);
     }
 }

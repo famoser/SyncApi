@@ -35,13 +35,17 @@
   </PropertyGroup>
   <ItemGroup>
     <!-- A reference to the entire .NET Framework is automatically included -->
+    <Folder Include="Models\Storage\" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ApiClient.cs" />
     <Compile Include="Entities\ApiConfigurationEntity.cs" />
-    <Compile Include="Entities\CollectionEntity.cs" />
-    <Compile Include="Entities\SyncEntity.cs" />
-    <Compile Include="Entities\UserEntity.cs" />
+    <Compile Include="Entities\Api\CollectionEntity.cs" />
+    <Compile Include="Entities\Storage\CacheStorageEntity.cs" />
+    <Compile Include="Entities\Api\SyncEntity.cs" />
+    <Compile Include="Entities\Api\UserEntity.cs" />
+    <Compile Include="Entities\Storage\ModelInformation.cs" />
+    <Compile Include="Enums\PendingAction.cs" />
     <Compile Include="Interfaces\IApiConfiguration.cs" />
     <Compile Include="Interfaces\IApiRepository.cs" />
     <Compile Include="Managers\Interfaces\IModelManager.cs" />

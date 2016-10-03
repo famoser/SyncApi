@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Famoser.SyncApi.Enums;
 
 namespace Famoser.SyncApi.Models.Interfaces
 {
@@ -16,13 +17,13 @@ namespace Famoser.SyncApi.Models.Interfaces
         void SetId(Guid id);
 
         /// <summary>
-        /// Get unique identifier for this type for the API
+        /// Get unique identifier (different for all objects) for the API
         /// </summary>
         /// <returns></returns>
         string GetUniqeIdentifier();
 
         /// <summary>
-        /// Get group identifier for this type
+        /// Get group identifier (same for all connected objects) for the api
         /// </summary>
         /// <returns></returns>
         string GetGroupIdentifier();

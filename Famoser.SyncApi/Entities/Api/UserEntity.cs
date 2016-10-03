@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Famoser.SyncApi.Entities
+namespace Famoser.SyncApi.Entities.Api
 {
     public class UserEntity
     {

@@ -6,11 +6,14 @@ using System.Text;
 using System.Threading.Tasks;
 using Famoser.FrameworkEssentials.Helpers;
 using Famoser.FrameworkEssentials.Services.Interfaces.Storage;
+using Famoser.SyncApi.Entities.Storage;
+using Famoser.SyncApi.Enums;
 using Famoser.SyncApi.Interfaces;
 using Famoser.SyncApi.Managers.Interfaces;
 using Famoser.SyncApi.Models.Interfaces;
 using Newtonsoft.Json;
 using Nito.AsyncEx;
+using SQLite.Net.Attributes;
 
 namespace Famoser.SyncApi.Repositories
 {
@@ -42,50 +45,45 @@ namespace Famoser.SyncApi.Repositories
             return model.GetUniqeIdentifier() + ".json";
         }
 
-        private bool _isInitialized;
-        private static readonly AsyncLock _asyncLock = new AsyncLock();
+        private readonly AsyncLock _asyncLock = new AsyncLock();
+        private CacheStorageEntity<TModel> _cacheModel;
         private Task Initialize()
         {
             return ExecuteSafe(async () =>
             {
                 using (await _asyncLock.LockAsync())
                 {
-                    if (_isInitialized)
+                    if (_cacheModel != null)
                         return;
-
-                    _isInitialized = true;
 
                     try
                     {
                         var json = await _cacheStorageService.GetCachedTextFileAsync(GetCacheFilePath());
-                        var models = JsonConvert.DeserializeObject<List<TModel>>(json);
-                        foreach (var model in models)
+                        var cacheModel = JsonConvert.DeserializeObject<CacheStorageEntity<TModel>>(json);
+                        foreach (var model in cacheModel.Models)
                         {
                             _modelManager.Add(model);
                         }
+                        _cacheModel = cacheModel;
                     }
                     catch
                     {
-                        // ignored: no savegame or wrong savegame. does not matter ether way
+                        // exception ignored: no savegame or wrong savegame. does not matter either way
+                        _cacheModel = new CacheStorageEntity<TModel>();
                     }
                 }
             });
         }
 
-        private ApiClient _apiClient;
+        private ApiClient<TModel> _apiClient;
 
-        private Task<ApiClient> GetApiClient()
+        private ApiClient<TModel> GetApiClient()
         {
-            return ExecuteSafe(async () =>
-            {
-                if (_apiClient != null)
-                    return _apiClient;
-
-                _apiClient = new ApiClient();
-
-
+            if (_apiClient != null)
                 return _apiClient;
-            });
+
+            _apiClient = new ApiClient<TModel>(_apiConfiguration.GetApiUri());
+            return _apiClient;
         }
 
 
@@ -102,14 +100,55 @@ namespace Famoser.SyncApi.Repositories
             });
         }
 
+        private ModelInformation GetModelInfos(TModel model)
+        {
+            return _cacheModel.ModelInformations.FirstOrDefault(s => s.Id == model.GetId());
+        }
+
         public Task<bool> Save(TModel model)
         {
+            return ExecuteSafe(async () =>
+            {
+                if (model.GetId() == Guid.Empty)
+                    model.SetId(new Guid());
+                
+                var objInfo = GetModelInfos(model);
+                // CASE 1: Model is new
+                if (objInfo == null)
+                {
+                    var collectionId = await _apiConfiguration.GetPrimaryGroupIdAsync(model.GetGroupIdentifier());
 
+                    objInfo = new ModelInformation()
+                    {
+                        PendingAction = PendingAction.Create,
+                        CollectionId = collectionId,
+                        Id = model.GetId()
+                    };
+                    _cacheModel.ModelInformations.Add(objInfo);
+                    _cacheModel.Models.Add(model);
+                    _modelManager.Add(model);
+
+
+                    var client = GetApiClient();
+                    if (await client.CreateAsync(model, collectionId))
+                    {
+                        objInfo.PendingAction = PendingAction.None;
+                    }
+                }
+
+                // CASE 2: Model is updated
+
+                return true;
+            });
         }
 
         public Task<bool> Remove(TModel model)
         {
+            return ExecuteSafe(async () =>
+            {
 
+                return true;
+            });
         }
     }
 }

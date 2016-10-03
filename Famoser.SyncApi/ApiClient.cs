@@ -21,5 +21,10 @@ namespace Famoser.SyncApi
 
             return true;
         }
+
+        public Task<bool> CreateAsync(TModel model, Guid collectionId)
+        {
+            throw new NotImplementedException();
+        }
     }
 }
