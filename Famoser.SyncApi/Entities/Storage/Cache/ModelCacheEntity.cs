@@ -2,7 +2,7 @@
 
 namespace Famoser.SyncApi.Entities.Storage
 {
-    internal class CacheStorageEntity<TModel>
+    internal class ModelCacheEntity<TModel>
     {
         public List<TModel> Models { get; set; } = new List<TModel>();
         public List<ModelInformation> ModelInformations { get; set; } = new List<ModelInformation>();

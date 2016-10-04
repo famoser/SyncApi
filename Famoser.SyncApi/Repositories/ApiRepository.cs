@@ -45,7 +45,7 @@ namespace Famoser.SyncApi.Repositories
         }
 
         private readonly AsyncLock _asyncLock = new AsyncLock();
-        private CacheStorageEntity<TModel> _cacheModel;
+        private ModelCacheEntity<TModel> _cacheModel;
         private Task Initialize()
         {
             return ExecuteSafe(async () =>
@@ -57,8 +57,11 @@ namespace Famoser.SyncApi.Repositories
 
                     try
                     {
+                        //read out storage
+                        //todo: test jsonconvert if null string is supplied
+
                         var json = await _cacheStorageService.GetCachedTextFileAsync(GetCacheFilePath());
-                        var cacheModel = JsonConvert.DeserializeObject<CacheStorageEntity<TModel>>(json);
+                        var cacheModel = JsonConvert.DeserializeObject<ModelCacheEntity<TModel>>(json);
                         foreach (var model in cacheModel.Models)
                         {
                             _modelManager.Add(model);
@@ -68,7 +71,7 @@ namespace Famoser.SyncApi.Repositories
                     catch
                     {
                         // exception ignored: no savegame or wrong savegame. does not matter either way
-                        _cacheModel = new CacheStorageEntity<TModel>();
+                        _cacheModel = new ModelCacheEntity<TModel>();
                     }
                 }
             });

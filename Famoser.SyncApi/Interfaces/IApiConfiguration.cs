@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Famoser.SyncApi.Entities.Storage.Cache;
+using Famoser.SyncApi.Entities.Storage.Roaming;
 
 namespace Famoser.SyncApi.Interfaces
 {
@@ -8,19 +10,10 @@ namespace Famoser.SyncApi.Interfaces
     {
         Uri GetApiUri();
 
-        Task<Guid> GetUserIdAsync();
-        /// <summary>
-        /// "read access"
-        /// </summary>
-        /// <param name="groupIdentifier"></param>
-        /// <returns></returns>
-        Task<List<Guid>> GetGroupIdAsync(string groupIdentifier);
-        /// <summary>
-        /// "write access"
-        /// </summary>
-        /// <param name="groupIdentifier"></param>
-        /// <returns></returns>
-        Task<Guid> GetPrimaryGroupIdAsync(string groupIdentifier);
-        Task<bool> AddGroupIdAsync(string groupIdentifier, Guid id);
+        Task<ApiCacheEntity> GetApiCacheEntityAsync();
+        Task<bool> SetApiCacheEntityAsync(ApiCacheEntity entity);
+
+        Task<ApiRoamingEntity> GetApiRoamingEntityAsync();
+        Task<bool> SetApiRoamingEntityAsync(ApiRoamingEntity entity);
     }
 }
