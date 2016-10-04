@@ -1,8 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using Famoser.FrameworkEssentials.Helpers;
 using Famoser.FrameworkEssentials.Services.Interfaces.Storage;
@@ -15,7 +13,6 @@ using Famoser.SyncApi.Managers.Interfaces;
 using Famoser.SyncApi.Models.Interfaces;
 using Newtonsoft.Json;
 using Nito.AsyncEx;
-using SQLite.Net.Attributes;
 
 namespace Famoser.SyncApi.Repositories
 {

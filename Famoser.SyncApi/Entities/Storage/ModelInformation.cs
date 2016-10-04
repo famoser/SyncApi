@@ -1,10 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Famoser.SyncApi.Enums;
-using Newtonsoft.Json;
 
 namespace Famoser.SyncApi.Entities.Storage
 {

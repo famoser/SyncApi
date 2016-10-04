@@ -1,5 +1,4 @@
-﻿using System;
-using Famoser.SyncApi.Entities.Api.Base;
+﻿using Famoser.SyncApi.Entities.Api.Base;
 
 namespace Famoser.SyncApi.Entities.Api
 {

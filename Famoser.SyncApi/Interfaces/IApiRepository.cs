@@ -1,11 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Diagnostics.Contracts;
-using System.Linq;
-using System.Text;
+﻿using System.Collections.ObjectModel;
 using System.Threading.Tasks;
-using Famoser.SyncApi.Entities;
 using Famoser.SyncApi.Models.Interfaces;
 
 namespace Famoser.SyncApi.Interfaces

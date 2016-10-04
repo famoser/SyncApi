@@ -1,6 +1,5 @@
 ﻿using System;
 using Famoser.SyncApi.Entities.Api.Base;
-using Famoser.SyncApi.Enums;
 
 namespace Famoser.SyncApi.Entities.Api
 {
