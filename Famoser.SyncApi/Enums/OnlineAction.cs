@@ -8,6 +8,7 @@
         Update = 3,
         Delete = 4,
         Various = 5,
-        Erase = 6
+        Erase = 6,
+        Created = 10
     }
 }

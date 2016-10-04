@@ -35,13 +35,14 @@
   </PropertyGroup>
   <ItemGroup>
     <!-- A reference to the entire .NET Framework is automatically included -->
+    <Folder Include="Helpers\" />
     <Folder Include="Models\Storage\" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ApiClient.cs" />
     <Compile Include="Entities\Api\Base\BaseEntity.cs" />
     <Compile Include="Entities\Api\CollectionEntity.cs" />
-    <Compile Include="Entities\Api\DeviceEntitiy.cs" />
+    <Compile Include="Entities\Api\DeviceEntity.cs" />
     <Compile Include="Entities\RequestEntity.cs" />
     <Compile Include="Entities\ResponseEntity.cs" />
     <Compile Include="Entities\Storage\Cache\ApiCacheEntity.cs" />
@@ -56,10 +57,13 @@
     <Compile Include="Enums\PendingAction.cs" />
     <Compile Include="Interfaces\IApiConfiguration.cs" />
     <Compile Include="Interfaces\IApiRepository.cs" />
+    <Compile Include="Interfaces\IApiStorageService.cs" />
     <Compile Include="Managers\Interfaces\IModelManager.cs" />
     <Compile Include="Models\Interfaces\ISyncModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Repositories\ApiRepository.cs" />
+    <Compile Include="Repositories\ApiRepositoryStorage.cs" />
+    <Compile Include="Repositories\ApiRepositoryWorkflows.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="Famoser.FrameworkEssentials, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">

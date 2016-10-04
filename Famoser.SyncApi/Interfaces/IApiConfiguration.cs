@@ -8,12 +8,8 @@ namespace Famoser.SyncApi.Interfaces
 {
     public interface IApiConfiguration
     {
-        Uri GetApiUri();
-
-        Task<ApiCacheEntity> GetApiCacheEntityAsync();
-        Task<bool> SetApiCacheEntityAsync(ApiCacheEntity entity);
-
-        Task<ApiRoamingEntity> GetApiRoamingEntityAsync();
-        Task<bool> SetApiRoamingEntityAsync(ApiRoamingEntity entity);
+        Task<Uri> GetApiUri();
+        Task<object> GetDeviceObjectAsync();
+        Task<object> GetUserObjectAsync();
     }
 }

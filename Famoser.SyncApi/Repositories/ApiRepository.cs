@@ -1,12 +1,16 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
 using Famoser.FrameworkEssentials.Helpers;
+using Famoser.FrameworkEssentials.Services.Interfaces;
 using Famoser.FrameworkEssentials.Services.Interfaces.Storage;
 using Famoser.SyncApi.Entities;
 using Famoser.SyncApi.Entities.Api;
 using Famoser.SyncApi.Entities.Storage;
+using Famoser.SyncApi.Entities.Storage.Cache;
+using Famoser.SyncApi.Entities.Storage.Roaming;
 using Famoser.SyncApi.Enums;
 using Famoser.SyncApi.Interfaces;
 using Famoser.SyncApi.Managers.Interfaces;
@@ -16,18 +20,20 @@ using Nito.AsyncEx;
 
 namespace Famoser.SyncApi.Repositories
 {
-    public class ApiRepository<TModel> : BaseHelper
+    public partial class ApiRepository<TModel> : BaseHelper
     where TModel : ISyncModel
     {
         private readonly IModelManager<TModel> _modelManager;
-        private readonly ICacheStorageService _cacheStorageService;
+        private readonly IStorageService _storageService;
         private IApiConfiguration _apiConfiguration;
+        private IApiStorageService _apiStorageService;
 
-        public ApiRepository(IModelManager<TModel> modelManager, ICacheStorageService cacheStorageService, IApiConfiguration apiConfiguration)
+        public ApiRepository(IModelManager<TModel> modelManager, IStorageService storageService, IApiConfiguration apiConfiguration, IApiStorageService apiStorageService)
         {
             _modelManager = modelManager;
-            _cacheStorageService = cacheStorageService;
+            _storageService = storageService;
             _apiConfiguration = apiConfiguration;
+            _apiStorageService = apiStorageService;
         }
 
         public ObservableCollection<TModel> GetAll()
@@ -38,49 +44,63 @@ namespace Famoser.SyncApi.Repositories
         }
 
 
-        private string GetCacheFilePath()
+        private string GetModelCacheFilePath()
         {
             var model = (TModel)Activator.CreateInstance(typeof(TModel));
-            return model.GetUniqeIdentifier() + ".json";
+            return _apiStorageService.GetFileName(model.GetUniqeIdentifier() + ".json", typeof(TModel));
+        }
+
+        private string GetApiCacheFilePath()
+        {
+            return _apiStorageService.GetFileName("api_cache.json");
+        }
+
+        private string GetApiRoamingFilePath()
+        {
+            return _apiStorageService.GetFileName("api_roaming.json");
         }
 
         private readonly AsyncLock _asyncLock = new AsyncLock();
-        private ModelCacheEntity<TModel> _cacheModel;
-        private Task Initialize()
+        private ModelCacheEntity<TModel> _apiCacheModel;
+        private ApiCacheEntity _apiCacheEntity;
+        private ApiRoamingEntity _apiRoamingEntity;
+        private bool _isInitialized;
+        private Task<bool> Initialize()
         {
             return ExecuteSafe(async () =>
             {
                 using (await _asyncLock.LockAsync())
                 {
-                    if (_cacheModel != null)
-                        return;
+                    if (_isInitialized)
+                        return true;
+                    
+                    await InitializeFromStorageAsync();
 
-                    try
+                    var res = true;
+                    if (_apiRoamingEntity == null)
                     {
-                        //read out storage
-                        //todo: test jsonconvert if null string is supplied
+                        res = await InitializeRoamingAsync();
 
-                        var json = await _cacheStorageService.GetCachedTextFileAsync(GetCacheFilePath());
-                        var cacheModel = JsonConvert.DeserializeObject<ModelCacheEntity<TModel>>(json);
-                        foreach (var model in cacheModel.Models)
-                        {
-                            _modelManager.Add(model);
-                        }
-                        _cacheModel = cacheModel;
                     }
-                    catch
+                    if (_apiCacheEntity == null)
                     {
-                        // exception ignored: no savegame or wrong savegame. does not matter either way
-                        _cacheModel = new ModelCacheEntity<TModel>();
+                        res = await InitializeDeviceAsync();
                     }
+                    if (_apiCacheModel == null)
+                    {
+                        _apiCacheEntity = new ApiCacheEntity();
+                    }
+
+                    _isInitialized = res;
+                    return res;
                 }
             });
         }
 
         private Task<bool> SaveCacheAsync()
         {
-            var json = JsonConvert.SerializeObject(_cacheModel);
-            return _cacheStorageService.SetCachedTextFileAsync(GetCacheFilePath(), json);
+            var json = JsonConvert.SerializeObject(_apiCacheModel);
+            return _cacheStorageService.SetCachedTextFileAsync(GetModelCacheFilePath(), json);
         }
 
         private ApiClient<TModel> _apiClient;
@@ -102,7 +122,7 @@ namespace Famoser.SyncApi.Repositories
                 await Initialize();
 
                 var request = new RequestEntity { OnlineAction = OnlineAction.Various };
-                foreach (var modelInformation in _cacheModel.ModelInformations)
+                foreach (var modelInformation in _apiCacheModel.ModelInformations)
                 {
                     request.SyncEntities.Add(new SyncEntity()
                     {
@@ -130,7 +150,7 @@ namespace Famoser.SyncApi.Repositories
 
         private ModelInformation GetModelInfos(TModel model)
         {
-            return _cacheModel.ModelInformations.FirstOrDefault(s => s.Id == model.GetId());
+            return _apiCacheModel.ModelInformations.FirstOrDefault(s => s.Id == model.GetId());
         }
 
         public Task<bool> Save(TModel model)
@@ -151,8 +171,8 @@ namespace Famoser.SyncApi.Repositories
                         CollectionId = collectionId,
                         Id = model.GetId()
                     };
-                    _cacheModel.ModelInformations.Add(objInfo);
-                    _cacheModel.Models.Add(model);
+                    _apiCacheModel.ModelInformations.Add(objInfo);
+                    _apiCacheModel.Models.Add(model);
                     _modelManager.Add(model);
                 }
                 else
