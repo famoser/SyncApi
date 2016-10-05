@@ -1,5 +1,6 @@
 ﻿using System.Collections.ObjectModel;
 using System.Threading.Tasks;
+using Famoser.SyncApi.Managers.Interfaces;
 using Famoser.SyncApi.Models.Interfaces;
 
 namespace Famoser.SyncApi.Interfaces
@@ -12,5 +13,7 @@ namespace Famoser.SyncApi.Interfaces
         Task<bool> Save(TModel model);
         Task<bool> Remove(TModel model);
         Task<bool> EraseData();
+        void SetModelManager(IModelManager<TModel> manager);
+        IModelManager<TModel> GetModelManager();
     }
 }

@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using Famoser.SyncApi.Entities.Storage;
 using Famoser.SyncApi.Entities.Storage.Cache;
@@ -37,6 +34,22 @@ namespace Famoser.SyncApi.Repositories
                 // exception ignored: no savegame or wrong savegame. does not matter either way
             }
             return true;
+        }
+
+        private string GetModelCacheFilePath()
+        {
+            var model = (TModel)Activator.CreateInstance(typeof(TModel));
+            return _apiConfiguration.GetFileName(model.GetUniqeIdentifier() + ".json", typeof(TModel));
+        }
+
+        private string GetApiCacheFilePath()
+        {
+            return _apiConfiguration.GetFileName("api_cache.json");
+        }
+
+        private string GetApiRoamingFilePath()
+        {
+            return _apiConfiguration.GetFileName("api_roaming.json");
         }
     }
 }

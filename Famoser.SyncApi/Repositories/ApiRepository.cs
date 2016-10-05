@@ -1,11 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
 using Famoser.FrameworkEssentials.Helpers;
 using Famoser.FrameworkEssentials.Services.Interfaces;
-using Famoser.FrameworkEssentials.Services.Interfaces.Storage;
 using Famoser.SyncApi.Entities;
 using Famoser.SyncApi.Entities.Api;
 using Famoser.SyncApi.Entities.Storage;
@@ -13,6 +11,7 @@ using Famoser.SyncApi.Entities.Storage.Cache;
 using Famoser.SyncApi.Entities.Storage.Roaming;
 using Famoser.SyncApi.Enums;
 using Famoser.SyncApi.Interfaces;
+using Famoser.SyncApi.Managers;
 using Famoser.SyncApi.Managers.Interfaces;
 using Famoser.SyncApi.Models.Interfaces;
 using Newtonsoft.Json;
@@ -25,15 +24,17 @@ namespace Famoser.SyncApi.Repositories
     {
         private readonly IModelManager<TModel> _modelManager;
         private readonly IStorageService _storageService;
-        private IApiConfiguration _apiConfiguration;
-        private IApiStorageService _apiStorageService;
+        private readonly IApiConfigurationService _apiConfiguration;
+        private readonly IApiStorageService _apiStorageService;
+        private readonly IApiAuthorizationService _apiAuthorizationService;
 
-        public ApiRepository(IModelManager<TModel> modelManager, IStorageService storageService, IApiConfiguration apiConfiguration, IApiStorageService apiStorageService)
+        public ApiRepository(IStorageService storageService, IApiConfigurationService apiConfiguration, IApiStorageService apiStorageService, IApiAuthorizationService apiAuthorizationService)
         {
-            _modelManager = modelManager;
+            _modelManager = new ModelManager<TModel>();
             _storageService = storageService;
             _apiConfiguration = apiConfiguration;
             _apiStorageService = apiStorageService;
+            _apiAuthorizationService = apiAuthorizationService;
         }
 
         public ObservableCollection<TModel> GetAll()
@@ -43,22 +44,6 @@ namespace Famoser.SyncApi.Repositories
             return _modelManager.GetObservableCollection();
         }
 
-
-        private string GetModelCacheFilePath()
-        {
-            var model = (TModel)Activator.CreateInstance(typeof(TModel));
-            return _apiStorageService.GetFileName(model.GetUniqeIdentifier() + ".json", typeof(TModel));
-        }
-
-        private string GetApiCacheFilePath()
-        {
-            return _apiStorageService.GetFileName("api_cache.json");
-        }
-
-        private string GetApiRoamingFilePath()
-        {
-            return _apiStorageService.GetFileName("api_roaming.json");
-        }
 
         private readonly AsyncLock _asyncLock = new AsyncLock();
         private ModelCacheEntity<TModel> _apiCacheModel;
@@ -80,13 +65,12 @@ namespace Famoser.SyncApi.Repositories
                     if (_apiRoamingEntity == null)
                     {
                         res = await InitializeRoamingAsync();
-
                     }
-                    if (_apiCacheEntity == null)
+                    else if (_apiCacheEntity == null)
                     {
                         res = await InitializeDeviceAsync();
                     }
-                    if (_apiCacheModel == null)
+                    else if (_apiCacheModel == null)
                     {
                         _apiCacheEntity = new ApiCacheEntity();
                     }
@@ -100,7 +84,7 @@ namespace Famoser.SyncApi.Repositories
         private Task<bool> SaveCacheAsync()
         {
             var json = JsonConvert.SerializeObject(_apiCacheModel);
-            return _cacheStorageService.SetCachedTextFileAsync(GetModelCacheFilePath(), json);
+            return _storageService.SetCachedTextFileAsync(GetModelCacheFilePath(), json);
         }
 
         private ApiClient<TModel> _apiClient;
@@ -110,7 +94,7 @@ namespace Famoser.SyncApi.Repositories
             if (_apiClient != null)
                 return _apiClient;
 
-            _apiClient = new ApiClient<TModel>(_apiConfiguration.GetApiUri(), await _apiConfiguration.GetUserIdAsync());
+            _apiClient = new ApiClient<TModel>(_apiConfiguration.GetApiUri(), await _apiStorageService.GetUserIdAsync());
             return _apiClient;
         }
 

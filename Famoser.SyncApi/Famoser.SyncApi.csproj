@@ -35,7 +35,6 @@
   </PropertyGroup>
   <ItemGroup>
     <!-- A reference to the entire .NET Framework is automatically included -->
-    <Folder Include="Helpers\" />
     <Folder Include="Models\Storage\" />
   </ItemGroup>
   <ItemGroup>
@@ -55,15 +54,19 @@
     <Compile Include="Enums\ApiError.cs" />
     <Compile Include="Enums\OnlineAction.cs" />
     <Compile Include="Enums\PendingAction.cs" />
-    <Compile Include="Interfaces\IApiConfiguration.cs" />
+    <Compile Include="Helpers\ApiStorageHelper.cs" />
+    <Compile Include="Interfaces\IApiConfigurationService.cs" />
     <Compile Include="Interfaces\IApiRepository.cs" />
     <Compile Include="Interfaces\IApiStorageService.cs" />
     <Compile Include="Managers\Interfaces\IModelManager.cs" />
+    <Compile Include="Managers\ModelManager.cs" />
     <Compile Include="Models\Interfaces\ISyncModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Repositories\ApiRepository.cs" />
     <Compile Include="Repositories\ApiRepositoryStorage.cs" />
     <Compile Include="Repositories\ApiRepositoryWorkflows.cs" />
+    <Compile Include="Helpers\ApiAuthorizationHelper.cs" />
+    <Compile Include="Services\ApiStorageService.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="Famoser.FrameworkEssentials, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
