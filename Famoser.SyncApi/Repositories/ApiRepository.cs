@@ -8,12 +8,14 @@ using Famoser.SyncApi.Entities;
 using Famoser.SyncApi.Entities.Api;
 using Famoser.SyncApi.Entities.Storage;
 using Famoser.SyncApi.Entities.Storage.Cache;
+using Famoser.SyncApi.Entities.Storage.Cache.Entitites;
 using Famoser.SyncApi.Entities.Storage.Roaming;
 using Famoser.SyncApi.Enums;
 using Famoser.SyncApi.Interfaces;
 using Famoser.SyncApi.Managers;
 using Famoser.SyncApi.Managers.Interfaces;
 using Famoser.SyncApi.Models.Interfaces;
+using Famoser.SyncApi.Services;
 using Newtonsoft.Json;
 using Nito.AsyncEx;
 
@@ -23,18 +25,14 @@ namespace Famoser.SyncApi.Repositories
     where TModel : ISyncModel
     {
         private readonly IModelManager<TModel> _modelManager;
-        private readonly IStorageService _storageService;
-        private readonly IApiConfigurationService _apiConfiguration;
+        private readonly IApiConfigurationService _apiConfigurationService;
         private readonly IApiStorageService _apiStorageService;
-        private readonly IApiAuthorizationService _apiAuthorizationService;
 
-        public ApiRepository(IStorageService storageService, IApiConfigurationService apiConfiguration, IApiStorageService apiStorageService, IApiAuthorizationService apiAuthorizationService)
+        public ApiRepository(IApiConfigurationService apiConfigurationService, IApiStorageService apiStorageService)
         {
             _modelManager = new ModelManager<TModel>();
-            _storageService = storageService;
-            _apiConfiguration = apiConfiguration;
+            _apiConfigurationService = apiConfigurationService;
             _apiStorageService = apiStorageService;
-            _apiAuthorizationService = apiAuthorizationService;
         }
 
         public ObservableCollection<TModel> GetAll()
@@ -44,11 +42,7 @@ namespace Famoser.SyncApi.Repositories
             return _modelManager.GetObservableCollection();
         }
 
-
         private readonly AsyncLock _asyncLock = new AsyncLock();
-        private ModelCacheEntity<TModel> _apiCacheModel;
-        private ApiCacheEntity _apiCacheEntity;
-        private ApiRoamingEntity _apiRoamingEntity;
         private bool _isInitialized;
         private Task<bool> Initialize()
         {
@@ -58,44 +52,66 @@ namespace Famoser.SyncApi.Repositories
                 {
                     if (_isInitialized)
                         return true;
-                    
-                    await InitializeFromStorageAsync();
 
                     var res = true;
-                    if (_apiRoamingEntity == null)
+
+                    var apiRoamingEntity = await _apiStorageService.GetApiRoamingEntityAsync();
+                    if (apiRoamingEntity == null)
                     {
-                        res = await InitializeRoamingAsync();
+                        var helper = GetApiAuthorizationHelper();
+                        var apiRoaming = new ApiRoamingEntity();
+                        var apiCache = new ApiCacheEntity();
+                        var cache = new ModelCacheEntity<TModel>();
+                        var userId = Guid.NewGuid();
+                        var deviceId = Guid.NewGuid();
+                        if (await helper.InitializeUserAsync(userId, deviceId, apiRoaming, apiCache, cache))
+                        {
+                            await _apiStorageService.SetApiRoamingEntityAsync(apiRoaming);
+                            await _apiStorageService.SetApiCacheEntityAsync(apiCache);
+                            await _apiStorageService.SetModelCacheJsonAsync(GetModelCacheFilePath(), cache);
+                        }
+                        else
+                            res = false;
                     }
-                    else if (_apiCacheEntity == null)
+                    else
                     {
-                        res = await InitializeDeviceAsync();
-                    }
-                    else if (_apiCacheModel == null)
-                    {
-                        _apiCacheEntity = new ApiCacheEntity();
+                        var apiCacheEntity = await _apiStorageService.GetApiCacheEntityAsync();
+                        if (apiCacheEntity == null)
+                        {
+                            var helper = GetApiAuthorizationHelper();
+                            var apiCache = new ApiCacheEntity();
+                            var cache = new ModelCacheEntity<TModel>();
+                            var deviceId = Guid.NewGuid();
+                            if (await helper.InitializeDeviceAsync(deviceId, apiRoamingEntity, apiCache, cache))
+                            {
+                                await _apiStorageService.SetApiCacheEntityAsync(apiCache);
+                                await _apiStorageService.SetModelCacheJsonAsync(GetModelCacheFilePath(), cache);
+                            }
+                            else
+                                res = false;
+                        }
+                        else
+                        {
+                            //read out storage
+                            var apiCacheModel = await _apiStorageService.GetModelCacheAsync<TModel>(GetModelCacheFilePath());
+                            if (apiCacheModel == null)
+                            {
+                                await _apiStorageService.SetModelCacheJsonAsync(GetModelCacheFilePath(), new ModelCacheEntity<TModel>());
+                            }
+                            else
+                            {
+                                foreach (var model in apiCacheModel.Models)
+                                {
+                                    _modelManager.Add(model);
+                                }
+                            }
+                        }
                     }
 
                     _isInitialized = res;
                     return res;
                 }
             });
-        }
-
-        private Task<bool> SaveCacheAsync()
-        {
-            var json = JsonConvert.SerializeObject(_apiCacheModel);
-            return _storageService.SetCachedTextFileAsync(GetModelCacheFilePath(), json);
-        }
-
-        private ApiClient<TModel> _apiClient;
-
-        private async Task<ApiClient<TModel>> GetApiClient()
-        {
-            if (_apiClient != null)
-                return _apiClient;
-
-            _apiClient = new ApiClient<TModel>(_apiConfiguration.GetApiUri(), await _apiStorageService.GetUserIdAsync());
-            return _apiClient;
         }
 
 
@@ -106,7 +122,7 @@ namespace Famoser.SyncApi.Repositories
                 await Initialize();
 
                 var request = new RequestEntity { OnlineAction = OnlineAction.Various };
-                foreach (var modelInformation in _apiCacheModel.ModelInformations)
+                foreach (var modelInformation in _apiStorageService.GetModelCache<TModel>(GetModelCacheFilePath()).ModelInformations)
                 {
                     request.SyncEntities.Add(new SyncEntity()
                     {
@@ -116,7 +132,7 @@ namespace Famoser.SyncApi.Repositories
                     });
                 }
 
-                var client = await GetApiClient();
+                var client = GetApiClient();
                 var resp = await client.DoRequestAsync(request);
                 if (resp.RequestFailed)
                     return false;
@@ -134,7 +150,7 @@ namespace Famoser.SyncApi.Repositories
 
         private ModelInformation GetModelInfos(TModel model)
         {
-            return _apiCacheModel.ModelInformations.FirstOrDefault(s => s.Id == model.GetId());
+            return GetModelCache().ModelInformations.FirstOrDefault(s => s.Id == model.GetId());
         }
 
         public Task<bool> Save(TModel model)
@@ -147,7 +163,13 @@ namespace Famoser.SyncApi.Repositories
                 var objInfo = GetModelInfos(model);
                 if (objInfo == null)
                 {
-                    var collectionId = await _apiConfiguration.GetPrimaryGroupIdAsync(model.GetGroupIdentifier());
+                    var collectionInfo = GetApiCache().GetSaveCollection(model.GetGroupIdentifier());
+                    if (collectionInfo == null)
+                    {
+                        var helper = GetApiAuthorizationHelper();
+                        if (!await helper.InitializeCollectionAsync(Guid.NewGuid(), GetApiCache(), GetModelCache()))
+                            return false;
+                    }
 
                     objInfo = new ModelInformation()
                     {

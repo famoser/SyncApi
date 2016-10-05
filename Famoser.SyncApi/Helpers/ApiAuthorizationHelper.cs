@@ -85,7 +85,7 @@ namespace Famoser.SyncApi.Services
             });
         }
 
-        public Task<bool> InitializeDeviceAsync(Guid deviceId)
+        public Task<bool> InitializeDeviceAsync(Guid deviceId, ApiRoamingEntity apiRoamingEntity, ApiCacheEntity apiCacheEntity, ModelCacheEntity<TModel> modelCacheEntity)
         {
             return ExecuteSafe(async () =>
             {
@@ -105,6 +105,21 @@ namespace Famoser.SyncApi.Services
                                 }
                             }
                 });
+
+                if (resp.RequestFailed)
+                    return false;
+
+                var device = resp.DeviceEntities.FirstOrDefault(d => d.Id == deviceId);
+                if (device == null)
+                    return false;
+
+                apiCacheEntity.DeviceEntity = new DeviceEntity()
+                {
+                    Content = deviceContent,
+                    Id = deviceId,
+                    VersionId = device.VersionId,
+                };
+
 
                 return !resp.RequestFailed;
             });

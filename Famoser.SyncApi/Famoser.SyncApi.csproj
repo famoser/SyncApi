@@ -63,8 +63,7 @@
     <Compile Include="Models\Interfaces\ISyncModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Repositories\ApiRepository.cs" />
-    <Compile Include="Repositories\ApiRepositoryStorage.cs" />
-    <Compile Include="Repositories\ApiRepositoryWorkflows.cs" />
+    <Compile Include="Repositories\ApiRepositoryContructors.cs" />
     <Compile Include="Helpers\ApiAuthorizationHelper.cs" />
     <Compile Include="Services\ApiStorageService.cs" />
   </ItemGroup>

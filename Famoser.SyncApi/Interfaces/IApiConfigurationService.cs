@@ -5,7 +5,7 @@ namespace Famoser.SyncApi.Interfaces
 {
     public interface IApiConfigurationService
     {
-        Task<Uri> GetApiUri();
+        Uri GetApiUri();
         Task<object> GetDeviceObjectAsync();
         Task<object> GetUserObjectAsync(); 
         string GetFileName(string proposedFilename, Type objectType = null);

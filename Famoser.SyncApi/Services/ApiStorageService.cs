@@ -4,47 +4,61 @@ using Famoser.FrameworkEssentials.Services.Interfaces;
 using Famoser.SyncApi.Entities.Storage.Cache;
 using Famoser.SyncApi.Entities.Storage.Roaming;
 using Famoser.SyncApi.Interfaces;
+using Newtonsoft.Json;
 
 namespace Famoser.SyncApi.Services
 {
     public class ApiStorageService : IApiStorageService
     {
-        private IStorageService _storageService;
-        private IApiConfigurationService _apiConfigurationService;
+        private readonly IStorageService _storageService;
+        private readonly IApiConfigurationService _apiConfigurationService;
 
-        public ApiStorageService(IStorageService storageService)
+        public ApiStorageService(IStorageService storageService, IApiConfigurationService apiConfigurationService)
         {
             _storageService = storageService;
+            _apiConfigurationService = apiConfigurationService;
         }
 
         public async Task<ApiRoamingEntity> GetApiRoamingEntityAsync()
         {
-            throw new NotImplementedException();
+            var json = await _storageService.GetRoamingTextFileAsync(GetApiRoamingFilePath());
+            return JsonConvert.DeserializeObject<ApiRoamingEntity>(json);
         }
 
-        public async Task<bool> SetApiRoamingEntityAsync(ApiRoamingEntity entity)
+        public Task<bool> SetApiRoamingEntityAsync(ApiRoamingEntity entity)
         {
-            throw new NotImplementedException();
+            return _storageService.SetCachedTextFileAsync(GetApiRoamingFilePath(), JsonConvert.SerializeObject(entity));
         }
 
         public async Task<ApiCacheEntity> GetApiCacheEntityAsync()
         {
-            throw new NotImplementedException();
+            var json = await _storageService.GetRoamingTextFileAsync(GetApiCacheFilePath());
+            return JsonConvert.DeserializeObject<ApiCacheEntity>(json);
         }
 
-        public async Task<bool> SetApiCacheEntityAsync(ApiCacheEntity entity)
+        public Task<bool> SetApiCacheEntityAsync(ApiCacheEntity entity)
         {
-            throw new NotImplementedException();
+            return _storageService.SetCachedTextFileAsync(GetApiCacheFilePath(), JsonConvert.SerializeObject(entity));
         }
 
         public Task<string> GetModelCacheJsonAsync(string identifier)
         {
-            throw new NotImplementedException();
+            return _storageService.GetCachedTextFileAsync(identifier);
         }
 
         public Task<bool> SetModelCacheJsonAsync(string identifier, string json)
         {
-            throw new NotImplementedException();
+            return _storageService.SetCachedTextFileAsync(identifier, json);
+        }
+        
+        private string GetApiCacheFilePath()
+        {
+            return _apiConfigurationService.GetFileName("api_cache.json");
+        }
+
+        private string GetApiRoamingFilePath()
+        {
+            return _apiConfigurationService.GetFileName("api_roaming.json");
         }
     }
 }
