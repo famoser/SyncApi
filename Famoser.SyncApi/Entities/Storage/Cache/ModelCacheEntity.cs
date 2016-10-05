@@ -3,7 +3,7 @@ using Famoser.SyncApi.Entities.Storage.Cache.Entitites;
 
 namespace Famoser.SyncApi.Entities.Storage.Cache
 {
-    internal class ModelCacheEntity<TModel>
+    public class ModelCacheEntity<TModel>
     {
         public List<TModel> Models { get; set; } = new List<TModel>();
         public List<ModelInformation> ModelInformations { get; set; } = new List<ModelInformation>();
