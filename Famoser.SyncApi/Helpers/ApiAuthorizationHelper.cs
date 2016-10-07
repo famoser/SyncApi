@@ -16,9 +16,9 @@ namespace Famoser.SyncApi.Helpers
 {
     public class ApiAuthorizationHelper<TModel> : BaseHelper where TModel : ISyncModel
     {
-        private ApiClient<TModel> _apiClient;
-        private IApiConfigurationService _apiConfigurationService;
-        private IApiStorageService _apiStorageService;
+        private readonly ApiClient<TModel> _apiClient;
+        private readonly IApiConfigurationService _apiConfigurationService;
+        private readonly IApiStorageService _apiStorageService;
 
         public ApiAuthorizationHelper(ApiClient<TModel> apiClient, IApiConfigurationService apiConfigurationService, IApiStorageService apiStorageService)
         {

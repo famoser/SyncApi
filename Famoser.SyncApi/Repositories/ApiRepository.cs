@@ -68,7 +68,7 @@ namespace Famoser.SyncApi.Repositories
                         {
                             await _apiStorageService.SetApiRoamingEntityAsync(apiRoaming);
                             await _apiStorageService.SetApiCacheEntityAsync(apiCache);
-                            await _apiStorageService.SetModelCacheJsonAsync(GetModelCacheFilePath(), cache);
+                            await _apiStorageService.SetModelCacheAsync(GetModelCacheFilePath(), cache);
                         }
                         else
                             res = false;
@@ -85,7 +85,7 @@ namespace Famoser.SyncApi.Repositories
                             if (await helper.InitializeDeviceAsync(deviceId, apiRoamingEntity, apiCache, cache))
                             {
                                 await _apiStorageService.SetApiCacheEntityAsync(apiCache);
-                                await _apiStorageService.SetModelCacheJsonAsync(GetModelCacheFilePath(), cache);
+                                await _apiStorageService.SetModelCacheAsync(GetModelCacheFilePath(), cache);
                             }
                             else
                                 res = false;
@@ -96,7 +96,7 @@ namespace Famoser.SyncApi.Repositories
                             var apiCacheModel = await _apiStorageService.GetModelCacheAsync<TModel>(GetModelCacheFilePath());
                             if (apiCacheModel == null)
                             {
-                                await _apiStorageService.SetModelCacheJsonAsync(GetModelCacheFilePath(), new ModelCacheEntity<TModel>());
+                                await _apiStorageService.SetModelCacheAsync(GetModelCacheFilePath(), new ModelCacheEntity<TModel>());
                             }
                             else
                             {
