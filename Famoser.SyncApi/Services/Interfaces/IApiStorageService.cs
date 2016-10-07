@@ -1,10 +1,9 @@
 ﻿using System.Threading.Tasks;
-using Famoser.SyncApi.Entities.Storage;
 using Famoser.SyncApi.Entities.Storage.Cache;
 using Famoser.SyncApi.Entities.Storage.Roaming;
 using Famoser.SyncApi.Models.Interfaces;
 
-namespace Famoser.SyncApi.Interfaces
+namespace Famoser.SyncApi.Services.Interfaces
 {
     public interface IApiStorageService
     {

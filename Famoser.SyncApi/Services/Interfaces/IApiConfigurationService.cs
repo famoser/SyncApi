@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 
-namespace Famoser.SyncApi.Interfaces
+namespace Famoser.SyncApi.Services.Interfaces
 {
     public interface IApiConfigurationService
     {

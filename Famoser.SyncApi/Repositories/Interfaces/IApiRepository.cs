@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 using Famoser.SyncApi.Managers.Interfaces;
 using Famoser.SyncApi.Models.Interfaces;
 
-namespace Famoser.SyncApi.Interfaces
+namespace Famoser.SyncApi.Repositories.Interfaces
 {
     public interface IApiRepository<TModel>
         where TModel : ISyncModel

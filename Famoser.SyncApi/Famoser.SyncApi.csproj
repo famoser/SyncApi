@@ -35,7 +35,6 @@
   </PropertyGroup>
   <ItemGroup>
     <!-- A reference to the entire .NET Framework is automatically included -->
-    <Folder Include="Models\Storage\" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ApiClient.cs" />
@@ -55,12 +54,15 @@
     <Compile Include="Enums\OnlineAction.cs" />
     <Compile Include="Enums\PendingAction.cs" />
     <Compile Include="Helpers\ApiStorageHelper.cs" />
-    <Compile Include="Interfaces\IApiConfigurationService.cs" />
-    <Compile Include="Interfaces\IApiRepository.cs" />
-    <Compile Include="Interfaces\IApiStorageService.cs" />
+    <Compile Include="Services\Interfaces\IApiConfigurationService.cs" />
+    <Compile Include="Repositories\Interfaces\IApiRepository.cs" />
+    <Compile Include="Services\Interfaces\IApiStorageService.cs" />
     <Compile Include="Managers\Interfaces\IModelManager.cs" />
     <Compile Include="Managers\ModelManager.cs" />
+    <Compile Include="Models\Interfaces\Base\IBaseSyncModel.cs" />
+    <Compile Include="Models\Interfaces\IDeviceModel.cs" />
     <Compile Include="Models\Interfaces\ISyncModel.cs" />
+    <Compile Include="Models\Interfaces\IUserModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Repositories\ApiRepository.cs" />
     <Compile Include="Repositories\ApiRepositoryContructors.cs" />

@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 using Famoser.FrameworkEssentials.Services.Interfaces;
 using Famoser.SyncApi.Entities.Storage.Cache;
 using Famoser.SyncApi.Entities.Storage.Roaming;
-using Famoser.SyncApi.Interfaces;
+using Famoser.SyncApi.Services.Interfaces;
 using Newtonsoft.Json;
 
 namespace Famoser.SyncApi.Services

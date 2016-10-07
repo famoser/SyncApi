@@ -11,11 +11,11 @@ using Famoser.SyncApi.Entities.Storage.Cache;
 using Famoser.SyncApi.Entities.Storage.Cache.Entitites;
 using Famoser.SyncApi.Entities.Storage.Roaming;
 using Famoser.SyncApi.Enums;
-using Famoser.SyncApi.Interfaces;
 using Famoser.SyncApi.Managers;
 using Famoser.SyncApi.Managers.Interfaces;
 using Famoser.SyncApi.Models.Interfaces;
 using Famoser.SyncApi.Services;
+using Famoser.SyncApi.Services.Interfaces;
 using Newtonsoft.Json;
 using Nito.AsyncEx;
 

@@ -1,4 +1,5 @@
 ﻿using System;
+using Famoser.SyncApi.Models.Interfaces.Base;
 
 namespace Famoser.SyncApi.Models.Interfaces
 {
@@ -6,11 +7,8 @@ namespace Famoser.SyncApi.Models.Interfaces
     /// implement this interface in your models to be synced.
     /// Mark all properties to be synced with the EntityMap attribute
     /// </summary>
-    public interface ISyncModel
+    public interface ISyncModel : IBaseSyncModel
     {
-        Guid GetId();
-        void SetId(Guid id);
-
         /// <summary>
         /// Get unique identifier (different for all objects) for the API
         /// </summary>
