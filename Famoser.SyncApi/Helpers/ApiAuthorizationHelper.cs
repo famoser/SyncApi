@@ -35,7 +35,7 @@ namespace Famoser.SyncApi.Services
             {
                 var userContent = JsonConvert.SerializeObject(await _apiConfigurationService.GetUserObjectAsync());
                 var deviceContent = JsonConvert.SerializeObject(await _apiConfigurationService.GetDeviceObjectAsync());
-
+                
                 //add device & user
                 var resp = await _apiClient.DoRequestAsync(new RequestEntity()
                 {
