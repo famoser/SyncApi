@@ -11,11 +11,11 @@ using Famoser.SyncApi.Entities.Storage.Cache;
 using Famoser.SyncApi.Entities.Storage.Cache.Entitites;
 using Famoser.SyncApi.Entities.Storage.Roaming;
 using Famoser.SyncApi.Enums;
-using Famoser.SyncApi.Interfaces;
 using Famoser.SyncApi.Managers;
 using Famoser.SyncApi.Managers.Interfaces;
 using Famoser.SyncApi.Models.Interfaces;
 using Famoser.SyncApi.Services;
+using Famoser.SyncApi.Services.Interfaces;
 using Newtonsoft.Json;
 using Nito.AsyncEx;
 
@@ -68,7 +68,7 @@ namespace Famoser.SyncApi.Repositories
                         {
                             await _apiStorageService.SetApiRoamingEntityAsync(apiRoaming);
                             await _apiStorageService.SetApiCacheEntityAsync(apiCache);
-                            await _apiStorageService.SetModelCacheJsonAsync(GetModelCacheFilePath(), cache);
+                            await _apiStorageService.SetModelCacheAsync(GetModelCacheFilePath(), cache);
                         }
                         else
                             res = false;
@@ -85,7 +85,7 @@ namespace Famoser.SyncApi.Repositories
                             if (await helper.InitializeDeviceAsync(deviceId, apiRoamingEntity, apiCache, cache))
                             {
                                 await _apiStorageService.SetApiCacheEntityAsync(apiCache);
-                                await _apiStorageService.SetModelCacheJsonAsync(GetModelCacheFilePath(), cache);
+                                await _apiStorageService.SetModelCacheAsync(GetModelCacheFilePath(), cache);
                             }
                             else
                                 res = false;
@@ -96,7 +96,7 @@ namespace Famoser.SyncApi.Repositories
                             var apiCacheModel = await _apiStorageService.GetModelCacheAsync<TModel>(GetModelCacheFilePath());
                             if (apiCacheModel == null)
                             {
-                                await _apiStorageService.SetModelCacheJsonAsync(GetModelCacheFilePath(), new ModelCacheEntity<TModel>());
+                                await _apiStorageService.SetModelCacheAsync(GetModelCacheFilePath(), new ModelCacheEntity<TModel>());
                             }
                             else
                             {

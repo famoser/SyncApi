@@ -1,26 +1,24 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using Famoser.FrameworkEssentials.Helpers;
 using Famoser.SyncApi.Entities;
 using Famoser.SyncApi.Entities.Api;
-using Famoser.SyncApi.Entities.Storage;
 using Famoser.SyncApi.Entities.Storage.Cache;
 using Famoser.SyncApi.Entities.Storage.Roaming;
 using Famoser.SyncApi.Enums;
-using Famoser.SyncApi.Interfaces;
 using Famoser.SyncApi.Models.Interfaces;
+using Famoser.SyncApi.Services.Interfaces;
 using Newtonsoft.Json;
 
-namespace Famoser.SyncApi.Services
+namespace Famoser.SyncApi.Helpers
 {
     public class ApiAuthorizationHelper<TModel> : BaseHelper where TModel : ISyncModel
     {
-        private ApiClient<TModel> _apiClient;
-        private IApiConfigurationService _apiConfigurationService;
-        private IApiStorageService _apiStorageService;
+        private readonly ApiClient<TModel> _apiClient;
+        private readonly IApiConfigurationService _apiConfigurationService;
+        private readonly IApiStorageService _apiStorageService;
 
         public ApiAuthorizationHelper(ApiClient<TModel> apiClient, IApiConfigurationService apiConfigurationService, IApiStorageService apiStorageService)
         {

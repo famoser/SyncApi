@@ -1,10 +1,9 @@
 ﻿using System.Threading.Tasks;
-using Famoser.SyncApi.Entities.Storage;
 using Famoser.SyncApi.Entities.Storage.Cache;
 using Famoser.SyncApi.Entities.Storage.Roaming;
 using Famoser.SyncApi.Models.Interfaces;
 
-namespace Famoser.SyncApi.Interfaces
+namespace Famoser.SyncApi.Services.Interfaces
 {
     public interface IApiStorageService
     {
@@ -18,6 +17,6 @@ namespace Famoser.SyncApi.Interfaces
 
         Task<ModelCacheEntity<TModel>> GetModelCacheAsync<TModel>(string identifier) where TModel : ISyncModel;
         ModelCacheEntity<TModel> GetModelCache<TModel>(string identifier) where TModel : ISyncModel;
-        Task<bool> SetModelCacheJsonAsync<TModel>(string identifier, ModelCacheEntity<TModel> cache) where TModel : ISyncModel;
+        Task<bool> SetModelCacheAsync<TModel>(string identifier, ModelCacheEntity<TModel> cache) where TModel : ISyncModel;
     }
 }
