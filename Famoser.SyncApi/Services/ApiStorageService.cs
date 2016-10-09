@@ -98,10 +98,9 @@ namespace Famoser.SyncApi.Services
                         }
                     };
 
-                    await
-                        _storageService.SetCachedTextFileAsync(GetApiCacheFilePath(),
-                            JsonConvert.SerializeObject(_apiCacheEntity));
+                    await _storageService.SetCachedTextFileAsync(GetApiCacheFilePath(), JsonConvert.SerializeObject(_apiCacheEntity));
                 }
+                //todo: sync apicache with auth
                 return true;
             }
         }
