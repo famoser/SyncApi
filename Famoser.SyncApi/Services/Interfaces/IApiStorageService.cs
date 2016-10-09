@@ -7,16 +7,12 @@ namespace Famoser.SyncApi.Services.Interfaces
 {
     public interface IApiStorageService
     {
-        Task<ApiRoamingEntity> GetApiRoamingEntityAsync();
+        Task<bool> InitializeAsync();
+        
         ApiRoamingEntity GetApiRoamingEntity();
-        Task<bool> SetApiRoamingEntityAsync(ApiRoamingEntity entity);
-
-        Task<ApiCacheEntity> GetApiCacheEntityAsync();
         ApiCacheEntity GetApiCacheEntity();
-        Task<bool> SetApiCacheEntityAsync(ApiCacheEntity entity);
-
-        Task<ModelCacheEntity<TModel>> GetModelCacheAsync<TModel>(string identifier) where TModel : ISyncModel;
+        
         ModelCacheEntity<TModel> GetModelCache<TModel>(string identifier) where TModel : ISyncModel;
-        Task<bool> SetModelCacheAsync<TModel>(string identifier, ModelCacheEntity<TModel> cache) where TModel : ISyncModel;
+        Task SetModelCacheAsync<TModel>(string identifier, ModelCacheEntity<TModel> cache) where TModel : ISyncModel;
     }
 }

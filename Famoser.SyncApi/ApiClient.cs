@@ -8,8 +8,7 @@ using Newtonsoft.Json;
 
 namespace Famoser.SyncApi
 {
-    public class ApiClient<TModel>
-        where TModel : ISyncModel
+    public class ApiClient
     {
         private readonly Uri _baseUri;
         private readonly Guid _userId;
@@ -56,16 +55,6 @@ namespace Famoser.SyncApi
         public Task<ResponseEntity> DoRequestAsync(RequestEntity entity)
         {
             return DoApiRequestAsync(entity);
-        }
-
-        public Task<bool> CreateAsync(TModel model, Guid collectionId)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<bool> UpdateAsync(ISyncModel model, Guid collectionId)
-        {
-            throw new NotImplementedException();
         }
     }
 }

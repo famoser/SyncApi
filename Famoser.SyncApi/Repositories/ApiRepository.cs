@@ -54,6 +54,7 @@ namespace Famoser.SyncApi.Repositories
                         return true;
 
                     var res = true;
+                    await _apiStorageService.InitializeAsync();
 
                     var apiRoamingEntity = await _apiStorageService.GetApiRoamingEntityAsync();
                     if (apiRoamingEntity == null)
@@ -89,22 +90,6 @@ namespace Famoser.SyncApi.Repositories
                             }
                             else
                                 res = false;
-                        }
-                        else
-                        {
-                            //read out storage
-                            var apiCacheModel = await _apiStorageService.GetModelCacheAsync<TModel>(GetModelCacheFilePath());
-                            if (apiCacheModel == null)
-                            {
-                                await _apiStorageService.SetModelCacheAsync(GetModelCacheFilePath(), new ModelCacheEntity<TModel>());
-                            }
-                            else
-                            {
-                                foreach (var model in apiCacheModel.Models)
-                                {
-                                    _modelManager.Add(model);
-                                }
-                            }
                         }
                     }
 

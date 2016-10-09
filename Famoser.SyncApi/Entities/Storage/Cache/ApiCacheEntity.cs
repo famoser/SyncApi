@@ -12,6 +12,7 @@ namespace Famoser.SyncApi.Entities.Storage.Cache
         public DeviceEntity DeviceEntity { get; set; }
         public UserEntity UserEntity { get; set; }
         public List<CollectionInformations> CollectionInformations { get; set; } = new List<CollectionInformations>();
+        public List<string> ModelIdentifiers { get; set; }
 
         public CollectionInformations GetSaveCollection(string groupIdentifier)
         {
