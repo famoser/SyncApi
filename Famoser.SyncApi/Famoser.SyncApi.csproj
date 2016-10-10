@@ -59,6 +59,7 @@
     <Compile Include="Enums\ApiError.cs" />
     <Compile Include="Enums\OnlineAction.cs" />
     <Compile Include="Enums\PendingAction.cs" />
+    <Compile Include="Models\Interfaces\ICollectionModel.cs" />
     <Compile Include="Repositories\AuthRepository.cs" />
     <Compile Include="Repositories\Interfaces\IAuthRepository.cs" />
     <Compile Include="Services\ApiAuthenticationService.cs" />

@@ -29,7 +29,7 @@ namespace Famoser.SyncApi.Services
             {
                 var authApiClient = new AuthApiClient(_apiConfigurationService.GetApiUri());
                 var apiCache = _apiStorageService.GetApiCacheEntity();
-                //todo: create modelmanager for user & device, IoC register?
+
                 var resp = await authApiClient.DoRequestAsync(new AuthRequestEntity()
                 {
                     DeviceEntity = apiCache.DeviceEntity,
