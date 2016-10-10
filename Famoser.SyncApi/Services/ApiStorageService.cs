@@ -55,7 +55,6 @@ namespace Famoser.SyncApi.Services
 
                 if (_apiRoamingEntity == null)
                 {
-                    //var apiClient = new ApiClient(_apiConfigurationService.GetApiUri(), userId);
                     var userId = Guid.NewGuid();
                     var deviceId = Guid.NewGuid();
                     _apiRoamingEntity = new ApiRoamingEntity { UserId = Guid.NewGuid() };
@@ -102,31 +101,7 @@ namespace Famoser.SyncApi.Services
 
                     await _storageService.SetCachedTextFileAsync(GetApiCacheFilePath(), JsonConvert.SerializeObject(_apiCacheEntity));
                 }
-                SyncAuthAsync();
                 return true;
-            }
-        }
-
-        private async void SyncAuthAsync()
-        {
-            var authApiClient = new AuthApiClient(_apiConfigurationService.GetApiUri());
-            var resp = await authApiClient.DoRequestAsync(new AuthRequestEntity()
-            {
-                DeviceEntity = _apiCacheEntity.DeviceEntity,
-                UserEntity = _apiCacheEntity.UserEntity,
-                UserId = _apiRoamingEntity.UserId
-            });
-            if (!resp.RequestFailed)
-            {
-                if (resp.DeviceEntity != null)
-                    _apiCacheEntity.DeviceEntity = resp.DeviceEntity;
-                if (resp.UserEntity != null)
-                    _apiCacheEntity.UserEntity = resp.UserEntity;
-
-                if (resp.DeviceEntity != null || resp.UserEntity != null)
-                {
-                    await _storageService.SetCachedTextFileAsync(GetApiCacheFilePath(), JsonConvert.SerializeObject(_apiCacheEntity));
-                }
             }
         }
 
@@ -138,6 +113,11 @@ namespace Famoser.SyncApi.Services
         public ApiCacheEntity GetApiCacheEntity()
         {
             return _apiCacheEntity;
+        }
+
+        public Task SaveApiCacheEntityAsync()
+        {
+            return _storageService.SetCachedTextFileAsync(GetApiCacheFilePath(), JsonConvert.SerializeObject(_apiCacheEntity));
         }
 
         public ModelCacheEntity<TModel> GetModelCache<TModel>(string identifier) where TModel : ISyncModel

@@ -59,7 +59,9 @@
     <Compile Include="Enums\ApiError.cs" />
     <Compile Include="Enums\OnlineAction.cs" />
     <Compile Include="Enums\PendingAction.cs" />
-    <Compile Include="Helpers\ApiStorageHelper.cs" />
+    <Compile Include="Repositories\AuthRepository.cs" />
+    <Compile Include="Repositories\Interfaces\IAuthRepository.cs" />
+    <Compile Include="Services\ApiAuthenticationService.cs" />
     <Compile Include="Services\Interfaces\IApiConfigurationService.cs" />
     <Compile Include="Repositories\Interfaces\IApiRepository.cs" />
     <Compile Include="Services\Interfaces\IApiStorageService.cs" />
@@ -72,8 +74,8 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Repositories\ApiRepository.cs" />
     <Compile Include="Repositories\ApiRepositoryContructors.cs" />
-    <Compile Include="Helpers\ApiAuthorizationHelper.cs" />
     <Compile Include="Services\ApiStorageService.cs" />
+    <Compile Include="Services\Interfaces\IApiAuthenticationService.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="Famoser.FrameworkEssentials, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">

@@ -52,49 +52,10 @@ namespace Famoser.SyncApi.Repositories
                 {
                     if (_isInitialized)
                         return true;
-
-                    var res = true;
-                    await _apiStorageService.InitializeAsync();
-
-                    var apiRoamingEntity = await _apiStorageService.GetApiRoamingEntityAsync();
-                    if (apiRoamingEntity == null)
-                    {
-                        var helper = GetApiAuthorizationHelper();
-                        var apiRoaming = new ApiRoamingEntity();
-                        var apiCache = new ApiCacheEntity();
-                        var cache = new ModelCacheEntity<TModel>();
-                        var userId = Guid.NewGuid();
-                        var deviceId = Guid.NewGuid();
-                        if (await helper.InitializeUserAsync(userId, deviceId, apiRoaming, apiCache, cache))
-                        {
-                            await _apiStorageService.SetApiRoamingEntityAsync(apiRoaming);
-                            await _apiStorageService.SetApiCacheEntityAsync(apiCache);
-                            await _apiStorageService.SetModelCacheAsync(GetModelCacheFilePath(), cache);
-                        }
-                        else
-                            res = false;
-                    }
-                    else
-                    {
-                        var apiCacheEntity = await _apiStorageService.GetApiCacheEntityAsync();
-                        if (apiCacheEntity == null)
-                        {
-                            var helper = GetApiAuthorizationHelper();
-                            var apiCache = new ApiCacheEntity();
-                            var cache = new ModelCacheEntity<TModel>();
-                            var deviceId = Guid.NewGuid();
-                            if (await helper.InitializeDeviceAsync(deviceId, apiRoamingEntity, apiCache, cache))
-                            {
-                                await _apiStorageService.SetApiCacheEntityAsync(apiCache);
-                                await _apiStorageService.SetModelCacheAsync(GetModelCacheFilePath(), cache);
-                            }
-                            else
-                                res = false;
-                        }
-                    }
-
-                    _isInitialized = res;
-                    return res;
+                    
+                    _isInitialized = await _apiStorageService.InitializeAsync();
+                    
+                    return _isInitialized;
                 }
             });
         }
