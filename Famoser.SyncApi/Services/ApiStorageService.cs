@@ -100,9 +100,15 @@ namespace Famoser.SyncApi.Services
 
                     await _storageService.SetCachedTextFileAsync(GetApiCacheFilePath(), JsonConvert.SerializeObject(_apiCacheEntity));
                 }
+                SyncAuthAsync();
                 //todo: sync apicache with auth
                 return true;
             }
+        }
+
+        private async void SyncAuthAsync()
+        {
+            
         }
 
         public ApiRoamingEntity GetApiRoamingEntity()

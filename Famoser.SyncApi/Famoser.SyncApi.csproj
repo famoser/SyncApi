@@ -37,11 +37,16 @@
     <!-- A reference to the entire .NET Framework is automatically included -->
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ApiClient.cs" />
+    <Compile Include="Clients\ApiClient.cs" />
+    <Compile Include="Clients\AuthApiClient.cs" />
+    <Compile Include="Clients\Base\BaseApiClient.cs" />
     <Compile Include="Entities\Api\Base\BaseEntity.cs" />
     <Compile Include="Entities\Api\CollectionEntity.cs" />
     <Compile Include="Entities\Api\DeviceEntity.cs" />
     <Compile Include="Entities\AuthorizationRequest.cs" />
+    <Compile Include="Entities\AuthorizationResponse.cs" />
+    <Compile Include="Entities\Base\BaseRequest.cs" />
+    <Compile Include="Entities\Base\BaseResponse.cs" />
     <Compile Include="Entities\RequestEntity.cs" />
     <Compile Include="Entities\ResponseEntity.cs" />
     <Compile Include="Entities\Storage\Cache\ApiCacheEntity.cs" />

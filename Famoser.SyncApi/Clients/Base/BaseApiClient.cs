@@ -1,22 +1,22 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using Famoser.FrameworkEssentials.Services;
 using Famoser.SyncApi.Entities;
-using Famoser.SyncApi.Enums;
-using Famoser.SyncApi.Models.Interfaces;
 using Newtonsoft.Json;
 
-namespace Famoser.SyncApi
+namespace Famoser.SyncApi.Clients.Base
 {
-    public class ApiClient
+    public class BaseApiClient
     {
         private readonly Uri _baseUri;
-        private readonly Guid _userId;
         private readonly RestService _restService;
-        public ApiClient(Uri baseUri, Guid userId)
+
+        public BaseApiClient(Uri baseUri)
         {
             _baseUri = baseUri;
-            _userId = userId;
             _restService = new RestService();
         }
 
@@ -25,9 +25,8 @@ namespace Famoser.SyncApi
             return _baseUri;
         }
 
-        private async Task<ResponseEntity> DoApiRequestAsync(RequestEntity request)
+        protected virtual async Task<ResponseEntity> DoApiRequestAsync(object request)
         {
-            request.UserId = _userId;
             var response = await _restService.PostJsonAsync(GetUri(), JsonConvert.SerializeObject(request));
             var rawResponse = await response.GetResponseAsStringAsync();
             var obj = JsonConvert.DeserializeObject<ResponseEntity>(rawResponse);
@@ -40,21 +39,6 @@ namespace Famoser.SyncApi
             {
                 RequestFailed = true
             };
-        }
-
-
-        public async Task<bool> EraseDataAsync()
-        {
-            var res = await DoApiRequestAsync(new RequestEntity()
-            {
-                OnlineAction = OnlineAction.Erase
-            });
-            return !res.RequestFailed;
-        }
-
-        public Task<ResponseEntity> DoRequestAsync(RequestEntity entity)
-        {
-            return DoApiRequestAsync(entity);
         }
     }
 }
