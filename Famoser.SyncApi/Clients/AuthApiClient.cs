@@ -15,9 +15,9 @@ namespace Famoser.SyncApi.Clients
         }
 
 
-        public Task<ResponseEntity> DoRequestAsync(AuthRequestEntity entity)
+        public Task<AuthorizationResponse> DoRequestAsync(AuthRequestEntity entity)
         {
-            return DoApiRequestAsync(entity);
+            return DoApiRequestAsync<AuthorizationResponse>(entity);
         }
     }
 }

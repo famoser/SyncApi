@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Famoser.FrameworkEssentials.Services;
 using Famoser.SyncApi.Entities;
+using Famoser.SyncApi.Entities.Base;
 using Newtonsoft.Json;
 
 namespace Famoser.SyncApi.Clients.Base
@@ -25,17 +26,17 @@ namespace Famoser.SyncApi.Clients.Base
             return _baseUri;
         }
 
-        protected virtual async Task<ResponseEntity> DoApiRequestAsync(object request)
+        protected virtual async Task<T> DoApiRequestAsync<T>(object request) where T : BaseResponse, new()
         {
             var response = await _restService.PostJsonAsync(GetUri(), JsonConvert.SerializeObject(request));
             var rawResponse = await response.GetResponseAsStringAsync();
-            var obj = JsonConvert.DeserializeObject<ResponseEntity>(rawResponse);
+            var obj = JsonConvert.DeserializeObject<T>(rawResponse);
             if (obj != null)
             {
                 obj.RequestFailed = !response.IsRequestSuccessfull;
                 return obj;
             }
-            return new ResponseEntity()
+            return new T()
             {
                 RequestFailed = true
             };

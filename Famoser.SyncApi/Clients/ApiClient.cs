@@ -22,7 +22,7 @@ namespace Famoser.SyncApi.Clients
         {
             request.UserId = _userId;
             request.DeviceId = _deviceId;
-            return base.DoApiRequestAsync(request);
+            return base.DoApiRequestAsync<ResponseEntity>(request);
         }
 
 
