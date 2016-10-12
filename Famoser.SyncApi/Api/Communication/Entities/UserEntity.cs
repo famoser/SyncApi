@@ -1,7 +1,6 @@
-﻿using System;
-using Famoser.SyncApi.Entities.Api.Base;
+﻿using Famoser.SyncApi.Api.Base;
 
-namespace Famoser.SyncApi.Entities.Api
+namespace Famoser.SyncApi.Api.Communication.Entities
 {
     public class UserEntity : BaseEntity
     {

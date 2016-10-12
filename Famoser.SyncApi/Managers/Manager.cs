@@ -5,8 +5,8 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
-using Famoser.SyncApi.Annotations;
 using Famoser.SyncApi.Managers.Interfaces;
+using Famoser.SyncApi.Properties;
 
 namespace Famoser.SyncApi.Managers
 {

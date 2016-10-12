@@ -4,7 +4,6 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Famoser.SqliteWrapper.Attributes;
-using Famoser.SyncApi.Entities;
 using Famoser.SyncApi.Models.Interfaces;
 using GalaSoft.MvvmLight;
 

@@ -3,14 +3,12 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Famoser.FrameworkEssentials.Services.Base;
 using Famoser.FrameworkEssentials.Services.Interfaces;
+using Famoser.SyncApi.Api.Communication.Entities;
 using Famoser.SyncApi.Clients;
-using Famoser.SyncApi.Entities;
-using Famoser.SyncApi.Entities.Api;
-using Famoser.SyncApi.Entities.Storage.Cache;
-using Famoser.SyncApi.Entities.Storage.Roaming;
 using Famoser.SyncApi.Enums;
 using Famoser.SyncApi.Models.Interfaces;
 using Famoser.SyncApi.Services.Interfaces;
+using Famoser.SyncApi.Storage.Roaming;
 using Newtonsoft.Json;
 using Nito.AsyncEx;
 

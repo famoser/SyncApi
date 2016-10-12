@@ -3,8 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Famoser.SyncApi.Api.Communication.Request;
+using Famoser.SyncApi.Api.Communication.Response;
 using Famoser.SyncApi.Clients.Base;
-using Famoser.SyncApi.Entities;
 
 namespace Famoser.SyncApi.Clients
 {

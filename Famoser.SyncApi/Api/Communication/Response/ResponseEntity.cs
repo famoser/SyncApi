@@ -1,9 +1,8 @@
 ﻿using System.Collections.Generic;
-using Famoser.SyncApi.Entities.Api;
-using Famoser.SyncApi.Entities.Base;
-using Famoser.SyncApi.Enums;
+using Famoser.SyncApi.Api.Communication.Entities;
+using Famoser.SyncApi.Api.Communication.Response.Base;
 
-namespace Famoser.SyncApi.Entities
+namespace Famoser.SyncApi.Api.Communication.Response
 {
     public class ResponseEntity : BaseResponse
     {

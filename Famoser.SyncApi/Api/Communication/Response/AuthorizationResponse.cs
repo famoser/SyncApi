@@ -1,12 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Famoser.SyncApi.Entities.Api;
-using Famoser.SyncApi.Entities.Base;
+﻿using Famoser.SyncApi.Api.Communication.Entities;
+using Famoser.SyncApi.Api.Communication.Response.Base;
 
-namespace Famoser.SyncApi.Entities
+namespace Famoser.SyncApi.Api.Communication.Response
 {
     public class AuthorizationResponse : BaseResponse
     {

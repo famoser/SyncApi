@@ -4,8 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Famoser.FrameworkEssentials.Services;
-using Famoser.SyncApi.Entities;
-using Famoser.SyncApi.Entities.Base;
+using Famoser.SyncApi.Api.Communication.Response.Base;
 using Newtonsoft.Json;
 
 namespace Famoser.SyncApi.Clients.Base

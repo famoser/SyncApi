@@ -1,7 +1,7 @@
 ﻿using System;
 using Famoser.SyncApi.Enums;
 
-namespace Famoser.SyncApi.Entities.Storage.Cache.Entitites
+namespace Famoser.SyncApi.Storage.Cache.Entitites
 {
     public class ModelInformation
     {

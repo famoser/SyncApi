@@ -1,11 +1,10 @@
 ﻿using System;
 using System.Threading.Tasks;
 using Famoser.SyncApi.Entities.Storage;
-using Famoser.SyncApi.Entities.Storage.Cache;
-using Famoser.SyncApi.Entities.Storage.Roaming;
 using Famoser.SyncApi.Helpers;
 using Famoser.SyncApi.Models.Interfaces;
 using Famoser.SyncApi.Services;
+using Famoser.SyncApi.Storage.Roaming;
 using Newtonsoft.Json;
 
 namespace Famoser.SyncApi.Repositories

@@ -1,11 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Famoser.SyncApi.Enums;
 
-namespace Famoser.SyncApi.Entities.Base
+namespace Famoser.SyncApi.Api.Communication.Request.Base
 {
     public class BaseRequest
     {

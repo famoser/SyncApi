@@ -1,11 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Famoser.SyncApi.Entities.Storage.Cache.Entitites;
+﻿using Famoser.SyncApi.Storage.Cache.Entitites;
 
-namespace Famoser.SyncApi.Entities.Storage.Cache
+namespace Famoser.SyncApi.Storage.Cache
 {
     public class CacheEntity<TModel>
     {

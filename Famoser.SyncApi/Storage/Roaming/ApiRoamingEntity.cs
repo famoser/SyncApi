@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Famoser.SyncApi.Entities.Storage.Roaming
+namespace Famoser.SyncApi.Storage.Roaming
 {
     public class ApiRoamingEntity
     {

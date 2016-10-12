@@ -1,7 +1,7 @@
 ﻿using System;
 using Famoser.SyncApi.Enums;
 
-namespace Famoser.SyncApi.Entities.Api.Base
+namespace Famoser.SyncApi.Api.Base
 {
     public class BaseEntity
     {

@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Threading.Tasks;
 using Famoser.FrameworkEssentials.Services;
+using Famoser.SyncApi.Api.Communication.Request;
+using Famoser.SyncApi.Api.Communication.Response;
 using Famoser.SyncApi.Clients.Base;
-using Famoser.SyncApi.Entities;
 using Famoser.SyncApi.Enums;
 
 namespace Famoser.SyncApi.Clients
