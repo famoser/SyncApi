@@ -1,5 +1,4 @@
-﻿using System;
-using Famoser.SyncApi.Models.Interfaces.Base;
+﻿using Famoser.SyncApi.Models.Interfaces.Base;
 
 namespace Famoser.SyncApi.Models.Interfaces
 {

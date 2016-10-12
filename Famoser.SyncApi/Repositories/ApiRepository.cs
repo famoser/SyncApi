@@ -1,26 +1,25 @@
 ﻿using System;
 using System.Collections.ObjectModel;
-using System.Linq;
 using System.Threading.Tasks;
 using Famoser.FrameworkEssentials.Helpers;
-using Famoser.FrameworkEssentials.Services.Interfaces;
 using Famoser.SyncApi.Api.Communication.Entities;
 using Famoser.SyncApi.Api.Communication.Request;
-using Famoser.SyncApi.Entities.Storage;
 using Famoser.SyncApi.Enums;
 using Famoser.SyncApi.Managers;
 using Famoser.SyncApi.Managers.Interfaces;
 using Famoser.SyncApi.Models.Interfaces;
-using Famoser.SyncApi.Services;
+using Famoser.SyncApi.Repositories.Interfaces;
 using Famoser.SyncApi.Services.Interfaces;
 using Famoser.SyncApi.Storage.Cache.Entitites;
-using Newtonsoft.Json;
 using Nito.AsyncEx;
 
 namespace Famoser.SyncApi.Repositories
 {
-    public partial class ApiRepository<TModel> : BaseHelper
-    where TModel : ISyncModel
+    public partial class ApiRepository<TModel, TCollection, TDevice, TUser> : BaseHelper, IApiRepository<TModel, TCollection, TDevice, TUser>
+        where TModel : ISyncModel
+        where TCollection : ICollectionModel
+        where TDevice : IDeviceModel
+        where TUser : IUserModel
     {
         private readonly ICollectionManager<TModel> _collectionManager;
         private readonly IApiConfigurationService _apiConfigurationService;

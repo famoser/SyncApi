@@ -4,7 +4,6 @@ using System.Threading.Tasks;
 using Famoser.FrameworkEssentials.Services.Base;
 using Famoser.FrameworkEssentials.Services.Interfaces;
 using Famoser.SyncApi.Api.Communication.Entities;
-using Famoser.SyncApi.Clients;
 using Famoser.SyncApi.Enums;
 using Famoser.SyncApi.Models.Interfaces;
 using Famoser.SyncApi.Services.Interfaces;

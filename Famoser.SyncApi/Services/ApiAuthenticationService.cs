@@ -1,12 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using Famoser.SyncApi.Api.Communication.Request;
 using Famoser.SyncApi.Clients;
 using Famoser.SyncApi.Services.Interfaces;
-using Newtonsoft.Json;
 using Nito.AsyncEx;
 
 namespace Famoser.SyncApi.Services

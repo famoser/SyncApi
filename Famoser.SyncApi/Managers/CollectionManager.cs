@@ -1,7 +1,5 @@
-﻿using System;
-using System.Collections.ObjectModel;
+﻿using System.Collections.ObjectModel;
 using Famoser.SyncApi.Managers.Interfaces;
-using Famoser.SyncApi.Models.Interfaces;
 
 namespace Famoser.SyncApi.Managers
 {
