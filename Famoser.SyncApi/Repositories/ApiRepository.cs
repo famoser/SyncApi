@@ -24,13 +24,13 @@ namespace Famoser.SyncApi.Repositories
     public partial class ApiRepository<TModel> : BaseHelper
     where TModel : ISyncModel
     {
-        private readonly IModelManager<TModel> _modelManager;
+        private readonly ICollectionManager<TModel> _collectionManager;
         private readonly IApiConfigurationService _apiConfigurationService;
         private readonly IApiStorageService _apiStorageService;
 
         public ApiRepository(IApiConfigurationService apiConfigurationService, IApiStorageService apiStorageService)
         {
-            _modelManager = new ModelManager<TModel>();
+            _collectionManager = new CollectionManager<TModel>();
             _apiConfigurationService = apiConfigurationService;
             _apiStorageService = apiStorageService;
         }
@@ -39,7 +39,7 @@ namespace Famoser.SyncApi.Repositories
         {
             Initialize();
 
-            return _modelManager.GetObservableCollection();
+            return _collectionManager.GetObservableCollection();
         }
 
         private readonly AsyncLock _asyncLock = new AsyncLock();
@@ -125,7 +125,7 @@ namespace Famoser.SyncApi.Repositories
                     };
                     _apiCacheModel.ModelInformations.Add(objInfo);
                     _apiCacheModel.Models.Add(model);
-                    _modelManager.Add(model);
+                    _collectionManager.Add(model);
                 }
                 else
                 {

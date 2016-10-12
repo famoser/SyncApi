@@ -1,10 +1,11 @@
-﻿using System.Collections.ObjectModel;
+﻿using System;
+using System.Collections.ObjectModel;
 using Famoser.SyncApi.Managers.Interfaces;
 using Famoser.SyncApi.Models.Interfaces;
 
 namespace Famoser.SyncApi.Managers
 {
-    public class ModelManager<TModel> : IModelManager<TModel> where TModel : ISyncModel
+    public class CollectionManager<TModel> : ICollectionManager<TModel>
     {
         private readonly ObservableCollection<TModel> _collection = new ObservableCollection<TModel>();
         public ObservableCollection<TModel> GetObservableCollection()
@@ -20,6 +21,14 @@ namespace Famoser.SyncApi.Managers
         public void Remove(TModel model)
         {
             _collection.Remove(model);
+        }
+
+        public void TransferFrom(ICollectionManager<TModel> collectionManager)
+        {
+            foreach (var model in collectionManager.GetObservableCollection())
+            {
+                Add(model);
+            }
         }
     }
 }

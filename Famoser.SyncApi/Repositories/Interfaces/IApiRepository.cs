@@ -2,18 +2,15 @@
 using System.Threading.Tasks;
 using Famoser.SyncApi.Managers.Interfaces;
 using Famoser.SyncApi.Models.Interfaces;
+using Famoser.SyncApi.Repositories.Interfaces.Base;
 
 namespace Famoser.SyncApi.Repositories.Interfaces
 {
-    public interface IApiRepository<TModel>
+    public interface IApiRepository<TModel, TCollection, TDevice, TUser> : IPersistentCollectionRespository<TModel>
         where TModel : ISyncModel
+        where TCollection : ICollectionModel
+        where TDevice : IDeviceModel
+        where TUser : IUserModel
     {
-        ObservableCollection<TModel> GetAll();
-        Task<bool> Sync();
-        Task<bool> Save(TModel model);
-        Task<bool> Remove(TModel model);
-        Task<bool> EraseData();
-        void SetModelManager(IModelManager<TModel> manager);
-        IModelManager<TModel> GetModelManager();
     }
 }
