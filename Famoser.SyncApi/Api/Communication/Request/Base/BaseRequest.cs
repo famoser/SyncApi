@@ -9,7 +9,8 @@ namespace Famoser.SyncApi.Entities.Base
 {
     public class BaseRequest
     {
-        public OnlineAction OnlineAction { get; set; }
         public Guid UserId { get; set; }
+        public Guid DeviceId { get; set; }
+        public int AuthorizationCode { get; set; }
     }
 }
