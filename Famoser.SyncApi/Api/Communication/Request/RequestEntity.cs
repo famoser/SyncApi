@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Famoser.SyncApi.Api.Communication.Entities;
 using Famoser.SyncApi.Api.Communication.Request.Base;
 

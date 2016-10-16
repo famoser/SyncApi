@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
 using Famoser.SyncApi.Api.Configuration;
-using Famoser.SyncApi.Models.Interfaces;
 
 namespace Famoser.SyncApi.Services.Interfaces
 {

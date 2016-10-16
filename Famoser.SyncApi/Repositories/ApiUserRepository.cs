@@ -1,10 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using Famoser.FrameworkEssentials.Helpers;
-using Famoser.FrameworkEssentials.Services.Base;
 using Famoser.SyncApi.Api.Communication.Entities;
 using Famoser.SyncApi.Api.Communication.Request;
 using Famoser.SyncApi.Api.Configuration;
