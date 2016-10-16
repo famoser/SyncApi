@@ -9,6 +9,5 @@ namespace Famoser.SyncApi.Api.Communication.Request
     {
         public List<SyncEntity> SyncEntities { get; set; } = new List<SyncEntity>();
         public List<CollectionEntity> CollectionEntities { get; set; } = new List<CollectionEntity>();
-        public Guid DeviceId { get; set; }
     }
 }

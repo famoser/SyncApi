@@ -11,6 +11,7 @@ namespace Famoser.SyncApi.Repositories.Interfaces.Base
 
         Task<bool> SaveAsync(T model);
         Task<bool> RemoveAsync(T model);
+        Task<bool> RemoveAllAsync();
 
         void SetCollectionManager(ICollectionManager<T> manager);
         ICollectionManager<T> GetCollectionManager();

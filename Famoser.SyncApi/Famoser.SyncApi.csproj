@@ -35,12 +35,13 @@
   </PropertyGroup>
   <ItemGroup>
     <!-- A reference to the entire .NET Framework is automatically included -->
+    <Folder Include="Repositories\Base\" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Clients\ApiClient.cs" />
     <Compile Include="Clients\AuthApiClient.cs" />
     <Compile Include="Clients\Base\BaseApiClient.cs" />
-    <Compile Include="Api\Configuration\ApiInformations.cs" />
+    <Compile Include="Api\Configuration\ApiInformationEntity.cs" />
     <Compile Include="Api\Base\BaseEntity.cs" />
     <Compile Include="Api\Communication\Entities\CollectionEntity.cs" />
     <Compile Include="Api\Communication\Entities\DeviceEntity.cs" />
@@ -50,6 +51,7 @@
     <Compile Include="Api\Communication\Response\Base\BaseResponse.cs" />
     <Compile Include="Api\Communication\Request\RequestEntity.cs" />
     <Compile Include="Api\Communication\Response\ResponseEntity.cs" />
+    <Compile Include="Repositories\ApiUserRepository.cs" />
     <Compile Include="Storage\Cache\CacheEntity.cs" />
     <Compile Include="Storage\Cache\CollectionCacheEntity.cs" />
     <Compile Include="Api\Communication\Entities\SyncEntity.cs" />
@@ -66,7 +68,6 @@
     <Compile Include="Models\Interfaces\Base\IUniqueSyncModel.cs" />
     <Compile Include="Models\Interfaces\ICollectionModel.cs" />
     <Compile Include="Properties\Annotations.cs" />
-    <Compile Include="Repositories\AuthRepository.cs" />
     <Compile Include="Repositories\Interfaces\Base\IBasePersistentRepository.cs" />
     <Compile Include="Repositories\Interfaces\Base\IPersistentRespository.cs" />
     <Compile Include="Repositories\Interfaces\IApiCollectionRepository.cs" />

@@ -1,18 +1,20 @@
 ﻿using System.Threading.Tasks;
 using Famoser.SyncApi.Models.Interfaces;
+using Famoser.SyncApi.Storage.Cache;
 using Famoser.SyncApi.Storage.Roaming;
 
 namespace Famoser.SyncApi.Services.Interfaces
 {
     public interface IApiStorageService
     {
-        Task<bool> InitializeAsync();
-
-        ApiRoamingEntity GetApiRoamingEntity();
-        ApiCacheEntity GetApiCacheEntity();
-        Task SaveApiCacheEntityAsync();
+        Task<bool> EraseAllAsync();
+        Task<ApiRoamingEntity> GetApiRoamingEntity();
+        Task<bool> SaveApiRoamingEntityAsync();
         
-        ModelCacheEntity<TModel> GetModelCache<TModel>(string identifier) where TModel : ISyncModel;
-        Task SetModelCacheAsync<TModel>(string identifier, ModelCacheEntity<TModel> cache) where TModel : ISyncModel;
+        Task<CacheEntity<T>> GetCacheEntity<T>();
+        Task<bool> SaveCacheEntityAsync<T>();
+
+        Task<CollectionCacheEntity<T>> GetCollectionCacheEntity<T>();
+        Task<bool> SaveCollectionEntityAsync<T>();
     }
 }

@@ -6,6 +6,6 @@ namespace Famoser.SyncApi.Api.Communication.Request.Base
     {
         public Guid UserId { get; set; }
         public Guid DeviceId { get; set; }
-        public int AuthorizationCode { get; set; }
+        public string AuthorizationCode { get; set; }
     }
 }
