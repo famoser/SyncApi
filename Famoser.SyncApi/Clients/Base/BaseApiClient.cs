@@ -17,14 +17,14 @@ namespace Famoser.SyncApi.Clients.Base
             _restService = new RestService();
         }
 
-        private Uri GetUri()
+        private Uri GetUri(string node)
         {
-            return _baseUri;
+            return new Uri(_baseUri.AbsolutePath + node);
         }
 
-        protected virtual async Task<T> DoApiRequestAsync<T>(object request) where T : BaseResponse, new()
+        protected virtual async Task<T> DoApiRequestAsync<T>(object request, string node = "") where T : BaseResponse, new()
         {
-            var response = await _restService.PostJsonAsync(GetUri(), JsonConvert.SerializeObject(request));
+            var response = await _restService.PostJsonAsync(GetUri(node), JsonConvert.SerializeObject(request));
             var rawResponse = await response.GetResponseAsStringAsync();
             var obj = JsonConvert.DeserializeObject<T>(rawResponse);
             if (obj != null)

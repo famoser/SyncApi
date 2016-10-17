@@ -35,96 +35,6 @@ namespace Famoser.SyncApi.Repositories
 
         private readonly AsyncLock _asyncLock = new AsyncLock();
         private ApiRoamingEntity _roaming;
-
-        protected override async Task<bool> SyncInternalAsync()
-        {
-            if (CacheEntity.ModelInformation.PendingAction == PendingAction.None)
-                return true;
-
-            if (CacheEntity.ModelInformation.PendingAction == PendingAction.Create)
-            {
-                var resp = await _authApiClient.DoRequestAsync(
-                    AuthorizeRequest(ApiInformationEntity, _roaming, new AuthRequestEntity()
-                    {
-                        UserEntity = new UserEntity()
-                        {
-                            Id = CacheEntity.ModelInformation.Id,
-                            OnlineAction = OnlineAction.Create,
-                            VersionId = CacheEntity.ModelInformation.VersionId,
-                            Content = JsonConvert.SerializeObject(CacheEntity.Model),
-                            PersonalSeed = _roaming.PersonalSeed
-                        }
-                    }));
-                if (resp.RequestFailed)
-                {
-                    return false;
-                }
-            }
-            else if (CacheEntity.ModelInformation.PendingAction == PendingAction.Read)
-            {
-                var resp = await _authApiClient.DoRequestAsync(
-                    AuthorizeRequest(ApiInformationEntity, _roaming, new AuthRequestEntity()
-                    {
-                        UserEntity = new UserEntity()
-                        {
-                            Id = CacheEntity.ModelInformation.Id,
-                            OnlineAction = OnlineAction.Read
-                        }
-                    }));
-                if (resp.IsSuccessfull)
-                {
-                    Manager.Set(JsonConvert.DeserializeObject<TUser>(resp.UserEntity.Content));
-                }
-                else
-                    return false;
-            }
-            else if (CacheEntity.ModelInformation.PendingAction == PendingAction.Update)
-            {
-                var resp = await _authApiClient.DoRequestAsync(
-                    AuthorizeRequest(ApiInformationEntity, _roaming, new AuthRequestEntity()
-                    {
-                        UserEntity = new UserEntity()
-                        {
-                            Id = CacheEntity.ModelInformation.Id,
-                            OnlineAction = OnlineAction.Update,
-                            VersionId = CacheEntity.ModelInformation.VersionId,
-                            Content = JsonConvert.SerializeObject(CacheEntity.Model)
-                        }
-                    }));
-                if (resp.RequestFailed)
-                {
-                    return false;
-                }
-            }
-            else if (CacheEntity.ModelInformation.PendingAction == PendingAction.Delete)
-            {
-                var resp = await _authApiClient.DoRequestAsync(
-                    AuthorizeRequest(ApiInformationEntity, _roaming, new AuthRequestEntity()
-                    {
-                        UserEntity = new UserEntity()
-                        {
-                            Id = CacheEntity.ModelInformation.Id,
-                            OnlineAction = OnlineAction.Delete
-                        }
-                    }));
-                if (resp.RequestFailed)
-                {
-                    return false;
-                }
-
-                //clean up
-                _roaming.UserId = Guid.Empty;
-                CacheEntity.ModelInformation.PendingAction = PendingAction.None;
-                return await _apiStorageService.EraseAllAsync();
-            }
-            else
-                return true;
-
-
-            CacheEntity.ModelInformation.PendingAction = PendingAction.None;
-            return await _apiStorageService.SaveCacheEntityAsync<TUser>();
-        }
-
         protected override async Task<bool> InitializeAsync()
         {
             using (await _asyncLock.LockAsync())
@@ -168,6 +78,95 @@ namespace Famoser.SyncApi.Repositories
                 return true;
             }
         }
+
+        protected override async Task<bool> SyncInternalAsync()
+        {
+            if (CacheEntity.ModelInformation.PendingAction == PendingAction.None)
+                return true;
+
+            if (CacheEntity.ModelInformation.PendingAction == PendingAction.Create)
+            {
+                var resp = await _authApiClient.DoSyncRequestAsync(
+                    AuthorizeRequest(ApiInformationEntity, _roaming, new AuthRequestEntity()
+                    {
+                        UserEntity = new UserEntity()
+                        {
+                            Id = CacheEntity.ModelInformation.Id,
+                            OnlineAction = OnlineAction.Create,
+                            VersionId = CacheEntity.ModelInformation.VersionId,
+                            Content = JsonConvert.SerializeObject(CacheEntity.Model),
+                            PersonalSeed = _roaming.PersonalSeed
+                        }
+                    }));
+                if (resp.RequestFailed)
+                {
+                    return false;
+                }
+            }
+            else if (CacheEntity.ModelInformation.PendingAction == PendingAction.Read)
+            {
+                var resp = await _authApiClient.DoSyncRequestAsync(
+                    AuthorizeRequest(ApiInformationEntity, _roaming, new AuthRequestEntity()
+                    {
+                        UserEntity = new UserEntity()
+                        {
+                            Id = CacheEntity.ModelInformation.Id,
+                            OnlineAction = OnlineAction.Read
+                        }
+                    }));
+                if (resp.IsSuccessfull)
+                {
+                    Manager.Set(JsonConvert.DeserializeObject<TUser>(resp.UserEntity.Content));
+                }
+                else
+                    return false;
+            }
+            else if (CacheEntity.ModelInformation.PendingAction == PendingAction.Update)
+            {
+                var resp = await _authApiClient.DoSyncRequestAsync(
+                    AuthorizeRequest(ApiInformationEntity, _roaming, new AuthRequestEntity()
+                    {
+                        UserEntity = new UserEntity()
+                        {
+                            Id = CacheEntity.ModelInformation.Id,
+                            OnlineAction = OnlineAction.Update,
+                            VersionId = CacheEntity.ModelInformation.VersionId,
+                            Content = JsonConvert.SerializeObject(CacheEntity.Model)
+                        }
+                    }));
+                if (resp.RequestFailed)
+                {
+                    return false;
+                }
+            }
+            else if (CacheEntity.ModelInformation.PendingAction == PendingAction.Delete)
+            {
+                var resp = await _authApiClient.DoSyncRequestAsync(
+                    AuthorizeRequest(ApiInformationEntity, _roaming, new AuthRequestEntity()
+                    {
+                        UserEntity = new UserEntity()
+                        {
+                            Id = CacheEntity.ModelInformation.Id,
+                            OnlineAction = OnlineAction.Delete
+                        }
+                    }));
+                if (resp.RequestFailed)
+                {
+                    return false;
+                }
+
+                //clean up
+                _roaming.UserId = Guid.Empty;
+                CacheEntity.ModelInformation.PendingAction = PendingAction.None;
+                return await _apiStorageService.EraseRoamingAndCacheAsync();
+            }
+            else
+                return true;
+
+            CacheEntity.ModelInformation.PendingAction = PendingAction.None;
+            return await _apiStorageService.SaveCacheEntityAsync<TUser>();
+        }
+
 
         private AuthRequestEntity AuthorizeRequest(ApiInformationEntity apiInformationEntity,
             ApiRoamingEntity apiRoamingInfo, AuthRequestEntity request)

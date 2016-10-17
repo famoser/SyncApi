@@ -50,7 +50,7 @@
     <Compile Include="Api\Communication\Response\Base\BaseResponse.cs" />
     <Compile Include="Api\Communication\Request\RequestEntity.cs" />
     <Compile Include="Api\Communication\Response\ResponseEntity.cs" />
-    <Compile Include="Repositories\ApiDeviceService.cs" />
+    <Compile Include="Repositories\ApiDeviceRepository.cs" />
     <Compile Include="Repositories\ApiUserRepository.cs" />
     <Compile Include="Repositories\Base\PersistentRepository.cs" />
     <Compile Include="Services\Interfaces\Authentication\IApiDeviceAuthenticationService.cs" />

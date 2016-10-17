@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 using Famoser.FrameworkEssentials.Helpers;
+using Famoser.FrameworkEssentials.Logging.Interfaces;
 using Famoser.SyncApi.Api.Configuration;
 using Famoser.SyncApi.Clients;
 using Famoser.SyncApi.Enums;
@@ -12,7 +13,7 @@ using Famoser.SyncApi.Storage.Cache;
 
 namespace Famoser.SyncApi.Repositories.Base
 {
-    public abstract class PersistentRepository<TModel> : BaseHelper, IPersistentRespository<TModel>
+    public abstract class PersistentRepository<TModel> : IPersistentRespository<TModel>
     {
         protected readonly IManager<TModel> Manager = new Manager<TModel>();
         protected CacheEntity<TModel> CacheEntity;
@@ -34,9 +35,6 @@ namespace Famoser.SyncApi.Repositories.Base
         {
             return ExecuteSafe(async () =>
             {
-                if (!await InitializeAsync())
-                    return default(TModel);
-
                 await SyncInternalAsync();
 
                 return Manager.GetModel();
@@ -47,9 +45,6 @@ namespace Famoser.SyncApi.Repositories.Base
         {
             return ExecuteSafe(async () =>
             {
-                if (!await InitializeAsync())
-                    return false;
-
                 if (CacheEntity.ModelInformation.PendingAction == PendingAction.None
                     || CacheEntity.ModelInformation.PendingAction == PendingAction.Delete
                     || CacheEntity.ModelInformation.PendingAction == PendingAction.Read)
@@ -65,9 +60,6 @@ namespace Famoser.SyncApi.Repositories.Base
         {
             return ExecuteSafe(async () =>
             {
-                if (!await InitializeAsync())
-                    return false;
-
                 if (CacheEntity.ModelInformation.PendingAction != PendingAction.Create)
                 {
                     CacheEntity.ModelInformation.PendingAction = PendingAction.Create;
@@ -75,16 +67,28 @@ namespace Famoser.SyncApi.Repositories.Base
                 return await SyncInternalAsync();
             });
         }
-        
+
         public Task<bool> SyncAsync()
         {
-            return ExecuteSafe(async () =>
+            return ExecuteSafe(async () => await SyncInternalAsync());
+        }
+
+
+        private IExceptionLogger _exceptionLogger;
+        protected async Task<T> ExecuteSafe<T>(Func<Task<T>> func)
+        {
+            try
             {
                 if (!await InitializeAsync())
-                    return false;
+                    return default(T);
 
-                return await SyncInternalAsync();
-            });
+                return await func();
+            }
+            catch (Exception ex)
+            {
+                _exceptionLogger?.LogException(ex, this);
+            }
+            return default(T);
         }
     }
 }

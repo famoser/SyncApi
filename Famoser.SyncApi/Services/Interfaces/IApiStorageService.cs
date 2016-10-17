@@ -6,14 +6,16 @@ namespace Famoser.SyncApi.Services.Interfaces
 {
     public interface IApiStorageService
     {
-        Task<bool> EraseAllAsync();
         Task<ApiRoamingEntity> GetApiRoamingEntity();
         Task<bool> SaveApiRoamingEntityAsync();
-        
+        Task<bool> EraseRoamingAndCacheAsync();
+
         Task<CacheEntity<T>> GetCacheEntity<T>();
         Task<bool> SaveCacheEntityAsync<T>();
+        Task<bool> EraseCacheEntityAsync<T>();
 
         Task<CollectionCacheEntity<T>> GetCollectionCacheEntity<T>();
         Task<bool> SaveCollectionEntityAsync<T>();
+        Task<bool> EraseCollectionEntityAsync<T>();
     }
 }
