@@ -1,25 +1,12 @@
 ﻿using System;
 using System.Collections.ObjectModel;
 using System.Threading.Tasks;
-using Famoser.FrameworkEssentials.Helpers;
-using Famoser.SyncApi.Api.Communication.Entities;
-using Famoser.SyncApi.Api.Communication.Request;
-using Famoser.SyncApi.Api.Configuration;
-using Famoser.SyncApi.Clients;
 using Famoser.SyncApi.Enums;
-using Famoser.SyncApi.Helpers;
-using Famoser.SyncApi.Managers;
-using Famoser.SyncApi.Managers.Interfaces;
 using Famoser.SyncApi.Models.Interfaces;
 using Famoser.SyncApi.Repositories.Base;
 using Famoser.SyncApi.Repositories.Interfaces;
 using Famoser.SyncApi.Services.Interfaces;
 using Famoser.SyncApi.Services.Interfaces.Authentication;
-using Famoser.SyncApi.Storage.Cache;
-using Famoser.SyncApi.Storage.Cache.Entitites;
-using Famoser.SyncApi.Storage.Roaming;
-using Newtonsoft.Json;
-using Nito.AsyncEx;
 
 namespace Famoser.SyncApi.Repositories
 {
@@ -71,14 +58,14 @@ namespace Famoser.SyncApi.Repositories
             throw new NotImplementedException();
         }
 
-        public async Task<Guid?> GetAuthenticatedDeviceId()
+        public async Task<Guid?> TryGetAuthenticatedDeviceIdAsync()
         {
             if (!await InitializeAsync())
                 return null;
 
             if (Manager.GetModel().GetAuthenticationState() == AuthenticationState.Authenticated)
                 return Manager.GetModel().GetId();
-            return null,
+            return null;
         }
     }
 }

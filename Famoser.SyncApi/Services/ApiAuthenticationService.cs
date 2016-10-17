@@ -1,11 +1,8 @@
 ﻿using System;
 using System.Threading.Tasks;
-using Famoser.SyncApi.Api.Communication.Request;
 using Famoser.SyncApi.Api.Communication.Request.Base;
 using Famoser.SyncApi.Api.Configuration;
-using Famoser.SyncApi.Clients;
 using Famoser.SyncApi.Helpers;
-using Famoser.SyncApi.Repositories.Interfaces;
 using Famoser.SyncApi.Services.Interfaces;
 using Famoser.SyncApi.Services.Interfaces.Authentication;
 using Famoser.SyncApi.Storage.Roaming;
@@ -16,9 +13,9 @@ namespace Famoser.SyncApi.Services
     public class ApiAuthenticationService : IApiAuthenticationService
     {
         private readonly AsyncLock _asyncLock = new AsyncLock();
-        private IApiUserAuthenticationService _apiUserAuthenticationService;
-        private IApiDeviceAuthenticationService _apiDeviceAuthenticationService;
-        private ApiInformationEntity _apiInformationEntity;
+        private readonly IApiUserAuthenticationService _apiUserAuthenticationService;
+        private readonly IApiDeviceAuthenticationService _apiDeviceAuthenticationService;
+        private readonly ApiInformationEntity _apiInformationEntity;
 
         public ApiAuthenticationService(IApiUserAuthenticationService apiUserAuthenticationService, IApiDeviceAuthenticationService deviceAuthenticationService, IApiDeviceAuthenticationService apiDeviceAuthenticationService, IApiConfigurationService apiConfigurationService)
         {

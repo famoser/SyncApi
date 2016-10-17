@@ -1,5 +1,4 @@
-﻿using System;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Famoser.SyncApi.Api.Communication.Request.Base;
 
 namespace Famoser.SyncApi.Services.Interfaces
