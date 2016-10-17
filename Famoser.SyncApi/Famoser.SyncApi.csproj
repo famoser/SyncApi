@@ -50,9 +50,11 @@
     <Compile Include="Api\Communication\Response\Base\BaseResponse.cs" />
     <Compile Include="Api\Communication\Request\RequestEntity.cs" />
     <Compile Include="Api\Communication\Response\ResponseEntity.cs" />
-    <Compile Include="Repositories\ApiDeviceRepository.cs" />
+    <Compile Include="Repositories\ApiDeviceService.cs" />
     <Compile Include="Repositories\ApiUserRepository.cs" />
     <Compile Include="Repositories\Base\PersistentRepository.cs" />
+    <Compile Include="Services\Interfaces\Authentication\IApiDeviceAuthenticationService.cs" />
+    <Compile Include="Services\Interfaces\Authentication\IApiUserAuthenticationRepository.cs" />
     <Compile Include="Storage\Cache\CacheEntity.cs" />
     <Compile Include="Storage\Cache\CollectionCacheEntity.cs" />
     <Compile Include="Api\Communication\Entities\SyncEntity.cs" />
@@ -90,7 +92,7 @@
     <Compile Include="Repositories\ApiRepository.cs" />
     <Compile Include="Repositories\ApiRepositoryContructors.cs" />
     <Compile Include="Services\ApiStorageService.cs" />
-    <Compile Include="Services\Interfaces\IApiAuthenticationService.cs" />
+    <Compile Include="Services\Interfaces\Authentication\IApiAuthenticationService.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="Famoser.FrameworkEssentials, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">

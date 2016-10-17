@@ -1,70 +1,73 @@
 ﻿using System;
 using System.Threading.Tasks;
 using Famoser.SyncApi.Api.Communication.Request;
+using Famoser.SyncApi.Api.Communication.Request.Base;
+using Famoser.SyncApi.Api.Configuration;
 using Famoser.SyncApi.Clients;
+using Famoser.SyncApi.Helpers;
+using Famoser.SyncApi.Repositories.Interfaces;
 using Famoser.SyncApi.Services.Interfaces;
+using Famoser.SyncApi.Services.Interfaces.Authentication;
+using Famoser.SyncApi.Storage.Roaming;
 using Nito.AsyncEx;
 
 namespace Famoser.SyncApi.Services
 {
     public class ApiAuthenticationService : IApiAuthenticationService
     {
-        private readonly IApiConfigurationService _apiConfigurationService;
-        private readonly IApiStorageService _apiStorageService;
         private readonly AsyncLock _asyncLock = new AsyncLock();
+        private IApiUserAuthenticationService _apiUserAuthenticationService;
+        private IApiDeviceAuthenticationService _apiDeviceAuthenticationService;
+        private ApiInformationEntity _apiInformationEntity;
 
-        public ApiAuthenticationService(IApiConfigurationService apiConfigurationService, IApiStorageService apiStorageService)
+        public ApiAuthenticationService(IApiUserAuthenticationService apiUserAuthenticationService, IApiDeviceAuthenticationService deviceAuthenticationService, IApiDeviceAuthenticationService apiDeviceAuthenticationService, IApiConfigurationService apiConfigurationService)
         {
-            _apiConfigurationService = apiConfigurationService;
-            _apiStorageService = apiStorageService;
+            _apiUserAuthenticationService = apiUserAuthenticationService;
+            _apiDeviceAuthenticationService = apiDeviceAuthenticationService;
+            _apiDeviceAuthenticationService = deviceAuthenticationService;
+
+            _apiInformationEntity = apiConfigurationService.GetApiInformations();
         }
 
-        private async Task SyncAuthAsync()
+        private bool _isAuthenticated;
+        public bool IsAuthenticated()
+        {
+            return _isAuthenticated;
+        }
+
+        private ApiRoamingEntity _apiRoamingEntity;
+        private Guid _deviceId;
+        public async Task<bool> AuthenticateAsync()
         {
             using (await _asyncLock.LockAsync())
             {
-                var authApiClient = new AuthApiClient(_apiConfigurationService.GetApiUri());
-                var apiCache = _apiStorageService.GetApiCacheEntity();
+                if (_isAuthenticated)
+                    return IsAuthenticated();
 
-                var resp = await authApiClient.DoRequestAsync(new AuthRequestEntity()
+                _apiRoamingEntity = await _apiUserAuthenticationService.TryGetApiRoamingEntityAsync();
+                var g = await _apiDeviceAuthenticationService.TryGetAuthenticatedDeviceIdAsync();
+                if (g.HasValue)
                 {
-                    DeviceEntity = apiCache.DeviceEntity,
-                    UserEntity = apiCache.UserEntity,
-                    UserId = _apiStorageService.GetApiRoamingEntity().UserId
-                });
-                if (!resp.RequestFailed)
-                {
-                    if (resp.DeviceEntity != null)
-                        apiCache.DeviceEntity = resp.DeviceEntity;
-                    if (resp.UserEntity != null)
-                        apiCache.UserEntity = resp.UserEntity;
-
-                    if (resp.DeviceEntity != null || resp.UserEntity != null)
-                    {
-                        await _apiStorageService.SaveApiCacheEntityAsync();
-                    }
+                    _deviceId = g.Value;
+                    _isAuthenticated = true;
                 }
+                else
+                    _isAuthenticated = false;
+
+                return IsAuthenticated();
             }
         }
 
-        public bool IsAuthenticated()
+        public bool AuthenticateRequest(BaseRequest request)
         {
-            throw new NotImplementedException();
-        }
+            if (!_isAuthenticated)
+                return false;
 
-        public async Task<bool> TryAuthenticationAsync()
-        {
-            throw new NotImplementedException();
-        }
+            request.AuthorizationCode = AuthorizationHelper.GenerateAuthorizationCode(_apiInformationEntity, _apiRoamingEntity);
+            request.UserId = _apiRoamingEntity.UserId;
+            request.DeviceId = _deviceId;
 
-        public Guid GetUserId()
-        {
-            throw new NotImplementedException();
-        }
-
-        public Guid GetDeviceId()
-        {
-            throw new NotImplementedException();
+            return _isAuthenticated;
         }
     }
 }

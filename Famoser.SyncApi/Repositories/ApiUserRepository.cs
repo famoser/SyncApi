@@ -13,6 +13,7 @@ using Famoser.SyncApi.Models.Interfaces;
 using Famoser.SyncApi.Repositories.Base;
 using Famoser.SyncApi.Repositories.Interfaces;
 using Famoser.SyncApi.Services.Interfaces;
+using Famoser.SyncApi.Services.Interfaces.Authentication;
 using Famoser.SyncApi.Storage.Cache;
 using Famoser.SyncApi.Storage.Cache.Entitites;
 using Famoser.SyncApi.Storage.Roaming;
@@ -21,7 +22,7 @@ using Nito.AsyncEx;
 
 namespace Famoser.SyncApi.Repositories
 {
-    public class ApiUserRepository<TUser> : PersistentRepository<TUser>, IApiUserRepository<TUser>
+    public class ApiUserRepository<TUser> : PersistentRepository<TUser>, IApiUserRepository<TUser>, IApiUserAuthenticationService
         where TUser : IUserModel
     {
         private readonly AuthApiClient _authApiClient;
@@ -178,6 +179,14 @@ namespace Famoser.SyncApi.Repositories
             request.AuthorizationCode = AuthorizationHelper.GenerateAuthorizationCode(apiInformationEntity, apiRoamingInfo);
             request.UserId = _roaming.UserId;
             return request;
+        }
+
+        public async Task<ApiRoamingEntity> TryGetApiRoamingEntityAsync()
+        {
+            if (!await InitializeAsync())
+                return null;
+
+            return _roaming;
         }
     }
 }

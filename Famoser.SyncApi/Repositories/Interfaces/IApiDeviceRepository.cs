@@ -10,7 +10,7 @@ namespace Famoser.SyncApi.Repositories.Interfaces
         where TUser : IUserModel
     {
         ObservableCollection<TDevice> GetAllLazy();
-        Task<ObservableCollection<TDevice>> GetAll();
+        Task<ObservableCollection<TDevice>> GetAllAsync();
 
         Task<bool> UnAuthenticateAsync(TDevice device);
         Task<bool> AuthenticateAsync(TDevice device);

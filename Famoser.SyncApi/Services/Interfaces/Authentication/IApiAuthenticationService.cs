@@ -1,14 +1,14 @@
 ﻿using System;
 using System.Threading.Tasks;
+using Famoser.SyncApi.Api.Communication.Request.Base;
 
 namespace Famoser.SyncApi.Services.Interfaces
 {
     public interface IApiAuthenticationService
     {
         bool IsAuthenticated();
-        Task<bool> TryAuthenticationAsync();
+        Task<bool> AuthenticateAsync();
 
-        Guid GetUserId();
-        Guid GetDeviceId();
+        bool AuthenticateRequest(BaseRequest request);
     }
 }
