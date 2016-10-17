@@ -39,66 +39,8 @@ namespace Famoser.SyncApi.Repositories
         private readonly AsyncLock _asyncLock = new AsyncLock();
         private ApiRoamingEntity _roaming;
 
-        protected override Task<bool> InitializeAsync()
+        protected override async Task<bool> SyncInternalAsync()
         {
-            return ExecuteSafe(async () =>
-            {
-                using (await _asyncLock.LockAsync())
-                {
-                    if (CacheEntity != null)
-                        return true;
-
-                    _roaming = await _apiStorageService.GetApiRoamingEntity();
-                    if (_roaming.UserId == Guid.Empty)
-                    {
-                        //totally new installation
-                        _roaming.UserId = Guid.NewGuid();
-                        var random = new Random(ApiInformationEntity.Seed);
-                        _roaming.PersonalSeed = random.Next();
-                        await _apiStorageService.SaveApiRoamingEntityAsync();
-
-                        CacheEntity = await _apiStorageService.GetCacheEntity<TUser>();
-                        CacheEntity.Model = await _apiConfigurationService.GetUserObjectAsync<TUser>();
-                        CacheEntity.ModelInformation = new ModelInformation()
-                        {
-                            Id = _roaming.UserId,
-                            PendingAction = PendingAction.Create,
-                            VersionId = Guid.NewGuid()
-                        };
-                        await _apiStorageService.SaveCacheEntityAsync<TUser>();
-                    }
-                    else
-                    {
-                        CacheEntity = await _apiStorageService.GetCacheEntity<TUser>();
-                        if (CacheEntity.ModelInformation == null)
-                        {
-                            CacheEntity.ModelInformation = new ModelInformation()
-                            {
-                                Id = _roaming.UserId,
-                                PendingAction = PendingAction.Read
-                            };
-                            await _apiStorageService.SaveCacheEntityAsync<TUser>();
-                        }
-                    }
-
-                    return true;
-                }
-            });
-        }
-
-        private AuthRequestEntity AuthorizeRequest(ApiInformationEntity apiInformationEntity,
-            ApiRoamingEntity apiRoamingInfo, AuthRequestEntity request)
-        {
-            request.AuthorizationCode = AuthorizationHelper.GenerateAuthorizationCode(apiInformationEntity, apiRoamingInfo);
-            request.UserId = _roaming.UserId;
-            return request;
-        }
-
-        public override async Task<bool> SyncAsync()
-        {
-            if (!await InitializeAsync())
-                return false;
-
             if (CacheEntity.ModelInformation.PendingAction == PendingAction.None)
                 return true;
 
@@ -184,6 +126,58 @@ namespace Famoser.SyncApi.Repositories
 
             CacheEntity.ModelInformation.PendingAction = PendingAction.None;
             return await _apiStorageService.SaveCacheEntityAsync<TUser>();
+        }
+
+        protected override async Task<bool> InitializeAsync()
+        {
+            using (await _asyncLock.LockAsync())
+            {
+                if (CacheEntity != null)
+                    return true;
+
+                _roaming = await _apiStorageService.GetApiRoamingEntity();
+                if (_roaming.UserId == Guid.Empty)
+                {
+                    //totally new installation
+                    _roaming.UserId = Guid.NewGuid();
+                    var random = new Random(ApiInformationEntity.Seed);
+                    _roaming.PersonalSeed = random.Next();
+                    await _apiStorageService.SaveApiRoamingEntityAsync();
+
+                    CacheEntity = await _apiStorageService.GetCacheEntity<TUser>();
+                    CacheEntity.Model = await _apiConfigurationService.GetUserObjectAsync<TUser>();
+                    CacheEntity.ModelInformation = new ModelInformation()
+                    {
+                        Id = _roaming.UserId,
+                        PendingAction = PendingAction.Create,
+                        VersionId = Guid.NewGuid()
+                    };
+                    await _apiStorageService.SaveCacheEntityAsync<TUser>();
+                }
+                else
+                {
+                    CacheEntity = await _apiStorageService.GetCacheEntity<TUser>();
+                    if (CacheEntity.ModelInformation == null)
+                    {
+                        CacheEntity.ModelInformation = new ModelInformation()
+                        {
+                            Id = _roaming.UserId,
+                            PendingAction = PendingAction.Read
+                        };
+                        await _apiStorageService.SaveCacheEntityAsync<TUser>();
+                    }
+                }
+
+                return true;
+            }
+        }
+
+        private AuthRequestEntity AuthorizeRequest(ApiInformationEntity apiInformationEntity,
+            ApiRoamingEntity apiRoamingInfo, AuthRequestEntity request)
+        {
+            request.AuthorizationCode = AuthorizationHelper.GenerateAuthorizationCode(apiInformationEntity, apiRoamingInfo);
+            request.UserId = _roaming.UserId;
+            return request;
         }
     }
 }

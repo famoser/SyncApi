@@ -31,39 +31,63 @@ namespace Famoser.SyncApi.Repositories.Base
             return new AuthApiClient(ApiInformationEntity.Uri);
         }
 
-        public abstract Task<bool> SyncAsync();
+        protected abstract Task<bool> SyncInternalAsync();
         protected abstract Task<bool> InitializeAsync();
-        public async Task<TModel> GetAsync()
+        public Task<TModel> GetAsync()
         {
-            if (!await InitializeAsync())
-                return default(TModel);
+            return ExecuteSafe(async () =>
+            {
+                if (!await InitializeAsync())
+                    return default(TModel);
 
-            await SyncAsync();
+                await SyncInternalAsync();
 
-            return Manager.GetModel();
+                return Manager.GetModel();
+            });
         }
-
 
         public Task<bool> SaveAsync()
         {
-            if (CacheEntity.ModelInformation.PendingAction == PendingAction.None
-                || CacheEntity.ModelInformation.PendingAction == PendingAction.Delete
-                || CacheEntity.ModelInformation.PendingAction == PendingAction.Read)
+            return ExecuteSafe(async () =>
             {
-                CacheEntity.ModelInformation.VersionId = Guid.NewGuid();
-                CacheEntity.ModelInformation.PendingAction = PendingAction.Update;
-                return SyncAsync();
-            }
-            return SyncAsync();
+                if (!await InitializeAsync())
+                    return false;
+
+                if (CacheEntity.ModelInformation.PendingAction == PendingAction.None
+                    || CacheEntity.ModelInformation.PendingAction == PendingAction.Delete
+                    || CacheEntity.ModelInformation.PendingAction == PendingAction.Read)
+                {
+                    CacheEntity.ModelInformation.VersionId = Guid.NewGuid();
+                    CacheEntity.ModelInformation.PendingAction = PendingAction.Update;
+                }
+                return await SyncInternalAsync();
+            });
         }
 
         public Task<bool> RemoveAsync()
         {
-            if (CacheEntity.ModelInformation.PendingAction != PendingAction.Create)
+            return ExecuteSafe(async () =>
             {
-                CacheEntity.ModelInformation.PendingAction = PendingAction.Create;
-            }
-            return SyncAsync();
+                if (!await InitializeAsync())
+                    return false;
+
+                if (CacheEntity.ModelInformation.PendingAction != PendingAction.Create)
+                {
+                    CacheEntity.ModelInformation.PendingAction = PendingAction.Create;
+                }
+                return await SyncInternalAsync();
+            });
+        }
+        
+        public Task<bool> SyncAsync()
+        {
+            return ExecuteSafe(async () =>
+            {
+                if (!await InitializeAsync())
+                    return false;
+
+                return await SyncInternalAsync();
+            });
         }
     }
 }
