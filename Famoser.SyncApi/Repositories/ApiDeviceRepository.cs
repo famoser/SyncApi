@@ -21,31 +21,34 @@ using Nito.AsyncEx;
 
 namespace Famoser.SyncApi.Repositories
 {
-    public class ApiUserRepository<TUser> : PersistentRepository<TUser>, IApiUserRepository<TUser>
+    public class ApiDeviceRepository<TDevice, TUser> : PersistentRepository<TDevice>, IApiDeviceRepository<TDevice, TUser>
+        where TDevice : IDeviceModel
         where TUser : IUserModel
     {
         private readonly AuthApiClient _authApiClient;
         private readonly IApiStorageService _apiStorageService;
         private readonly IApiConfigurationService _apiConfigurationService;
 
-        public ApiUserRepository(IApiConfigurationService apiConfigurationService, IApiStorageService apiStorageService) : base(apiConfigurationService)
+        public ApiDeviceRepository(IApiConfigurationService apiConfigurationService, IApiStorageService apiStorageService)
         {
+            _apiInformationEntity = apiConfigurationService.GetApiInformations();
             _apiConfigurationService = apiConfigurationService;
-            _apiStorageService = apiStorageService;
 
-            _authApiClient = GetAuthApiClient();
+            _apiStorageService = apiStorageService;
+            _authApiClient = new AuthApiClient(_apiInformationEntity.Uri);
         }
 
         private readonly AsyncLock _asyncLock = new AsyncLock();
+        private CacheEntity<TUser> _user;
         private ApiRoamingEntity _roaming;
-
-        protected override Task<bool> InitializeAsync()
+        private readonly ApiInformationEntity _apiInformationEntity;
+        private Task<bool> Initialize()
         {
             return ExecuteSafe(async () =>
             {
                 using (await _asyncLock.LockAsync())
                 {
-                    if (CacheEntity != null)
+                    if (_user != null)
                         return true;
 
                     _roaming = await _apiStorageService.GetApiRoamingEntity();
@@ -53,13 +56,13 @@ namespace Famoser.SyncApi.Repositories
                     {
                         //totally new installation
                         _roaming.UserId = Guid.NewGuid();
-                        var random = new Random(ApiInformationEntity.Seed);
+                        var random = new Random(_apiInformationEntity.Seed);
                         _roaming.PersonalSeed = random.Next();
                         await _apiStorageService.SaveApiRoamingEntityAsync();
 
-                        CacheEntity = await _apiStorageService.GetCacheEntity<TUser>();
-                        CacheEntity.Model = await _apiConfigurationService.GetUserObjectAsync<TUser>();
-                        CacheEntity.ModelInformation = new ModelInformation()
+                        _user = await _apiStorageService.GetCacheEntity<TUser>();
+                        _user.Model = await _apiConfigurationService.GetUserObjectAsync<TUser>();
+                        _user.ModelInformation = new ModelInformation()
                         {
                             Id = _roaming.UserId,
                             PendingAction = PendingAction.Create,
@@ -69,10 +72,10 @@ namespace Famoser.SyncApi.Repositories
                     }
                     else
                     {
-                        CacheEntity = await _apiStorageService.GetCacheEntity<TUser>();
-                        if (CacheEntity.ModelInformation == null)
+                        _user = await _apiStorageService.GetCacheEntity<TUser>();
+                        if (_user.ModelInformation == null)
                         {
-                            CacheEntity.ModelInformation = new ModelInformation()
+                            _user.ModelInformation = new ModelInformation()
                             {
                                 Id = _roaming.UserId,
                                 PendingAction = PendingAction.Read
@@ -94,25 +97,25 @@ namespace Famoser.SyncApi.Repositories
             return request;
         }
 
-        public override async Task<bool> SyncAsync()
+        public async Task<bool> SyncAsync()
         {
-            if (!await InitializeAsync())
+            if (!await Initialize())
                 return false;
 
-            if (CacheEntity.ModelInformation.PendingAction == PendingAction.None)
+            if (_user.ModelInformation.PendingAction == PendingAction.None)
                 return true;
 
-            if (CacheEntity.ModelInformation.PendingAction == PendingAction.Create)
+            if (_user.ModelInformation.PendingAction == PendingAction.Create)
             {
                 var resp = await _authApiClient.DoRequestAsync(
-                    AuthorizeRequest(ApiInformationEntity, _roaming, new AuthRequestEntity()
+                    AuthorizeRequest(_apiInformationEntity, _roaming, new AuthRequestEntity()
                     {
                         UserEntity = new UserEntity()
                         {
-                            Id = CacheEntity.ModelInformation.Id,
+                            Id = _user.ModelInformation.Id,
                             OnlineAction = OnlineAction.Create,
-                            VersionId = CacheEntity.ModelInformation.VersionId,
-                            Content = JsonConvert.SerializeObject(CacheEntity.Model),
+                            VersionId = _user.ModelInformation.VersionId,
+                            Content = JsonConvert.SerializeObject(_user.Model),
                             PersonalSeed = _roaming.PersonalSeed
                         }
                     }));
@@ -121,14 +124,14 @@ namespace Famoser.SyncApi.Repositories
                     return false;
                 }
             }
-            else if (CacheEntity.ModelInformation.PendingAction == PendingAction.Read)
+            else if (_user.ModelInformation.PendingAction == PendingAction.Read)
             {
                 var resp = await _authApiClient.DoRequestAsync(
-                    AuthorizeRequest(ApiInformationEntity, _roaming, new AuthRequestEntity()
+                    AuthorizeRequest(_apiInformationEntity, _roaming, new AuthRequestEntity()
                     {
                         UserEntity = new UserEntity()
                         {
-                            Id = CacheEntity.ModelInformation.Id,
+                            Id = _user.ModelInformation.Id,
                             OnlineAction = OnlineAction.Read
                         }
                     }));
@@ -139,17 +142,17 @@ namespace Famoser.SyncApi.Repositories
                 else
                     return false;
             }
-            else if (CacheEntity.ModelInformation.PendingAction == PendingAction.Update)
+            else if (_user.ModelInformation.PendingAction == PendingAction.Update)
             {
                 var resp = await _authApiClient.DoRequestAsync(
-                    AuthorizeRequest(ApiInformationEntity, _roaming, new AuthRequestEntity()
+                    AuthorizeRequest(_apiInformationEntity, _roaming, new AuthRequestEntity()
                     {
                         UserEntity = new UserEntity()
                         {
-                            Id = CacheEntity.ModelInformation.Id,
+                            Id = _user.ModelInformation.Id,
                             OnlineAction = OnlineAction.Update,
-                            VersionId = CacheEntity.ModelInformation.VersionId,
-                            Content = JsonConvert.SerializeObject(CacheEntity.Model)
+                            VersionId = _user.ModelInformation.VersionId,
+                            Content = JsonConvert.SerializeObject(_user.Model)
                         }
                     }));
                 if (resp.RequestFailed)
@@ -157,14 +160,14 @@ namespace Famoser.SyncApi.Repositories
                     return false;
                 }
             }
-            else if (CacheEntity.ModelInformation.PendingAction == PendingAction.Delete)
+            else if (_user.ModelInformation.PendingAction == PendingAction.Delete)
             {
                 var resp = await _authApiClient.DoRequestAsync(
-                    AuthorizeRequest(ApiInformationEntity, _roaming, new AuthRequestEntity()
+                    AuthorizeRequest(_apiInformationEntity, _roaming, new AuthRequestEntity()
                     {
                         UserEntity = new UserEntity()
                         {
-                            Id = CacheEntity.ModelInformation.Id,
+                            Id = _user.ModelInformation.Id,
                             OnlineAction = OnlineAction.Delete
                         }
                     }));
@@ -175,15 +178,49 @@ namespace Famoser.SyncApi.Repositories
 
                 //clean up
                 _roaming.UserId = Guid.Empty;
-                CacheEntity.ModelInformation.PendingAction = PendingAction.None;
+                _user.ModelInformation.PendingAction = PendingAction.None;
                 return await _apiStorageService.EraseAllAsync();
             }
             else
                 return true;
 
 
-            CacheEntity.ModelInformation.PendingAction = PendingAction.None;
+            _user.ModelInformation.PendingAction = PendingAction.None;
             return await _apiStorageService.SaveCacheEntityAsync<TUser>();
+        }
+
+        public async Task<TUser> GetAsync()
+        {
+            if (!await Initialize())
+                return default(TUser);
+
+            await SyncAsync();
+
+            return Manager.GetModel();
+        }
+
+
+        public Task<bool> SaveAsync()
+        {
+
+            if (_user.ModelInformation.PendingAction == PendingAction.None
+                || _user.ModelInformation.PendingAction == PendingAction.Delete
+                || _user.ModelInformation.PendingAction == PendingAction.Read)
+            {
+                _user.ModelInformation.VersionId = Guid.NewGuid();
+                _user.ModelInformation.PendingAction = PendingAction.Update;
+                return SyncAsync();
+            }
+            return SyncAsync();
+        }
+
+        public Task<bool> RemoveAsync()
+        {
+            if (_user.ModelInformation.PendingAction != PendingAction.Create)
+            {
+                _user.ModelInformation.PendingAction = PendingAction.Create;
+            }
+            return SyncAsync();
         }
     }
 }

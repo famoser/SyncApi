@@ -35,7 +35,6 @@
   </PropertyGroup>
   <ItemGroup>
     <!-- A reference to the entire .NET Framework is automatically included -->
-    <Folder Include="Repositories\Base\" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Clients\ApiClient.cs" />
@@ -51,7 +50,9 @@
     <Compile Include="Api\Communication\Response\Base\BaseResponse.cs" />
     <Compile Include="Api\Communication\Request\RequestEntity.cs" />
     <Compile Include="Api\Communication\Response\ResponseEntity.cs" />
+    <Compile Include="Repositories\ApiDeviceRepository.cs" />
     <Compile Include="Repositories\ApiUserRepository.cs" />
+    <Compile Include="Repositories\Base\PersistentRepository.cs" />
     <Compile Include="Storage\Cache\CacheEntity.cs" />
     <Compile Include="Storage\Cache\CollectionCacheEntity.cs" />
     <Compile Include="Api\Communication\Entities\SyncEntity.cs" />
