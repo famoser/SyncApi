@@ -4,6 +4,11 @@ using Famoser.SyncApi.Storage.Roaming;
 
 namespace Famoser.SyncApi.Services.Interfaces
 {
+    /// <summary>
+    /// This service provides the repositories with the entities from storage. 
+    /// If the entity is not found, it must retrieve a new instance of the modle (never 0)
+    /// It must always return the same instance of the entity
+    /// </summary>
     public interface IApiStorageService
     {
         Task<ApiRoamingEntity> GetApiRoamingEntity();

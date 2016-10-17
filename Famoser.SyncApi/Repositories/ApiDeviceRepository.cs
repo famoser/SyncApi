@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Threading.Tasks;
 using Famoser.SyncApi.Api.Communication.Entities;
@@ -7,6 +8,7 @@ using Famoser.SyncApi.Api.Configuration;
 using Famoser.SyncApi.Clients;
 using Famoser.SyncApi.Enums;
 using Famoser.SyncApi.Helpers;
+using Famoser.SyncApi.Managers;
 using Famoser.SyncApi.Models.Interfaces;
 using Famoser.SyncApi.Repositories.Base;
 using Famoser.SyncApi.Repositories.Interfaces;
@@ -154,14 +156,47 @@ namespace Famoser.SyncApi.Repositories
         }
 
 
+        private readonly AsyncLock _deviceLock = new AsyncLock();
+        private bool _initializedDevices;
+        private CollectionCacheEntity<TDevice> _deviceCache;
+        private async Task<bool> InitializeDevicesAsync()
+        {
+            using (await _deviceLock.LockAsync())
+            {
+                if (_initializedDevices)
+                    return true;
+
+                _initializedDevices = true;
+
+                _deviceCache = await _apiStorageService.GetCollectionCacheEntity<TDevice>();
+                if (_deviceCache.ModelInformations == null)
+                {
+                    _deviceCache.ModelInformations = new List<ModelInformation>();
+                    _deviceCache.Models = new List<TDevice>();
+                }
+
+                return true;
+            }
+        }
+
+        private readonly CollectionManager<TDevice> _deviceManager = new CollectionManager<TDevice>();
         public ObservableCollection<TDevice> GetAllLazy()
         {
-            throw new NotImplementedException();
+#pragma warning disable 4014
+            InitializeDevicesAsync();
+#pragma warning restore 4014
+
+            return _deviceManager.GetObservableCollection();
         }
 
         public Task<ObservableCollection<TDevice>> GetAllAsync()
         {
-            throw new NotImplementedException();
+            return ExecuteSafe(async () =>
+            {
+                await InitializeDevicesAsync();
+
+                return _deviceManager.GetObservableCollection();
+            });
         }
 
         public Task<bool> UnAuthenticateAsync(TDevice device)
