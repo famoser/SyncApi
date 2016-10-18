@@ -64,7 +64,7 @@ namespace Famoser.SyncApi.Repositories
             {
                 await Initialize();
 
-                var request = new RequestEntity { OnlineAction = OnlineAction.Various };
+                var request = new CollectionEntityRequest { OnlineAction = OnlineAction.Various };
                 foreach (var modelInformation in _apiStorageService.GetModelCache<TModel>(GetModelCacheFilePath()).ModelInformations)
                 {
                     request.SyncEntities.Add(new SyncEntity()

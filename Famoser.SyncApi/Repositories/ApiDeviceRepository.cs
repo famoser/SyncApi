@@ -174,9 +174,16 @@ namespace Famoser.SyncApi.Repositories
                     _deviceCache.ModelInformations = new List<ModelInformation>();
                     _deviceCache.Models = new List<TDevice>();
                 }
+                
+
 
                 return true;
             }
+        }
+
+        private async Task<bool> SyncDevicesAsync()
+        {
+
         }
 
         private readonly CollectionManager<TDevice> _deviceManager = new CollectionManager<TDevice>();

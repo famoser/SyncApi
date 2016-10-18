@@ -1,4 +1,5 @@
 ﻿using System.Threading.Tasks;
+using Famoser.SyncApi.Models.Interfaces;
 using Famoser.SyncApi.Storage.Cache;
 using Famoser.SyncApi.Storage.Roaming;
 

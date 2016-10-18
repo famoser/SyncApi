@@ -18,24 +18,32 @@ namespace Famoser.SyncApi.Clients
             _deviceId = deviceId;
         }
 
-        protected Task<ResponseEntity> DoApiRequestAsync(RequestEntity request)
+
+        public Task<SyncEntityResponse> DoApiRequestAsync(SyncEntityRequest request)
         {
             request.UserId = _userId;
             request.DeviceId = _deviceId;
-            return base.DoApiRequestAsync<ResponseEntity>(request);
+            return base.DoApiRequestAsync<SyncEntityResponse>(request);
+        }
+
+        public Task<TReq> DoApiRequestAsync<TResp, TReq>(TReq request)
+        {
+            request.UserId = _userId;
+            request.DeviceId = _deviceId;
+            return base.DoApiRequestAsync<TResp>(request);
         }
 
 
         public async Task<bool> EraseDataAsync()
         {
-            var res = await DoApiRequestAsync(new RequestEntity()
+            var res = await DoApiRequestAsync(new CollectionEntityRequest()
             {
                 OnlineAction = OnlineAction.Erase
             });
             return !res.RequestFailed;
         }
 
-        public Task<ResponseEntity> DoRequestAsync(RequestEntity entity)
+        public Task<ResponseEntity> DoRequestAsync(CollectionEntityRequest entity)
         {
             return DoApiRequestAsync(entity);
         }
