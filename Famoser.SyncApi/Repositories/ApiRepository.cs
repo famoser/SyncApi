@@ -24,15 +24,17 @@ namespace Famoser.SyncApi.Repositories
         private readonly ICollectionManager<TModel> _collectionManager;
         private readonly IApiConfigurationService _apiConfigurationService;
         private readonly IApiStorageService _apiStorageService;
+        private readonly IApiAuthenticationService _apiAuthenticationService;
 
-        public ApiRepository(IApiConfigurationService apiConfigurationService, IApiStorageService apiStorageService)
+        public ApiRepository(IApiConfigurationService apiConfigurationService, IApiStorageService apiStorageService, IApiAuthenticationService apiAuthenticationService)
         {
             _collectionManager = new CollectionManager<TModel>();
             _apiConfigurationService = apiConfigurationService;
             _apiStorageService = apiStorageService;
+            _apiAuthenticationService = apiAuthenticationService;
         }
 
-        public ObservableCollection<TModel> GetAll()
+        public ObservableCollection<TModel> GetAllLazy()
         {
             Initialize();
 
@@ -49,8 +51,15 @@ namespace Famoser.SyncApi.Repositories
                 {
                     if (_isInitialized)
                         return true;
+
                     
-                    _isInitialized = await _apiStorageService.InitializeAsync();
+                    if (!_apiAuthenticationService.IsAuthenticated())
+                    {
+                        var res = await _apiAuthenticationService.AuthenticateAsync();
+                        if (!res)
+                            return false;
+                    }
+                    _isInitialized = false;
                     
                     return _isInitialized;
                 }
@@ -63,28 +72,7 @@ namespace Famoser.SyncApi.Repositories
             return ExecuteSafe(async () =>
             {
                 await Initialize();
-
-                var request = new CollectionEntityRequest { OnlineAction = OnlineAction.Various };
-                foreach (var modelInformation in _apiStorageService.GetModelCache<TModel>(GetModelCacheFilePath()).ModelInformations)
-                {
-                    request.SyncEntities.Add(new SyncEntity()
-                    {
-                        VersionId = modelInformation.VersionId,
-                        CollectionId = modelInformation.CollectionId,
-                        Id = modelInformation.Id
-                    });
-                }
-
-                var client = GetApiClient();
-                var resp = await client.DoRequestAsync(request);
-                if (resp.RequestFailed)
-                    return false;
-
-                //all entities in here are updated
-                foreach (var syncEntity in resp.SyncEntities)
-                {
-
-                }
+                
 
 
                 return true;

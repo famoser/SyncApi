@@ -1,5 +1,6 @@
 ﻿using System.Threading.Tasks;
 using Famoser.SyncApi.Api.Communication.Request.Base;
+using Famoser.SyncApi.Storage.Cache.Entitites;
 
 namespace Famoser.SyncApi.Services.Interfaces
 {
@@ -9,5 +10,6 @@ namespace Famoser.SyncApi.Services.Interfaces
         Task<bool> AuthenticateAsync();
 
         bool AuthenticateRequest(BaseRequest request);
+        bool FillModelInformation(ModelInformation info);
     }
 }

@@ -5,6 +5,7 @@ using Famoser.SyncApi.Api.Configuration;
 using Famoser.SyncApi.Helpers;
 using Famoser.SyncApi.Services.Interfaces;
 using Famoser.SyncApi.Services.Interfaces.Authentication;
+using Famoser.SyncApi.Storage.Cache.Entitites;
 using Famoser.SyncApi.Storage.Roaming;
 using Nito.AsyncEx;
 
@@ -57,14 +58,25 @@ namespace Famoser.SyncApi.Services
 
         public bool AuthenticateRequest(BaseRequest request)
         {
-            if (!_isAuthenticated)
+            if (!IsAuthenticated())
                 return false;
 
             request.AuthorizationCode = AuthorizationHelper.GenerateAuthorizationCode(_apiInformationEntity, _apiRoamingEntity);
             request.UserId = _apiRoamingEntity.UserId;
             request.DeviceId = _deviceId;
 
-            return _isAuthenticated;
+            return IsAuthenticated();
+        }
+
+        public bool FillModelInformation(ModelInformation info)
+        {
+            if (!IsAuthenticated())
+                return false;
+
+            info.UserId = _apiRoamingEntity.UserId;
+            info.DeviceId = _deviceId;
+
+            return IsAuthenticated();
         }
     }
 }

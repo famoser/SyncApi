@@ -54,7 +54,9 @@
     <Compile Include="Api\Communication\Response\SyncEntityResponse.cs" />
     <Compile Include="Repositories\ApiDeviceRepository.cs" />
     <Compile Include="Repositories\ApiUserRepository.cs" />
+    <Compile Include="Repositories\Base\PersistentCollectionRepository.cs" />
     <Compile Include="Repositories\Base\PersistentRepository.cs" />
+    <Compile Include="Repositories\ApiCollectionRepository.cs" />
     <Compile Include="Services\Interfaces\Authentication\IApiDeviceAuthenticationService.cs" />
     <Compile Include="Services\Interfaces\Authentication\IApiUserAuthenticationRepository.cs" />
     <Compile Include="Storage\Cache\CacheEntity.cs" />

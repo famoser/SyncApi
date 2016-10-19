@@ -175,15 +175,9 @@ namespace Famoser.SyncApi.Repositories
                     _deviceCache.Models = new List<TDevice>();
                 }
                 
-
-
+                //todo: implement device sync
                 return true;
             }
-        }
-
-        private async Task<bool> SyncDevicesAsync()
-        {
-
         }
 
         private readonly CollectionManager<TDevice> _deviceManager = new CollectionManager<TDevice>();
