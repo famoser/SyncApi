@@ -19,7 +19,7 @@ using Nito.AsyncEx;
 namespace Famoser.SyncApi.Repositories
 {
     public class ApiUserRepository<TUser> : PersistentRepository<TUser>, IApiUserRepository<TUser>, IApiUserAuthenticationService
-        where TUser : IUserModel
+        where TUser : class, IUserModel
     {
         private readonly ApiClient _authApiClient;
         private readonly IApiStorageService _apiStorageService;
@@ -176,7 +176,7 @@ namespace Famoser.SyncApi.Repositories
             return request;
         }
 
-        public async Task<ApiRoamingEntity> TryGetApiRoamingEntityAsync()
+        public async Task<ApiRoamingEntity> GetApiRoamingEntityAsync()
         {
             if (!await InitializeAsync())
                 return null;

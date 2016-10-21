@@ -23,8 +23,8 @@ using Nito.AsyncEx;
 namespace Famoser.SyncApi.Repositories
 {
     public class ApiDeviceRepository<TDevice, TUser> : PersistentRepository<TDevice>, IApiDeviceRepository<TDevice, TUser>, IApiDeviceAuthenticationService
-        where TDevice : IDeviceModel
-        where TUser : IUserModel
+        where TDevice : class, IDeviceModel
+        where TUser : class, IUserModel
     {
         private readonly IApiStorageService _apiStorageService;
         private readonly IApiConfigurationService _apiConfigurationService;
@@ -249,7 +249,7 @@ namespace Famoser.SyncApi.Repositories
         }
 
         private ApiRoamingEntity _apiRoamingEntity;
-        public async Task<Guid?> TryGetAuthenticatedDeviceIdAsync(ApiRoamingEntity apiRoamingEntity)
+        public async Task<Guid?> GetAuthenticatedDeviceIdAsync(ApiRoamingEntity apiRoamingEntity)
         {
             _apiRoamingEntity = apiRoamingEntity;
 

@@ -29,13 +29,25 @@ namespace Famoser.SyncApi.Services.Interfaces.Authentication
         ///     - DeviceId
         ///     - AuthenticationCode
         ///     - OnlineAction
-        ///     - CollectionIds (if applicable)
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="action"></param>
         /// <returns></returns>
         T CreateRequest<T>(OnlineAction action) where T : BaseRequest, new();
 
+        /// <summary>
+        /// create a valid, authenticated request.
+        /// sets:
+        ///     - UserId
+        ///     - DeviceId
+        ///     - AuthenticationCode
+        ///     - OnlineAction
+        ///     - CollectionIds for action == OnlineAction.SyncVersion
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="action"></param>
+        /// <param name="collectionType">The type of collection this entity belongs to</param>
+        /// <returns></returns>
         T CreateRequest<T>(OnlineAction action, Type collectionType) where T : SyncEntityRequest, new();
 
         /// <summary>
@@ -51,6 +63,12 @@ namespace Famoser.SyncApi.Services.Interfaces.Authentication
         /// <returns></returns>
         ModelInformation CreateModelInformation();
 
+        /// <summary>
+        /// Sets the collection ids for a specific collection.
+        /// This is used to authenticate SyncRequests
+        /// </summary>
+        /// <typeparam name="TCollection"></typeparam>
+        /// <param name="id"></param>
         void OverwriteCollectionIds<TCollection>(List<Guid> id);
     }
 }

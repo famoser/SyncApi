@@ -52,6 +52,10 @@
     <Compile Include="Api\Communication\Request\CollectionEntityRequest.cs" />
     <Compile Include="Api\Communication\Response\SyncEntityResponse.cs" />
     <Compile Include="Helpers\ApiEntityHelper.cs" />
+    <Compile Include="Models\Base\BaseModel.cs" />
+    <Compile Include="Models\CollectionModel.cs" />
+    <Compile Include="Models\DeviceModel.cs" />
+    <Compile Include="Models\UserModel.cs" />
     <Compile Include="Repositories\ApiDeviceRepository.cs" />
     <Compile Include="Repositories\ApiUserRepository.cs" />
     <Compile Include="Repositories\Base\BasePersistentRepository.cs" />

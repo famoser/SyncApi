@@ -20,9 +20,9 @@ using Nito.AsyncEx;
 namespace Famoser.SyncApi.Repositories
 {
     public class ApiCollectionRepository<TCollection, TDevice, TUser> : PersistentCollectionRepository<TCollection>, IApiCollectionRepository<TCollection, TDevice, TUser>
-        where TCollection : ICollectionModel
-        where TDevice : IDeviceModel
-        where TUser : IUserModel
+        where TCollection : class, ICollectionModel
+        where TDevice : class, IDeviceModel
+        where TUser : class, IUserModel
     {
         private readonly IApiAuthenticationService _apiAuthenticationService;
         private readonly IApiStorageService _apiStorageService;
@@ -68,6 +68,12 @@ namespace Famoser.SyncApi.Repositories
 
         protected override async Task<bool> SyncInternalAsync()
         {
+            if (!_apiAuthenticationService.IsAuthenticated())
+            {
+                if (!await _apiAuthenticationService.AuthenticateAsync())
+                    return false;
+            }
+
             var req = _apiAuthenticationService.CreateRequest<CollectionEntityRequest>(OnlineAction.SyncEntity);
             if (req == null)
                 return false;

@@ -5,6 +5,10 @@ namespace Famoser.SyncApi.Services.Interfaces.Authentication
 {
     public interface IApiUserAuthenticationService
     {
-        Task<ApiRoamingEntity> TryGetApiRoamingEntityAsync();
+        /// <summary>
+        /// Get Api informations
+        /// </summary>
+        /// <returns></returns>
+        Task<ApiRoamingEntity> GetApiRoamingEntityAsync();
     }
 }

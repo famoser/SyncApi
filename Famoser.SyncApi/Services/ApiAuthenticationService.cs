@@ -46,8 +46,8 @@ namespace Famoser.SyncApi.Services
                 if (_isAuthenticated)
                     return IsAuthenticated();
 
-                _apiRoamingEntity = await _apiUserAuthenticationService.TryGetApiRoamingEntityAsync();
-                var g = await _apiDeviceAuthenticationService.TryGetAuthenticatedDeviceIdAsync(_apiRoamingEntity);
+                _apiRoamingEntity = await _apiUserAuthenticationService.GetApiRoamingEntityAsync();
+                var g = await _apiDeviceAuthenticationService.GetAuthenticatedDeviceIdAsync(_apiRoamingEntity);
                 if (g.HasValue)
                 {
                     _deviceId = g.Value;

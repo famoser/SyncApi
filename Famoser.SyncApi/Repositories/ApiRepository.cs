@@ -41,6 +41,12 @@ namespace Famoser.SyncApi.Repositories
 
         protected override async Task<bool> SyncInternalAsync()
         {
+            if (!_apiAuthenticationService.IsAuthenticated())
+            {
+                if (!await _apiAuthenticationService.AuthenticateAsync())
+                    return false;
+            }
+
             var req = _apiAuthenticationService.CreateRequest<SyncEntityRequest>(OnlineAction.SyncVersion, typeof(TCollection));
             if (req == null)
                 return false;

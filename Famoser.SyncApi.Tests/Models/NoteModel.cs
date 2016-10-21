@@ -7,7 +7,6 @@ namespace Famoser.SyncApi.Tests.Models
 {
     public class NoteModel : ObservableObject, ISyncModel
     {
-        [EntityMap]
         public string Content { get; set; }
         private Guid Id { get; set; }
 
@@ -24,11 +23,6 @@ namespace Famoser.SyncApi.Tests.Models
         public string GetUniqeIdentifier()
         {
             return "notes";
-        }
-
-        public string GetGroupIdentifier()
-        {
-            return "all";
         }
     }
 }

@@ -19,7 +19,7 @@ namespace Famoser.SyncApi.Clients
         /// <returns></returns>
         public Task<CollectionEntityResponse> DoSyncRequestAsync(CollectionEntityRequest entity)
         {
-            return DoApiRequestAsync<CollectionEntityResponse>(entity, "sync");
+            return DoApiRequestAsync<CollectionEntityResponse>(entity, "collection/sync");
         }
         
         /// <summary>
@@ -29,7 +29,7 @@ namespace Famoser.SyncApi.Clients
         /// <returns></returns>
         public Task<SyncEntityResponse> DoSyncRequestAsync(SyncEntityRequest entity)
         {
-            return DoApiRequestAsync<SyncEntityResponse>(entity, "sync");
+            return DoApiRequestAsync<SyncEntityResponse>(entity, "entity/sync");
         }
 
         /// <summary>
@@ -39,7 +39,7 @@ namespace Famoser.SyncApi.Clients
         /// <returns></returns>
         public Task<AuthorizationResponse> DoSyncRequestAsync(AuthRequestEntity entity)
         {
-            return DoApiRequestAsync<AuthorizationResponse>(entity, "sync");
+            return DoApiRequestAsync<AuthorizationResponse>(entity, "auth/sync");
         }
 
         /// <summary>
@@ -49,7 +49,7 @@ namespace Famoser.SyncApi.Clients
         /// <returns></returns>
         public Task<AuthorizationResponse> CreateAuthCodeRequestAsync(AuthRequestEntity entity)
         {
-            return DoApiRequestAsync<AuthorizationResponse>(entity, "auth");
+            return DoApiRequestAsync<AuthorizationResponse>(entity, "auth/generate");
         }
 
         /// <summary>
@@ -59,7 +59,7 @@ namespace Famoser.SyncApi.Clients
         /// <returns></returns>
         public Task<AuthorizationResponse> UseAuthCodeRequestAsync(AuthRequestEntity entity)
         {
-            return DoApiRequestAsync<AuthorizationResponse>(entity, "useauth");
+            return DoApiRequestAsync<AuthorizationResponse>(entity, "auth/use");
         }
 
         /// <summary>
@@ -69,7 +69,7 @@ namespace Famoser.SyncApi.Clients
         /// <returns></returns>
         public Task<AuthorizationResponse> AuthenticateRequestAsync(AuthRequestEntity entity)
         {
-            return DoApiRequestAsync<AuthorizationResponse>(entity, "doauth");
+            return DoApiRequestAsync<AuthorizationResponse>(entity, "auth/do");
         }
 
         /// <summary>
@@ -79,7 +79,7 @@ namespace Famoser.SyncApi.Clients
         /// <returns></returns>
         public Task<AuthorizationResponse> UnAuthenticateRequestAsync(AuthRequestEntity entity)
         {
-            return DoApiRequestAsync<AuthorizationResponse>(entity, "unauth");
+            return DoApiRequestAsync<AuthorizationResponse>(entity, "auth/undo");
         }
     }
 }

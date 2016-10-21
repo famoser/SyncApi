@@ -6,6 +6,11 @@ namespace Famoser.SyncApi.Services.Interfaces.Authentication
 {
     public interface IApiDeviceAuthenticationService
     {
-        Task<Guid?> TryGetAuthenticatedDeviceIdAsync(ApiRoamingEntity apiRoamingEntity);
+        /// <summary>
+        /// Get a DeviceId
+        /// </summary>
+        /// <param name="apiRoamingEntity"></param>
+        /// <returns></returns>
+        Task<Guid?> GetAuthenticatedDeviceIdAsync(ApiRoamingEntity apiRoamingEntity);
     }
 }
