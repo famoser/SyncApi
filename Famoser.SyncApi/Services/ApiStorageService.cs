@@ -1,16 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Net.Http.Headers;
 using System.Threading.Tasks;
 using Famoser.FrameworkEssentials.Logging.Interfaces;
-using Famoser.FrameworkEssentials.Services.Base;
 using Famoser.FrameworkEssentials.Services.Interfaces;
-using Famoser.SyncApi.Api.Communication.Entities;
-using Famoser.SyncApi.Enums;
-using Famoser.SyncApi.Models.Interfaces;
 using Famoser.SyncApi.Services.Interfaces;
 using Famoser.SyncApi.Storage.Cache;
-using Famoser.SyncApi.Storage.Cache.Service;
 using Famoser.SyncApi.Storage.Roaming;
 using Newtonsoft.Json;
 using Nito.AsyncEx;

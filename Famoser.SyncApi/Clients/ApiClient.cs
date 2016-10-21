@@ -3,9 +3,7 @@ using System.Threading.Tasks;
 using Famoser.SyncApi.Api.Communication.Request;
 using Famoser.SyncApi.Api.Communication.Response;
 using Famoser.SyncApi.Clients.Base;
-using Famoser.SyncApi.Enums;
 using Famoser.SyncApi.Services.Interfaces;
-using Famoser.SyncApi.Services.Interfaces.Authentication;
 
 namespace Famoser.SyncApi.Clients
 {

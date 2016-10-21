@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Threading.Tasks;
-using Famoser.FrameworkEssentials.Helpers;
-using Famoser.FrameworkEssentials.Logging.Interfaces;
 using Famoser.SyncApi.Api.Configuration;
 using Famoser.SyncApi.Clients;
 using Famoser.SyncApi.Enums;

@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Famoser.SyncApi.Storage.Cache.Service
+﻿namespace Famoser.SyncApi.Storage.Cache.Service
 {
     public class StorageServiceCache
     {
