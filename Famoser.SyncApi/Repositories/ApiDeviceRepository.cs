@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Threading.Tasks;
 using Famoser.SyncApi.Api.Communication.Entities;
@@ -14,7 +13,6 @@ using Famoser.SyncApi.Repositories.Base;
 using Famoser.SyncApi.Repositories.Interfaces;
 using Famoser.SyncApi.Services.Interfaces;
 using Famoser.SyncApi.Services.Interfaces.Authentication;
-using Famoser.SyncApi.Storage.Cache;
 using Famoser.SyncApi.Storage.Cache.Entitites;
 using Famoser.SyncApi.Storage.Roaming;
 using Newtonsoft.Json;

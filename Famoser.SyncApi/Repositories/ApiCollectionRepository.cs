@@ -4,7 +4,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using Famoser.SyncApi.Api.Communication.Entities;
 using Famoser.SyncApi.Api.Communication.Request;
-using Famoser.SyncApi.Clients;
 using Famoser.SyncApi.Enums;
 using Famoser.SyncApi.Helpers;
 using Famoser.SyncApi.Models.Interfaces;
@@ -12,8 +11,6 @@ using Famoser.SyncApi.Repositories.Base;
 using Famoser.SyncApi.Repositories.Interfaces;
 using Famoser.SyncApi.Services.Interfaces;
 using Famoser.SyncApi.Services.Interfaces.Authentication;
-using Famoser.SyncApi.Storage.Cache;
-using Famoser.SyncApi.Storage.Cache.Entitites;
 using Newtonsoft.Json;
 using Nito.AsyncEx;
 

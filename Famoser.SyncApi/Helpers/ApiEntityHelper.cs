@@ -1,12 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Famoser.SyncApi.Api.Base;
 using Famoser.SyncApi.Api.Communication.Entities;
 using Famoser.SyncApi.Enums;
-using Famoser.SyncApi.Models.Interfaces;
 using Famoser.SyncApi.Storage.Cache.Entitites;
 using Newtonsoft.Json;
 

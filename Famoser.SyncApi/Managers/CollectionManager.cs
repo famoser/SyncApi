@@ -1,5 +1,4 @@
 ﻿using System.Collections.ObjectModel;
-using System.Linq;
 using Famoser.SyncApi.Managers.Interfaces;
 
 namespace Famoser.SyncApi.Managers
