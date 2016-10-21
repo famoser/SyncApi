@@ -54,6 +54,7 @@
     <Compile Include="Api\Communication\Response\SyncEntityResponse.cs" />
     <Compile Include="Repositories\ApiDeviceRepository.cs" />
     <Compile Include="Repositories\ApiUserRepository.cs" />
+    <Compile Include="Repositories\Base\BasePersistentRepository.cs" />
     <Compile Include="Repositories\Base\PersistentCollectionRepository.cs" />
     <Compile Include="Repositories\Base\PersistentRepository.cs" />
     <Compile Include="Repositories\ApiCollectionRepository.cs" />
@@ -64,6 +65,7 @@
     <Compile Include="Api\Communication\Entities\SyncEntity.cs" />
     <Compile Include="Api\Communication\Entities\UserEntity.cs" />
     <Compile Include="Storage\Cache\Entitites\ModelInformation.cs" />
+    <Compile Include="Storage\Cache\Service\StorageServiceCache.cs" />
     <Compile Include="Storage\Roaming\ApiRoamingEntity.cs" />
     <Compile Include="Enums\ApiError.cs" />
     <Compile Include="Enums\AuthenticationState.cs" />
@@ -94,7 +96,6 @@
     <Compile Include="Models\Interfaces\IUserModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Repositories\ApiRepository.cs" />
-    <Compile Include="Repositories\ApiRepositoryContructors.cs" />
     <Compile Include="Services\ApiStorageService.cs" />
     <Compile Include="Services\Interfaces\Authentication\IApiAuthenticationService.cs" />
   </ItemGroup>

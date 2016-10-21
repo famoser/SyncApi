@@ -2,7 +2,7 @@
 
 namespace Famoser.SyncApi.Models.Interfaces
 {
-    public interface IUserModel : IBaseSyncModel
+    public interface IUserModel : IUniqueSyncModel
     {
 
     }

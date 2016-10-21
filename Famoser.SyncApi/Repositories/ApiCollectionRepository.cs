@@ -8,58 +8,32 @@ using Famoser.FrameworkEssentials.Helpers;
 using Famoser.SyncApi.Managers;
 using Famoser.SyncApi.Managers.Interfaces;
 using Famoser.SyncApi.Models.Interfaces;
+using Famoser.SyncApi.Repositories.Base;
 using Famoser.SyncApi.Repositories.Interfaces;
+using Famoser.SyncApi.Services.Interfaces;
 
 namespace Famoser.SyncApi.Repositories
 {
-    public class ApiCollectionRepository<TCollection, TDevice, TUser> : BaseHelper, IApiCollectionRepository<TCollection, TDevice, TUser>
+    public class ApiCollectionRepository<TCollection, TDevice, TUser> : PersistentCollectionRepository<TCollection>, IApiCollectionRepository<TCollection, TDevice, TUser>
         where TCollection : ICollectionModel
         where TDevice : IDeviceModel
         where TUser : IUserModel
     {
-        private CollectionManager<TCollection> _collectionManager = new CollectionManager<TCollection>();
+        public ApiCollectionRepository(IApiAuthenticationService apiAuthenticationService, IApiStorageService apiStorageService, IApiConfigurationService apiConfigurationService) : base(apiAuthenticationService, apiStorageService, apiConfigurationService)
+        {
+        }
+
+        protected override Task<bool> SyncInternalAsync()
+        {
+            throw new NotImplementedException();
+        }
+
+        protected override Task<bool> InitializeAsync()
+        {
+            throw new NotImplementedException();
+        }
 
         public Task<bool> AddUserToCollectionAsync(TCollection collection, TUser user)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<bool> SyncAsync()
-        {
-            throw new NotImplementedException();
-        }
-
-        public ObservableCollection<TCollection> GetAllLazy()
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<ObservableCollection<TCollection>> GetAll()
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<bool> SaveAsync(TCollection model)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<bool> RemoveAsync(TCollection model)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<bool> RemoveAllAsync()
-        {
-            throw new NotImplementedException();
-        }
-
-        public void SetCollectionManager(ICollectionManager<TCollection> manager)
-        {
-            throw new NotImplementedException();
-        }
-
-        public ICollectionManager<TCollection> GetCollectionManager()
         {
             throw new NotImplementedException();
         }

@@ -9,6 +9,7 @@ using Famoser.SyncApi.Enums;
 using Famoser.SyncApi.Managers;
 using Famoser.SyncApi.Managers.Interfaces;
 using Famoser.SyncApi.Models.Interfaces;
+using Famoser.SyncApi.Models.Interfaces.Base;
 using Famoser.SyncApi.Repositories.Interfaces;
 using Famoser.SyncApi.Repositories.Interfaces.Base;
 using Famoser.SyncApi.Services.Interfaces;
@@ -17,8 +18,8 @@ using Famoser.SyncApi.Storage.Cache.Entitites;
 
 namespace Famoser.SyncApi.Repositories.Base
 {
-    public abstract class PersistentCollectionRepository<TCollection> : IPersistentCollectionRespository<TCollection>
-        where TCollection : ICollectionModel
+    public abstract class PersistentCollectionRepository<TCollection> : BasePersistentRepository<TCollection>, IPersistentCollectionRespository<TCollection>
+        where TCollection : IUniqueSyncModel
     {
         protected ICollectionManager<TCollection> CollectionManager = new CollectionManager<TCollection>();
         protected CollectionCacheEntity<TCollection> CollectionCache;
@@ -28,18 +29,11 @@ namespace Famoser.SyncApi.Repositories.Base
         private readonly IApiAuthenticationService _apiAuthenticationService;
 
         protected PersistentCollectionRepository(IApiAuthenticationService apiAuthenticationService, IApiStorageService apiStorageService, IApiConfigurationService apiConfigurationService)
+            : base(apiConfigurationService)
         {
             _apiAuthenticationService = apiAuthenticationService;
             _apiStorageService = apiStorageService;
             _apiConfigurationService = apiConfigurationService;
-        }
-
-        protected abstract Task<bool> InitializeAsync();
-        protected abstract Task<bool> SyncInternalAsync();
-
-        public Task<bool> SyncAsync()
-        {
-            return ExecuteSafe(async () => await SyncInternalAsync());
         }
 
         public ObservableCollection<TCollection> GetAllLazy()
@@ -138,24 +132,6 @@ namespace Famoser.SyncApi.Repositories.Base
         public ICollectionManager<TCollection> GetCollectionManager()
         {
             return CollectionManager;
-        }
-        
-
-        private IExceptionLogger _exceptionLogger;
-        protected async Task<T> ExecuteSafe<T>(Func<Task<T>> func)
-        {
-            try
-            {
-                if (!await InitializeAsync())
-                    return default(T);
-
-                return await func();
-            }
-            catch (Exception ex)
-            {
-                _exceptionLogger?.LogException(ex, this);
-            }
-            return default(T);
         }
     }
 }

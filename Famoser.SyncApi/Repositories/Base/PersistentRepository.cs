@@ -7,19 +7,22 @@ using Famoser.SyncApi.Clients;
 using Famoser.SyncApi.Enums;
 using Famoser.SyncApi.Managers;
 using Famoser.SyncApi.Managers.Interfaces;
+using Famoser.SyncApi.Models.Interfaces.Base;
 using Famoser.SyncApi.Repositories.Interfaces.Base;
 using Famoser.SyncApi.Services.Interfaces;
 using Famoser.SyncApi.Storage.Cache;
 
 namespace Famoser.SyncApi.Repositories.Base
 {
-    public abstract class PersistentRepository<TModel> : IPersistentRespository<TModel>
+    public abstract class PersistentRepository<TModel> : BasePersistentRepository<TModel>,IPersistentRespository<TModel>
+        where TModel : IUniqueSyncModel
     {
         protected readonly IManager<TModel> Manager = new Manager<TModel>();
         protected CacheEntity<TModel> CacheEntity;
         protected readonly ApiInformationEntity ApiInformationEntity;
 
         protected PersistentRepository(IApiConfigurationService apiConfigurationService)
+            : base(apiConfigurationService)
         {
             ApiInformationEntity = apiConfigurationService.GetApiInformations();
         }
@@ -29,8 +32,6 @@ namespace Famoser.SyncApi.Repositories.Base
             return new AuthApiClient(ApiInformationEntity.Uri);
         }
 
-        protected abstract Task<bool> SyncInternalAsync();
-        protected abstract Task<bool> InitializeAsync();
         public Task<TModel> GetAsync()
         {
             return ExecuteSafe(async () =>
@@ -66,29 +67,6 @@ namespace Famoser.SyncApi.Repositories.Base
                 }
                 return await SyncInternalAsync();
             });
-        }
-
-        public Task<bool> SyncAsync()
-        {
-            return ExecuteSafe(async () => await SyncInternalAsync());
-        }
-
-
-        private IExceptionLogger _exceptionLogger;
-        protected async Task<T> ExecuteSafe<T>(Func<Task<T>> func)
-        {
-            try
-            {
-                if (!await InitializeAsync())
-                    return default(T);
-
-                return await func();
-            }
-            catch (Exception ex)
-            {
-                _exceptionLogger?.LogException(ex, this);
-            }
-            return default(T);
         }
     }
 }
