@@ -1,4 +1,5 @@
 ﻿using System.Collections.ObjectModel;
+using System.Linq;
 using Famoser.SyncApi.Managers.Interfaces;
 
 namespace Famoser.SyncApi.Managers
@@ -27,6 +28,12 @@ namespace Famoser.SyncApi.Managers
             {
                 Add(model);
             }
+        }
+
+        public void Replace(TModel oldOne, TModel newOne)
+        {
+           var index = _collection.IndexOf(oldOne);
+            _collection[index] = newOne;
         }
     }
 }

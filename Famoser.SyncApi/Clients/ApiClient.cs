@@ -3,23 +3,83 @@ using System.Threading.Tasks;
 using Famoser.SyncApi.Api.Communication.Request;
 using Famoser.SyncApi.Api.Communication.Response;
 using Famoser.SyncApi.Clients.Base;
-using Famoser.SyncApi.Services.Interfaces;
 
 namespace Famoser.SyncApi.Clients
 {
     public class ApiClient : BaseApiClient
     {
-        private readonly IApiAuthenticationService _apiAuthenticationService;
-        public ApiClient(Uri baseUri, IApiAuthenticationService apiAuthenticationService) : base(baseUri)
+        public ApiClient(Uri baseUri) : base(baseUri)
         {
-            _apiAuthenticationService = apiAuthenticationService;
-        }
-
-        public Task<SyncEntityResponse> DoApiRequestAsync(SyncEntityRequest request)
-        {
-            _apiAuthenticationService.AuthenticateRequest(request);
-            return base.DoApiRequestAsync<SyncEntityResponse>(request);
         }
         
+        /// <summary>
+        /// sync collections
+        /// </summary>
+        /// <param name="entity"></param>
+        /// <returns></returns>
+        public Task<CollectionEntityResponse> DoSyncRequestAsync(CollectionEntityRequest entity)
+        {
+            return DoApiRequestAsync<CollectionEntityResponse>(entity, "sync");
+        }
+        
+        /// <summary>
+        /// sync entities
+        /// </summary>
+        /// <param name="entity"></param>
+        /// <returns></returns>
+        public Task<SyncEntityResponse> DoSyncRequestAsync(SyncEntityRequest entity)
+        {
+            return DoApiRequestAsync<SyncEntityResponse>(entity, "sync");
+        }
+
+        /// <summary>
+        /// sync the devices & users in the lists
+        /// </summary>
+        /// <param name="entity"></param>
+        /// <returns></returns>
+        public Task<AuthorizationResponse> DoSyncRequestAsync(AuthRequestEntity entity)
+        {
+            return DoApiRequestAsync<AuthorizationResponse>(entity, "sync");
+        }
+
+        /// <summary>
+        /// Create an authorization code, authenticated Device in DeviceId
+        /// </summary>
+        /// <param name="entity"></param>
+        /// <returns></returns>
+        public Task<AuthorizationResponse> CreateAuthCodeRequestAsync(AuthRequestEntity entity)
+        {
+            return DoApiRequestAsync<AuthorizationResponse>(entity, "auth");
+        }
+
+        /// <summary>
+        /// use an authorization code for own DeviceId
+        /// </summary>
+        /// <param name="entity"></param>
+        /// <returns></returns>
+        public Task<AuthorizationResponse> UseAuthCodeRequestAsync(AuthRequestEntity entity)
+        {
+            return DoApiRequestAsync<AuthorizationResponse>(entity, "useauth");
+        }
+
+        /// <summary>
+        /// authenticate the DeviceEntities
+        /// </summary>
+        /// <param name="entity"></param>
+        /// <returns></returns>
+        public Task<AuthorizationResponse> AuthenticateRequestAsync(AuthRequestEntity entity)
+        {
+            return DoApiRequestAsync<AuthorizationResponse>(entity, "doauth");
+        }
+
+        /// <summary>
+        /// unauthenticate the DeviceEntities
+        /// </summary>
+        /// <param name="entity"></param>
+        /// <returns></returns>
+        public Task<AuthorizationResponse> UnAuthenticateRequestAsync(AuthRequestEntity entity)
+        {
+            return DoApiRequestAsync<AuthorizationResponse>(entity, "unauth");
+        }
     }
 }

@@ -28,7 +28,7 @@ namespace Famoser.SyncApi.Repositories
     {
         private readonly IApiStorageService _apiStorageService;
         private readonly IApiConfigurationService _apiConfigurationService;
-        private readonly AuthApiClient _authApiClient;
+        private readonly ApiClient _authApiClient;
         public ApiDeviceRepository(IApiConfigurationService apiConfigurationService, IApiStorageService apiStorageService) : base(apiConfigurationService)
         {
             _apiStorageService = apiStorageService;
@@ -49,17 +49,18 @@ namespace Famoser.SyncApi.Repositories
                 if (_apiRoamingEntity == null)
                     return false;
 
-                CacheEntity = await _apiStorageService.GetCacheEntity<TDevice>();
+                CacheEntity = await _apiStorageService.GetCacheEntity<TDevice>(GetModelCacheFilePath());
                 if (CacheEntity.ModelInformation == null)
                 {
                     CacheEntity.Model = await _apiConfigurationService.GetDeviceObjectAsync<TDevice>();
                     CacheEntity.ModelInformation = new ModelInformation()
                     {
-                        Id = _apiRoamingEntity.UserId,
+                        Id = Guid.NewGuid(),
                         UserId = _apiRoamingEntity.UserId,
                         PendingAction = PendingAction.Create,
                         VersionId = Guid.NewGuid()
                     };
+                    CacheEntity.Model.SetId(CacheEntity.ModelInformation.Id);
                     await _apiStorageService.SaveCacheEntityAsync<TDevice>();
                 }
 
@@ -158,7 +159,7 @@ namespace Famoser.SyncApi.Repositories
 
         private readonly AsyncLock _deviceLock = new AsyncLock();
         private bool _initializedDevices;
-        private CollectionCacheEntity<TDevice> _deviceCache;
+        //private CollectionCacheEntity<TDevice> _deviceCache;
         private async Task<bool> InitializeDevicesAsync()
         {
             using (await _deviceLock.LockAsync())
@@ -168,6 +169,7 @@ namespace Famoser.SyncApi.Repositories
 
                 _initializedDevices = true;
 
+                /*
                 _deviceCache = await _apiStorageService.GetCollectionCacheEntity<TDevice>();
                 if (_deviceCache.ModelInformations == null)
                 {
@@ -176,6 +178,7 @@ namespace Famoser.SyncApi.Repositories
                 }
                 
                 //todo: implement device sync
+                */
                 return true;
             }
         }

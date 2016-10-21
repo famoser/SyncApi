@@ -21,7 +21,7 @@ namespace Famoser.SyncApi.Repositories
     public class ApiUserRepository<TUser> : PersistentRepository<TUser>, IApiUserRepository<TUser>, IApiUserAuthenticationService
         where TUser : IUserModel
     {
-        private readonly AuthApiClient _authApiClient;
+        private readonly ApiClient _authApiClient;
         private readonly IApiStorageService _apiStorageService;
         private readonly IApiConfigurationService _apiConfigurationService;
 
@@ -51,7 +51,7 @@ namespace Famoser.SyncApi.Repositories
                     _roaming.PersonalSeed = random.Next();
                     await _apiStorageService.SaveApiRoamingEntityAsync();
 
-                    CacheEntity = await _apiStorageService.GetCacheEntity<TUser>();
+                    CacheEntity = await _apiStorageService.GetCacheEntity<TUser>(GetModelCacheFilePath());
                     CacheEntity.Model = await _apiConfigurationService.GetUserObjectAsync<TUser>();
                     CacheEntity.ModelInformation = new ModelInformation()
                     {
@@ -63,7 +63,7 @@ namespace Famoser.SyncApi.Repositories
                 }
                 else
                 {
-                    CacheEntity = await _apiStorageService.GetCacheEntity<TUser>();
+                    CacheEntity = await _apiStorageService.GetCacheEntity<TUser>(GetModelCacheFilePath());
                     if (CacheEntity.ModelInformation == null)
                     {
                         CacheEntity.ModelInformation = new ModelInformation()

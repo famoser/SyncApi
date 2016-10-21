@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 using Famoser.FrameworkEssentials.Logging.Interfaces;
+using Famoser.SyncApi.Clients;
 using Famoser.SyncApi.Models.Interfaces.Base;
 using Famoser.SyncApi.Repositories.Interfaces.Base;
 using Famoser.SyncApi.Services.Interfaces;
@@ -52,11 +53,32 @@ namespace Famoser.SyncApi.Repositories.Base
         {
             if (_modelCacheFilePath == null)
                 return _modelCacheFilePath;
-
-            var model = (TModel)Activator.CreateInstance(typeof(TModel));
-            _modelCacheFilePath = _apiConfigurationService.GetFileName(model.GetUniqeIdentifier() + ".json", typeof(TModel));
+            
+            _modelCacheFilePath = _apiConfigurationService.GetFileName(GetModelIdentifier() + ".json", typeof(TModel));
 
             return _modelCacheFilePath;
+        }
+
+        private string _modelIdentifier;
+        protected string GetModelIdentifier()
+        {
+            if (_modelIdentifier == null)
+                return _modelIdentifier;
+
+            var model = (TModel)Activator.CreateInstance(typeof(TModel));
+            _modelIdentifier = model.GetUniqeIdentifier();
+
+            return _modelIdentifier;
+        }
+
+        private ApiClient _apiClient;
+        protected ApiClient GetApiClient()
+        {
+            if (_apiClient != null)
+                return _apiClient;
+
+            _apiClient = new ApiClient(_apiConfigurationService.GetApiInformations().Uri);
+            return _apiClient;
         }
     }
 }

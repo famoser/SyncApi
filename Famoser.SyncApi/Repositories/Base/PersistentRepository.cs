@@ -25,9 +25,9 @@ namespace Famoser.SyncApi.Repositories.Base
             ApiInformationEntity = apiConfigurationService.GetApiInformations();
         }
 
-        protected AuthApiClient GetAuthApiClient()
+        protected ApiClient GetAuthApiClient()
         {
-            return new AuthApiClient(ApiInformationEntity.Uri);
+            return new ApiClient(ApiInformationEntity.Uri);
         }
 
         public Task<TModel> GetAsync()

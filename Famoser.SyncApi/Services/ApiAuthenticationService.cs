@@ -1,7 +1,11 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
+using Famoser.SyncApi.Api.Communication.Entities;
+using Famoser.SyncApi.Api.Communication.Request;
 using Famoser.SyncApi.Api.Communication.Request.Base;
 using Famoser.SyncApi.Api.Configuration;
+using Famoser.SyncApi.Enums;
 using Famoser.SyncApi.Helpers;
 using Famoser.SyncApi.Services.Interfaces;
 using Famoser.SyncApi.Services.Interfaces.Authentication;
@@ -56,27 +60,62 @@ namespace Famoser.SyncApi.Services
             }
         }
 
-        public bool AuthenticateRequest(BaseRequest request)
+        public T CreateRequest<T>(OnlineAction action) where T : BaseRequest, new()
         {
             if (!IsAuthenticated())
-                return false;
+                return null;
 
-            request.AuthorizationCode = AuthorizationHelper.GenerateAuthorizationCode(_apiInformationEntity, _apiRoamingEntity);
-            request.UserId = _apiRoamingEntity.UserId;
-            request.DeviceId = _deviceId;
+            var request = new T
+            {
+                AuthorizationCode = AuthorizationHelper.GenerateAuthorizationCode(_apiInformationEntity, _apiRoamingEntity),
+                UserId = _apiRoamingEntity.UserId,
+                DeviceId = _deviceId,
+                OnlineAction = action
+            };
 
-            return IsAuthenticated();
+            return request;
         }
 
-        public bool FillModelInformation(ModelInformation info)
+        public T CreateRequest<T>(OnlineAction action, Type collectionType) where T : SyncEntityRequest, new()
+        {
+            var req = CreateRequest<T>(action);
+            if (action == OnlineAction.SyncVersion && _collectionIdsDictionary.ContainsKey(collectionType))
+            {
+                foreach (var guid in _collectionIdsDictionary[collectionType])
+                {
+                    req.CollectionEntities.Add(new CollectionEntity()
+                    {
+                        Id = guid
+                    });
+                }
+            }
+            return req;
+        }
+
+        public ModelInformation CreateModelInformation()
         {
             if (!IsAuthenticated())
-                return false;
+                return null;
 
-            info.UserId = _apiRoamingEntity.UserId;
-            info.DeviceId = _deviceId;
+            var mi = new ModelInformation
+            {
+                Id = Guid.NewGuid(),
+                VersionId = Guid.NewGuid(),
+                UserId = _apiRoamingEntity.UserId,
+                DeviceId = _deviceId,
+                CreateDateTime = DateTime.Now,
+                PendingAction = PendingAction.Create
+            };
+            return mi;
+        }
 
-            return IsAuthenticated();
+        private readonly Dictionary<Type, List<Guid>> _collectionIdsDictionary = new Dictionary<Type, List<Guid>>();
+        public void OverwriteCollectionIds<TCollection>(List<Guid> id)
+        {
+            if (_collectionIdsDictionary.ContainsKey(typeof(TCollection)))
+                _collectionIdsDictionary[typeof(TCollection)] = id;
+            else
+                _collectionIdsDictionary.Add(typeof(TCollection), id);
         }
     }
 }

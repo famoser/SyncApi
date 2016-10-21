@@ -7,6 +7,5 @@ namespace Famoser.SyncApi.Api.Communication.Entities
     {
         public Guid UserId { get; set; }
         public Guid DeviceId { get; set; }
-        public string Identifier { get; set; }
     }
 }

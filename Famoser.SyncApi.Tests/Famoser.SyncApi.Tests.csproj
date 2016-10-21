@@ -98,6 +98,9 @@
     </Otherwise>
   </Choose>
   <ItemGroup>
+    <Compile Include="CSharpTests\GenericsTest.cs" />
+    <Compile Include="CSharpTests\Models\BaseModel.cs" />
+    <Compile Include="CSharpTests\Models\ChildModel.cs" />
     <Compile Include="Models\NoteModel.cs" />
     <Compile Include="RepositoryTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

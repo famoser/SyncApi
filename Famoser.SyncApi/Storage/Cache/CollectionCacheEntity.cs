@@ -5,7 +5,7 @@ namespace Famoser.SyncApi.Storage.Cache
 {
     public class CollectionCacheEntity<TModel>
     {
-        public List<TModel> Models { get; set; }
-        public List<ModelInformation> ModelInformations { get; set; }
+        public List<TModel> Models { get; set; } = new List<TModel>();
+        public List<ModelInformation> ModelInformations { get; set; } = new List<ModelInformation>();
     }
 }

@@ -40,7 +40,6 @@
     <Compile Include="Api\Communication\Request\SyncEntityRequest.cs" />
     <Compile Include="Api\Communication\Response\CollectionEntityResponse.cs" />
     <Compile Include="Clients\ApiClient.cs" />
-    <Compile Include="Clients\AuthApiClient.cs" />
     <Compile Include="Clients\Base\BaseApiClient.cs" />
     <Compile Include="Api\Configuration\ApiInformationEntity.cs" />
     <Compile Include="Api\Base\BaseEntity.cs" />
@@ -52,6 +51,7 @@
     <Compile Include="Api\Communication\Response\Base\BaseResponse.cs" />
     <Compile Include="Api\Communication\Request\CollectionEntityRequest.cs" />
     <Compile Include="Api\Communication\Response\SyncEntityResponse.cs" />
+    <Compile Include="Helpers\ApiEntityHelper.cs" />
     <Compile Include="Repositories\ApiDeviceRepository.cs" />
     <Compile Include="Repositories\ApiUserRepository.cs" />
     <Compile Include="Repositories\Base\BasePersistentRepository.cs" />

@@ -1,15 +1,21 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
+using Famoser.SyncApi.Api.Communication.Entities;
+using Famoser.SyncApi.Api.Communication.Request;
 using Famoser.SyncApi.Enums;
+using Famoser.SyncApi.Helpers;
 using Famoser.SyncApi.Managers;
 using Famoser.SyncApi.Managers.Interfaces;
 using Famoser.SyncApi.Models.Interfaces.Base;
 using Famoser.SyncApi.Repositories.Interfaces.Base;
 using Famoser.SyncApi.Services.Interfaces;
+using Famoser.SyncApi.Services.Interfaces.Authentication;
 using Famoser.SyncApi.Storage.Cache;
 using Famoser.SyncApi.Storage.Cache.Entitites;
+using Newtonsoft.Json;
 
 namespace Famoser.SyncApi.Repositories.Base
 {
@@ -47,7 +53,7 @@ namespace Famoser.SyncApi.Repositories.Base
                 return CollectionManager.GetObservableCollection();
             });
         }
-
+        
         public Task<bool> SaveAsync(TCollection model)
         {
             return ExecuteSafe(async () =>
@@ -55,14 +61,7 @@ namespace Famoser.SyncApi.Repositories.Base
                 var info = CollectionCache.ModelInformations.FirstOrDefault(s => s.Id == model.GetId());
                 if (info == null)
                 {
-                    info = new ModelInformation()
-                    {
-                        Id = Guid.NewGuid(),
-                        PendingAction = PendingAction.Create,
-                        VersionId = Guid.NewGuid()
-                    };
-                    if (!_apiAuthenticationService.FillModelInformation(info))
-                        return false;
+                    info = _apiAuthenticationService.CreateModelInformation();
 
                     model.SetId(info.Id);
                     CollectionCache.ModelInformations.Add(info);
