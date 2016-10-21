@@ -17,7 +17,7 @@ using Nito.AsyncEx;
 
 namespace Famoser.SyncApi.Services
 {
-    public class ApiStorageService :  IApiStorageService
+    public class ApiStorageService : IApiStorageService
     {
         private readonly IStorageService _storageService;
         private readonly IApiConfigurationService _apiConfigurationService;
@@ -27,12 +27,9 @@ namespace Famoser.SyncApi.Services
             _storageService = storageService;
             _apiConfigurationService = apiConfigurationService;
         }
-
-        private readonly Dictionary<string, string> _modelDictionary = new Dictionary<string, string>();
+        
         private readonly AsyncLock _asyncLock = new AsyncLock();
-
         private ApiRoamingEntity _apiRoamingEntity;
-        private StorageServiceCache _storageServiceCache;
         private async Task<bool> InitializeAsync()
         {
             using (await _asyncLock.LockAsync())
@@ -41,10 +38,6 @@ namespace Famoser.SyncApi.Services
                 {
                     var json = await _storageService.GetRoamingTextFileAsync(GetApiRoamingFilePath());
                     _apiRoamingEntity = JsonConvert.DeserializeObject<ApiRoamingEntity>(json);
-
-                    json = await _storageService.GetCachedTextFileAsync(GetApiStorageFilePath());
-                    _storageServiceCache = JsonConvert.DeserializeObject<StorageServiceCache>(json);
-
                 }
                 catch (Exception)
                 {
@@ -53,17 +46,8 @@ namespace Famoser.SyncApi.Services
                 if (_apiRoamingEntity == null)
                     _apiRoamingEntity = new ApiRoamingEntity();
 
-                if (_storageServiceCache == null)
-                    _storageServiceCache = new StorageServiceCache();
-
                 return true;
             }
-        }
-
-
-        private string GetApiCacheFilePath()
-        {
-            return _apiConfigurationService.GetFileName("api_cache.json");
         }
 
         private string GetApiRoamingFilePath()
@@ -99,41 +83,77 @@ namespace Famoser.SyncApi.Services
 
                 //new entities
                 _apiRoamingEntity = new ApiRoamingEntity();
-                _storageServiceCache = new StorageServiceCache();
-                
+
                 return true;
             });
         }
 
-        public Task<CacheEntity<T>> GetCacheEntity<T>()
+        private readonly Dictionary<Type, string> _filenameCache = new Dictionary<Type, string>();
+        private readonly Dictionary<string, object> _unserializeCache = new Dictionary<string, object>();
+        public Task<CacheEntity<T>> GetCacheEntity<T>(string filename)
         {
-            //get filename from instace, cache it, wat?
-            throw new NotImplementedException();
+            return GetEntity<CacheEntity<T>>(filename);
         }
 
         public Task<bool> SaveCacheEntityAsync<T>()
         {
-            throw new NotImplementedException();
+            return SaveEntityAsync<CacheEntity<T>>();
         }
 
         public Task<bool> EraseCacheEntityAsync<T>()
         {
-            throw new NotImplementedException();
+            return EraseEntityAsync<CacheEntity<T>>();
         }
 
-        public Task<CollectionCacheEntity<T>> GetCollectionCacheEntity<T>()
+        public Task<CollectionCacheEntity<T>> GetCollectionCacheEntity<T>(string filename)
         {
-            throw new NotImplementedException();
+            return GetEntity<CollectionCacheEntity<T>>(filename);
         }
 
         public Task<bool> SaveCollectionEntityAsync<T>()
         {
-            throw new NotImplementedException();
+            return SaveEntityAsync<CollectionCacheEntity<T>>();
         }
 
         public Task<bool> EraseCollectionEntityAsync<T>()
         {
-            throw new NotImplementedException();
+            return EraseEntityAsync<CollectionCacheEntity<T>>();
+        }
+
+        private async Task<T> GetEntity<T>(string filename) where T : class
+        {
+            if (!_filenameCache.ContainsKey(typeof(T)))
+                _filenameCache.Add(typeof(T), filename);
+            else
+                _filenameCache[typeof(T)] = filename;
+
+            if (!_unserializeCache.ContainsKey(filename))
+            {
+                var json = await _storageService.GetCachedTextFileAsync(filename);
+                _unserializeCache.Add(filename, JsonConvert.DeserializeObject<T>(json));
+            }
+            return _unserializeCache[filename] as T;
+        }
+
+        private async Task<bool> SaveEntityAsync<T>()
+        {
+            if (!_filenameCache.ContainsKey(typeof(T)))
+                return false;
+
+            var key = _filenameCache[typeof(T)];
+            return await _storageService.SetCachedTextFileAsync(key, JsonConvert.SerializeObject(_unserializeCache[key]));
+        }
+
+        private async Task<bool> EraseEntityAsync<T>()
+        {
+            if (!_filenameCache.ContainsKey(typeof(T)))
+                return true; //no key anyways
+
+            var key = _filenameCache[typeof(T)];
+            await _storageService.DeleteCachedFileAsync(key);
+            _filenameCache.Remove(typeof(T));
+            _unserializeCache.Remove(key);
+            return true;
         }
 
         public void SetExceptionLogger(IExceptionLogger logger)

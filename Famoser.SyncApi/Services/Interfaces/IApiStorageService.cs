@@ -16,11 +16,11 @@ namespace Famoser.SyncApi.Services.Interfaces
         Task<bool> SaveApiRoamingEntityAsync();
         Task<bool> EraseRoamingAndCacheAsync();
 
-        Task<CacheEntity<T>> GetCacheEntity<T>();
+        Task<CacheEntity<T>> GetCacheEntity<T>(string filename);
         Task<bool> SaveCacheEntityAsync<T>();
         Task<bool> EraseCacheEntityAsync<T>();
 
-        Task<CollectionCacheEntity<T>> GetCollectionCacheEntity<T>();
+        Task<CollectionCacheEntity<T>> GetCollectionCacheEntity<T>(string filename);
         Task<bool> SaveCollectionEntityAsync<T>();
         Task<bool> EraseCollectionEntityAsync<T>();
     }
