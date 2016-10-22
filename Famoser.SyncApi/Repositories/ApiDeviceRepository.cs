@@ -22,9 +22,8 @@ using Nito.AsyncEx;
 
 namespace Famoser.SyncApi.Repositories
 {
-    public class ApiDeviceRepository<TDevice, TUser> : PersistentRepository<TDevice>, IApiDeviceRepository<TDevice, TUser>, IApiDeviceAuthenticationService
+    public class ApiDeviceRepository<TDevice> : PersistentRepository<TDevice>, IApiDeviceRepository<TDevice>, IApiDeviceAuthenticationService
         where TDevice : class, IDeviceModel
-        where TUser : class, IUserModel
     {
         private readonly IApiStorageService _apiStorageService;
         private readonly IApiConfigurationService _apiConfigurationService;
@@ -131,14 +130,14 @@ namespace Famoser.SyncApi.Repositories
 
                 //clean up
                 CacheEntity.ModelInformation.PendingAction = PendingAction.None;
-                return await _apiStorageService.EraseCacheEntityAsync<TUser>();
+                return await _apiStorageService.EraseCacheEntityAsync<TDevice>();
             }
             else
                 return true;
 
 
             CacheEntity.ModelInformation.PendingAction = PendingAction.None;
-            return await _apiStorageService.SaveCacheEntityAsync<TUser>();
+            return await _apiStorageService.SaveCacheEntityAsync<TDevice>();
         }
 
 

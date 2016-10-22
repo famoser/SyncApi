@@ -8,7 +8,6 @@ using Famoser.SyncApi.Services.Interfaces;
 using Famoser.SyncApi.Services.Interfaces.Authentication;
 using GalaSoft.MvvmLight.Ioc;
 using NUnit.Framework;
-using NUnit.Framework.Internal;
 
 namespace Famoser.SyncApi.NUnitTests
 {
@@ -21,7 +20,7 @@ namespace Famoser.SyncApi.NUnitTests
             SimpleIoc.Default.Register<IApiConfigurationService, ApiConfigurationService>();
             SimpleIoc.Default.Register<IApiStorageService, ApiStorageService>();
             var userRep = SimpleIoc.Default.GetInstanceWithoutCaching<ApiUserRepository<UserModel>>();
-            var deviceRepo = SimpleIoc.Default.GetInstanceWithoutCaching<ApiDeviceRepository<DeviceModel, UserModel>>();
+            var deviceRepo = SimpleIoc.Default.GetInstanceWithoutCaching<ApiDeviceRepository<DeviceModel>>();
             var aus = new ApiAuthenticationService(userRep, deviceRepo, SimpleIoc.Default.GetInstance<IApiConfigurationService>());
             SimpleIoc.Default.Register<IApiAuthenticationService>(() => aus);
         }
@@ -30,7 +29,7 @@ namespace Famoser.SyncApi.NUnitTests
         public async Task TestSync()
         {
             //arrange
-            var repo = SimpleIoc.Default.GetInstanceWithoutCaching<ApiRepository<NoteModel, CollectionModel, DeviceModel, UserModel>>();
+            var repo = SimpleIoc.Default.GetInstanceWithoutCaching<ApiRepository<NoteModel, CollectionModel>>();
             var model = new NoteModel { Content = "Hallo Welt!" };
 
             //act

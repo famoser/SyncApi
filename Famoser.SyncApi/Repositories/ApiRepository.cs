@@ -17,11 +17,9 @@ using Nito.AsyncEx;
 
 namespace Famoser.SyncApi.Repositories
 {
-    public class ApiRepository<TModel, TCollection, TDevice, TUser> : PersistentCollectionRepository<TModel>, IApiRepository<TModel, TCollection, TDevice, TUser>
+    public class ApiRepository<TModel, TCollection> : PersistentCollectionRepository<TModel>, IApiRepository<TModel, TCollection>
         where TModel : ISyncModel
         where TCollection : ICollectionModel
-        where TDevice : IDeviceModel
-        where TUser : IUserModel
     {
         private readonly ICollectionManager<TModel> _collectionManager;
         private readonly IApiConfigurationService _apiConfigurationService;

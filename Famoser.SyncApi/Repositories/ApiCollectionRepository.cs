@@ -16,15 +16,17 @@ using Nito.AsyncEx;
 
 namespace Famoser.SyncApi.Repositories
 {
-    public class ApiCollectionRepository<TCollection, TDevice, TUser> : PersistentCollectionRepository<TCollection>, IApiCollectionRepository<TCollection, TDevice, TUser>
+    public class ApiCollectionRepository<TCollection> : PersistentCollectionRepository<TCollection>,
+            IApiCollectionRepository<TCollection>
         where TCollection : class, ICollectionModel
-        where TDevice : class, IDeviceModel
-        where TUser : class, IUserModel
     {
         private readonly IApiAuthenticationService _apiAuthenticationService;
         private readonly IApiStorageService _apiStorageService;
         private readonly IApiConfigurationService _apiConfigurationService;
-        public ApiCollectionRepository(IApiAuthenticationService apiAuthenticationService, IApiStorageService apiStorageService, IApiConfigurationService apiConfigurationService) : base(apiAuthenticationService, apiStorageService, apiConfigurationService)
+
+        public ApiCollectionRepository(IApiAuthenticationService apiAuthenticationService,
+            IApiStorageService apiStorageService, IApiConfigurationService apiConfigurationService)
+            : base(apiAuthenticationService, apiStorageService, apiConfigurationService)
         {
             _apiAuthenticationService = apiAuthenticationService;
             _apiStorageService = apiStorageService;
@@ -32,6 +34,7 @@ namespace Famoser.SyncApi.Repositories
         }
 
         private readonly AsyncLock _asyncLock = new AsyncLock();
+
         protected override async Task<bool> InitializeAsync()
         {
             using (await _asyncLock.LockAsync())
@@ -39,7 +42,8 @@ namespace Famoser.SyncApi.Repositories
                 if (CollectionCache != null)
                     return true;
 
-                CollectionCache = await _apiStorageService.GetCollectionCacheEntity<TCollection>(GetModelCacheFilePath());
+                CollectionCache =
+                    await _apiStorageService.GetCollectionCacheEntity<TCollection>(GetModelCacheFilePath());
 
                 if (CollectionCache.ModelInformations.Count == 0)
                 {
@@ -51,7 +55,8 @@ namespace Famoser.SyncApi.Repositories
                     CollectionCache.ModelInformations.Add(mi);
                     await _apiStorageService.SaveCollectionEntityAsync<TCollection>();
 
-                    _apiAuthenticationService.OverwriteCollectionIds<TCollection>(CollectionCache.ModelInformations.Select(d => d.Id).ToList());
+                    _apiAuthenticationService.OverwriteCollectionIds<TCollection>(
+                        CollectionCache.ModelInformations.Select(d => d.Id).ToList());
                 }
 
                 foreach (var collectionCacheModel in CollectionCache.Models)
@@ -83,7 +88,8 @@ namespace Famoser.SyncApi.Repositories
             {
                 //such elegance wooooow
                 var index1 = index;
-                var mdl = ApiEntityHelper.CreateCollectionEntity(CollectionCache.ModelInformations[index], GetModelIdentifier(), () => CollectionCache.Models[index1]);
+                var mdl = ApiEntityHelper.CreateCollectionEntity(CollectionCache.ModelInformations[index],
+                    GetModelIdentifier(), () => CollectionCache.Models[index1]);
                 if (mdl != null)
                 {
                     req.CollectionEntities.Add(mdl);
@@ -113,7 +119,7 @@ namespace Famoser.SyncApi.Repositories
             resp = await client.DoSyncRequestAsync(req);
             if (!resp.IsSuccessfull)
                 return false;
-            
+
             foreach (var respCollectionEntity in resp.CollectionEntities)
             {
                 //new!
@@ -148,13 +154,14 @@ namespace Famoser.SyncApi.Repositories
             if (resp.CollectionEntities.Any())
             {
                 await _apiStorageService.SaveCollectionEntityAsync<TCollection>();
-                _apiAuthenticationService.OverwriteCollectionIds<TCollection>(CollectionCache.ModelInformations.Select(d => d.Id).ToList());
+                _apiAuthenticationService.OverwriteCollectionIds<TCollection>(
+                    CollectionCache.ModelInformations.Select(d => d.Id).ToList());
             }
 
             return true;
         }
 
-        public Task<bool> AddUserToCollectionAsync(TCollection collection, TUser user)
+        public Task<bool> AddUserToCollectionAsync(TCollection collection, Guid userId)
         {
             throw new NotImplementedException();
         }

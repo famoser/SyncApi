@@ -3,11 +3,9 @@ using Famoser.SyncApi.Repositories.Interfaces.Base;
 
 namespace Famoser.SyncApi.Repositories.Interfaces
 {
-    public interface IApiRepository<TModel, TCollection, TDevice, TUser> : IPersistentCollectionRespository<TModel>
+    public interface IApiRepository<TModel, TCollection> : IPersistentCollectionRespository<TModel>
         where TModel : ISyncModel
         where TCollection : ICollectionModel
-        where TDevice : IDeviceModel
-        where TUser : IUserModel
     {
     }
 }
