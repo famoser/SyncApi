@@ -38,10 +38,8 @@ namespace Famoser.SyncApi.Helpers
             var mdl = CreateApiEntity<CollectionEntity>(info, identifier, getModelFunc);
             if (mdl != null)
             {
-                if (info.DeviceId.HasValue)
-                    mdl.DeviceId = info.DeviceId.Value;
-                if (info.UserId.HasValue)
-                    mdl.UserId = info.UserId.Value;
+                mdl.DeviceId = info.DeviceId;
+                mdl.UserId = info.UserId;
             }
             return mdl;
         }
@@ -54,12 +52,9 @@ namespace Famoser.SyncApi.Helpers
             var mdl = CreateApiEntity<SyncEntity>(info, identifier, getModelFunc);
             if (mdl != null)
             {
-                if (info.DeviceId.HasValue)
-                    mdl.DeviceId = info.DeviceId.Value;
-                if (info.UserId.HasValue)
-                    mdl.UserId = info.UserId.Value;
-                if (info.CollectionId.HasValue)
-                    mdl.CollectionId = info.CollectionId.Value;
+                mdl.DeviceId = info.DeviceId;
+                mdl.UserId = info.UserId;
+                mdl.CollectionId = info.CollectionId;
             }
             return mdl;
         }

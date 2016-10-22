@@ -20,8 +20,11 @@ namespace Famoser.SyncApi.Tests
             SimpleIoc.Default.Register<IApiConfigurationService, ApiConfigurationService>();
             SimpleIoc.Default.Register<IApiStorageService, ApiStorageService>();
             var userRep = SimpleIoc.Default.GetInstanceWithoutCaching<ApiUserRepository<UserModel>>();
-            SimpleIoc.Default.Register<IApiAuthenticationService, ApiAuthenticationService>();
+            var deviceRepo = SimpleIoc.Default.GetInstanceWithoutCaching<ApiDeviceRepository<DeviceModel, UserModel>>();
+            var aus = new ApiAuthenticationService(userRep, deviceRepo, SimpleIoc.Default.GetInstance<IApiConfigurationService>());
+            SimpleIoc.Default.Register<IApiAuthenticationService>(() => aus);
         }
+
         [TestMethod]
         public async Task TestSync()
         {

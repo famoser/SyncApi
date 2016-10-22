@@ -22,11 +22,10 @@ namespace Famoser.SyncApi.Services
         private readonly IApiDeviceAuthenticationService _apiDeviceAuthenticationService;
         private readonly ApiInformationEntity _apiInformationEntity;
 
-        public ApiAuthenticationService(IApiUserAuthenticationService apiUserAuthenticationService, IApiDeviceAuthenticationService deviceAuthenticationService, IApiDeviceAuthenticationService apiDeviceAuthenticationService, IApiConfigurationService apiConfigurationService)
+        public ApiAuthenticationService(IApiUserAuthenticationService apiUserAuthenticationService, IApiDeviceAuthenticationService apiDeviceAuthenticationService, IApiConfigurationService apiConfigurationService)
         {
             _apiUserAuthenticationService = apiUserAuthenticationService;
             _apiDeviceAuthenticationService = apiDeviceAuthenticationService;
-            _apiDeviceAuthenticationService = deviceAuthenticationService;
 
             _apiInformationEntity = apiConfigurationService.GetApiInformations();
         }
@@ -94,9 +93,6 @@ namespace Famoser.SyncApi.Services
 
         public ModelInformation CreateModelInformation()
         {
-            if (!IsAuthenticated())
-                return null;
-
             var mi = new ModelInformation
             {
                 Id = Guid.NewGuid(),

@@ -53,7 +53,7 @@ namespace Famoser.SyncApi.Repositories.Base
         {
             if (_modelCacheFilePath == null)
                 return _modelCacheFilePath;
-            
+
             _modelCacheFilePath = _apiConfigurationService.GetFileName(GetModelIdentifier() + ".json", typeof(TModel));
 
             return _modelCacheFilePath;

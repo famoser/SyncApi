@@ -38,7 +38,7 @@ namespace Famoser.SyncApi.Repositories.Base
             return CollectionManager.GetObservableCollection();
         }
 
-        public Task<ObservableCollection<TCollection>> GetAll()
+        public Task<ObservableCollection<TCollection>> GetAllAsync()
         {
             return ExecuteSafe(async () =>
             {

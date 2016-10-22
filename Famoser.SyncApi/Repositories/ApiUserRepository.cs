@@ -47,6 +47,8 @@ namespace Famoser.SyncApi.Repositories
                 {
                     //totally new installation
                     _roaming.UserId = Guid.NewGuid();
+                    _roaming.AuthenticationState = AuthenticationState.NotYetAuthenticated;
+
                     var random = new Random(ApiInformationEntity.Seed);
                     _roaming.PersonalSeed = random.Next();
                     await _apiStorageService.SaveApiRoamingEntityAsync();
@@ -102,6 +104,7 @@ namespace Famoser.SyncApi.Repositories
                 {
                     return false;
                 }
+                _roaming.AuthenticationState = AuthenticationState.Authenticated;
             }
             else if (CacheEntity.ModelInformation.PendingAction == PendingAction.Read)
             {
@@ -157,6 +160,7 @@ namespace Famoser.SyncApi.Repositories
 
                 //clean up
                 _roaming.UserId = Guid.Empty;
+                _roaming.AuthenticationState = AuthenticationState.UnAuthenticated;
                 CacheEntity.ModelInformation.PendingAction = PendingAction.None;
                 return await _apiStorageService.EraseRoamingAndCacheAsync();
             }
@@ -178,9 +182,7 @@ namespace Famoser.SyncApi.Repositories
 
         public async Task<ApiRoamingEntity> GetApiRoamingEntityAsync()
         {
-            if (!await InitializeAsync())
-                return null;
-
+            await ExecuteSafe(async () => await SyncInternalAsync());
             return _roaming;
         }
     }

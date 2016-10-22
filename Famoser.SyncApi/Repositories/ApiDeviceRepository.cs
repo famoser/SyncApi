@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Threading.Tasks;
 using Famoser.SyncApi.Api.Communication.Entities;
@@ -13,6 +14,7 @@ using Famoser.SyncApi.Repositories.Base;
 using Famoser.SyncApi.Repositories.Interfaces;
 using Famoser.SyncApi.Services.Interfaces;
 using Famoser.SyncApi.Services.Interfaces.Authentication;
+using Famoser.SyncApi.Storage.Cache;
 using Famoser.SyncApi.Storage.Cache.Entitites;
 using Famoser.SyncApi.Storage.Roaming;
 using Newtonsoft.Json;
@@ -92,21 +94,6 @@ namespace Famoser.SyncApi.Repositories
             // read is not valid action in this repo
             //else if (CacheEntity.ModelInformation.PendingAction == PendingAction.Read)
             //{
-            //    var resp = await _authApiClient.DoRequestAsync(
-            //        AuthorizeRequest(ApiInformationEntity, _apiRoamingEntity, new AuthRequestEntity()
-            //        {
-            //            UserEntity = new UserEntity()
-            //            {
-            //                Id = CacheEntity.ModelInformation.Id,
-            //                OnlineAction = OnlineAction.Read
-            //            }
-            //        }));
-            //    if (resp.IsSuccessfull)
-            //    {
-            //        Manager.Set(JsonConvert.DeserializeObject<TDevice>(resp.UserEntity.Content));
-            //    }
-            //    else
-            //        return false;
             //}
             else if (CacheEntity.ModelInformation.PendingAction == PendingAction.Update)
             {
@@ -155,9 +142,34 @@ namespace Famoser.SyncApi.Repositories
         }
 
 
+
+        private string _deviceCacheFilePath;
+        protected string GetDeviceCacheFilePath()
+        {
+            if (_deviceCacheFilePath == null)
+                return _deviceCacheFilePath;
+
+            _deviceCacheFilePath = _apiConfigurationService.GetFileName(GetModelIdentifier() + "_col.json", typeof(TDevice));
+
+            return _deviceCacheFilePath;
+        }
+
+        private string _deviceIdentifier;
+        protected string GetDeviceIdentifier()
+        {
+            if (_deviceIdentifier == null)
+                return _deviceIdentifier;
+
+            var model = (TDevice)Activator.CreateInstance(typeof(TDevice));
+            _deviceIdentifier = model.GetUniqeIdentifier();
+
+            return _deviceIdentifier;
+        }
+
+
         private readonly AsyncLock _deviceLock = new AsyncLock();
         private bool _initializedDevices;
-        //private CollectionCacheEntity<TDevice> _deviceCache;
+        private CollectionCacheEntity<TDevice> _deviceCache;
         private async Task<bool> InitializeDevicesAsync()
         {
             using (await _deviceLock.LockAsync())
@@ -167,16 +179,14 @@ namespace Famoser.SyncApi.Repositories
 
                 _initializedDevices = true;
 
-                /*
-                _deviceCache = await _apiStorageService.GetCollectionCacheEntity<TDevice>();
+
+                _deviceCache = await _apiStorageService.GetCollectionCacheEntity<TDevice>(GetModelCacheFilePath());
                 if (_deviceCache.ModelInformations == null)
                 {
                     _deviceCache.ModelInformations = new List<ModelInformation>();
                     _deviceCache.Models = new List<TDevice>();
                 }
-                
-                //todo: implement device sync
-                */
+
                 return true;
             }
         }
@@ -251,12 +261,8 @@ namespace Famoser.SyncApi.Repositories
         {
             _apiRoamingEntity = apiRoamingEntity;
 
-            if (!await InitializeAsync())
-                return null;
-
-            if (Manager.GetModel().GetAuthenticationState() == AuthenticationState.Authenticated)
-                return Manager.GetModel().GetId();
-            return null;
+            await ExecuteSafe(async () => await SyncInternalAsync());
+            return Manager.GetModel().GetId();
         }
 
         private AuthRequestEntity AuthorizeRequest(ApiInformationEntity apiInformationEntity,
