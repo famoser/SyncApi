@@ -7,7 +7,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Famoser.SyncApi", "Famoser.
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{A61F36A2-068C-4348-9FCD-75650E1A0491}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Famoser.SyncApi.Tests", "Famoser.SyncApi.Tests\Famoser.SyncApi.Tests.csproj", "{21156276-6448-41B8-BBE2-10A678318C65}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Famoser.SyncApi.NUnitTests", "Famoser.SyncApi.NUnitTests\Famoser.SyncApi.NUnitTests.csproj", "{067456C0-086C-46A8-B37F-1405717B7BFC}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -19,15 +19,15 @@ Global
 		{7DC23924-D011-4477-BB64-0DB88FAEDBCF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7DC23924-D011-4477-BB64-0DB88FAEDBCF}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7DC23924-D011-4477-BB64-0DB88FAEDBCF}.Release|Any CPU.Build.0 = Release|Any CPU
-		{21156276-6448-41B8-BBE2-10A678318C65}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{21156276-6448-41B8-BBE2-10A678318C65}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{21156276-6448-41B8-BBE2-10A678318C65}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{21156276-6448-41B8-BBE2-10A678318C65}.Release|Any CPU.Build.0 = Release|Any CPU
+		{067456C0-086C-46A8-B37F-1405717B7BFC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{067456C0-086C-46A8-B37F-1405717B7BFC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{067456C0-086C-46A8-B37F-1405717B7BFC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{067456C0-086C-46A8-B37F-1405717B7BFC}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
-		{21156276-6448-41B8-BBE2-10A678318C65} = {A61F36A2-068C-4348-9FCD-75650E1A0491}
+		{067456C0-086C-46A8-B37F-1405717B7BFC} = {A61F36A2-068C-4348-9FCD-75650E1A0491}
 	EndGlobalSection
 EndGlobal
