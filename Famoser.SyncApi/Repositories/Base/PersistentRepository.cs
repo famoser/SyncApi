@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.ObjectModel;
 using System.Threading.Tasks;
 using Famoser.SyncApi.Api.Configuration;
 using Famoser.SyncApi.Clients;
@@ -65,6 +66,11 @@ namespace Famoser.SyncApi.Repositories.Base
                 }
                 return await SyncInternalAsync();
             });
+        }
+
+        public Task<ObservableCollection<TModel>> GetHistoryAsync()
+        {
+            throw new NotImplementedException();
         }
     }
 }

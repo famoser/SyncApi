@@ -1,5 +1,4 @@
 ﻿using System;
-using Famoser.SqliteWrapper.Attributes;
 using Famoser.SyncApi.Models.Interfaces;
 using GalaSoft.MvvmLight;
 

@@ -99,6 +99,16 @@ namespace Famoser.SyncApi.Repositories.Base
             });
         }
 
+        public ObservableCollection<TCollection> GetHistoryLazy(TCollection model)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<ObservableCollection<TCollection>> GetHistoryAsync(TCollection model)
+        {
+            throw new NotImplementedException();
+        }
+
         public Task<bool> RemoveAllAsync()
         {
             return ExecuteSafe(async () =>
