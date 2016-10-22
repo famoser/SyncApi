@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
+using Famoser.SyncApi.Models.Interfaces;
 using Famoser.SyncApi.Storage.Roaming;
 
 namespace Famoser.SyncApi.Services.Interfaces.Authentication
@@ -11,6 +12,6 @@ namespace Famoser.SyncApi.Services.Interfaces.Authentication
         /// </summary>
         /// <param name="apiRoamingEntity"></param>
         /// <returns></returns>
-        Task<Guid?> GetAuthenticatedDeviceIdAsync(ApiRoamingEntity apiRoamingEntity);
+        Task<IDeviceModel> GetAuthenticatedDeviceAsync(ApiRoamingEntity apiRoamingEntity);
     }
 }

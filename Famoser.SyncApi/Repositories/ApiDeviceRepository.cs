@@ -257,12 +257,12 @@ namespace Famoser.SyncApi.Repositories
         }
 
         private ApiRoamingEntity _apiRoamingEntity;
-        public async Task<Guid?> GetAuthenticatedDeviceIdAsync(ApiRoamingEntity apiRoamingEntity)
+        public async Task<IDeviceModel> GetAuthenticatedDeviceAsync(ApiRoamingEntity apiRoamingEntity)
         {
             _apiRoamingEntity = apiRoamingEntity;
 
             await ExecuteSafe(async () => await SyncInternalAsync());
-            return Manager.GetModel().GetId();
+            return Manager.GetModel();
         }
 
         private AuthRequestEntity AuthorizeRequest(ApiInformationEntity apiInformationEntity,

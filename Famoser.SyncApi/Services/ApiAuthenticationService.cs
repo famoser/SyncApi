@@ -7,6 +7,7 @@ using Famoser.SyncApi.Api.Communication.Request.Base;
 using Famoser.SyncApi.Api.Configuration;
 using Famoser.SyncApi.Enums;
 using Famoser.SyncApi.Helpers;
+using Famoser.SyncApi.Models.Interfaces;
 using Famoser.SyncApi.Services.Interfaces;
 using Famoser.SyncApi.Services.Interfaces.Authentication;
 using Famoser.SyncApi.Storage.Cache.Entitites;
@@ -29,32 +30,23 @@ namespace Famoser.SyncApi.Services
 
             _apiInformationEntity = apiConfigurationService.GetApiInformations();
         }
-
-        private bool _isAuthenticated;
+        
         public bool IsAuthenticated()
         {
-            return _isAuthenticated;
+            return _apiRoamingEntity?.AuthenticationState == AuthenticationState.Authenticated && _deviceModel?.GetAuthenticationState() == AuthenticationState.Authenticated;
         }
 
         private ApiRoamingEntity _apiRoamingEntity;
-        private Guid _deviceId;
+        private IDeviceModel _deviceModel;
         public async Task<bool> AuthenticateAsync()
         {
             using (await _asyncLock.LockAsync())
             {
-                if (_isAuthenticated)
-                    return IsAuthenticated();
-
-                _apiRoamingEntity = await _apiUserAuthenticationService.GetApiRoamingEntityAsync();
-                var g = await _apiDeviceAuthenticationService.GetAuthenticatedDeviceIdAsync(_apiRoamingEntity);
-                if (g.HasValue)
+                if (_apiRoamingEntity == null || _deviceModel == null)
                 {
-                    _deviceId = g.Value;
-                    _isAuthenticated = true;
+                    _apiRoamingEntity = await _apiUserAuthenticationService.GetApiRoamingEntityAsync();
+                    _deviceModel = await _apiDeviceAuthenticationService.GetAuthenticatedDeviceAsync(_apiRoamingEntity);
                 }
-                else
-                    _isAuthenticated = false;
-
                 return IsAuthenticated();
             }
         }
@@ -68,7 +60,7 @@ namespace Famoser.SyncApi.Services
             {
                 AuthorizationCode = AuthorizationHelper.GenerateAuthorizationCode(_apiInformationEntity, _apiRoamingEntity),
                 UserId = _apiRoamingEntity.UserId,
-                DeviceId = _deviceId,
+                DeviceId = _deviceModel.GetId(),
                 OnlineAction = action
             };
 
@@ -98,7 +90,7 @@ namespace Famoser.SyncApi.Services
                 Id = Guid.NewGuid(),
                 VersionId = Guid.NewGuid(),
                 UserId = _apiRoamingEntity.UserId,
-                DeviceId = _deviceId,
+                DeviceId = _deviceModel.GetId(),
                 CreateDateTime = DateTime.Now,
                 PendingAction = PendingAction.Create
             };
