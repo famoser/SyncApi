@@ -19,9 +19,9 @@ using Nito.AsyncEx;
 namespace Famoser.SyncApi.Repositories
 {
     public class ApiUserRepository<TUser> : PersistentRepository<TUser>, IApiUserRepository<TUser>, IApiUserAuthenticationService
-        where TUser : IUserModel
+        where TUser : class, IUserModel
     {
-        private readonly AuthApiClient _authApiClient;
+        private readonly ApiClient _authApiClient;
         private readonly IApiStorageService _apiStorageService;
         private readonly IApiConfigurationService _apiConfigurationService;
 
@@ -47,11 +47,13 @@ namespace Famoser.SyncApi.Repositories
                 {
                     //totally new installation
                     _roaming.UserId = Guid.NewGuid();
-                    var random = new Random(ApiInformationEntity.Seed);
+                    _roaming.AuthenticationState = AuthenticationState.NotYetAuthenticated;
+
+                    var random = new Random(ApiInformationEntity.ApplicationSeed);
                     _roaming.PersonalSeed = random.Next();
                     await _apiStorageService.SaveApiRoamingEntityAsync();
 
-                    CacheEntity = await _apiStorageService.GetCacheEntity<TUser>();
+                    CacheEntity = await _apiStorageService.GetCacheEntity<TUser>(GetModelCacheFilePath());
                     CacheEntity.Model = await _apiConfigurationService.GetUserObjectAsync<TUser>();
                     CacheEntity.ModelInformation = new ModelInformation()
                     {
@@ -63,7 +65,7 @@ namespace Famoser.SyncApi.Repositories
                 }
                 else
                 {
-                    CacheEntity = await _apiStorageService.GetCacheEntity<TUser>();
+                    CacheEntity = await _apiStorageService.GetCacheEntity<TUser>(GetModelCacheFilePath());
                     if (CacheEntity.ModelInformation == null)
                     {
                         CacheEntity.ModelInformation = new ModelInformation()
@@ -102,6 +104,7 @@ namespace Famoser.SyncApi.Repositories
                 {
                     return false;
                 }
+                _roaming.AuthenticationState = AuthenticationState.Authenticated;
             }
             else if (CacheEntity.ModelInformation.PendingAction == PendingAction.Read)
             {
@@ -157,6 +160,7 @@ namespace Famoser.SyncApi.Repositories
 
                 //clean up
                 _roaming.UserId = Guid.Empty;
+                _roaming.AuthenticationState = AuthenticationState.UnAuthenticated;
                 CacheEntity.ModelInformation.PendingAction = PendingAction.None;
                 return await _apiStorageService.EraseRoamingAndCacheAsync();
             }
@@ -176,11 +180,9 @@ namespace Famoser.SyncApi.Repositories
             return request;
         }
 
-        public async Task<ApiRoamingEntity> TryGetApiRoamingEntityAsync()
+        public async Task<ApiRoamingEntity> GetApiRoamingEntityAsync()
         {
-            if (!await InitializeAsync())
-                return null;
-
+            await ExecuteSafe(async () => await SyncInternalAsync());
             return _roaming;
         }
     }

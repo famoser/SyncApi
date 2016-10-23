@@ -2,10 +2,10 @@
 {
     public enum PendingAction
     {
-        None = 0,
-        Create = 1,
-        Read = 2,
-        Update = 3,
-        Delete = 4
+        Create = 0,
+        Read = 1,
+        Update = 2,
+        Delete = 3,
+        None = 4
     }
 }

@@ -8,5 +8,6 @@ namespace Famoser.SyncApi.Managers.Interfaces
         void Add(TModel model);
         void Remove(TModel model);
         void TransferFrom(ICollectionManager<TModel> collectionManager);
+        void Replace(TModel oldOne, TModel newOne);
     }
 }

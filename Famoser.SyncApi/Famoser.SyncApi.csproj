@@ -37,8 +37,9 @@
     <!-- A reference to the entire .NET Framework is automatically included -->
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Api\Communication\Request\SyncEntityRequest.cs" />
+    <Compile Include="Api\Communication\Response\CollectionEntityResponse.cs" />
     <Compile Include="Clients\ApiClient.cs" />
-    <Compile Include="Clients\AuthApiClient.cs" />
     <Compile Include="Clients\Base\BaseApiClient.cs" />
     <Compile Include="Api\Configuration\ApiInformationEntity.cs" />
     <Compile Include="Api\Base\BaseEntity.cs" />
@@ -48,11 +49,21 @@
     <Compile Include="Api\Communication\Response\AuthorizationResponse.cs" />
     <Compile Include="Api\Communication\Request\Base\BaseRequest.cs" />
     <Compile Include="Api\Communication\Response\Base\BaseResponse.cs" />
-    <Compile Include="Api\Communication\Request\RequestEntity.cs" />
-    <Compile Include="Api\Communication\Response\ResponseEntity.cs" />
+    <Compile Include="Api\Communication\Request\CollectionEntityRequest.cs" />
+    <Compile Include="Api\Communication\Response\SyncEntityResponse.cs" />
+    <Compile Include="Helpers\ApiEntityHelper.cs" />
+    <Compile Include="Helpers\SyncApiHelper.cs" />
+    <Compile Include="Models\Base\BaseModel.cs" />
+    <Compile Include="Models\CollectionModel.cs" />
+    <Compile Include="Models\DeviceModel.cs" />
+    <Compile Include="Models\UserModel.cs" />
     <Compile Include="Repositories\ApiDeviceRepository.cs" />
     <Compile Include="Repositories\ApiUserRepository.cs" />
+    <Compile Include="Repositories\Base\BasePersistentRepository.cs" />
+    <Compile Include="Repositories\Base\PersistentCollectionRepository.cs" />
     <Compile Include="Repositories\Base\PersistentRepository.cs" />
+    <Compile Include="Repositories\ApiCollectionRepository.cs" />
+    <Compile Include="Services\ApiConfigurationService.cs" />
     <Compile Include="Services\Interfaces\Authentication\IApiDeviceAuthenticationService.cs" />
     <Compile Include="Services\Interfaces\Authentication\IApiUserAuthenticationRepository.cs" />
     <Compile Include="Storage\Cache\CacheEntity.cs" />
@@ -76,7 +87,6 @@
     <Compile Include="Repositories\Interfaces\IApiCollectionRepository.cs" />
     <Compile Include="Repositories\Interfaces\IApiDeviceRepository.cs" />
     <Compile Include="Repositories\Interfaces\IApiUserRepository.cs" />
-    <Compile Include="Repositories\Interfaces\IAuthRepository.cs" />
     <Compile Include="Repositories\Interfaces\Base\IPersistentCollectionRespository.cs" />
     <Compile Include="Services\ApiAuthenticationService.cs" />
     <Compile Include="Services\Interfaces\IApiConfigurationService.cs" />
@@ -90,7 +100,6 @@
     <Compile Include="Models\Interfaces\IUserModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Repositories\ApiRepository.cs" />
-    <Compile Include="Repositories\ApiRepositoryContructors.cs" />
     <Compile Include="Services\ApiStorageService.cs" />
     <Compile Include="Services\Interfaces\Authentication\IApiAuthenticationService.cs" />
   </ItemGroup>

@@ -1,19 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Famoser.FrameworkEssentials.Services.Base;
+using Famoser.FrameworkEssentials.Logging.Interfaces;
 using Famoser.FrameworkEssentials.Services.Interfaces;
-using Famoser.SyncApi.Api.Communication.Entities;
-using Famoser.SyncApi.Enums;
-using Famoser.SyncApi.Models.Interfaces;
 using Famoser.SyncApi.Services.Interfaces;
+using Famoser.SyncApi.Storage.Cache;
 using Famoser.SyncApi.Storage.Roaming;
 using Newtonsoft.Json;
 using Nito.AsyncEx;
 
 namespace Famoser.SyncApi.Services
 {
-    public class ApiStorageService : BaseService, IApiStorageService
+    public class ApiStorageService : IApiStorageService
     {
         private readonly IStorageService _storageService;
         private readonly IApiConfigurationService _apiConfigurationService;
@@ -23,12 +21,10 @@ namespace Famoser.SyncApi.Services
             _storageService = storageService;
             _apiConfigurationService = apiConfigurationService;
         }
-
-        private ApiRoamingEntity _apiRoamingEntity;
-        private ApiCacheEntity _apiCacheEntity;
-        private readonly Dictionary<string, string> _modelDictionary = new Dictionary<string, string>();
+        
         private readonly AsyncLock _asyncLock = new AsyncLock();
-        public async Task<bool> InitializeAsync()
+        private ApiRoamingEntity _apiRoamingEntity;
+        private async Task<bool> InitializeAsync()
         {
             using (await _asyncLock.LockAsync())
             {
@@ -36,108 +32,16 @@ namespace Famoser.SyncApi.Services
                 {
                     var json = await _storageService.GetRoamingTextFileAsync(GetApiRoamingFilePath());
                     _apiRoamingEntity = JsonConvert.DeserializeObject<ApiRoamingEntity>(json);
-
-                    json = await _storageService.GetCachedTextFileAsync(GetApiCacheFilePath());
-                    _apiCacheEntity = JsonConvert.DeserializeObject<ApiCacheEntity>(json);
-
-                    foreach (var modelIdentifier in _apiCacheEntity.ModelIdentifiers)
-                    {
-                        _modelDictionary.Add(modelIdentifier, await _storageService.GetCachedTextFileAsync(modelIdentifier));
-                    }
                 }
                 catch (Exception)
                 {
-                    // ignored: new installation perhaps, some exceptions may happen in storageservice
+                    // omited as it can be a new installation
                 }
-
                 if (_apiRoamingEntity == null)
-                {
-                    var userId = Guid.NewGuid();
-                    var deviceId = Guid.NewGuid();
-                    _apiRoamingEntity = new ApiRoamingEntity { UserId = Guid.NewGuid() };
-                    _apiCacheEntity = new ApiCacheEntity
-                    {
-                        DeviceId = Guid.NewGuid(),
-                        DeviceEntity = new DeviceEntity()
-                        {
-                            Content = JsonConvert.SerializeObject(await _apiConfigurationService.GetDeviceObjectAsync()),
-                            OnlineAction = OnlineAction.Create,
-                            UserId = userId,
-                            Id = deviceId
-                        },
-                        UserEntity = new UserEntity()
-                        {
-                            Content = JsonConvert.SerializeObject(await _apiConfigurationService.GetUserObjectAsync()),
-                            OnlineAction = OnlineAction.Create,
-                            Id = deviceId
-                        }
-                    };
+                    _apiRoamingEntity = new ApiRoamingEntity();
 
-                    await _storageService.SetRoamingTextFileAsync(GetApiRoamingFilePath(), JsonConvert.SerializeObject(_apiRoamingEntity));
-                    await _storageService.SetCachedTextFileAsync(GetApiCacheFilePath(), JsonConvert.SerializeObject(_apiCacheEntity));
-                }
-                else if (_apiCacheEntity == null)
-                {
-                    var deviceId = Guid.NewGuid();
-                    _apiCacheEntity = new ApiCacheEntity
-                    {
-                        DeviceId = Guid.NewGuid(),
-                        DeviceEntity = new DeviceEntity()
-                        {
-                            Content = JsonConvert.SerializeObject(await _apiConfigurationService.GetDeviceObjectAsync()),
-                            OnlineAction = OnlineAction.Create,
-                            UserId = _apiRoamingEntity.UserId,
-                            Id = deviceId
-                        },
-                        UserEntity = new UserEntity()
-                        {
-                            OnlineAction = OnlineAction.Read,
-                            Id = _apiRoamingEntity.UserId
-                        }
-                    };
-
-                    await _storageService.SetCachedTextFileAsync(GetApiCacheFilePath(), JsonConvert.SerializeObject(_apiCacheEntity));
-                }
                 return true;
             }
-        }
-
-        public ApiRoamingEntity GetApiRoamingEntity()
-        {
-            return _apiRoamingEntity;
-        }
-
-        public ApiCacheEntity GetApiCacheEntity()
-        {
-            return _apiCacheEntity;
-        }
-
-        public Task SaveApiCacheEntityAsync()
-        {
-            return _storageService.SetCachedTextFileAsync(GetApiCacheFilePath(), JsonConvert.SerializeObject(_apiCacheEntity));
-        }
-
-        public ModelCacheEntity<TModel> GetModelCache<TModel>(string identifier) where TModel : ISyncModel
-        {
-            if (_modelDictionary.ContainsKey(identifier))
-                return JsonConvert.DeserializeObject<ModelCacheEntity<TModel>>(_modelDictionary[identifier]);
-            return new ModelCacheEntity<TModel>();
-        }
-
-        public async Task SetModelCacheAsync<TModel>(string identifier, ModelCacheEntity<TModel> cache) where TModel : ISyncModel
-        {
-            _modelDictionary[identifier] = JsonConvert.SerializeObject(cache);
-            if (!_apiCacheEntity.ModelIdentifiers.Contains(identifier))
-            {
-                _apiCacheEntity.ModelIdentifiers.Add(identifier);
-                await _storageService.SetCachedTextFileAsync(GetApiCacheFilePath(), JsonConvert.SerializeObject(_apiCacheEntity));
-            }
-            await _storageService.SetCachedTextFileAsync(identifier, JsonConvert.SerializeObject(cache));
-        }
-
-        private string GetApiCacheFilePath()
-        {
-            return _apiConfigurationService.GetFileName("api_cache.json");
         }
 
         private string GetApiRoamingFilePath()
@@ -145,5 +49,144 @@ namespace Famoser.SyncApi.Services
             return _apiConfigurationService.GetFileName("api_roaming.json");
         }
 
+        private string GetApiStorageFilePath()
+        {
+            return _apiConfigurationService.GetFileName("api_storage_cache.json");
+        }
+
+        public Task<ApiRoamingEntity> GetApiRoamingEntity()
+        {
+            return ExecuteSafe(() => _apiRoamingEntity);
+
+        }
+
+        public Task<bool> SaveApiRoamingEntityAsync()
+        {
+            return ExecuteSafe(async () => await _storageService.SetRoamingTextFileAsync(GetApiRoamingFilePath(), JsonConvert.SerializeObject(_apiRoamingEntity)));
+        }
+
+        public Task<bool> EraseRoamingAndCacheAsync()
+        {
+            return ExecuteSafe(async () =>
+            {
+                await _storageService.DeleteRoamingFileAsync(GetApiRoamingFilePath());
+                await _storageService.DeleteCachedFileAsync(GetApiStorageFilePath());
+
+                //invalidate userId
+                _apiRoamingEntity.UserId = Guid.Empty;
+
+                //new entities
+                _apiRoamingEntity = new ApiRoamingEntity();
+
+                return true;
+            });
+        }
+
+        private readonly Dictionary<Type, string> _filenameCache = new Dictionary<Type, string>();
+        private readonly Dictionary<string, object> _unserializeCache = new Dictionary<string, object>();
+        public Task<CacheEntity<T>> GetCacheEntity<T>(string filename)
+        {
+            return GetEntity<CacheEntity<T>>(filename);
+        }
+
+        public Task<bool> SaveCacheEntityAsync<T>()
+        {
+            return SaveEntityAsync<CacheEntity<T>>();
+        }
+
+        public Task<bool> EraseCacheEntityAsync<T>()
+        {
+            return EraseEntityAsync<CacheEntity<T>>();
+        }
+
+        public Task<CollectionCacheEntity<T>> GetCollectionCacheEntity<T>(string filename)
+        {
+            return GetEntity<CollectionCacheEntity<T>>(filename);
+        }
+
+        public Task<bool> SaveCollectionEntityAsync<T>()
+        {
+            return SaveEntityAsync<CollectionCacheEntity<T>>();
+        }
+
+        public Task<bool> EraseCollectionEntityAsync<T>()
+        {
+            return EraseEntityAsync<CollectionCacheEntity<T>>();
+        }
+
+        private async Task<T> GetEntity<T>(string filename) where T : class
+        {
+            if (!_filenameCache.ContainsKey(typeof(T)))
+                _filenameCache.Add(typeof(T), filename);
+            else
+                _filenameCache[typeof(T)] = filename;
+
+            if (!_unserializeCache.ContainsKey(filename))
+            {
+                var json = await _storageService.GetCachedTextFileAsync(filename);
+                _unserializeCache.Add(filename, JsonConvert.DeserializeObject<T>(json));
+            }
+            return _unserializeCache[filename] as T;
+        }
+
+        private async Task<bool> SaveEntityAsync<T>()
+        {
+            if (!_filenameCache.ContainsKey(typeof(T)))
+                return false;
+
+            var key = _filenameCache[typeof(T)];
+            return await _storageService.SetCachedTextFileAsync(key, JsonConvert.SerializeObject(_unserializeCache[key]));
+        }
+
+        private async Task<bool> EraseEntityAsync<T>()
+        {
+            if (!_filenameCache.ContainsKey(typeof(T)))
+                return true; //no key anyways
+
+            var key = _filenameCache[typeof(T)];
+            await _storageService.DeleteCachedFileAsync(key);
+            _filenameCache.Remove(typeof(T));
+            _unserializeCache.Remove(key);
+            return true;
+        }
+
+        public void SetExceptionLogger(IExceptionLogger logger)
+        {
+            _exceptionLogger = logger;
+        }
+        private IExceptionLogger _exceptionLogger;
+        protected async Task<T> ExecuteSafe<T>(Func<Task<T>> func)
+            where T : new()
+        {
+            try
+            {
+                if (!await InitializeAsync())
+                    return new T();
+
+                return await func();
+            }
+            catch (Exception ex)
+            {
+                _exceptionLogger?.LogException(ex, this);
+            }
+            return default(T);
+        }
+
+        protected async Task<T> ExecuteSafe<T>(Func<T> func)
+            where T : new()
+        {
+            try
+            {
+                if (!await InitializeAsync())
+                    return new T();
+
+                return func();
+            }
+            catch (Exception ex)
+            {
+                _exceptionLogger?.LogException(ex, this);
+            }
+            return default(T);
+        }
     }
 }

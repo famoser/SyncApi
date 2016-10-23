@@ -22,13 +22,12 @@ using Nito.AsyncEx;
 
 namespace Famoser.SyncApi.Repositories
 {
-    public class ApiDeviceRepository<TDevice, TUser> : PersistentRepository<TDevice>, IApiDeviceRepository<TDevice, TUser>, IApiDeviceAuthenticationService
-        where TDevice : IDeviceModel
-        where TUser : IUserModel
+    public class ApiDeviceRepository<TDevice> : PersistentRepository<TDevice>, IApiDeviceRepository<TDevice>, IApiDeviceAuthenticationService
+        where TDevice : class, IDeviceModel
     {
         private readonly IApiStorageService _apiStorageService;
         private readonly IApiConfigurationService _apiConfigurationService;
-        private readonly AuthApiClient _authApiClient;
+        private readonly ApiClient _authApiClient;
         public ApiDeviceRepository(IApiConfigurationService apiConfigurationService, IApiStorageService apiStorageService) : base(apiConfigurationService)
         {
             _apiStorageService = apiStorageService;
@@ -49,17 +48,18 @@ namespace Famoser.SyncApi.Repositories
                 if (_apiRoamingEntity == null)
                     return false;
 
-                CacheEntity = await _apiStorageService.GetCacheEntity<TDevice>();
+                CacheEntity = await _apiStorageService.GetCacheEntity<TDevice>(GetModelCacheFilePath());
                 if (CacheEntity.ModelInformation == null)
                 {
                     CacheEntity.Model = await _apiConfigurationService.GetDeviceObjectAsync<TDevice>();
                     CacheEntity.ModelInformation = new ModelInformation()
                     {
-                        Id = _apiRoamingEntity.UserId,
+                        Id = Guid.NewGuid(),
                         UserId = _apiRoamingEntity.UserId,
                         PendingAction = PendingAction.Create,
                         VersionId = Guid.NewGuid()
                     };
+                    CacheEntity.Model.SetId(CacheEntity.ModelInformation.Id);
                     await _apiStorageService.SaveCacheEntityAsync<TDevice>();
                 }
 
@@ -93,21 +93,6 @@ namespace Famoser.SyncApi.Repositories
             // read is not valid action in this repo
             //else if (CacheEntity.ModelInformation.PendingAction == PendingAction.Read)
             //{
-            //    var resp = await _authApiClient.DoRequestAsync(
-            //        AuthorizeRequest(ApiInformationEntity, _apiRoamingEntity, new AuthRequestEntity()
-            //        {
-            //            UserEntity = new UserEntity()
-            //            {
-            //                Id = CacheEntity.ModelInformation.Id,
-            //                OnlineAction = OnlineAction.Read
-            //            }
-            //        }));
-            //    if (resp.IsSuccessfull)
-            //    {
-            //        Manager.Set(JsonConvert.DeserializeObject<TDevice>(resp.UserEntity.Content));
-            //    }
-            //    else
-            //        return false;
             //}
             else if (CacheEntity.ModelInformation.PendingAction == PendingAction.Update)
             {
@@ -145,14 +130,39 @@ namespace Famoser.SyncApi.Repositories
 
                 //clean up
                 CacheEntity.ModelInformation.PendingAction = PendingAction.None;
-                return await _apiStorageService.EraseCacheEntityAsync<TUser>();
+                return await _apiStorageService.EraseCacheEntityAsync<TDevice>();
             }
             else
                 return true;
 
 
             CacheEntity.ModelInformation.PendingAction = PendingAction.None;
-            return await _apiStorageService.SaveCacheEntityAsync<TUser>();
+            return await _apiStorageService.SaveCacheEntityAsync<TDevice>();
+        }
+
+
+
+        private string _deviceCacheFilePath;
+        protected string GetDeviceCacheFilePath()
+        {
+            if (_deviceCacheFilePath == null)
+                return _deviceCacheFilePath;
+
+            _deviceCacheFilePath = _apiConfigurationService.GetFileName(GetModelIdentifier() + "_col.json", typeof(TDevice));
+
+            return _deviceCacheFilePath;
+        }
+
+        private string _deviceIdentifier;
+        protected string GetDeviceIdentifier()
+        {
+            if (_deviceIdentifier == null)
+                return _deviceIdentifier;
+
+            var model = (TDevice)Activator.CreateInstance(typeof(TDevice));
+            _deviceIdentifier = model.GetUniqeIdentifier();
+
+            return _deviceIdentifier;
         }
 
 
@@ -168,7 +178,8 @@ namespace Famoser.SyncApi.Repositories
 
                 _initializedDevices = true;
 
-                _deviceCache = await _apiStorageService.GetCollectionCacheEntity<TDevice>();
+
+                _deviceCache = await _apiStorageService.GetCollectionCacheEntity<TDevice>(GetModelCacheFilePath());
                 if (_deviceCache.ModelInformations == null)
                 {
                     _deviceCache.ModelInformations = new List<ModelInformation>();
@@ -245,16 +256,12 @@ namespace Famoser.SyncApi.Repositories
         }
 
         private ApiRoamingEntity _apiRoamingEntity;
-        public async Task<Guid?> TryGetAuthenticatedDeviceIdAsync(ApiRoamingEntity apiRoamingEntity)
+        public async Task<IDeviceModel> GetAuthenticatedDeviceAsync(ApiRoamingEntity apiRoamingEntity)
         {
             _apiRoamingEntity = apiRoamingEntity;
 
-            if (!await InitializeAsync())
-                return null;
-
-            if (Manager.GetModel().GetAuthenticationState() == AuthenticationState.Authenticated)
-                return Manager.GetModel().GetId();
-            return null;
+            await ExecuteSafe(async () => await SyncInternalAsync());
+            return Manager.GetModel();
         }
 
         private AuthRequestEntity AuthorizeRequest(ApiInformationEntity apiInformationEntity,

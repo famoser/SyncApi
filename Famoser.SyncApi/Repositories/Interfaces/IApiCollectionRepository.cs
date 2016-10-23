@@ -1,14 +1,13 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 using Famoser.SyncApi.Models.Interfaces;
 using Famoser.SyncApi.Repositories.Interfaces.Base;
 
 namespace Famoser.SyncApi.Repositories.Interfaces
 {
-    public interface IApiCollectionRepository<TCollection, TDevice, TUser> : IPersistentCollectionRespository<TCollection>
+    public interface IApiCollectionRepository<TCollection> : IPersistentCollectionRespository<TCollection>
         where TCollection : ICollectionModel
-        where TDevice : IDeviceModel
-        where TUser : IUserModel
     {
-        Task<bool> AddUserToCollectionAsync(TCollection collection, TUser user);
+        Task<bool> AddUserToCollectionAsync(TCollection collection, Guid userId);
     }
 }

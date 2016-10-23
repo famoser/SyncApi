@@ -5,9 +5,8 @@ using Famoser.SyncApi.Repositories.Interfaces.Base;
 
 namespace Famoser.SyncApi.Repositories.Interfaces
 {
-    public interface IApiDeviceRepository<TDevice, TUser> : IPersistentRespository<TDevice>
+    public interface IApiDeviceRepository<TDevice> : IPersistentRespository<TDevice>
         where TDevice : IDeviceModel
-        where TUser : IUserModel
     {
         ObservableCollection<TDevice> GetAllLazy();
         Task<ObservableCollection<TDevice>> GetAllAsync();

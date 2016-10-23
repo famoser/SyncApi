@@ -1,10 +1,16 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
+using Famoser.SyncApi.Api.Communication.Entities;
+using Famoser.SyncApi.Api.Communication.Request;
 using Famoser.SyncApi.Api.Communication.Request.Base;
 using Famoser.SyncApi.Api.Configuration;
+using Famoser.SyncApi.Enums;
 using Famoser.SyncApi.Helpers;
+using Famoser.SyncApi.Models.Interfaces;
 using Famoser.SyncApi.Services.Interfaces;
 using Famoser.SyncApi.Services.Interfaces.Authentication;
+using Famoser.SyncApi.Storage.Cache.Entitites;
 using Famoser.SyncApi.Storage.Roaming;
 using Nito.AsyncEx;
 
@@ -17,54 +23,88 @@ namespace Famoser.SyncApi.Services
         private readonly IApiDeviceAuthenticationService _apiDeviceAuthenticationService;
         private readonly ApiInformationEntity _apiInformationEntity;
 
-        public ApiAuthenticationService(IApiUserAuthenticationService apiUserAuthenticationService, IApiDeviceAuthenticationService deviceAuthenticationService, IApiDeviceAuthenticationService apiDeviceAuthenticationService, IApiConfigurationService apiConfigurationService)
+        public ApiAuthenticationService(IApiConfigurationService apiConfigurationService,IApiUserAuthenticationService apiUserAuthenticationService, IApiDeviceAuthenticationService apiDeviceAuthenticationService)
         {
+            _apiInformationEntity = apiConfigurationService.GetApiInformations();
+
             _apiUserAuthenticationService = apiUserAuthenticationService;
             _apiDeviceAuthenticationService = apiDeviceAuthenticationService;
-            _apiDeviceAuthenticationService = deviceAuthenticationService;
-
-            _apiInformationEntity = apiConfigurationService.GetApiInformations();
         }
-
-        private bool _isAuthenticated;
+        
         public bool IsAuthenticated()
         {
-            return _isAuthenticated;
+            return _apiRoamingEntity?.AuthenticationState == AuthenticationState.Authenticated && _deviceModel?.GetAuthenticationState() == AuthenticationState.Authenticated;
         }
 
         private ApiRoamingEntity _apiRoamingEntity;
-        private Guid _deviceId;
+        private IDeviceModel _deviceModel;
         public async Task<bool> AuthenticateAsync()
         {
             using (await _asyncLock.LockAsync())
             {
-                if (_isAuthenticated)
-                    return IsAuthenticated();
-
-                _apiRoamingEntity = await _apiUserAuthenticationService.TryGetApiRoamingEntityAsync();
-                var g = await _apiDeviceAuthenticationService.TryGetAuthenticatedDeviceIdAsync(_apiRoamingEntity);
-                if (g.HasValue)
+                if (_apiRoamingEntity == null || _deviceModel == null)
                 {
-                    _deviceId = g.Value;
-                    _isAuthenticated = true;
+                    _apiRoamingEntity = await _apiUserAuthenticationService.GetApiRoamingEntityAsync();
+                    _deviceModel = await _apiDeviceAuthenticationService.GetAuthenticatedDeviceAsync(_apiRoamingEntity);
                 }
-                else
-                    _isAuthenticated = false;
-
                 return IsAuthenticated();
             }
         }
 
-        public bool AuthenticateRequest(BaseRequest request)
+        public T CreateRequest<T>(OnlineAction action) where T : BaseRequest, new()
         {
-            if (!_isAuthenticated)
-                return false;
+            if (!IsAuthenticated())
+                return null;
 
-            request.AuthorizationCode = AuthorizationHelper.GenerateAuthorizationCode(_apiInformationEntity, _apiRoamingEntity);
-            request.UserId = _apiRoamingEntity.UserId;
-            request.DeviceId = _deviceId;
+            var request = new T
+            {
+                AuthorizationCode = AuthorizationHelper.GenerateAuthorizationCode(_apiInformationEntity, _apiRoamingEntity),
+                UserId = _apiRoamingEntity.UserId,
+                DeviceId = _deviceModel.GetId(),
+                OnlineAction = action,
+                ApplicationId = _apiInformationEntity.ApplicationId
+            };
 
-            return _isAuthenticated;
+            return request;
+        }
+
+        public T CreateRequest<T>(OnlineAction action, Type collectionType) where T : SyncEntityRequest, new()
+        {
+            var req = CreateRequest<T>(action);
+            if (action == OnlineAction.SyncVersion && _collectionIdsDictionary.ContainsKey(collectionType))
+            {
+                foreach (var guid in _collectionIdsDictionary[collectionType])
+                {
+                    req.CollectionEntities.Add(new CollectionEntity()
+                    {
+                        Id = guid
+                    });
+                }
+            }
+            return req;
+        }
+
+        public ModelInformation CreateModelInformation()
+        {
+            var mi = new ModelInformation
+            {
+                Id = Guid.NewGuid(),
+                VersionId = Guid.NewGuid(),
+                UserId = _apiRoamingEntity.UserId,
+                DeviceId = _deviceModel.GetId(),
+                CreateDateTime = DateTime.Now,
+                PendingAction = PendingAction.Create
+            };
+            return mi;
+        }
+
+        private readonly Dictionary<Type, List<Guid>> _collectionIdsDictionary = new Dictionary<Type, List<Guid>>();
+        public void OverwriteCollectionIds<TCollection>(List<Guid> id)
+        {
+            if (_collectionIdsDictionary.ContainsKey(typeof(TCollection)))
+                _collectionIdsDictionary[typeof(TCollection)] = id;
+            else
+                _collectionIdsDictionary.Add(typeof(TCollection), id);
         }
     }
 }

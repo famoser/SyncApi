@@ -9,5 +9,7 @@ namespace Famoser.SyncApi.Api.Base
         public Guid VersionId { get; set; }
         public OnlineAction OnlineAction { get; set; }
         public string Content { get; set; }
+        public DateTime CreateDateTime { get; set; }
+        public string Identifier { get; set; }
     }
 }

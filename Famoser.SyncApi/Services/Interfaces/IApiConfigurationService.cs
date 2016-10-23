@@ -4,31 +4,33 @@ using Famoser.SyncApi.Api.Configuration;
 
 namespace Famoser.SyncApi.Services.Interfaces
 {
-    /// <summary>
-    /// configures the api
-    /// </summary>
     public interface IApiConfigurationService
     {
         /// <summary>
-        /// configure the api to be used by this wrapper
+        /// Resolve your api informations
         /// </summary>
         /// <returns></returns>
         ApiInformationEntity GetApiInformations();
         /// <summary>
-        /// Get a device object. This will represent the current installation.
-        /// </summary>
-        /// <typeparam name="TDevice"></typeparam>
-        /// <returns></returns>
-        Task<TDevice> GetDeviceObjectAsync<TDevice>();
-        /// <summary>
-        /// Get a user object. This will be synced across all devices of the same user
+        /// Get a user object. This method will be called once per user, while the application is authenticating against the api.
         /// </summary>
         /// <typeparam name="TUser"></typeparam>
         /// <returns></returns>
-        Task<TUser> GetUserObjectAsync<TUser>(); 
+        Task<TUser> GetUserObjectAsync<TUser>() where TUser : class;
         /// <summary>
-        /// normally you may just return the proposed filename.
-        /// if you have conflicts (for example if you use multiple instances of the API) you may customize the name
+        /// Get a device object. This method will be called once for every installation of a user, while the applcation is authenticating against the api
+        /// </summary>
+        /// <typeparam name="TDevice"></typeparam>
+        /// <returns></returns>
+        Task<TDevice> GetDeviceObjectAsync<TDevice>() where TDevice : class;
+        /// <summary>
+        /// Get a collection object. Will be called once if there is no collection present for a specific SyncEntity to be saved
+        /// </summary>
+        /// <typeparam name="TCollection"></typeparam>
+        /// <returns></returns>
+        Task<TCollection> GetCollectionObjectAsync<TCollection>() where TCollection : class;
+        /// <summary>
+        /// Each filename this library uses passes this function. If you are using the roaming & cache storage too, you may want to modify those so nothing of your data will be overwritten.
         /// </summary>
         /// <param name="proposedFilename"></param>
         /// <param name="objectType"></param>
