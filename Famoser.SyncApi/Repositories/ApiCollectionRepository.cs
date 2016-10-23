@@ -54,9 +54,6 @@ namespace Famoser.SyncApi.Repositories
                     CollectionCache.Models.Add(model);
                     CollectionCache.ModelInformations.Add(mi);
                     await _apiStorageService.SaveCollectionEntityAsync<TCollection>();
-
-                    _apiAuthenticationService.OverwriteCollectionIds<TCollection>(
-                        CollectionCache.ModelInformations.Select(d => d.Id).ToList());
                 }
 
                 foreach (var collectionCacheModel in CollectionCache.Models)
@@ -76,7 +73,7 @@ namespace Famoser.SyncApi.Repositories
                     return false;
             }
 
-            var req = _apiAuthenticationService.CreateRequest<CollectionEntityRequest>(OnlineAction.SyncEntity);
+            var req = _apiAuthenticationService.CreateRequestAsync<CollectionEntityRequest>(OnlineAction.SyncEntity);
             if (req == null)
                 return false;
 
@@ -105,7 +102,7 @@ namespace Famoser.SyncApi.Repositories
 
             await _apiStorageService.SaveCollectionEntityAsync<TCollection>();
 
-            req = _apiAuthenticationService.CreateRequest<CollectionEntityRequest>(OnlineAction.SyncVersion);
+            req = _apiAuthenticationService.CreateRequestAsync<CollectionEntityRequest>(OnlineAction.SyncVersion);
             //second request: get active version ids for all
             // this will return missing, updated & removed entities
             foreach (var collectionCacheModelInformation in CollectionCache.ModelInformations)
@@ -154,8 +151,6 @@ namespace Famoser.SyncApi.Repositories
             if (resp.CollectionEntities.Any())
             {
                 await _apiStorageService.SaveCollectionEntityAsync<TCollection>();
-                _apiAuthenticationService.OverwriteCollectionIds<TCollection>(
-                    CollectionCache.ModelInformations.Select(d => d.Id).ToList());
             }
 
             return true;

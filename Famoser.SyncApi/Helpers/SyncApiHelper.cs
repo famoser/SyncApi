@@ -21,11 +21,5 @@ namespace Famoser.SyncApi.Helpers
             var deviceRepo = new ApiDeviceRepository<DeviceModel>(_apiConfigurationService, _apiStorageService);
             _apiAuthenticationService = new ApiAuthenticationService(_apiConfigurationService, userRepo, deviceRepo);
         }
-
-        
-        public void InitializeRepository()
-        {
-
-        }
     }
 }

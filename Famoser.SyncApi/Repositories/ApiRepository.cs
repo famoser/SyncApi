@@ -44,7 +44,7 @@ namespace Famoser.SyncApi.Repositories
                     return false;
             }
 
-            var req = _apiAuthenticationService.CreateRequest<SyncEntityRequest>(OnlineAction.SyncVersion, typeof(TCollection));
+            var req = await _apiAuthenticationService.CreateRequestAsync<SyncEntityRequest, TCollection>(OnlineAction.SyncVersion);
             if (req == null)
                 return false;
 
@@ -72,7 +72,7 @@ namespace Famoser.SyncApi.Repositories
 
             await _apiStorageService.SaveCollectionEntityAsync<TCollection>();
 
-            req = _apiAuthenticationService.CreateRequest<SyncEntityRequest>(OnlineAction.SyncVersion, typeof(TCollection));
+            req = await _apiAuthenticationService.CreateRequestAsync<SyncEntityRequest, TCollection>(OnlineAction.SyncVersion);
             //second request: get active version ids for all
             // this will return missing, updated & removed entities
             foreach (var collectionCacheModelInformation in CollectionCache.ModelInformations)

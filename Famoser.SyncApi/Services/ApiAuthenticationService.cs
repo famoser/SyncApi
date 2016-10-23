@@ -8,6 +8,7 @@ using Famoser.SyncApi.Api.Configuration;
 using Famoser.SyncApi.Enums;
 using Famoser.SyncApi.Helpers;
 using Famoser.SyncApi.Models.Interfaces;
+using Famoser.SyncApi.Repositories.Interfaces;
 using Famoser.SyncApi.Services.Interfaces;
 using Famoser.SyncApi.Services.Interfaces.Authentication;
 using Famoser.SyncApi.Storage.Cache.Entitites;
@@ -45,13 +46,13 @@ namespace Famoser.SyncApi.Services
                 if (_apiRoamingEntity == null || _deviceModel == null)
                 {
                     _apiRoamingEntity = await _apiUserAuthenticationService.GetApiRoamingEntityAsync();
-                    _deviceModel = await _apiDeviceAuthenticationService.GetAuthenticatedDeviceAsync(_apiRoamingEntity);
+                    _deviceModel = await _apiDeviceAuthenticationService.GetDeviceAsync(_apiRoamingEntity);
                 }
                 return IsAuthenticated();
             }
         }
 
-        public T CreateRequest<T>(OnlineAction action) where T : BaseRequest, new()
+        public T CreateRequestAsync<T>(OnlineAction action) where T : BaseRequest, new()
         {
             if (!IsAuthenticated())
                 return null;
@@ -68,17 +69,22 @@ namespace Famoser.SyncApi.Services
             return request;
         }
 
-        public T CreateRequest<T>(OnlineAction action, Type collectionType) where T : SyncEntityRequest, new()
+        public async Task<T> CreateRequestAsync<T, TCollection>(OnlineAction action) where T : SyncEntityRequest, new() where TCollection : ICollectionModel
         {
-            var req = CreateRequest<T>(action);
-            if (action == OnlineAction.SyncVersion && _collectionIdsDictionary.ContainsKey(collectionType))
+            var req = CreateRequestAsync<T>(action);
+            if (action == OnlineAction.SyncVersion && _dictionary.ContainsKey(typeof(TCollection)))
             {
-                foreach (var guid in _collectionIdsDictionary[collectionType])
+                var ss = _dictionary[typeof(TCollection)] as IApiCollectionRepository<TCollection>;
+                if (ss != null)
                 {
-                    req.CollectionEntities.Add(new CollectionEntity()
+                    var colls = await ss.GetAllAsync();
+                    foreach (var collection in colls)
                     {
-                        Id = guid
-                    });
+                        req.CollectionEntities.Add(new CollectionEntity()
+                        {
+                            Id = collection.GetId()
+                        });
+                    }
                 }
             }
             return req;
@@ -98,13 +104,13 @@ namespace Famoser.SyncApi.Services
             return mi;
         }
 
-        private readonly Dictionary<Type, List<Guid>> _collectionIdsDictionary = new Dictionary<Type, List<Guid>>();
-        public void OverwriteCollectionIds<TCollection>(List<Guid> id)
+        private readonly Dictionary<Type, object> _dictionary = new Dictionary<Type, object>();
+        public void RegisterCollectionRepository<TCollection>(IApiCollectionRepository<TCollection> repository) where TCollection : ICollectionModel
         {
-            if (_collectionIdsDictionary.ContainsKey(typeof(TCollection)))
-                _collectionIdsDictionary[typeof(TCollection)] = id;
+            if (_dictionary.ContainsKey(typeof(TCollection)))
+                _dictionary[typeof(TCollection)] = repository;
             else
-                _collectionIdsDictionary.Add(typeof(TCollection), id);
+                _dictionary.Add(typeof(TCollection), repository);
         }
     }
 }

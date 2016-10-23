@@ -11,6 +11,6 @@ namespace Famoser.SyncApi.Services.Interfaces.Authentication
         /// </summary>
         /// <param name="apiRoamingEntity"></param>
         /// <returns></returns>
-        Task<IDeviceModel> GetAuthenticatedDeviceAsync(ApiRoamingEntity apiRoamingEntity);
+        Task<IDeviceModel> GetDeviceAsync(ApiRoamingEntity apiRoamingEntity);
     }
 }

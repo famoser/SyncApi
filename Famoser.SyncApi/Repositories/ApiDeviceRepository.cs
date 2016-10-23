@@ -256,7 +256,7 @@ namespace Famoser.SyncApi.Repositories
         }
 
         private ApiRoamingEntity _apiRoamingEntity;
-        public async Task<IDeviceModel> GetAuthenticatedDeviceAsync(ApiRoamingEntity apiRoamingEntity)
+        public async Task<IDeviceModel> GetDeviceAsync(ApiRoamingEntity apiRoamingEntity)
         {
             _apiRoamingEntity = apiRoamingEntity;
 

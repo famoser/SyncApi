@@ -4,6 +4,8 @@ using System.Threading.Tasks;
 using Famoser.SyncApi.Api.Communication.Request;
 using Famoser.SyncApi.Api.Communication.Request.Base;
 using Famoser.SyncApi.Enums;
+using Famoser.SyncApi.Models.Interfaces;
+using Famoser.SyncApi.Repositories.Interfaces;
 using Famoser.SyncApi.Storage.Cache.Entitites;
 
 namespace Famoser.SyncApi.Services.Interfaces.Authentication
@@ -24,6 +26,7 @@ namespace Famoser.SyncApi.Services.Interfaces.Authentication
 
         /// <summary>
         /// create a valid, authenticated request.
+        /// Will only return a request if authenticated
         /// sets:
         ///     - UserId
         ///     - DeviceId
@@ -33,10 +36,12 @@ namespace Famoser.SyncApi.Services.Interfaces.Authentication
         /// <typeparam name="T"></typeparam>
         /// <param name="action"></param>
         /// <returns></returns>
-        T CreateRequest<T>(OnlineAction action) where T : BaseRequest, new();
+        T CreateRequestAsync<T>(OnlineAction action) where T : BaseRequest, new();
 
         /// <summary>
         /// create a valid, authenticated request.
+        /// Will only return a request if authenticated
+        /// Will get the collectionIds from the corresponding repository
         /// sets:
         ///     - UserId
         ///     - DeviceId
@@ -45,10 +50,11 @@ namespace Famoser.SyncApi.Services.Interfaces.Authentication
         ///     - CollectionIds for action == OnlineAction.SyncVersion
         /// </summary>
         /// <typeparam name="T"></typeparam>
+        /// <typeparam name="TCollection"></typeparam>
         /// <param name="action"></param>
-        /// <param name="collectionType">The type of collection this entity belongs to</param>
         /// <returns></returns>
-        T CreateRequest<T>(OnlineAction action, Type collectionType) where T : SyncEntityRequest, new();
+        Task<T> CreateRequestAsync<T, TCollection>(OnlineAction action) where T : SyncEntityRequest, new()
+             where TCollection : ICollectionModel;
 
         /// <summary>
         /// creates model information, returns null if initialization from IsAuthenticated is not finished!
@@ -64,11 +70,11 @@ namespace Famoser.SyncApi.Services.Interfaces.Authentication
         ModelInformation CreateModelInformation();
 
         /// <summary>
-        /// Sets the collection ids for a specific collection.
-        /// This is used to authenticate SyncRequests
+        /// Regisiter a collection repository, so proper requests for Models can be constructued
         /// </summary>
         /// <typeparam name="TCollection"></typeparam>
-        /// <param name="id"></param>
-        void OverwriteCollectionIds<TCollection>(List<Guid> id);
+        /// <param name="repository"></param>
+        void RegisterCollectionRepository<TCollection>(IApiCollectionRepository<TCollection> repository)
+            where TCollection : ICollectionModel;
     }
 }
