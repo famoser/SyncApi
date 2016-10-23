@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Famoser.FrameworkEssentials.Services.Interfaces;
 using Famoser.SyncApi.Services.Interfaces;
 
+#pragma warning disable 1998
 namespace Famoser.SyncApi.NUnitTests.Implementations
 {
     public class StorageService : IStorageService

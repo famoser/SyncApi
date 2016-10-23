@@ -4,6 +4,7 @@ using System.Collections.ObjectModel;
 using System.Threading.Tasks;
 using Famoser.SyncApi.Api.Communication.Entities;
 using Famoser.SyncApi.Api.Communication.Request;
+using Famoser.SyncApi.Api.Communication.Request.Base;
 using Famoser.SyncApi.Api.Configuration;
 using Famoser.SyncApi.Clients;
 using Famoser.SyncApi.Enums;
@@ -186,6 +187,11 @@ namespace Famoser.SyncApi.Repositories
                     _deviceCache.Models = new List<TDevice>();
                 }
 
+                var resp = await _authApiClient.GetDevicesAsync(AuthorizeRequest(ApiInformationEntity, _apiRoamingEntity, new CollectionEntityRequest()
+                {
+                    
+                }));
+
                 return true;
             }
         }
@@ -214,7 +220,7 @@ namespace Famoser.SyncApi.Repositories
         {
             return ExecuteSafe(async () =>
             {
-                var resp = await _authApiClient.UnAuthenticateRequestAsync(AuthorizeRequest(ApiInformationEntity, _apiRoamingEntity, new AuthRequestEntity()
+                var resp = await _authApiClient.UnAuthenticateDeviceAsync(AuthorizeRequest(ApiInformationEntity, _apiRoamingEntity, new AuthRequestEntity()
                 {
                     ClientMessage = device.GetId().ToString()
                 }));
@@ -226,7 +232,7 @@ namespace Famoser.SyncApi.Repositories
         {
             return ExecuteSafe(async () =>
             {
-                var resp = await _authApiClient.AuthenticateRequestAsync(AuthorizeRequest(ApiInformationEntity, _apiRoamingEntity, new AuthRequestEntity()
+                var resp = await _authApiClient.AuthenticateDeviceAsync(AuthorizeRequest(ApiInformationEntity, _apiRoamingEntity, new AuthRequestEntity()
                 {
                     ClientMessage = device.GetId().ToString()
                 }));
@@ -238,7 +244,7 @@ namespace Famoser.SyncApi.Repositories
         {
             return ExecuteSafe(async () =>
             {
-                var resp = await _authApiClient.CreateAuthCodeRequestAsync(AuthorizeRequest(ApiInformationEntity, _apiRoamingEntity, new AuthRequestEntity()));
+                var resp = await _authApiClient.CreateAuthorizationCodeAsync(AuthorizeRequest(ApiInformationEntity, _apiRoamingEntity, new AuthRequestEntity()));
                 return resp.IsSuccessfull ? resp.ServerMessage : default(string);
             });
         }
@@ -247,7 +253,7 @@ namespace Famoser.SyncApi.Repositories
         {
             return ExecuteSafe(async () =>
             {
-                var resp = await _authApiClient.DoSyncRequestAsync(AuthorizeRequest(ApiInformationEntity, _apiRoamingEntity, new AuthRequestEntity()
+                var resp = await _authApiClient.UseAuthenticationCodeAsync(AuthorizeRequest(ApiInformationEntity, _apiRoamingEntity, new AuthRequestEntity()
                 {
                     ClientMessage = authenticationCode
                 }));
@@ -264,13 +270,26 @@ namespace Famoser.SyncApi.Repositories
             return Manager.GetModel();
         }
 
-        private AuthRequestEntity AuthorizeRequest(ApiInformationEntity apiInformationEntity,
-            ApiRoamingEntity apiRoamingInfo, AuthRequestEntity request)
+        private T AuthorizeRequestBase<T>(ApiInformationEntity apiInformationEntity,
+            ApiRoamingEntity apiRoamingInfo, T request)
+            where T : BaseRequest
         {
             request.AuthorizationCode = AuthorizationHelper.GenerateAuthorizationCode(apiInformationEntity, apiRoamingInfo);
             request.UserId = _apiRoamingEntity.UserId;
             request.DeviceId = CacheEntity.Model.GetId();
             return request;
+        }
+
+        private AuthRequestEntity AuthorizeRequest(ApiInformationEntity apiInformationEntity,
+            ApiRoamingEntity apiRoamingInfo, AuthRequestEntity request)
+        {
+            return AuthorizeRequestBase(apiInformationEntity, apiRoamingInfo, request);
+        }
+
+        private CollectionEntityRequest AuthorizeRequest(ApiInformationEntity apiInformationEntity,
+            ApiRoamingEntity apiRoamingInfo, CollectionEntityRequest request)
+        {
+            return AuthorizeRequestBase(apiInformationEntity, apiRoamingInfo, request);
         }
     }
 }

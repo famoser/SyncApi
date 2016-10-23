@@ -8,6 +8,6 @@ namespace Famoser.SyncApi.Repositories.Interfaces
     public interface IApiCollectionRepository<TCollection> : IPersistentCollectionRespository<TCollection>
         where TCollection : ICollectionModel
     {
-        Task<bool> AddUserToCollectionAsync(TCollection collection, Guid userId);
+        Task<bool> AddUserToCollectionAsync(TCollection collection, IUserModel userModel);
     }
 }

@@ -158,9 +158,23 @@ namespace Famoser.SyncApi.Repositories
             return true;
         }
 
-        public Task<bool> AddUserToCollectionAsync(TCollection collection, Guid userId)
+        public Task<bool> AddUserToCollectionAsync(TCollection collection, IUserModel userModel)
         {
-            throw new NotImplementedException();
+            return ExecuteSafe(async () =>
+            {
+                var req = _apiAuthenticationService.CreateRequestAsync<AuthRequestEntity>(OnlineAction.AuthUser);
+                req.CollectionEntity = new CollectionEntity()
+                {
+                    Id = collection.GetId()
+                };
+                req.UserEntity = new UserEntity()
+                {
+                    Id = userModel.GetId()
+                };
+                var apiClient = GetApiClient();
+                var resp = await apiClient.AuthenticateUserRequestAsync(req);
+                return resp.IsSuccessfull;
+            });
         }
     }
 }

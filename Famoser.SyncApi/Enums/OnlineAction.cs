@@ -8,6 +8,7 @@
         Update = 3,
         Delete = 4,
         SyncVersion = 5,
-        SyncEntity = 6
+        SyncEntity = 6,
+        AuthUser = 6,
     }
 }

@@ -47,7 +47,7 @@ namespace Famoser.SyncApi.Clients
         /// </summary>
         /// <param name="entity"></param>
         /// <returns></returns>
-        public Task<AuthorizationResponse> CreateAuthCodeRequestAsync(AuthRequestEntity entity)
+        public Task<AuthorizationResponse> CreateAuthorizationCodeAsync(AuthRequestEntity entity)
         {
             return DoApiRequestAsync<AuthorizationResponse>(entity, "auth/generate");
         }
@@ -57,7 +57,7 @@ namespace Famoser.SyncApi.Clients
         /// </summary>
         /// <param name="entity"></param>
         /// <returns></returns>
-        public Task<AuthorizationResponse> UseAuthCodeRequestAsync(AuthRequestEntity entity)
+        public Task<AuthorizationResponse> UseAuthenticationCodeAsync(AuthRequestEntity entity)
         {
             return DoApiRequestAsync<AuthorizationResponse>(entity, "auth/use");
         }
@@ -67,9 +67,29 @@ namespace Famoser.SyncApi.Clients
         /// </summary>
         /// <param name="entity"></param>
         /// <returns></returns>
-        public Task<AuthorizationResponse> AuthenticateRequestAsync(AuthRequestEntity entity)
+        public Task<AuthorizationResponse> AuthenticateUserRequestAsync(AuthRequestEntity entity)
         {
-            return DoApiRequestAsync<AuthorizationResponse>(entity, "auth/do");
+            return DoApiRequestAsync<AuthorizationResponse>(entity, "users/auth");
+        }
+
+        /// <summary>
+        /// Get all devices from an user
+        /// </summary>
+        /// <param name="entity"></param>
+        /// <returns></returns>
+        public Task<CollectionEntityResponse> GetDevicesAsync(CollectionEntityRequest entity)
+        {
+            return DoApiRequestAsync<CollectionEntityResponse>(entity, "devices/get");
+        }
+
+        /// <summary>
+        /// authenticate the DeviceEntities
+        /// </summary>
+        /// <param name="entity"></param>
+        /// <returns></returns>
+        public Task<AuthorizationResponse> AuthenticateDeviceAsync(AuthRequestEntity entity)
+        {
+            return DoApiRequestAsync<AuthorizationResponse>(entity, "devices/auth");
         }
 
         /// <summary>
@@ -77,9 +97,9 @@ namespace Famoser.SyncApi.Clients
         /// </summary>
         /// <param name="entity"></param>
         /// <returns></returns>
-        public Task<AuthorizationResponse> UnAuthenticateRequestAsync(AuthRequestEntity entity)
+        public Task<AuthorizationResponse> UnAuthenticateDeviceAsync(AuthRequestEntity entity)
         {
-            return DoApiRequestAsync<AuthorizationResponse>(entity, "auth/undo");
+            return DoApiRequestAsync<AuthorizationResponse>(entity, "devices/unauth");
         }
     }
 }

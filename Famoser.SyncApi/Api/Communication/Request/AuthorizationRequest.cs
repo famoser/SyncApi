@@ -7,6 +7,7 @@ namespace Famoser.SyncApi.Api.Communication.Request
     {
         public UserEntity UserEntity { get; set; }
         public DeviceEntity DeviceEntity { get; set; }
+        public CollectionEntity CollectionEntity { get; set; }
         public string ClientMessage { get; set; }
     }
 }
