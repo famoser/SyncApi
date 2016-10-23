@@ -1,12 +1,8 @@
 ﻿using System.Threading.Tasks;
 using Famoser.SyncApi.Models;
 using Famoser.SyncApi.NUnitTests.Helpers;
-using Famoser.SyncApi.NUnitTests.Implementations;
 using Famoser.SyncApi.NUnitTests.Models;
 using Famoser.SyncApi.Repositories;
-using Famoser.SyncApi.Services;
-using Famoser.SyncApi.Services.Interfaces;
-using Famoser.SyncApi.Services.Interfaces.Authentication;
 using GalaSoft.MvvmLight.Ioc;
 using NUnit.Framework;
 
