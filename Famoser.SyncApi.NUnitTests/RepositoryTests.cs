@@ -1,6 +1,8 @@
 ﻿using System.Threading.Tasks;
+using Famoser.SyncApi.Helpers;
 using Famoser.SyncApi.Models;
 using Famoser.SyncApi.NUnitTests.Helpers;
+using Famoser.SyncApi.NUnitTests.Implementations;
 using Famoser.SyncApi.NUnitTests.Models;
 using Famoser.SyncApi.Repositories;
 using GalaSoft.MvvmLight.Ioc;
@@ -21,7 +23,8 @@ namespace Famoser.SyncApi.NUnitTests
         public async Task TestSync()
         {
             //arrange
-            var repo = SimpleIoc.Default.GetInstanceWithoutCaching<ApiRepository<NoteModel, CollectionModel>>();
+            var helper = new SyncApiHelper(new StorageService(), "test", "https://test.syncapi.famoser.ch");
+            var repo = helper.ResolveRepository<NoteModel>();
             var model = new NoteModel { Content = "Hallo Welt!" };
 
             //act

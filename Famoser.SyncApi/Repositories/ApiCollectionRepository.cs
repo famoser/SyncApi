@@ -31,6 +31,8 @@ namespace Famoser.SyncApi.Repositories
             _apiAuthenticationService = apiAuthenticationService;
             _apiStorageService = apiStorageService;
             _apiConfigurationService = apiConfigurationService;
+
+            _apiAuthenticationService.RegisterCollectionRepository(this);
         }
 
         private readonly AsyncLock _asyncLock = new AsyncLock();
