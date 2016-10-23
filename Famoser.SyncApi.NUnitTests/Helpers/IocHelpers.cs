@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Famoser.SyncApi.Models;
+﻿using Famoser.SyncApi.Models;
 using Famoser.SyncApi.Repositories;
 using Famoser.SyncApi.Services;
 using Famoser.SyncApi.Services.Interfaces;
