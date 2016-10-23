@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Threading.Tasks;
+using Famoser.SyncApi.Api.Base;
 using Famoser.SyncApi.Api.Communication.Request;
 using Famoser.SyncApi.Api.Communication.Response;
-using Famoser.SyncApi.Clients.Base;
 
-namespace Famoser.SyncApi.Clients
+namespace Famoser.SyncApi.Api
 {
     public class ApiClient : BaseApiClient
     {

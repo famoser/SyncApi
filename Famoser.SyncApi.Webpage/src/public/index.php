@@ -104,20 +104,24 @@ $app->add(new TestsMiddleware($c));
 $app->add(new LoggingMiddleware($c));
 
 $routes = function () use ($controllerNamespace) {
-    $this->group("/authorization", function () use ($controllerNamespace) {
-        $this->post('/createuser', $controllerNamespace . 'AuthorizationController:createUser');
-        $this->post('/wipeuser', $controllerNamespace . 'AuthorizationController:wipeUser');
-        $this->post('/authorize', $controllerNamespace . 'AuthorizationController:authorize');
-        $this->post('/status', $controllerNamespace . 'AuthorizationController:status');
-        $this->post('/createauthorization', $controllerNamespace . 'AuthorizationController:createAuthorization');
-        $this->post('/unauthorize', $controllerNamespace . 'AuthorizationController:unAuthorize');
-        $this->post('/authorizeddevices', $controllerNamespace . 'AuthorizationController:authorizedDevices');
+    $this->group("/devices", function () use ($controllerNamespace) {
+        $this->post('/get', $controllerNamespace . 'DeviceController:createUser');
+        $this->post('/auth', $controllerNamespace . 'DeviceController:wipeUser');
+        $this->post('/unauth', $controllerNamespace . 'DeviceController:authorize');
     });
-    $this->group("/sync", function () use ($controllerNamespace) {
-        $this->post('/sync', $controllerNamespace . 'SyncController:sync');
-        $this->post('/update', $controllerNamespace . 'SyncController:update');
-        $this->post('/readcontententity', $controllerNamespace . 'SyncController:readContentEntity');
-        $this->post('/gethistory', $controllerNamespace . 'SyncController:getHistory');
+    $this->group("/users", function () use ($controllerNamespace) {
+        $this->post('/auth', $controllerNamespace . 'UserController:createUser');
+    });
+    $this->group("/auth", function () use ($controllerNamespace) {
+        $this->post('/use', $controllerNamespace . 'AuthorizationController:createUser');
+        $this->post('/generate', $controllerNamespace . 'AuthorizationController:createUser');
+        $this->post('/sync', $controllerNamespace . 'AuthorizationController:createUser');
+    });
+    $this->group("/entity", function () use ($controllerNamespace) {
+        $this->post('/sync', $controllerNamespace . 'EntityController:sync');
+    });
+    $this->group("/collection", function () use ($controllerNamespace) {
+        $this->post('/sync', $controllerNamespace . 'CollectionController:sync');
     });
 };
 

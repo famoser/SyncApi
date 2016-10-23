@@ -4,7 +4,7 @@ using Famoser.FrameworkEssentials.Services;
 using Famoser.SyncApi.Api.Communication.Response.Base;
 using Newtonsoft.Json;
 
-namespace Famoser.SyncApi.Clients.Base
+namespace Famoser.SyncApi.Api.Base
 {
     public class BaseApiClient
     {
