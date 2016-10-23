@@ -23,12 +23,12 @@ namespace Famoser.SyncApi.Services
         private readonly IApiDeviceAuthenticationService _apiDeviceAuthenticationService;
         private readonly ApiInformationEntity _apiInformationEntity;
 
-        public ApiAuthenticationService(IApiUserAuthenticationService apiUserAuthenticationService, IApiDeviceAuthenticationService apiDeviceAuthenticationService, IApiConfigurationService apiConfigurationService)
+        public ApiAuthenticationService(IApiConfigurationService apiConfigurationService,IApiUserAuthenticationService apiUserAuthenticationService, IApiDeviceAuthenticationService apiDeviceAuthenticationService)
         {
+            _apiInformationEntity = apiConfigurationService.GetApiInformations();
+
             _apiUserAuthenticationService = apiUserAuthenticationService;
             _apiDeviceAuthenticationService = apiDeviceAuthenticationService;
-
-            _apiInformationEntity = apiConfigurationService.GetApiInformations();
         }
         
         public bool IsAuthenticated()
@@ -61,7 +61,8 @@ namespace Famoser.SyncApi.Services
                 AuthorizationCode = AuthorizationHelper.GenerateAuthorizationCode(_apiInformationEntity, _apiRoamingEntity),
                 UserId = _apiRoamingEntity.UserId,
                 DeviceId = _deviceModel.GetId(),
-                OnlineAction = action
+                OnlineAction = action,
+                ApplicationId = _apiInformationEntity.ApplicationId
             };
 
             return request;

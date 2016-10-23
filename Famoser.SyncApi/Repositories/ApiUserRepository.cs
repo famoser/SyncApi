@@ -49,7 +49,7 @@ namespace Famoser.SyncApi.Repositories
                     _roaming.UserId = Guid.NewGuid();
                     _roaming.AuthenticationState = AuthenticationState.NotYetAuthenticated;
 
-                    var random = new Random(ApiInformationEntity.Seed);
+                    var random = new Random(ApiInformationEntity.ApplicationSeed);
                     _roaming.PersonalSeed = random.Next();
                     await _apiStorageService.SaveApiRoamingEntityAsync();
 

@@ -5,17 +5,26 @@ using Famoser.SyncApi.Models;
 using Famoser.SyncApi.Services.Interfaces;
 
 #pragma warning disable 1998
-namespace Famoser.SyncApi.NUnitTests.Implementations
+namespace Famoser.SyncApi.Services
 {
     public class ApiConfigurationService : IApiConfigurationService
     {
+        private readonly string _applicationId;
+        private readonly Uri _baseUri;
+        public ApiConfigurationService(string applicationId, string baseUri = "https://public.syncapi.famoser.ch")
+        {
+            _applicationId = applicationId;
+            _baseUri = new Uri(baseUri);
+        }
+
         public ApiInformationEntity GetApiInformations()
         {
             return new ApiInformationEntity()
             {
-                Uri = new Uri("https://syncapi.famoser.ch"),
+                Uri = _baseUri,
                 Modulo = 10000019,
-                Seed = 3102
+                ApplicationSeed = 3102,
+                ApplicationId = _applicationId
             };
         }
 

@@ -51,7 +51,7 @@ namespace Famoser.SyncApi.Services.Interfaces.Authentication
         T CreateRequest<T>(OnlineAction action, Type collectionType) where T : SyncEntityRequest, new();
 
         /// <summary>
-        /// creates model information, returns null if device is not / not yet authorized
+        /// creates model information, returns null if initialization from IsAuthenticated is not finished!
         /// sets:
         ///     - Id
         ///     - VersionId

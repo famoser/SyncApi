@@ -61,7 +61,7 @@
     <Compile Include="CSharpTests\Models\BaseModel.cs" />
     <Compile Include="CSharpTests\Models\ChildModel.cs" />
     <Compile Include="CSharpTests\UriTests.cs" />
-    <Compile Include="Implementations\ApiConfigurationService.cs" />
+    <Compile Include="Helpers\IocHelpers.cs" />
     <Compile Include="Models\NoteModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RepositoryTests.cs" />

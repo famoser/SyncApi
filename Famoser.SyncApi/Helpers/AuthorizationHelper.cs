@@ -11,7 +11,7 @@ namespace Famoser.SyncApi.Helpers
             var baseNumber = DateTime.Now.Second + DateTime.Now.Minute*100 + DateTime.Now.Hour*10000 +
                              DateTime.Now.DayOfYear + 1000000;
 
-            var authCode = baseNumber * info.Seed * apiRoamingEntity.PersonalSeed;
+            var authCode = baseNumber * info.ApplicationSeed * apiRoamingEntity.PersonalSeed;
             authCode %= info.Modulo;
             return baseNumber + "_" + authCode;
         }

@@ -1,5 +1,6 @@
 ﻿using System.Threading.Tasks;
 using Famoser.SyncApi.Models;
+using Famoser.SyncApi.NUnitTests.Helpers;
 using Famoser.SyncApi.NUnitTests.Implementations;
 using Famoser.SyncApi.NUnitTests.Models;
 using Famoser.SyncApi.Repositories;
@@ -17,12 +18,7 @@ namespace Famoser.SyncApi.NUnitTests
         [SetUp]
         public void InitializeIocContainer()
         {
-            SimpleIoc.Default.Register<IApiConfigurationService, ApiConfigurationService>();
-            SimpleIoc.Default.Register<IApiStorageService, ApiStorageService>();
-            var userRep = SimpleIoc.Default.GetInstanceWithoutCaching<ApiUserRepository<UserModel>>();
-            var deviceRepo = SimpleIoc.Default.GetInstanceWithoutCaching<ApiDeviceRepository<DeviceModel>>();
-            var aus = new ApiAuthenticationService(userRep, deviceRepo, SimpleIoc.Default.GetInstance<IApiConfigurationService>());
-            SimpleIoc.Default.Register<IApiAuthenticationService>(() => aus);
+            IocHelper.InitializeContainer();
         }
 
         [Test]
