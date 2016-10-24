@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Linq;
 using System.Threading.Tasks;
 using Famoser.SyncApi.Api.Communication.Entities;
 using Famoser.SyncApi.Api.Communication.Request;
@@ -179,7 +180,6 @@ namespace Famoser.SyncApi.Repositories
 
                 _initializedDevices = true;
 
-
                 _deviceCache = await _apiStorageService.GetCollectionCacheEntity<TDevice>(GetModelCacheFilePath());
                 if (_deviceCache.ModelInformations == null)
                 {
@@ -187,13 +187,65 @@ namespace Famoser.SyncApi.Repositories
                     _deviceCache.Models = new List<TDevice>();
                 }
 
-                var resp = await _authApiClient.GetDevicesAsync(AuthorizeRequest(ApiInformationEntity, _apiRoamingEntity, new CollectionEntityRequest()
-                {
-                    
-                }));
+                await SyncDevicesInternalAsync();
 
                 return true;
             }
+        }
+
+        private async Task<bool> SyncDevicesInternalAsync()
+        {
+            //sync devices
+            var req = new CollectionEntityRequest();
+            // this will return missing, updated & removed entities
+            foreach (var collectionCacheModelInformation in _deviceCache.ModelInformations)
+            {
+                req.CollectionEntities.Add(new SyncEntity()
+                {
+                    Id = collectionCacheModelInformation.Id,
+                    VersionId = collectionCacheModelInformation.VersionId
+                });
+            }
+            var resp = await _authApiClient.GetDevicesAsync(AuthorizeRequest(ApiInformationEntity, _apiRoamingEntity, req));
+            if (!resp.IsSuccessfull)
+                return false;
+
+            foreach (var syncEntity in resp.SyncEntities)
+            {
+                //new!
+                if (syncEntity.OnlineAction == OnlineAction.Create)
+                {
+                    var mi = ApiEntityHelper.CreateModelInformation(syncEntity);
+                    var tcol = JsonConvert.DeserializeObject<TDevice>(syncEntity.Content);
+                    tcol.SetId(mi.Id);
+                    _deviceCache.ModelInformations.Add(mi);
+                    _deviceCache.Models.Add(tcol);
+                    _deviceManager.Add(tcol);
+                }
+                //updated
+                else if (syncEntity.OnlineAction == OnlineAction.Update)
+                {
+                    var index = _deviceCache.ModelInformations.FindIndex(d => d.Id == syncEntity.Id);
+                    _deviceCache.ModelInformations[index].VersionId = syncEntity.VersionId;
+                    var model = JsonConvert.DeserializeObject<TDevice>(syncEntity.Content);
+                    _deviceManager.Replace(_deviceCache.Models[index], model);
+                    _deviceCache.Models[index] = model;
+                }
+                //removed
+                else if (syncEntity.OnlineAction == OnlineAction.Delete)
+                {
+                    var index = _deviceCache.ModelInformations.FindIndex(d => d.Id == syncEntity.Id);
+                    _deviceManager.Remove(_deviceCache.Models[index]);
+                    _deviceCache.ModelInformations.RemoveAt(index);
+                    _deviceCache.Models.RemoveAt(index);
+                }
+            }
+
+            if (resp.SyncEntities.Any())
+            {
+                await _apiStorageService.SaveCollectionEntityAsync<TDevice>();
+            }
+            return true;
         }
 
         private readonly CollectionManager<TDevice> _deviceManager = new CollectionManager<TDevice>();
@@ -214,6 +266,11 @@ namespace Famoser.SyncApi.Repositories
 
                 return _deviceManager.GetObservableCollection();
             });
+        }
+
+        public Task<bool> SyncDevicesAsync()
+        {
+            return ExecuteSafe(async () => await SyncDevicesInternalAsync());
         }
 
         public Task<bool> UnAuthenticateAsync(TDevice device)
