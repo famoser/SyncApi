@@ -1,5 +1,8 @@
 # SyncApi
-a nuget portable library to sync models in a very convenient way
+[![Build Status](https://travis-ci.org/famoser/SyncApi.svg?branch=master)](https://travis-ci.org/famoser/SyncApi)
+[![Issue Count](https://codeclimate.com/github/famoser/SyncApi/badges/issue_count.svg)](https://codeclimate.com/github/famoser/SyncApi)
+
+a nuget portable library to sync models in a very convenient way.
 
 This library manages the synchronization between multiple installation of an application of the same user. 
 You may save any entity you want, and it will be synced typesafe. Also included is some sort of version control, and history for each entity.

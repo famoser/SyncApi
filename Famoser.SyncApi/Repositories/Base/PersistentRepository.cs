@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.ObjectModel;
 using System.Threading.Tasks;
+using Famoser.SyncApi.Api;
 using Famoser.SyncApi.Api.Configuration;
-using Famoser.SyncApi.Clients;
 using Famoser.SyncApi.Enums;
 using Famoser.SyncApi.Managers;
 using Famoser.SyncApi.Managers.Interfaces;

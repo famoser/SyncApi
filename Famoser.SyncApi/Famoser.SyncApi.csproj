@@ -39,8 +39,8 @@
   <ItemGroup>
     <Compile Include="Api\Communication\Request\SyncEntityRequest.cs" />
     <Compile Include="Api\Communication\Response\CollectionEntityResponse.cs" />
-    <Compile Include="Clients\ApiClient.cs" />
-    <Compile Include="Clients\Base\BaseApiClient.cs" />
+    <Compile Include="Api\ApiClient.cs" />
+    <Compile Include="Api\Base\BaseApiClient.cs" />
     <Compile Include="Api\Configuration\ApiInformationEntity.cs" />
     <Compile Include="Api\Base\BaseEntity.cs" />
     <Compile Include="Api\Communication\Entities\CollectionEntity.cs" />

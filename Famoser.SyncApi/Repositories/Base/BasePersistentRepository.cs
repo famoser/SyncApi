@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 using Famoser.FrameworkEssentials.Logging.Interfaces;
-using Famoser.SyncApi.Clients;
+using Famoser.SyncApi.Api;
 using Famoser.SyncApi.Models.Interfaces.Base;
 using Famoser.SyncApi.Repositories.Interfaces.Base;
 using Famoser.SyncApi.Services.Interfaces;
