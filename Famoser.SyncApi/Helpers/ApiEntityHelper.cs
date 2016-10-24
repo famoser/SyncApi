@@ -1,6 +1,7 @@
 ﻿using System;
 using Famoser.SyncApi.Api.Base;
 using Famoser.SyncApi.Api.Communication.Entities;
+using Famoser.SyncApi.Api.Communication.Entities.Base;
 using Famoser.SyncApi.Enums;
 using Famoser.SyncApi.Storage.Cache.Entitites;
 using Newtonsoft.Json;

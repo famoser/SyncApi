@@ -8,7 +8,7 @@ using Famoser.SyncApi.Services.Interfaces;
 
 namespace Famoser.SyncApi.Repositories.Base
 {
-    public abstract class BasePersistentRepository<TModel> : IBasePersistentRepository
+    public abstract class BasePersistentRepository<TModel> : IBasePersistentRepository, IDisposable
         where TModel : IUniqueSyncModel
     {
         private readonly IApiConfigurationService _apiConfigurationService;
@@ -79,6 +79,21 @@ namespace Famoser.SyncApi.Repositories.Base
 
             _apiClient = new ApiClient(_apiConfigurationService.GetApiInformations().Uri);
             return _apiClient;
+        }
+
+        private bool _isDisposed;
+        protected virtual void Dispose(bool disposing)
+        {
+            if (_isDisposed)
+                if (disposing)
+                    _apiClient.Dispose();
+            _isDisposed = true;
+        }
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
         }
     }
 }

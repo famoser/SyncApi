@@ -10,7 +10,7 @@ namespace Famoser\SyncApi\Middleware;
 
 
 use Famoser\SyncApi\Models\Response\Base\ApiResponse;
-use Famoser\SyncApi\Types\ApiErrorTypes;
+use Famoser\SyncApi\Types\ApiError;
 use Slim\Http\Environment;
 use Slim\Http\Request;
 use Slim\Http\Response;
@@ -25,7 +25,7 @@ class ApiVersionMiddleware extends BaseMiddleware
             $response = $next($request->withRequestTarget($newpath)->withAttribute("api_version", 1), $response);
         } else {
             $response->withStatus(406, "API version not supported");
-            $resp = new ApiResponse(false, ApiErrorTypes::ApiVersionInvalid);
+            $resp = new ApiResponse(false, ApiError::ApiVersionInvalid);
             $response->withJson($resp);
         }
         return $response;

@@ -24,7 +24,7 @@ use Famoser\SyncApi\Models\Response\Entities\HistoryEntry;
 use Famoser\SyncApi\Models\Response\Entities\RefreshEntity;
 use Famoser\SyncApi\Models\Response\RefreshResponse;
 use Famoser\SyncApi\Models\Response\UpdateResponse;
-use Famoser\SyncApi\Types\ApiErrorTypes;
+use Famoser\SyncApi\Types\ApiError;
 use Famoser\SyncApi\Types\ServerVersion;
 use Slim\Http\Request;
 use Slim\Http\Response;
@@ -38,7 +38,7 @@ class SyncController extends BaseController
         $model = RequestHelper::parseSyncRequest($request);
         if ($this->isAuthorized($model)) {
             if (!$this->isWellDefined($model, null, array("RefreshEntities", "CollectionIds")))
-                return $this->returnApiError(ApiErrorTypes::NotWellDefined, $response);
+                return $this->returnApiError(ApiError::NotWellDefined, $response);
 
             $contentIds = [];
             $contentVersionById = [];
@@ -133,7 +133,7 @@ class SyncController extends BaseController
 
             return ResponseHelper::getJsonResponse($response, $resp);
         } else {
-            return $this->returnApiError(ApiErrorTypes::NotAuthorized, $response);
+            return $this->returnApiError(ApiError::NotAuthorized, $response);
         }
     }
 
@@ -142,12 +142,12 @@ class SyncController extends BaseController
         $model = RequestHelper::parseUpdateRequest($request);
         if ($this->isAuthorized($model)) {
             if (!$this->isWellDefined($model, array("CollectionId", "ContentId", "VersionId")))
-                return $this->returnApiError(ApiErrorTypes::NotWellDefined, $response);
+                return $this->returnApiError(ApiError::NotWellDefined, $response);
 
             $helper = $this->getDatabaseHelper();
             $exiting = $helper->getSingleFromDatabase(new Content(), "content_id=:content_id AND version_id=:version_id", array("content_id" => $model->ContentId, "version_id" => $model->VersionId));
             if ($exiting != null)
-                return $this->returnApiError(ApiErrorTypes::InvalidVersionId, $response);
+                return $this->returnApiError(ApiError::InvalidVersionId, $response);
 
             //save file
             $storage = new FileSystem($this->getUserDirForContent($this->getAuthorizedUser($model)->user_id));
@@ -164,13 +164,13 @@ class SyncController extends BaseController
             $newModel->creation_date_time = time();
             $newModel->version_id = $model->VersionId;
             if (!$helper->saveToDatabase($newModel)) {
-                return $this->returnApiError(ApiErrorTypes::DatabaseFailure, $response);
+                return $this->returnApiError(ApiError::DatabaseFailure, $response);
             }
 
             $resp = new UpdateResponse();
             return ResponseHelper::getJsonResponse($response, $resp);
         } else {
-            return $this->returnApiError(ApiErrorTypes::NotAuthorized, $response);
+            return $this->returnApiError(ApiError::NotAuthorized, $response);
         }
     }
 
@@ -179,16 +179,16 @@ class SyncController extends BaseController
         $model = RequestHelper::parseContentEntityRequest($request);
         if ($this->isAuthorized($model)) {
             if (!$this->isWellDefined($model, array("VersionId", "ContentId")))
-                return $this->returnApiError(ApiErrorTypes::NotWellDefined, $response);
+                return $this->returnApiError(ApiError::NotWellDefined, $response);
 
             $path = $this->getPathForContent($this->getAuthorizedUser($model)->user_id, $model->ContentId, $model->VersionId);
             if (!file_exists($path)) {
-                return $this->returnApiError(ApiErrorTypes::ContentNotFound, $response, $path);
+                return $this->returnApiError(ApiError::ContentNotFound, $response, $path);
             }
             $content = file_get_contents($path);
             return $response->getBody()->write($content);
         } else {
-            return $this->returnApiError(ApiErrorTypes::NotAuthorized, $response);
+            return $this->returnApiError(ApiError::NotAuthorized, $response);
         }
     }
 
@@ -197,7 +197,7 @@ class SyncController extends BaseController
         $model = RequestHelper::parseContentEntityHistoryRequest($request);
         if ($this->isAuthorized($model)) {
             if (!$this->isWellDefined($model, array("ContentId")))
-                return $this->returnApiError(ApiErrorTypes::NotWellDefined, $response);
+                return $this->returnApiError(ApiError::NotWellDefined, $response);
 
             $helper = $this->getDatabaseHelper();
 
@@ -230,7 +230,7 @@ class SyncController extends BaseController
             return ResponseHelper::getJsonResponse($response, $resp);
 
         } else {
-            return $this->returnApiError(ApiErrorTypes::NotAuthorized, $response);
+            return $this->returnApiError(ApiError::NotAuthorized, $response);
         }
     }
 

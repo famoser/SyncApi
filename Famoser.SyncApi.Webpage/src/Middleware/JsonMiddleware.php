@@ -13,7 +13,7 @@ use Famoser\SyncApi\Helpers\LogHelper;
 use Famoser\SyncApi\Helpers\RequestHelper;
 use Famoser\SyncApi\Helpers\ResponseHelper;
 use Famoser\SyncApi\Models\Response\Base\ApiResponse;
-use Famoser\SyncApi\Types\ApiErrorTypes;
+use Famoser\SyncApi\Types\ApiError;
 use Slim\Http\Request;
 use Slim\Http\Response;
 
@@ -27,7 +27,7 @@ class JsonMiddleware
             if ($jsonObj == null) {
                 $response->withStatus(400, "No json content in POST request");
                 LogHelper::log($request->getBody(), "JsonMiddleware.txt");
-                $resp = new ApiResponse(false, ApiErrorTypes::RequestJsonFailure);
+                $resp = new ApiResponse(false, ApiError::RequestJsonFailure);
                 $response->withJson($resp);
             } else {
                 LogHelper::log(json_encode($request->getParsedBody(), JSON_PRETTY_PRINT), "JsonMiddleware.txt");

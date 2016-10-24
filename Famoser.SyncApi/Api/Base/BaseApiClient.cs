@@ -6,7 +6,7 @@ using Newtonsoft.Json;
 
 namespace Famoser.SyncApi.Api.Base
 {
-    public class BaseApiClient
+    public class BaseApiClient : IDisposable
     {
         private readonly Uri _baseUri;
         private readonly RestService _restService;
@@ -36,6 +36,21 @@ namespace Famoser.SyncApi.Api.Base
             {
                 RequestFailed = true
             };
+        }
+
+        private bool _isDisposed;
+        protected virtual void Dispose(bool disposing)
+        {
+            if (_isDisposed)
+                if (disposing)
+                    _restService.Dispose();
+            _isDisposed = true;
+        }
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
         }
     }
 }

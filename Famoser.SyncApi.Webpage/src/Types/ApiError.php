@@ -9,7 +9,7 @@
 namespace Famoser\SyncApi\Types;
 
 
-class ApiErrorTypes
+class ApiError
 {
 //[Description("No API error occured")]
     const None = 0;
@@ -21,15 +21,6 @@ class ApiErrorTypes
     const DeviceNotAuthorized = 1001;
 //[Description("Your device was unauthorized")]
     const DeviceUnAuthorized = 1002;
-    #endregion
-
-    #region request errors
-//[Description("Json request could not be deserialized")]
-    const RequestJsonFailure = 101;
-//[Description("You tried to access a resource you have no access to")]
-    const Forbidden = 104;
-//[Description("Some required properties were missing")]
-    const NotWellDefined = 105;
     #endregion
 
     #region general error

@@ -42,7 +42,7 @@
     <Compile Include="Api\ApiClient.cs" />
     <Compile Include="Api\Base\BaseApiClient.cs" />
     <Compile Include="Api\Configuration\ApiInformationEntity.cs" />
-    <Compile Include="Api\Base\BaseEntity.cs" />
+    <Compile Include="Api\Communication\Entities\Base\BaseEntity.cs" />
     <Compile Include="Api\Communication\Entities\CollectionEntity.cs" />
     <Compile Include="Api\Communication\Entities\DeviceEntity.cs" />
     <Compile Include="Api\Communication\Request\AuthorizationRequest.cs" />

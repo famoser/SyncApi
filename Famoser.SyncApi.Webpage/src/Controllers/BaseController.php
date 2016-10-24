@@ -16,7 +16,7 @@ use Famoser\SyncApi\Models\Entities\Device;
 use Famoser\SyncApi\Models\Entities\User;
 use Famoser\SyncApi\Models\Request\Base\ApiRequest;
 use Famoser\SyncApi\Models\Response\Base\ApiResponse;
-use Famoser\SyncApi\Types\ApiErrorTypes;
+use Famoser\SyncApi\Types\ApiError;
 use Interop\Container\ContainerInterface;
 use Slim\Http\Response;
 
@@ -30,24 +30,28 @@ class BaseController
         $this->container = $ci;
     }
 
+    protected function returnServerError(Response $response, $debugMessage = null)
+    {
 
+        return $response->withStatus($apiError[$apiErrorType])->withJson($resp);
+        }
     protected function returnApiError($apiErrorType, Response $response, $debugMessage = null)
     {
         $apiError = array(
-            ApiErrorTypes::DatabaseFailure => 500,
-            ApiErrorTypes::ApiVersionInvalid => 406,
-            ApiErrorTypes::AuthorizationCodeInvalid => 401,
-            ApiErrorTypes::ContentNotFound => 404,
-            ApiErrorTypes::DeviceNotFound => 401,
-            ApiErrorTypes::Forbidden => 401,
-            ApiErrorTypes::NoDevicesFound => 500,
-            ApiErrorTypes::None => 200,
-            ApiErrorTypes::NotAuthorized => 401,
-            ApiErrorTypes::NotWellDefined => 400,
-            ApiErrorTypes::RequestJsonFailure => 400,
-            ApiErrorTypes::DeviceNotFound => 401,
-            ApiErrorTypes::RequestUriInvalid => 404,
-            ApiErrorTypes::Unauthorized => 401
+            ApiError::DatabaseFailure => 500,
+            ApiError::ApiVersionInvalid => 406,
+            ApiError::AuthorizationCodeInvalid => 401,
+            ApiError::ContentNotFound => 404,
+            ApiError::DeviceNotFound => 401,
+            ApiError::Forbidden => 401,
+            ApiError::NoDevicesFound => 500,
+            ApiError::None => 200,
+            ApiError::NotAuthorized => 401,
+            ApiError::NotWellDefined => 400,
+            ApiError::RequestJsonFailure => 400,
+            ApiError::DeviceNotFound => 401,
+            ApiError::RequestUriInvalid => 404,
+            ApiError::Unauthorized => 401
         );
 
         if (!in_array($apiErrorType, $apiError)) {

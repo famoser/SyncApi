@@ -24,7 +24,7 @@ use Famoser\SyncApi\Models\Response\Authorization\CreateAuthorizationResponse;
 use Famoser\SyncApi\Models\Response\Authorization\UnAuthorizationResponse;
 use Famoser\SyncApi\Models\Response\Base\ApiResponse;
 use Famoser\SyncApi\Models\Response\Entities\AuthorizedDeviceEntity;
-use Famoser\SyncApi\Types\ApiErrorTypes;
+use Famoser\SyncApi\Types\ApiError;
 use Interop\Container\ContainerInterface;
 use Models\Request\Authorization\WipeUserRequest;
 use Models\Response\Authorization\CreateUserResponse;
@@ -38,19 +38,19 @@ class AuthorizationController extends BaseController
     {
         $model = RequestHelper::parseCreateUserRequest($request);
         if (!$this->isWellDefined($model, array("UserName", "DeviceName")))
-            return $this->returnApiError(ApiErrorTypes::NotWellDefined, $response);
+            return $this->returnApiError(ApiError::NotWellDefined, $response);
 
         $helper = $this->getDatabaseHelper();
         $user = $helper->getSingleFromDatabase(new User(), "user_id=:user_id", array("user_id" => $model->UserId));
         if ($user != null) {
-            return $this->returnApiError(ApiErrorTypes::UserAlreadyExists, $response);
+            return $this->returnApiError(ApiError::UserAlreadyExists, $response);
         }
         //create new user & device
         $newUser = new User();
         $newUser->user_id = $model->UserId;
         $newUser->user_name = $model->UserName;
         if (!$helper->saveToDatabase($newUser)) {
-            return $this->returnApiError(ApiErrorTypes::DatabaseFailure, $response);
+            return $this->returnApiError(ApiError::DatabaseFailure, $response);
         }
 
         $device = new Device();
@@ -62,7 +62,7 @@ class AuthorizationController extends BaseController
         $device->last_modification_date_time = time();
         $device->last_request_date_time = time();
         if (!$helper->saveToDatabase($device)) {
-            return $this->returnApiError(ApiErrorTypes::DatabaseFailure, $response);
+            return $this->returnApiError(ApiError::DatabaseFailure, $response);
         }
 
         $resp = new CreateUserResponse();
@@ -75,30 +75,30 @@ class AuthorizationController extends BaseController
     {
         $model = RequestHelper::parseAuthorisationRequest($request);
         if (!$this->isWellDefined($model, array("DeviceName")))
-            return $this->returnApiError(ApiErrorTypes::NotWellDefined, $response);
+            return $this->returnApiError(ApiError::NotWellDefined, $response);
 
         $helper = $this->getDatabaseHelper();
         $user = $helper->getSingleFromDatabase(new User(), "user_id=:user_id", array("user_id" => $model->UserId));
         if ($user == null) {
-            return $this->returnApiError(ApiErrorTypes::UserNotFound, $response);
+            return $this->returnApiError(ApiError::UserNotFound, $response);
         }
         //authorize device with auth code
         $authCode = $helper->getSingleFromDatabase(new AuthorizationCode(), "user_id=:user_id AND code=:code", array("user_id" => $user->id, "code" => $model->AuthorisationCode));
         if ($authCode == null) {
-            return $this->returnApiError(ApiErrorTypes::AuthorizationCodeInvalid, $response);
+            return $this->returnApiError(ApiError::AuthorizationCodeInvalid, $response);
         }
         while ($authCode->valid_till < time()) {
             $helper->deleteFromDatabase($authCode);
-            return $this->returnApiError(ApiErrorTypes::AuthorizationCodeInvalid, $response);
+            return $this->returnApiError(ApiError::AuthorizationCodeInvalid, $response);
         }
         //successful! delete auth code now
         if (!$helper->deleteFromDatabase($authCode))
-            return $this->returnApiError(ApiErrorTypes::DatabaseFailure, $response);
+            return $this->returnApiError(ApiError::DatabaseFailure, $response);
 
         //check if device in database, if so update it
         $oldDevice = $helper->getSingleFromDatabase(new Device(), "user_id=:user_id AND device_id=:device_id", array("user_id" => $user->id, "device_id" => $model->DeviceId));
         if ($oldDevice != null) {
-            return $this->returnApiError(ApiErrorTypes::DeviceAlreadyExists, $response);
+            return $this->returnApiError(ApiError::DeviceAlreadyExists, $response);
         } else {
             $oldDevice = new Device();
             $oldDevice->device_name = $model->DeviceName;
@@ -109,7 +109,7 @@ class AuthorizationController extends BaseController
             $oldDevice->access_revoked_date_time = 0;
             $oldDevice->access_revoked_reason = null;
             if (!$helper->saveToDatabase($oldDevice)) {
-                return $this->returnApiError(ApiErrorTypes::NotWellDefined, $response);
+                return $this->returnApiError(ApiError::NotWellDefined, $response);
             }
         }
 
@@ -132,7 +132,7 @@ class AuthorizationController extends BaseController
                 $resp->IsAuthorized = false;
                 $resp->UnauthorizedReason = $device->access_revoked_reason;
             } else {
-                return $this->returnApiError(ApiErrorTypes::NotAuthorized, $response);
+                return $this->returnApiError(ApiError::NotAuthorized, $response);
             }
         }
         return ResponseHelper::getJsonResponse($response, $resp);
@@ -146,11 +146,11 @@ class AuthorizationController extends BaseController
             $devices = $helper->getFromDatabase(new Device(), "user_id=:user_id", array("user_id" => $this->getAuthorizedUser($model)->id));
             foreach ($devices as $device) {
                 if (!$helper->deleteFromDatabase($device)) {
-                    return $this->returnApiError(ApiErrorTypes::NotWellDefined, $response);
+                    return $this->returnApiError(ApiError::NotWellDefined, $response);
                 }
             }
             if (!$helper->deleteFromDatabase($this->getAuthorizedUser($model))) {
-                return $this->returnApiError(ApiErrorTypes::NotWellDefined, $response);
+                return $this->returnApiError(ApiError::NotWellDefined, $response);
             }
         }
 
@@ -163,7 +163,7 @@ class AuthorizationController extends BaseController
         $model = RequestHelper::parseCreateAuthorizationRequest($request);
         if ($this->isAuthorized($model)) {
             if (!$this->isWellDefined($model, array("AuthorisationCode")))
-                return $this->returnApiError(ApiErrorTypes::NotWellDefined, $response);
+                return $this->returnApiError(ApiError::NotWellDefined, $response);
 
             $helper = $this->getDatabaseHelper();
             $req = new AuthorizationCode();
@@ -175,10 +175,10 @@ class AuthorizationController extends BaseController
                 $resp = new CreateAuthorizationResponse();
                 return ResponseHelper::getJsonResponse($response, $resp);
             } else {
-                return $this->returnApiError(ApiErrorTypes::NotWellDefined, $response);
+                return $this->returnApiError(ApiError::NotWellDefined, $response);
             }
         } else {
-            return $this->returnApiError(ApiErrorTypes::NotAuthorized, $response);
+            return $this->returnApiError(ApiError::NotAuthorized, $response);
         }
     }
 
@@ -187,7 +187,7 @@ class AuthorizationController extends BaseController
         $model = RequestHelper::parseUnAuthorisationRequest($request);
         if ($this->isAuthorized($model)) {
             if (!$this->isWellDefined($model, array("DeviceToBlockId")))
-                return $this->returnApiError(ApiErrorTypes::NotWellDefined, $response);
+                return $this->returnApiError(ApiError::NotWellDefined, $response);
 
             $helper = $this->getDatabaseHelper();
             $deviceToUnAuthorized = $helper->getSingleFromDatabase(new Device(), "device_id=:device_id AND user_id=:user_id", array("device_id" => $model->DeviceToBlockId, "user_id" => $this->getAuthorizedUser($model)->id));
@@ -200,13 +200,13 @@ class AuthorizationController extends BaseController
                     $resp = new UnAuthorizationResponse();
                     return ResponseHelper::getJsonResponse($response, $resp);
                 } else {
-                    return $this->returnApiError(ApiErrorTypes::NotWellDefined, $response);
+                    return $this->returnApiError(ApiError::NotWellDefined, $response);
                 }
             } else {
-                return $this->returnApiError(ApiErrorTypes::DeviceNotFound, $response);
+                return $this->returnApiError(ApiError::DeviceNotFound, $response);
             }
         } else {
-            return $this->returnApiError(ApiErrorTypes::NotAuthorized, $response);
+            return $this->returnApiError(ApiError::NotAuthorized, $response);
         }
     }
 
@@ -231,10 +231,10 @@ class AuthorizationController extends BaseController
                 return ResponseHelper::getJsonResponse($response, $resp);
 
             } else {
-                return $this->returnApiError(ApiErrorTypes::NoDevicesFound, $response);
+                return $this->returnApiError(ApiError::NoDevicesFound, $response);
             }
         } else {
-            return $this->returnApiError(ApiErrorTypes::NotAuthorized, $response);
+            return $this->returnApiError(ApiError::NotAuthorized, $response);
         }
     }
 }

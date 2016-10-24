@@ -17,7 +17,7 @@ use Famoser\SyncApi\Middleware\TestsMiddleware;
 use Famoser\SyncApi\Models\Request\Base\ApiRequest;
 use Famoser\SyncApi\Models\Request\SyncRequest;
 use Famoser\SyncApi\Models\Response\Base\ApiResponse;
-use Famoser\SyncApi\Types\ApiErrorTypes;
+use Famoser\SyncApi\Types\ApiError;
 use \Psr\Http\Message\ServerRequestInterface as Request;
 use \Psr\Http\Message\ResponseInterface as Response;
 use Slim\App;
@@ -50,7 +50,7 @@ $configuration = [
 $c = new Container($configuration);
 $c['notFoundHandler'] = function (Container $c) {
     return function (Request $req, Response $resp) use ($c) {
-        $res = new ApiResponse(false, ApiErrorTypes::RequestUriInvalid);
+        $res = new ApiResponse(false, ApiError::RequestUriInvalid);
         if ($c->get("settings")["debug_mode"])
             $res->ApiMessage = "requested: " . $req->getRequestTarget();
 
@@ -59,7 +59,7 @@ $c['notFoundHandler'] = function (Container $c) {
 };
 $c['notAllowedHandler'] = function (Container $c) {
     return function (Request $req, Response $resp) use ($c) {
-        $res = new ApiResponse(false, ApiErrorTypes::RequestUriInvalid);
+        $res = new ApiResponse(false, ApiError::RequestUriInvalid);
         if ($c->get("settings")["debug_mode"])
             $res->ApiMessage = "requested: " . $req->getRequestTarget();
 
@@ -74,7 +74,7 @@ $c['errorHandler'] = function (Container $c) {
      * @return mixed
      */
     return function (Request $request, Response $response, Exception $exception) use ($c) {
-        $res = new ApiResponse(false, ApiErrorTypes::ServerFailure);
+        $res = new ApiResponse(false, ApiError::ServerFailure);
         if ($c->get("settings")["debug_mode"])
             $res->ApiMessage = "Exception: " . $exception->getMessage() . " \nStack: " . $exception->getTraceAsString();
         return $response->withStatus(500, $exception->getMessage())->withJson($res);

@@ -9,11 +9,11 @@
 namespace Famoser\SyncApi\Models\Response\Base;
 
 
-use Famoser\SyncApi\Types\ApiErrorTypes;
+use Famoser\SyncApi\Types\ApiError;
 
 class ApiResponse
 {
-    public function __construct($successfull = true, $apiError = ApiErrorTypes::None)
+    public function __construct($successfull = true, $apiError = ApiError::None)
     {
         $this->Successfull = $successfull;
         $this->ApiError = $apiError;
