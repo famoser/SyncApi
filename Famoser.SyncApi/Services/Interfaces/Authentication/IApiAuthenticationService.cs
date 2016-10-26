@@ -1,12 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Famoser.SyncApi.Api.Communication.Request;
 using Famoser.SyncApi.Api.Communication.Request.Base;
 using Famoser.SyncApi.Enums;
+using Famoser.SyncApi.Models.Information;
 using Famoser.SyncApi.Models.Interfaces;
 using Famoser.SyncApi.Repositories.Interfaces;
-using Famoser.SyncApi.Storage.Cache.Entitites;
 
 namespace Famoser.SyncApi.Services.Interfaces.Authentication
 {
@@ -62,7 +60,7 @@ namespace Famoser.SyncApi.Services.Interfaces.Authentication
         ///     - sets Create action
         /// </summary>
         /// <returns></returns>
-        Task<ModelInformation> CreateModelInformationAsync();
+        Task<CacheInformations> CreateModelInformationAsync();
 
         /// <summary>
         /// Regisiter a collection repository, so proper requests for Models can be constructued

@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Famoser.SyncApi.Enums;
 using Famoser.SyncApi.Managers;
 using Famoser.SyncApi.Managers.Interfaces;
+using Famoser.SyncApi.Models.Information;
 using Famoser.SyncApi.Models.Interfaces.Base;
 using Famoser.SyncApi.Repositories.Interfaces.Base;
 using Famoser.SyncApi.Services.Interfaces;
@@ -103,14 +104,20 @@ namespace Famoser.SyncApi.Repositories.Base
             });
         }
 
-        public ObservableCollection<TCollection> GetHistoryLazy(TCollection model)
+        public ObservableCollection<HistoryInformations<TCollection>> GetHistoryLazy(TCollection model)
         {
             throw new NotImplementedException();
         }
 
-        public Task<ObservableCollection<TCollection>> GetHistoryAsync(TCollection model)
+        public Task<ObservableCollection<HistoryInformations<TCollection>>> GetHistoryAsync(TCollection model)
         {
             throw new NotImplementedException();
+        }
+
+        public CacheInformations GetCacheInformations(TCollection model)
+        {
+            var index = CollectionCache.Models.IndexOf(model);
+            return CollectionCache.ModelInformations[index];
         }
 
         public Task<bool> RemoveAllAsync()

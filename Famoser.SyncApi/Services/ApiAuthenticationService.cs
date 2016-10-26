@@ -7,11 +7,11 @@ using Famoser.SyncApi.Api.Communication.Request.Base;
 using Famoser.SyncApi.Api.Configuration;
 using Famoser.SyncApi.Enums;
 using Famoser.SyncApi.Helpers;
+using Famoser.SyncApi.Models.Information;
 using Famoser.SyncApi.Models.Interfaces;
 using Famoser.SyncApi.Repositories.Interfaces;
 using Famoser.SyncApi.Services.Interfaces;
 using Famoser.SyncApi.Services.Interfaces.Authentication;
-using Famoser.SyncApi.Storage.Cache.Entitites;
 using Famoser.SyncApi.Storage.Roaming;
 using Nito.AsyncEx;
 
@@ -98,11 +98,11 @@ namespace Famoser.SyncApi.Services
             return req;
         }
 
-        public async Task<ModelInformation> CreateModelInformationAsync()
+        public async Task<CacheInformations> CreateModelInformationAsync()
         {
             await InitializeAsync();
 
-            var mi = new ModelInformation
+            var mi = new CacheInformations
             {
                 Id = Guid.NewGuid(),
                 VersionId = Guid.NewGuid(),

@@ -1,9 +1,9 @@
 ﻿using System;
 using Famoser.SyncApi.Enums;
 
-namespace Famoser.SyncApi.Storage.Cache.Entitites
+namespace Famoser.SyncApi.Models.Information
 {
-    public class ModelInformation
+    public class CacheInformations
     {
         public Guid Id { get; set; }
         public Guid UserId { get; set; }

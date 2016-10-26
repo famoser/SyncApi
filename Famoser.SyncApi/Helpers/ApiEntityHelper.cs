@@ -1,16 +1,15 @@
 ﻿using System;
-using Famoser.SyncApi.Api.Base;
 using Famoser.SyncApi.Api.Communication.Entities;
 using Famoser.SyncApi.Api.Communication.Entities.Base;
 using Famoser.SyncApi.Enums;
-using Famoser.SyncApi.Storage.Cache.Entitites;
+using Famoser.SyncApi.Models.Information;
 using Newtonsoft.Json;
 
 namespace Famoser.SyncApi.Helpers
 {
     public class ApiEntityHelper
     {
-        private static T CreateApiEntity<T>(ModelInformation info, string identifier, Func<object> getModelFunc)
+        private static T CreateApiEntity<T>(CacheInformations info, string identifier, Func<object> getModelFunc)
             where T : BaseEntity, new()
         {
             if (info.PendingAction == PendingAction.None)
@@ -31,7 +30,7 @@ namespace Famoser.SyncApi.Helpers
             return modl;
         }
 
-        public static CollectionEntity CreateCollectionEntity(ModelInformation info, string identifier, Func<object> getModelFunc)
+        public static CollectionEntity CreateCollectionEntity(CacheInformations info, string identifier, Func<object> getModelFunc)
         {
             if (info.PendingAction == PendingAction.None)
                 return null;
@@ -45,7 +44,7 @@ namespace Famoser.SyncApi.Helpers
             return mdl;
         }
 
-        public static SyncEntity CreateSyncEntity(ModelInformation info, string identifier, Func<object> getModelFunc)
+        public static SyncEntity CreateSyncEntity(CacheInformations info, string identifier, Func<object> getModelFunc)
         {
             if (info.PendingAction == PendingAction.None)
                 return null;
@@ -61,9 +60,9 @@ namespace Famoser.SyncApi.Helpers
         }
 
 
-        private static ModelInformation CreateModelInformation(BaseEntity entity)
+        private static CacheInformations CreateModelInformation(BaseEntity entity)
         {
-            return new ModelInformation()
+            return new CacheInformations()
             {
                 Id = entity.Id,
                 VersionId = entity.VersionId,
@@ -72,7 +71,7 @@ namespace Famoser.SyncApi.Helpers
             };
         }
 
-        public static ModelInformation CreateModelInformation(CollectionEntity entity)
+        public static CacheInformations CreateModelInformation(CollectionEntity entity)
         {
             var mi = CreateModelInformation(entity as BaseEntity);
             mi.UserId = entity.UserId;
@@ -80,7 +79,7 @@ namespace Famoser.SyncApi.Helpers
             return mi;
         }
 
-        public static ModelInformation CreateModelInformation(SyncEntity entity)
+        public static CacheInformations CreateModelInformation(SyncEntity entity)
         {
             var mi = CreateModelInformation(entity as BaseEntity);
             mi.UserId = entity.UserId;

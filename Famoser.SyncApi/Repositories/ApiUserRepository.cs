@@ -6,12 +6,11 @@ using Famoser.SyncApi.Api.Communication.Request;
 using Famoser.SyncApi.Api.Configuration;
 using Famoser.SyncApi.Enums;
 using Famoser.SyncApi.Helpers;
+using Famoser.SyncApi.Models.Information;
 using Famoser.SyncApi.Models.Interfaces;
 using Famoser.SyncApi.Repositories.Base;
 using Famoser.SyncApi.Repositories.Interfaces;
 using Famoser.SyncApi.Services.Interfaces;
-using Famoser.SyncApi.Services.Interfaces.Authentication;
-using Famoser.SyncApi.Storage.Cache.Entitites;
 using Famoser.SyncApi.Storage.Roaming;
 using Newtonsoft.Json;
 using Nito.AsyncEx;
@@ -55,7 +54,7 @@ namespace Famoser.SyncApi.Repositories
 
                     CacheEntity = await _apiStorageService.GetCacheEntity<TUser>(GetModelCacheFilePath());
                     CacheEntity.Model = await _apiConfigurationService.GetUserObjectAsync<TUser>();
-                    CacheEntity.ModelInformation = new ModelInformation()
+                    CacheEntity.ModelInformation = new CacheInformations()
                     {
                         Id = _roaming.UserId,
                         PendingAction = PendingAction.Create,
@@ -68,7 +67,7 @@ namespace Famoser.SyncApi.Repositories
                     CacheEntity = await _apiStorageService.GetCacheEntity<TUser>(GetModelCacheFilePath());
                     if (CacheEntity.ModelInformation == null)
                     {
-                        CacheEntity.ModelInformation = new ModelInformation()
+                        CacheEntity.ModelInformation = new CacheInformations()
                         {
                             Id = _roaming.UserId,
                             PendingAction = PendingAction.Read

@@ -11,13 +11,12 @@ using Famoser.SyncApi.Api.Configuration;
 using Famoser.SyncApi.Enums;
 using Famoser.SyncApi.Helpers;
 using Famoser.SyncApi.Managers;
+using Famoser.SyncApi.Models.Information;
 using Famoser.SyncApi.Models.Interfaces;
 using Famoser.SyncApi.Repositories.Base;
 using Famoser.SyncApi.Repositories.Interfaces;
 using Famoser.SyncApi.Services.Interfaces;
-using Famoser.SyncApi.Services.Interfaces.Authentication;
 using Famoser.SyncApi.Storage.Cache;
-using Famoser.SyncApi.Storage.Cache.Entitites;
 using Famoser.SyncApi.Storage.Roaming;
 using Newtonsoft.Json;
 using Nito.AsyncEx;
@@ -54,7 +53,7 @@ namespace Famoser.SyncApi.Repositories
                 if (CacheEntity.ModelInformation == null)
                 {
                     CacheEntity.Model = await _apiConfigurationService.GetDeviceObjectAsync<TDevice>();
-                    CacheEntity.ModelInformation = new ModelInformation()
+                    CacheEntity.ModelInformation = new CacheInformations()
                     {
                         Id = Guid.NewGuid(),
                         UserId = _apiRoamingEntity.UserId,
@@ -184,7 +183,7 @@ namespace Famoser.SyncApi.Repositories
                 _deviceCache = await _apiStorageService.GetCollectionCacheEntity<TDevice>(GetModelCacheFilePath());
                 if (_deviceCache.ModelInformations == null)
                 {
-                    _deviceCache.ModelInformations = new List<ModelInformation>();
+                    _deviceCache.ModelInformations = new List<CacheInformations>();
                     _deviceCache.Models = new List<TDevice>();
                 }
 

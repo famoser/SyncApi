@@ -56,6 +56,7 @@
     <Compile Include="Models\Base\BaseModel.cs" />
     <Compile Include="Models\CollectionModel.cs" />
     <Compile Include="Models\DeviceModel.cs" />
+    <Compile Include="Models\Information\HistoryInformations.cs" />
     <Compile Include="Models\UserModel.cs" />
     <Compile Include="Repositories\ApiDeviceRepository.cs" />
     <Compile Include="Repositories\ApiUserRepository.cs" />
@@ -71,7 +72,7 @@
     <Compile Include="Storage\Cache\CollectionCacheEntity.cs" />
     <Compile Include="Api\Communication\Entities\SyncEntity.cs" />
     <Compile Include="Api\Communication\Entities\UserEntity.cs" />
-    <Compile Include="Storage\Cache\Entitites\ModelInformation.cs" />
+    <Compile Include="Models\Information\CacheInformations.cs" />
     <Compile Include="Storage\Roaming\ApiRoamingEntity.cs" />
     <Compile Include="Enums\ApiError.cs" />
     <Compile Include="Enums\AuthenticationState.cs" />

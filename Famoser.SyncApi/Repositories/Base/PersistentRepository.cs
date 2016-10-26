@@ -6,10 +6,10 @@ using Famoser.SyncApi.Api.Configuration;
 using Famoser.SyncApi.Enums;
 using Famoser.SyncApi.Managers;
 using Famoser.SyncApi.Managers.Interfaces;
+using Famoser.SyncApi.Models.Information;
 using Famoser.SyncApi.Models.Interfaces.Base;
 using Famoser.SyncApi.Repositories.Interfaces.Base;
 using Famoser.SyncApi.Services.Interfaces;
-using Famoser.SyncApi.Services.Interfaces.Authentication;
 using Famoser.SyncApi.Storage.Cache;
 
 namespace Famoser.SyncApi.Repositories.Base
@@ -58,7 +58,8 @@ namespace Famoser.SyncApi.Repositories.Base
                     CacheEntity.ModelInformation.VersionId = Guid.NewGuid();
                     CacheEntity.ModelInformation.PendingAction = PendingAction.Update;
                 }
-                return await SyncInternalAsync();
+                await SaveCacheAsync();
+                return true;
             });
         }
 
@@ -70,7 +71,8 @@ namespace Famoser.SyncApi.Repositories.Base
                 {
                     CacheEntity.ModelInformation.PendingAction = PendingAction.Create;
                 }
-                return await SyncInternalAsync();
+                await SaveCacheAsync();
+                return true;
             });
         }
         
@@ -87,9 +89,14 @@ namespace Famoser.SyncApi.Repositories.Base
             }
         }
 
-        public Task<ObservableCollection<TModel>> GetHistoryAsync()
+        public Task<ObservableCollection<HistoryInformations<TModel>>> GetHistoryAsync()
         {
             throw new NotImplementedException();
+        }
+
+        public CacheInformations GetCacheInformations()
+        {
+            return CacheEntity.ModelInformation;
         }
     }
 }
