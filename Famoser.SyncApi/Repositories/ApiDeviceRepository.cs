@@ -24,7 +24,7 @@ using Nito.AsyncEx;
 
 namespace Famoser.SyncApi.Repositories
 {
-    public class ApiDeviceRepository<TDevice> : PersistentRepository<TDevice>, IApiDeviceRepository<TDevice>, IApiDeviceAuthenticationService
+    public class ApiDeviceRepository<TDevice> : PersistentRepository<TDevice>, IApiDeviceRepository<TDevice>
         where TDevice : class, IDeviceModel
     {
         private readonly IApiStorageService _apiStorageService;

@@ -8,7 +8,7 @@ using Famoser.SyncApi.Services.Interfaces;
 
 namespace Famoser.SyncApi.Repositories.Base
 {
-    public abstract class BasePersistentRepository<TModel> : IBasePersistentRepository, IDisposable
+    public abstract class BasePersistentRepository<TModel> : IBasePersistentRepository
         where TModel : IUniqueSyncModel
     {
         private readonly IApiConfigurationService _apiConfigurationService;
@@ -51,7 +51,7 @@ namespace Famoser.SyncApi.Repositories.Base
         private string _modelCacheFilePath;
         protected string GetModelCacheFilePath()
         {
-            if (_modelCacheFilePath == null)
+            if (_modelCacheFilePath != null)
                 return _modelCacheFilePath;
 
             _modelCacheFilePath = _apiConfigurationService.GetFileName(GetModelIdentifier() + ".json", typeof(TModel));
@@ -62,7 +62,7 @@ namespace Famoser.SyncApi.Repositories.Base
         private string _modelIdentifier;
         protected string GetModelIdentifier()
         {
-            if (_modelIdentifier == null)
+            if (_modelIdentifier != null)
                 return _modelIdentifier;
 
             var model = (TModel)Activator.CreateInstance(typeof(TModel));

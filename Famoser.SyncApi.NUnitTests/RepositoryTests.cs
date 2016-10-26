@@ -1,10 +1,10 @@
 ﻿using System.Threading.Tasks;
 using Famoser.SyncApi.Helpers;
 using Famoser.SyncApi.Models;
-using Famoser.SyncApi.NUnitTests.Helpers;
 using Famoser.SyncApi.NUnitTests.Implementations;
 using Famoser.SyncApi.NUnitTests.Models;
 using Famoser.SyncApi.Repositories;
+using Famoser.SyncApi.Services;
 using GalaSoft.MvvmLight.Ioc;
 using NUnit.Framework;
 
@@ -13,12 +13,6 @@ namespace Famoser.SyncApi.NUnitTests
     [TestFixture]
     public class RepositoryTests
     {
-        [SetUp]
-        public void InitializeIocContainer()
-        {
-            IocHelper.InitializeContainer();
-        }
-
         [Test]
         public async Task TestSync()
         {

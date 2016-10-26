@@ -2,10 +2,11 @@
 using System.Threading.Tasks;
 using Famoser.SyncApi.Models.Interfaces;
 using Famoser.SyncApi.Repositories.Interfaces.Base;
+using Famoser.SyncApi.Services.Interfaces.Authentication;
 
 namespace Famoser.SyncApi.Repositories.Interfaces
 {
-    public interface IApiDeviceRepository<TDevice> : IPersistentRespository<TDevice>
+    public interface IApiDeviceRepository<TDevice> : IPersistentRespository<TDevice>, IApiDeviceAuthenticationService
         where TDevice : IDeviceModel
     {
         ObservableCollection<TDevice> GetAllLazy();

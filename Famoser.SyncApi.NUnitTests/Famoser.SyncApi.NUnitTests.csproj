@@ -65,7 +65,6 @@
     <Compile Include="CSharpTests\Models\BaseModel.cs" />
     <Compile Include="CSharpTests\Models\ChildModel.cs" />
     <Compile Include="CSharpTests\UriTests.cs" />
-    <Compile Include="Helpers\IocHelpers.cs" />
     <Compile Include="Implementations\StorageService.cs" />
     <Compile Include="Models\NoteModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -79,6 +78,9 @@
       <Project>{7dc23924-d011-4477-bb64-0db88faedbcf}</Project>
       <Name>Famoser.SyncApi</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Helpers\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

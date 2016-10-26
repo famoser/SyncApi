@@ -12,28 +12,63 @@ namespace Famoser.SyncApi.Helpers
 {
     public class SyncApiHelper : IDisposable
     {
-        private readonly IApiConfigurationService _apiConfigurationService;
-        private readonly IApiStorageService _apiStorageService;
-        private readonly IApiAuthenticationService _apiAuthenticationService;
-
-        private readonly ApiUserRepository<UserModel> _apiUserRepository;
-        private readonly ApiDeviceRepository<DeviceModel> _apiDeviceRepository;
-        private readonly ApiCollectionRepository<CollectionModel> _apiCollectionRepository;
-
+        private readonly IStorageService _storageService;
+        private readonly string _applicationName;
+        private readonly string _uri;
         public SyncApiHelper(IStorageService storageService, string applicationName, string uri = "https://public.syncapi.famoser.ch")
         {
-            _apiConfigurationService = new ApiConfigurationService(applicationName, uri);
-            _apiStorageService = new ApiStorageService(storageService, _apiConfigurationService);
-            _apiUserRepository = new ApiUserRepository<UserModel>(_apiConfigurationService, _apiStorageService);
-            _apiDeviceRepository = new ApiDeviceRepository<DeviceModel>(_apiConfigurationService, _apiStorageService);
-            _apiAuthenticationService = new ApiAuthenticationService(_apiConfigurationService, _apiUserRepository, _apiDeviceRepository);
-            _apiCollectionRepository = new ApiCollectionRepository<CollectionModel>(_apiAuthenticationService, _apiStorageService, _apiConfigurationService);
+            _storageService = storageService;
+            _applicationName = applicationName;
+            _uri = uri;
         }
+
+        private IApiConfigurationService _apiConfigurationService;
+        public IApiConfigurationService ApiConfigurationService
+        {
+            get { return _apiConfigurationService ?? (_apiConfigurationService = new ApiConfigurationService(_applicationName, _uri)); }
+            set { _apiConfigurationService = value; }
+        }
+
+        private IApiStorageService _apiStorageService;
+        public IApiStorageService ApiStorageService
+        {
+            get { return _apiStorageService ?? (_apiStorageService = new ApiStorageService(_storageService, ApiConfigurationService)); }
+            set { _apiStorageService = value; }
+        }
+
+        private IApiAuthenticationService _apiAuthenticationService;
+        public IApiAuthenticationService ApiAuthenticationService
+        {
+            get { return _apiAuthenticationService ?? (_apiAuthenticationService = new ApiAuthenticationService(ApiConfigurationService, ApiUserRepository, ApiDeviceRepository)); }
+            set { _apiAuthenticationService = value; }
+        }
+
+        private IApiUserRepository<UserModel> _apiUserRepository;
+        public IApiUserRepository<UserModel> ApiUserRepository
+        {
+            get { return _apiUserRepository ?? (_apiUserRepository = new ApiUserRepository<UserModel>(ApiConfigurationService, ApiStorageService)); }
+            set { _apiUserRepository = value; }
+        }
+
+        private IApiDeviceRepository<DeviceModel> _apiDeviceRepository;
+        public IApiDeviceRepository<DeviceModel> ApiDeviceRepository
+        {
+            get { return _apiDeviceRepository ?? (_apiDeviceRepository = new ApiDeviceRepository<DeviceModel>(ApiConfigurationService, ApiStorageService)); }
+            set { _apiDeviceRepository = value; }
+        }
+
+        private IApiCollectionRepository<CollectionModel> _apiCollectionRepository;
+        public IApiCollectionRepository<CollectionModel> ApiCollectionRepository
+        {
+            get { return _apiCollectionRepository ?? (_apiCollectionRepository = new ApiCollectionRepository<CollectionModel>(ApiAuthenticationService, ApiStorageService, ApiConfigurationService)); }
+            set { _apiCollectionRepository = value; }
+        }
+
 
         public ApiRepository<T, CollectionModel> ResolveRepository<T>()
             where T : ISyncModel
         {
-            return new ApiRepository<T, CollectionModel>(_apiConfigurationService, _apiStorageService, _apiAuthenticationService);
+            return new ApiRepository<T, CollectionModel>(ApiConfigurationService, ApiStorageService, ApiAuthenticationService);
         }
 
         private bool _isDisposed;
@@ -42,9 +77,9 @@ namespace Famoser.SyncApi.Helpers
             if (_isDisposed)
                 if (disposing)
                 {
-                    _apiUserRepository.Dispose();
-                    _apiDeviceRepository.Dispose();
-                    _apiCollectionRepository.Dispose();
+                    ApiUserRepository.Dispose();
+                    ApiDeviceRepository.Dispose();
+                    ApiCollectionRepository.Dispose();
                 }
             _isDisposed = true;
         }

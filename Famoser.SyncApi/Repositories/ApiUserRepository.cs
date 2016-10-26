@@ -18,7 +18,7 @@ using Nito.AsyncEx;
 
 namespace Famoser.SyncApi.Repositories
 {
-    public class ApiUserRepository<TUser> : PersistentRepository<TUser>, IApiUserRepository<TUser>, IApiUserAuthenticationService
+    public class ApiUserRepository<TUser> : PersistentRepository<TUser>, IApiUserRepository<TUser>
         where TUser : class, IUserModel
     {
         private readonly ApiClient _authApiClient;

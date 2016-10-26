@@ -21,9 +21,10 @@ namespace Famoser.SyncApi.Services
             _storageService = storageService;
             _apiConfigurationService = apiConfigurationService;
         }
-        
+
         private readonly AsyncLock _asyncLock = new AsyncLock();
         private ApiRoamingEntity _apiRoamingEntity;
+
         private async Task<bool> InitializeAsync()
         {
             using (await _asyncLock.LockAsync())
@@ -62,7 +63,12 @@ namespace Famoser.SyncApi.Services
 
         public Task<bool> SaveApiRoamingEntityAsync()
         {
-            return ExecuteSafe(async () => await _storageService.SetRoamingTextFileAsync(GetApiRoamingFilePath(), JsonConvert.SerializeObject(_apiRoamingEntity)));
+            return
+                ExecuteSafe(
+                    async () =>
+                        await
+                            _storageService.SetRoamingTextFileAsync(GetApiRoamingFilePath(),
+                                JsonConvert.SerializeObject(_apiRoamingEntity)));
         }
 
         public Task<bool> EraseRoamingAndCacheAsync()
@@ -84,6 +90,7 @@ namespace Famoser.SyncApi.Services
 
         private readonly Dictionary<Type, string> _filenameCache = new Dictionary<Type, string>();
         private readonly Dictionary<string, object> _unserializeCache = new Dictionary<string, object>();
+
         public Task<CacheEntity<T>> GetCacheEntity<T>(string filename)
         {
             return GetEntity<CacheEntity<T>>(filename);
@@ -114,7 +121,7 @@ namespace Famoser.SyncApi.Services
             return EraseEntityAsync<CollectionCacheEntity<T>>();
         }
 
-        private async Task<T> GetEntity<T>(string filename) where T : class
+        private async Task<T> GetEntity<T>(string filename) where T : class, new()
         {
             if (!_filenameCache.ContainsKey(typeof(T)))
                 _filenameCache.Add(typeof(T), filename);
@@ -123,8 +130,19 @@ namespace Famoser.SyncApi.Services
 
             if (!_unserializeCache.ContainsKey(filename))
             {
-                var json = await _storageService.GetCachedTextFileAsync(filename);
-                _unserializeCache.Add(filename, JsonConvert.DeserializeObject<T>(json));
+                try
+                {
+                    var json = await _storageService.GetCachedTextFileAsync(filename);
+                    _unserializeCache.Add(filename, JsonConvert.DeserializeObject<T>(json));
+                }
+                catch
+                {
+                    //ignore because storage service cna fail if file is not found
+                }
+                if (!_unserializeCache.ContainsKey(filename))
+                    _unserializeCache.Add(filename, new T());
+                else if (_unserializeCache[filename] == null)
+                    _unserializeCache[filename] = new T();
             }
             return _unserializeCache[filename] as T;
         }
