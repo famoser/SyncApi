@@ -21,26 +21,42 @@ namespace Famoser.SyncApi.Repositories
         where TModel : ISyncModel
         where TCollection : ICollectionModel
     {
-        private readonly ICollectionManager<TModel> _collectionManager;
         private readonly IApiConfigurationService _apiConfigurationService;
         private readonly IApiStorageService _apiStorageService;
         private readonly IApiAuthenticationService _apiAuthenticationService;
 
         public ApiRepository(IApiConfigurationService apiConfigurationService, IApiStorageService apiStorageService, IApiAuthenticationService apiAuthenticationService)
-            : base(apiAuthenticationService, apiStorageService, apiConfigurationService)
+            : base(apiConfigurationService, apiStorageService, apiAuthenticationService)
         {
-            _collectionManager = new CollectionManager<TModel>();
             _apiConfigurationService = apiConfigurationService;
             _apiStorageService = apiStorageService;
             _apiAuthenticationService = apiAuthenticationService;
         }
 
+        private readonly AsyncLock _asyncLock = new AsyncLock();
+        protected override async Task<bool> InitializeAsync()
+        {
+            using (await _asyncLock.LockAsync())
+            {
+                if (CollectionCache != null)
+                    return true;
+
+                CollectionCache = await _apiStorageService.GetCollectionCacheEntity<TModel>(GetModelCacheFilePath());
+
+                foreach (var collectionCacheModel in CollectionCache.Models)
+                {
+                    CollectionManager.Add(collectionCacheModel);
+                }
+
+                return true;
+            }
+        }
 
         protected override async Task<bool> SyncInternalAsync()
         {
-            if (!_apiAuthenticationService.IsAuthenticated())
+            if (! await _apiAuthenticationService.IsAuthenticatedAsync())
             {
-                if (!await _apiAuthenticationService.AuthenticateAsync())
+                if (!await _apiAuthenticationService.IsAuthenticatedAsync())
                     return false;
             }
 
@@ -124,25 +140,6 @@ namespace Famoser.SyncApi.Repositories
             }
 
             return true;
-        }
-
-        private readonly AsyncLock _asyncLock = new AsyncLock();
-        protected override async Task<bool> InitializeAsync()
-        {
-            using (await _asyncLock.LockAsync())
-            {
-                if (CollectionCache != null)
-                    return true;
-
-                CollectionCache = await _apiStorageService.GetCollectionCacheEntity<TModel>(GetModelCacheFilePath());
-                
-                foreach (var collectionCacheModel in CollectionCache.Models)
-                {
-                    CollectionManager.Add(collectionCacheModel);
-                }
-
-                return true;
-            }
         }
     }
 }

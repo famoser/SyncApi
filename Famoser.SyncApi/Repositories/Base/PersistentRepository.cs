@@ -9,6 +9,7 @@ using Famoser.SyncApi.Managers.Interfaces;
 using Famoser.SyncApi.Models.Interfaces.Base;
 using Famoser.SyncApi.Repositories.Interfaces.Base;
 using Famoser.SyncApi.Services.Interfaces;
+using Famoser.SyncApi.Services.Interfaces.Authentication;
 using Famoser.SyncApi.Storage.Cache;
 
 namespace Famoser.SyncApi.Repositories.Base
@@ -19,10 +20,15 @@ namespace Famoser.SyncApi.Repositories.Base
         protected readonly IManager<TModel> Manager = new Manager<TModel>();
         protected CacheEntity<TModel> CacheEntity;
         protected readonly ApiInformationEntity ApiInformationEntity;
+        private readonly IApiConfigurationService _apiConfigurationService;
+        private readonly IApiStorageService _apiStorageService;
 
-        protected PersistentRepository(IApiConfigurationService apiConfigurationService)
+        protected PersistentRepository(IApiConfigurationService apiConfigurationService, IApiStorageService apiStorageService)
             : base(apiConfigurationService)
         {
+            _apiConfigurationService = apiConfigurationService;
+            _apiStorageService = apiStorageService;
+
             ApiInformationEntity = apiConfigurationService.GetApiInformations();
         }
 
@@ -66,6 +72,19 @@ namespace Famoser.SyncApi.Repositories.Base
                 }
                 return await SyncInternalAsync();
             });
+        }
+        
+        protected async Task SaveCacheAsync()
+        {
+            try
+            {
+                await _apiStorageService.SaveCacheEntityAsync<TModel>();
+                await SyncInternalAsync();
+            }
+            catch (Exception ex)
+            {
+                ExceptionLogger?.LogException(ex, this);
+            }
         }
 
         public Task<ObservableCollection<TModel>> GetHistoryAsync()

@@ -32,14 +32,12 @@ namespace Famoser.SyncApi.Services
             _apiDeviceAuthenticationService = apiDeviceAuthenticationService;
         }
         
-        public bool IsAuthenticated()
+        private bool IsAuthenticated()
         {
             return _apiRoamingEntity?.AuthenticationState == AuthenticationState.Authenticated && _deviceModel?.GetAuthenticationState() == AuthenticationState.Authenticated;
         }
 
-        private ApiRoamingEntity _apiRoamingEntity;
-        private IDeviceModel _deviceModel;
-        public async Task<bool> AuthenticateAsync()
+        private async Task InitializeAsync()
         {
             using (await _asyncLock.LockAsync())
             {
@@ -48,12 +46,20 @@ namespace Famoser.SyncApi.Services
                     _apiRoamingEntity = await _apiUserAuthenticationService.GetApiRoamingEntityAsync();
                     _deviceModel = await _apiDeviceAuthenticationService.GetDeviceAsync(_apiRoamingEntity);
                 }
-                return IsAuthenticated();
             }
         }
 
-        public T CreateRequestAsync<T>(OnlineAction action) where T : BaseRequest, new()
+        private ApiRoamingEntity _apiRoamingEntity;
+        private IDeviceModel _deviceModel;
+        public async Task<bool> IsAuthenticatedAsync()
         {
+            await InitializeAsync();
+            return IsAuthenticated();
+        }
+
+        public async Task<T> CreateRequestAsync<T>(OnlineAction action) where T : BaseRequest, new()
+        {
+            await IsAuthenticatedAsync();
             if (!IsAuthenticated())
                 return null;
 
@@ -71,7 +77,9 @@ namespace Famoser.SyncApi.Services
 
         public async Task<T> CreateRequestAsync<T, TCollection>(OnlineAction action) where T : SyncEntityRequest, new() where TCollection : ICollectionModel
         {
-            var req = CreateRequestAsync<T>(action);
+            await InitializeAsync();
+
+            var req = await CreateRequestAsync<T>(action);
             if (action == OnlineAction.SyncVersion && _dictionary.ContainsKey(typeof(TCollection)))
             {
                 var ss = _dictionary[typeof(TCollection)] as IApiCollectionRepository<TCollection>;
@@ -90,8 +98,10 @@ namespace Famoser.SyncApi.Services
             return req;
         }
 
-        public ModelInformation CreateModelInformation()
+        public async Task<ModelInformation> CreateModelInformationAsync()
         {
+            await InitializeAsync();
+
             var mi = new ModelInformation
             {
                 Id = Guid.NewGuid(),

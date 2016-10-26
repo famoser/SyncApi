@@ -13,7 +13,8 @@ using Famoser.SyncApi.Storage.Cache;
 
 namespace Famoser.SyncApi.Repositories.Base
 {
-    public abstract class PersistentCollectionRepository<TCollection> : BasePersistentRepository<TCollection>, IPersistentCollectionRespository<TCollection>
+    public abstract class PersistentCollectionRepository<TCollection> : BasePersistentRepository<TCollection>,
+            IPersistentCollectionRespository<TCollection>
         where TCollection : IUniqueSyncModel
     {
         protected ICollectionManager<TCollection> CollectionManager = new CollectionManager<TCollection>();
@@ -23,7 +24,8 @@ namespace Famoser.SyncApi.Repositories.Base
         private readonly IApiStorageService _apiStorageService;
         private readonly IApiAuthenticationService _apiAuthenticationService;
 
-        protected PersistentCollectionRepository(IApiAuthenticationService apiAuthenticationService, IApiStorageService apiStorageService, IApiConfigurationService apiConfigurationService)
+        protected PersistentCollectionRepository(IApiConfigurationService apiConfigurationService,
+            IApiStorageService apiStorageService, IApiAuthenticationService apiAuthenticationService)
             : base(apiConfigurationService)
         {
             _apiAuthenticationService = apiAuthenticationService;
@@ -47,7 +49,7 @@ namespace Famoser.SyncApi.Repositories.Base
                 return CollectionManager.GetObservableCollection();
             });
         }
-        
+
         public Task<bool> SaveAsync(TCollection model)
         {
             return ExecuteSafe(async () =>
@@ -55,7 +57,7 @@ namespace Famoser.SyncApi.Repositories.Base
                 var info = CollectionCache.ModelInformations.FirstOrDefault(s => s.Id == model.GetId());
                 if (info == null)
                 {
-                    info = _apiAuthenticationService.CreateModelInformation();
+                    info = await _apiAuthenticationService.CreateModelInformationAsync();
 
                     model.SetId(info.Id);
                     CollectionCache.ModelInformations.Add(info);
@@ -63,13 +65,14 @@ namespace Famoser.SyncApi.Repositories.Base
                     CollectionManager.Add(model);
                 }
                 else if (info.PendingAction == PendingAction.None
-                    || info.PendingAction == PendingAction.Delete
-                    || info.PendingAction == PendingAction.Read)
+                         || info.PendingAction == PendingAction.Delete
+                         || info.PendingAction == PendingAction.Read)
                 {
                     info.VersionId = Guid.NewGuid();
                     info.PendingAction = PendingAction.Update;
                 }
-                return await SyncInternalAsync();
+                await SaveCacheAsync();
+                return true;
             });
         }
 
@@ -95,7 +98,8 @@ namespace Famoser.SyncApi.Repositories.Base
                 {
                     info.PendingAction = PendingAction.Delete;
                 }
-                return await SyncInternalAsync();
+                await SaveCacheAsync();
+                return true;
             });
         }
 
@@ -117,8 +121,22 @@ namespace Famoser.SyncApi.Repositories.Base
                 {
                     collectionCacheModelInformation.PendingAction = PendingAction.Delete;
                 }
-                return await SyncInternalAsync();
+                await SaveCacheAsync();
+                return true;
             });
+        }
+
+        protected async Task SaveCacheAsync()
+        {
+            try
+            {
+                await _apiStorageService.SaveCollectionEntityAsync<TCollection>();
+                await SyncInternalAsync();
+            }
+            catch (Exception ex)
+            {
+                ExceptionLogger?.LogException(ex, this);
+            }
         }
 
         public void SetCollectionManager(ICollectionManager<TCollection> manager)

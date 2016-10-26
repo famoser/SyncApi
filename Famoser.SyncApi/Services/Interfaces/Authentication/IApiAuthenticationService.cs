@@ -13,16 +13,11 @@ namespace Famoser.SyncApi.Services.Interfaces.Authentication
     public interface IApiAuthenticationService
     {
         /// <summary>
-        /// check if the user is already authenticated
+        /// checks if the user is already authenticated
+        /// If possible, the user & device is authenticated
         /// </summary>
         /// <returns></returns>
-        bool IsAuthenticated();
-
-        /// <summary>
-        /// Authenticate the user against the api
-        /// </summary>
-        /// <returns></returns>
-        Task<bool> AuthenticateAsync();
+        Task<bool> IsAuthenticatedAsync();
 
         /// <summary>
         /// create a valid, authenticated request.
@@ -36,7 +31,7 @@ namespace Famoser.SyncApi.Services.Interfaces.Authentication
         /// <typeparam name="T"></typeparam>
         /// <param name="action"></param>
         /// <returns></returns>
-        T CreateRequestAsync<T>(OnlineAction action) where T : BaseRequest, new();
+        Task<T> CreateRequestAsync<T>(OnlineAction action) where T : BaseRequest, new();
 
         /// <summary>
         /// create a valid, authenticated request.
@@ -67,7 +62,7 @@ namespace Famoser.SyncApi.Services.Interfaces.Authentication
         ///     - sets Create action
         /// </summary>
         /// <returns></returns>
-        ModelInformation CreateModelInformation();
+        Task<ModelInformation> CreateModelInformationAsync();
 
         /// <summary>
         /// Regisiter a collection repository, so proper requests for Models can be constructued

@@ -30,7 +30,7 @@ namespace Famoser.SyncApi.Repositories
         private readonly IApiStorageService _apiStorageService;
         private readonly IApiConfigurationService _apiConfigurationService;
         private readonly ApiClient _authApiClient;
-        public ApiDeviceRepository(IApiConfigurationService apiConfigurationService, IApiStorageService apiStorageService) : base(apiConfigurationService)
+        public ApiDeviceRepository(IApiConfigurationService apiConfigurationService, IApiStorageService apiStorageService) : base(apiConfigurationService, apiStorageService)
         {
             _apiStorageService = apiStorageService;
             _apiConfigurationService = apiConfigurationService;
@@ -64,6 +64,7 @@ namespace Famoser.SyncApi.Repositories
                     CacheEntity.Model.SetId(CacheEntity.ModelInformation.Id);
                     await _apiStorageService.SaveCacheEntityAsync<TDevice>();
                 }
+                Manager.Set(CacheEntity.Model);
 
                 return true;
             }
@@ -187,6 +188,10 @@ namespace Famoser.SyncApi.Repositories
                     _deviceCache.Models = new List<TDevice>();
                 }
 
+                foreach (var deviceCacheModel in _deviceCache.Models)
+                {
+                    _deviceManager.Add(deviceCacheModel);
+                }
                 await SyncDevicesInternalAsync();
 
                 return true;

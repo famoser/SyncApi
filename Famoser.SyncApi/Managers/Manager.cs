@@ -18,7 +18,7 @@ namespace Famoser.SyncApi.Managers
 
         public void Set(TModel model)
         {
-            bool raisePropertyChanged = !_model.Equals(model);
+            bool raisePropertyChanged = _model != null && !_model.Equals(model);
             _model = model;
             if (raisePropertyChanged)
                 OnPropertyChanged(nameof(Model));

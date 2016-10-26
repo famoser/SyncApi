@@ -24,14 +24,13 @@ namespace Famoser.SyncApi.Repositories.Base
 
         public void SetExceptionLogger(IExceptionLogger exceptionLogger)
         {
-            _exceptionLogger = exceptionLogger;
+            ExceptionLogger = exceptionLogger;
         }
 
         protected abstract Task<bool> SyncInternalAsync();
         protected abstract Task<bool> InitializeAsync();
 
-
-        private IExceptionLogger _exceptionLogger;
+        protected IExceptionLogger ExceptionLogger;
         protected async Task<T> ExecuteSafe<T>(Func<Task<T>> func)
         {
             try
@@ -43,7 +42,7 @@ namespace Famoser.SyncApi.Repositories.Base
             }
             catch (Exception ex)
             {
-                _exceptionLogger?.LogException(ex, this);
+                ExceptionLogger?.LogException(ex, this);
             }
             return default(T);
         }

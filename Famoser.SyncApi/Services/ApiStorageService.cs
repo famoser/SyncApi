@@ -64,10 +64,7 @@ namespace Famoser.SyncApi.Services
         public Task<bool> SaveApiRoamingEntityAsync()
         {
             return
-                ExecuteSafe(
-                    async () =>
-                        await
-                            _storageService.SetRoamingTextFileAsync(GetApiRoamingFilePath(),
+                ExecuteSafe(async () => await _storageService.SetRoamingTextFileAsync(GetApiRoamingFilePath(),
                                 JsonConvert.SerializeObject(_apiRoamingEntity)));
         }
 
@@ -137,7 +134,7 @@ namespace Famoser.SyncApi.Services
                 }
                 catch
                 {
-                    //ignore because storage service cna fail if file is not found
+                    //ignore because storage service can fail if file is not found
                 }
                 if (!_unserializeCache.ContainsKey(filename))
                     _unserializeCache.Add(filename, new T());
@@ -162,9 +159,9 @@ namespace Famoser.SyncApi.Services
                 return true; //no key anyways
 
             var key = _filenameCache[typeof(T)];
-            await _storageService.DeleteCachedFileAsync(key);
             _filenameCache.Remove(typeof(T));
             _unserializeCache.Remove(key);
+            await _storageService.DeleteCachedFileAsync(key);
             return true;
         }
 

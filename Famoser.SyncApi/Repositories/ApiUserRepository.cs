@@ -25,7 +25,7 @@ namespace Famoser.SyncApi.Repositories
         private readonly IApiStorageService _apiStorageService;
         private readonly IApiConfigurationService _apiConfigurationService;
 
-        public ApiUserRepository(IApiConfigurationService apiConfigurationService, IApiStorageService apiStorageService) : base(apiConfigurationService)
+        public ApiUserRepository(IApiConfigurationService apiConfigurationService, IApiStorageService apiStorageService) : base(apiConfigurationService, apiStorageService)
         {
             _apiConfigurationService = apiConfigurationService;
             _apiStorageService = apiStorageService;
@@ -76,6 +76,7 @@ namespace Famoser.SyncApi.Repositories
                         await _apiStorageService.SaveCacheEntityAsync<TUser>();
                     }
                 }
+                Manager.Set(CacheEntity.Model);
 
                 return true;
             }

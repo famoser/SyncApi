@@ -26,7 +26,7 @@ namespace Famoser.SyncApi.Repositories
 
         public ApiCollectionRepository(IApiAuthenticationService apiAuthenticationService,
             IApiStorageService apiStorageService, IApiConfigurationService apiConfigurationService)
-            : base(apiAuthenticationService, apiStorageService, apiConfigurationService)
+            : base(apiConfigurationService, apiStorageService, apiAuthenticationService)
         {
             _apiAuthenticationService = apiAuthenticationService;
             _apiStorageService = apiStorageService;
@@ -49,7 +49,7 @@ namespace Famoser.SyncApi.Repositories
 
                 if (CollectionCache.ModelInformations.Count == 0)
                 {
-                    var mi = _apiAuthenticationService.CreateModelInformation();
+                    var mi = await _apiAuthenticationService.CreateModelInformationAsync();
                     var model = await _apiConfigurationService.GetCollectionObjectAsync<TCollection>();
                     mi.Id = Guid.NewGuid();
                     model.SetId(mi.Id);
@@ -69,13 +69,13 @@ namespace Famoser.SyncApi.Repositories
 
         protected override async Task<bool> SyncInternalAsync()
         {
-            if (!_apiAuthenticationService.IsAuthenticated())
+            if (! await _apiAuthenticationService.IsAuthenticatedAsync())
             {
-                if (!await _apiAuthenticationService.AuthenticateAsync())
+                if (!await _apiAuthenticationService.IsAuthenticatedAsync())
                     return false;
             }
 
-            var req = _apiAuthenticationService.CreateRequestAsync<CollectionEntityRequest>(OnlineAction.SyncEntity);
+            var req = await _apiAuthenticationService.CreateRequestAsync<CollectionEntityRequest>(OnlineAction.SyncEntity);
             if (req == null)
                 return false;
 
@@ -104,7 +104,7 @@ namespace Famoser.SyncApi.Repositories
 
             await _apiStorageService.SaveCollectionEntityAsync<TCollection>();
 
-            req = _apiAuthenticationService.CreateRequestAsync<CollectionEntityRequest>(OnlineAction.SyncVersion);
+            req = await _apiAuthenticationService.CreateRequestAsync<CollectionEntityRequest>(OnlineAction.SyncVersion);
             //second request: get active version ids for all
             // this will return missing, updated & removed entities
             foreach (var collectionCacheModelInformation in CollectionCache.ModelInformations)
@@ -162,7 +162,7 @@ namespace Famoser.SyncApi.Repositories
         {
             return ExecuteSafe(async () =>
             {
-                var req = _apiAuthenticationService.CreateRequestAsync<AuthRequestEntity>(OnlineAction.AuthUser);
+                var req = await _apiAuthenticationService.CreateRequestAsync<AuthRequestEntity>(OnlineAction.AuthUser);
                 req.CollectionEntity = new CollectionEntity()
                 {
                     Id = collection.GetId()
