@@ -80,7 +80,7 @@ namespace Famoser.SyncApi.Repositories.Base
         {
             try
             {
-                await _apiStorageService.SaveCacheEntityAsync<TModel>();
+                await _apiStorageService.SaveCacheEntityAsync<CacheEntity<TModel>>();
                 await SyncInternalAsync();
             }
             catch (Exception ex)

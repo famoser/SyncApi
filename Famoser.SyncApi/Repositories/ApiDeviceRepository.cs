@@ -49,7 +49,7 @@ namespace Famoser.SyncApi.Repositories
                 if (_apiRoamingEntity == null)
                     return false;
 
-                CacheEntity = await _apiStorageService.GetCacheEntity<TDevice>(GetModelCacheFilePath());
+                CacheEntity = await _apiStorageService.GetCacheEntityAsync<CacheEntity<TDevice>>(GetModelCacheFilePath());
                 if (CacheEntity.ModelInformation == null)
                 {
                     CacheEntity.Model = await _apiConfigurationService.GetDeviceObjectAsync<TDevice>();
@@ -61,7 +61,7 @@ namespace Famoser.SyncApi.Repositories
                         VersionId = Guid.NewGuid()
                     };
                     CacheEntity.Model.SetId(CacheEntity.ModelInformation.Id);
-                    await _apiStorageService.SaveCacheEntityAsync<TDevice>();
+                    await _apiStorageService.SaveCacheEntityAsync<CacheEntity<TDevice>>();
                 }
                 Manager.Set(CacheEntity.Model);
 
@@ -132,14 +132,14 @@ namespace Famoser.SyncApi.Repositories
 
                 //clean up
                 CacheEntity.ModelInformation.PendingAction = PendingAction.None;
-                return await _apiStorageService.EraseCacheEntityAsync<TDevice>();
+                return await _apiStorageService.EraseCacheEntityAsync<CacheEntity<TDevice>>();
             }
             else
                 return true;
 
 
             CacheEntity.ModelInformation.PendingAction = PendingAction.None;
-            return await _apiStorageService.SaveCacheEntityAsync<TDevice>();
+            return await _apiStorageService.SaveCacheEntityAsync<CacheEntity<TDevice>>();
         }
 
 
@@ -180,7 +180,7 @@ namespace Famoser.SyncApi.Repositories
 
                 _initializedDevices = true;
 
-                _deviceCache = await _apiStorageService.GetCollectionCacheEntity<TDevice>(GetModelCacheFilePath());
+                _deviceCache = await _apiStorageService.GetCacheEntityAsync<CollectionCacheEntity<TDevice>>(GetModelCacheFilePath());
                 if (_deviceCache.ModelInformations == null)
                 {
                     _deviceCache.ModelInformations = new List<CacheInformations>();
@@ -247,7 +247,7 @@ namespace Famoser.SyncApi.Repositories
 
             if (resp.SyncEntities.Any())
             {
-                await _apiStorageService.SaveCollectionEntityAsync<TDevice>();
+                await _apiStorageService.SaveCacheEntityAsync<CollectionCacheEntity<TDevice>>();
             }
             return true;
         }

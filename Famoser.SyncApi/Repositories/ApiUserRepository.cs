@@ -11,6 +11,7 @@ using Famoser.SyncApi.Models.Interfaces;
 using Famoser.SyncApi.Repositories.Base;
 using Famoser.SyncApi.Repositories.Interfaces;
 using Famoser.SyncApi.Services.Interfaces;
+using Famoser.SyncApi.Storage.Cache;
 using Famoser.SyncApi.Storage.Roaming;
 using Newtonsoft.Json;
 using Nito.AsyncEx;
@@ -41,7 +42,7 @@ namespace Famoser.SyncApi.Repositories
                 if (CacheEntity != null)
                     return true;
 
-                _roaming = await _apiStorageService.GetApiRoamingEntity();
+                _roaming = await _apiStorageService.GetApiRoamingEntityAsync();
                 if (_roaming.UserId == Guid.Empty)
                 {
                     //totally new installation
@@ -52,7 +53,7 @@ namespace Famoser.SyncApi.Repositories
                     _roaming.PersonalSeed = random.Next();
                     await _apiStorageService.SaveApiRoamingEntityAsync();
 
-                    CacheEntity = await _apiStorageService.GetCacheEntity<TUser>(GetModelCacheFilePath());
+                    CacheEntity = await _apiStorageService.GetCacheEntityAsync<CacheEntity<TUser>>(GetModelCacheFilePath());
                     CacheEntity.Model = await _apiConfigurationService.GetUserObjectAsync<TUser>();
                     CacheEntity.ModelInformation = new CacheInformations()
                     {
@@ -60,11 +61,11 @@ namespace Famoser.SyncApi.Repositories
                         PendingAction = PendingAction.Create,
                         VersionId = Guid.NewGuid()
                     };
-                    await _apiStorageService.SaveCacheEntityAsync<TUser>();
+                    await _apiStorageService.SaveCacheEntityAsync<CacheEntity<TUser>>();
                 }
                 else
                 {
-                    CacheEntity = await _apiStorageService.GetCacheEntity<TUser>(GetModelCacheFilePath());
+                    CacheEntity = await _apiStorageService.GetCacheEntityAsync<CacheEntity<TUser>>(GetModelCacheFilePath());
                     if (CacheEntity.ModelInformation == null)
                     {
                         CacheEntity.ModelInformation = new CacheInformations()
@@ -72,7 +73,7 @@ namespace Famoser.SyncApi.Repositories
                             Id = _roaming.UserId,
                             PendingAction = PendingAction.Read
                         };
-                        await _apiStorageService.SaveCacheEntityAsync<TUser>();
+                        await _apiStorageService.SaveCacheEntityAsync<CacheEntity<TUser>>();
                     }
                 }
                 Manager.Set(CacheEntity.Model);
@@ -168,7 +169,7 @@ namespace Famoser.SyncApi.Repositories
                 return true;
 
             CacheEntity.ModelInformation.PendingAction = PendingAction.None;
-            return await _apiStorageService.SaveCacheEntityAsync<TUser>();
+            return await _apiStorageService.SaveCacheEntityAsync<CacheEntity<TUser>>();
         }
 
 

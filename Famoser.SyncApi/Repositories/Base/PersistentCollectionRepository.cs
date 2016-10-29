@@ -91,7 +91,7 @@ namespace Famoser.SyncApi.Repositories.Base
                     CollectionManager.Remove(model);
                     CollectionCache.ModelInformations.Remove(info);
                     CollectionCache.Models.Remove(model);
-                    return await _apiStorageService.SaveCacheEntityAsync<TCollection>();
+                    return await _apiStorageService.SaveCacheEntityAsync<CollectionCacheEntity<TCollection>>();
                 }
                 if (info.PendingAction == PendingAction.None
                     || info.PendingAction == PendingAction.Update
@@ -137,7 +137,7 @@ namespace Famoser.SyncApi.Repositories.Base
         {
             try
             {
-                await _apiStorageService.SaveCollectionEntityAsync<TCollection>();
+                await _apiStorageService.SaveCacheEntityAsync<CollectionCacheEntity<TCollection>>();
                 await SyncInternalAsync();
             }
             catch (Exception ex)

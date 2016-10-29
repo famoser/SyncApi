@@ -11,6 +11,7 @@ using Famoser.SyncApi.Repositories.Base;
 using Famoser.SyncApi.Repositories.Interfaces;
 using Famoser.SyncApi.Services.Interfaces;
 using Famoser.SyncApi.Services.Interfaces.Authentication;
+using Famoser.SyncApi.Storage.Cache;
 using Newtonsoft.Json;
 using Nito.AsyncEx;
 
@@ -45,7 +46,7 @@ namespace Famoser.SyncApi.Repositories
                     return true;
 
                 CollectionCache =
-                    await _apiStorageService.GetCollectionCacheEntity<TCollection>(GetModelCacheFilePath());
+                    await _apiStorageService.GetCacheEntityAsync<CollectionCacheEntity<TCollection>>(GetModelCacheFilePath());
 
                 if (CollectionCache.ModelInformations.Count == 0)
                 {
@@ -55,7 +56,7 @@ namespace Famoser.SyncApi.Repositories
                     model.SetId(mi.Id);
                     CollectionCache.Models.Add(model);
                     CollectionCache.ModelInformations.Add(mi);
-                    await _apiStorageService.SaveCollectionEntityAsync<TCollection>();
+                    await _apiStorageService.SaveCacheEntityAsync<CollectionCacheEntity<TCollection>>();
                 }
 
                 foreach (var collectionCacheModel in CollectionCache.Models)
@@ -102,7 +103,7 @@ namespace Famoser.SyncApi.Repositories
             foreach (var modelInformation in synced)
                 CollectionCache.ModelInformations[modelInformation].PendingAction = PendingAction.None;
 
-            await _apiStorageService.SaveCollectionEntityAsync<TCollection>();
+            await _apiStorageService.SaveCacheEntityAsync<CollectionCacheEntity<TCollection>>();
 
             req = await _apiAuthenticationService.CreateRequestAsync<CollectionEntityRequest>(OnlineAction.SyncVersion);
             //second request: get active version ids for all
@@ -152,7 +153,7 @@ namespace Famoser.SyncApi.Repositories
 
             if (resp.CollectionEntities.Any())
             {
-                await _apiStorageService.SaveCollectionEntityAsync<TCollection>();
+                await _apiStorageService.SaveCacheEntityAsync<CollectionCacheEntity<TCollection>>();
             }
 
             return true;
