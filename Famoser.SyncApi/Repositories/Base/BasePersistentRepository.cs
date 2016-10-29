@@ -19,7 +19,12 @@ namespace Famoser.SyncApi.Repositories.Base
 
         public Task<bool> SyncAsync()
         {
-            return ExecuteSafe(async () => await SyncInternalAsync());
+            return ExecuteSafe(async () =>
+            {
+                if (_apiConfigurationService.CanUseWebConnection())
+                    return await SyncInternalAsync();
+                return false;
+            });
         }
 
         public void SetExceptionLogger(IExceptionLogger exceptionLogger)
@@ -31,20 +36,37 @@ namespace Famoser.SyncApi.Repositories.Base
         protected abstract Task<bool> InitializeAsync();
 
         protected IExceptionLogger ExceptionLogger;
-        protected async Task<T> ExecuteSafe<T>(Func<Task<T>> func)
+        protected async Task<T> ExecuteSafe<T>(Func<Task<T>> func, bool ensureWebCanBeUsed = false)
         {
             try
             {
                 if (!await InitializeAsync())
                     return default(T);
 
-                return await func();
+                if (!ensureWebCanBeUsed || _apiConfigurationService.CanUseWebConnection())
+                    return await func();
             }
             catch (Exception ex)
             {
                 ExceptionLogger?.LogException(ex, this);
             }
             return default(T);
+        }
+
+        protected async Task ExecuteSafe(Func<Task> func, bool ensureWebCanBeUsed = false)
+        {
+            try
+            {
+                if (!await InitializeAsync())
+                    return;
+
+                if (!ensureWebCanBeUsed || _apiConfigurationService.CanUseWebConnection())
+                    await func();
+            }
+            catch (Exception ex)
+            {
+                ExceptionLogger?.LogException(ex, this);
+            }
         }
 
         private string _modelCacheFilePath;

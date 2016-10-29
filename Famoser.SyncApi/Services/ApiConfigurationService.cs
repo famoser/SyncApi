@@ -11,10 +11,12 @@ namespace Famoser.SyncApi.Services
     {
         private readonly string _applicationId;
         private readonly Uri _baseUri;
-        public ApiConfigurationService(string applicationId, string baseUri = "https://public.syncapi.famoser.ch")
+        private Func<bool> _canUseWebConnection; 
+        public ApiConfigurationService(string applicationId, string baseUri = "https://public.syncapi.famoser.ch", Func<bool> canUseWebConnection = null)
         {
             _applicationId = applicationId;
             _baseUri = new Uri(baseUri);
+            _canUseWebConnection = canUseWebConnection;
         }
 
         public ApiInformationEntity GetApiInformations()
@@ -26,6 +28,18 @@ namespace Famoser.SyncApi.Services
                 ApplicationSeed = 3102,
                 ApplicationId = _applicationId
             };
+        }
+
+        public bool CanUseWebConnection()
+        {
+            if (_canUseWebConnection != null)
+                return _canUseWebConnection.Invoke();
+            return true;
+        }
+
+        public bool StartSyncAutomatically()
+        {
+            return true;
         }
 
         public async Task<TUser> GetUserObjectAsync<TUser>() where TUser : class

@@ -142,6 +142,7 @@ namespace Famoser.SyncApi.Repositories
             return await _apiStorageService.SaveCacheEntityAsync<CacheEntity<TDevice>>();
         }
 
+        #region device methods
 
 
         private string _deviceCacheFilePath;
@@ -169,29 +170,19 @@ namespace Famoser.SyncApi.Repositories
 
 
         private readonly AsyncLock _deviceLock = new AsyncLock();
-        private bool _initializedDevices;
         private CollectionCacheEntity<TDevice> _deviceCache;
         private async Task<bool> InitializeDevicesAsync()
         {
             using (await _deviceLock.LockAsync())
             {
-                if (_initializedDevices)
+                if (_deviceCache != null)
                     return true;
 
-                _initializedDevices = true;
-
-                _deviceCache = await _apiStorageService.GetCacheEntityAsync<CollectionCacheEntity<TDevice>>(GetModelCacheFilePath());
-                if (_deviceCache.ModelInformations == null)
-                {
-                    _deviceCache.ModelInformations = new List<CacheInformations>();
-                    _deviceCache.Models = new List<TDevice>();
-                }
-
+                _deviceCache = await _apiStorageService.GetCacheEntityAsync<CollectionCacheEntity<TDevice>>(GetDeviceCacheFilePath());
                 foreach (var deviceCacheModel in _deviceCache.Models)
                 {
                     _deviceManager.Add(deviceCacheModel);
                 }
-                await SyncDevicesInternalAsync();
 
                 return true;
             }
@@ -256,7 +247,7 @@ namespace Famoser.SyncApi.Repositories
         public ObservableCollection<TDevice> GetAllLazy()
         {
 #pragma warning disable 4014
-            InitializeDevicesAsync();
+            InitializeDevicesAsync().ContinueWith((t) => SyncDevicesAsync());
 #pragma warning restore 4014
 
             return _deviceManager.GetObservableCollection();
@@ -266,7 +257,7 @@ namespace Famoser.SyncApi.Repositories
         {
             return ExecuteSafe(async () =>
             {
-                await InitializeDevicesAsync();
+                await InitializeDevicesAsync().ContinueWith(t => SyncDevicesAsync());
 
                 return _deviceManager.GetObservableCollection();
             });
@@ -274,8 +265,13 @@ namespace Famoser.SyncApi.Repositories
 
         public Task<bool> SyncDevicesAsync()
         {
-            return ExecuteSafe(async () => await SyncDevicesInternalAsync());
+            return ExecuteSafe(async () =>
+            {
+                await InitializeDevicesAsync();
+                return await SyncDevicesInternalAsync();
+            }, true);
         }
+        #endregion
 
         public Task<bool> UnAuthenticateAsync(TDevice device)
         {
@@ -286,7 +282,7 @@ namespace Famoser.SyncApi.Repositories
                     ClientMessage = device.GetId().ToString()
                 }));
                 return resp.IsSuccessfull;
-            });
+            }, true);
         }
 
         public Task<bool> AuthenticateAsync(TDevice device)
@@ -298,7 +294,7 @@ namespace Famoser.SyncApi.Repositories
                     ClientMessage = device.GetId().ToString()
                 }));
                 return resp.IsSuccessfull;
-            });
+            }, true);
         }
 
         public Task<string> CreateNewAuthenticationCodeAsync()
@@ -307,7 +303,7 @@ namespace Famoser.SyncApi.Repositories
             {
                 var resp = await _authApiClient.CreateAuthorizationCodeAsync(AuthorizeRequest(ApiInformationEntity, _apiRoamingEntity, new AuthRequestEntity()));
                 return resp.IsSuccessfull ? resp.ServerMessage : default(string);
-            });
+            }, true);
         }
 
         public Task<bool> TryUseAuthenticationCodeAsync(string authenticationCode)
@@ -319,15 +315,14 @@ namespace Famoser.SyncApi.Repositories
                     ClientMessage = authenticationCode
                 }));
                 return resp.IsSuccessfull;
-            });
+            }, true);
         }
 
         private ApiRoamingEntity _apiRoamingEntity;
         public async Task<IDeviceModel> GetDeviceAsync(ApiRoamingEntity apiRoamingEntity)
         {
             _apiRoamingEntity = apiRoamingEntity;
-
-            await ExecuteSafe(async () => await SyncInternalAsync());
+            await SyncAsync();
             return Manager.GetModel();
         }
 

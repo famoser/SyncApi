@@ -53,11 +53,8 @@ namespace Famoser.SyncApi.Repositories
 
         protected override async Task<bool> SyncInternalAsync()
         {
-            if (! await _apiAuthenticationService.IsAuthenticatedAsync())
-            {
-                if (!await _apiAuthenticationService.IsAuthenticatedAsync())
-                    return false;
-            }
+            if (!await _apiAuthenticationService.IsAuthenticatedAsync())
+                return false;
 
             var req = await _apiAuthenticationService.CreateRequestAsync<SyncEntityRequest, TCollection>(OnlineAction.SyncVersion);
             if (req == null)
@@ -88,7 +85,7 @@ namespace Famoser.SyncApi.Repositories
             await _apiStorageService.SaveCacheEntityAsync<CollectionCacheEntity<TCollection>>();
 
             req = await _apiAuthenticationService.CreateRequestAsync<SyncEntityRequest, TCollection>(OnlineAction.SyncVersion);
-            //second request: get active version ids for all
+            // second request: get active version ids for all
             // this will return missing, updated & removed entities
             foreach (var collectionCacheModelInformation in CollectionCache.ModelInformations)
             {

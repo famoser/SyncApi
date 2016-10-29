@@ -50,34 +50,17 @@ $configuration = [
 $c = new Container($configuration);
 $c['notFoundHandler'] = function (Container $c) {
     return function (Request $req, Response $resp) use ($c) {
-        $res = new ApiResponse(false, ApiError::RequestUriInvalid);
-        if ($c->get("settings")["debug_mode"])
-            $res->ApiMessage = "requested: " . $req->getRequestTarget();
-
-        return $resp->withStatus(404, "endpoint not found")->withJson($res);
+        return $resp->withStatus(404, "Endpoint not found");
     };
 };
 $c['notAllowedHandler'] = function (Container $c) {
     return function (Request $req, Response $resp) use ($c) {
-        $res = new ApiResponse(false, ApiError::RequestUriInvalid);
-        if ($c->get("settings")["debug_mode"])
-            $res->ApiMessage = "requested: " . $req->getRequestTarget();
-
-        return $resp->withStatus(405, "wrong method")->withJson($res);
+        return $resp->withStatus(405, "Method not allowed");
     };
 };
 $c['errorHandler'] = function (Container $c) {
-    /**
-     * @param $request
-     * @param $response
-     * @param $exception
-     * @return mixed
-     */
     return function (Request $request, Response $response, Exception $exception) use ($c) {
-        $res = new ApiResponse(false, ApiError::ServerFailure);
-        if ($c->get("settings")["debug_mode"])
-            $res->ApiMessage = "Exception: " . $exception->getMessage() . " \nStack: " . $exception->getTraceAsString();
-        return $response->withStatus(500, $exception->getMessage())->withJson($res);
+        return $response->withStatus(500, "Server failure");
     };
 };
 // Register component on container
@@ -97,20 +80,16 @@ $c['view'] = function (Container $c) {
 $controllerNamespace = 'Famoser\SyncApi\Controllers\\';
 
 $app = new App($c);
-$app->add(new JsonMiddleware());
-$app->add(new AuthorizationMiddleware());
-$app->add(new ApiVersionMiddleware($c));
-$app->add(new TestsMiddleware($c));
 $app->add(new LoggingMiddleware($c));
 
 $routes = function () use ($controllerNamespace) {
+    $this->group("/users", function () use ($controllerNamespace) {
+        $this->post('/auth', $controllerNamespace . 'UserController:createUser');
+    });
     $this->group("/devices", function () use ($controllerNamespace) {
         $this->post('/get', $controllerNamespace . 'DeviceController:createUser');
         $this->post('/auth', $controllerNamespace . 'DeviceController:wipeUser');
         $this->post('/unauth', $controllerNamespace . 'DeviceController:authorize');
-    });
-    $this->group("/users", function () use ($controllerNamespace) {
-        $this->post('/auth', $controllerNamespace . 'UserController:createUser');
     });
     $this->group("/auth", function () use ($controllerNamespace) {
         $this->post('/use', $controllerNamespace . 'AuthorizationController:createUser');
@@ -125,8 +104,6 @@ $routes = function () use ($controllerNamespace) {
     });
 };
 
-
-$app->group("/tests/1.0", $routes);
 $app->group("/1.0", $routes);
 
 $app->get("/1.0/", $controllerNamespace . 'PublicController:index');

@@ -45,14 +45,12 @@ namespace Famoser.SyncApi.Repositories
                 if (CollectionCache != null)
                     return true;
 
-                CollectionCache =
-                    await _apiStorageService.GetCacheEntityAsync<CollectionCacheEntity<TCollection>>(GetModelCacheFilePath());
+                CollectionCache = await _apiStorageService.GetCacheEntityAsync<CollectionCacheEntity<TCollection>>(GetModelCacheFilePath());
 
                 if (CollectionCache.ModelInformations.Count == 0)
                 {
-                    var mi = await _apiAuthenticationService.CreateModelInformationAsync();
                     var model = await _apiConfigurationService.GetCollectionObjectAsync<TCollection>();
-                    mi.Id = Guid.NewGuid();
+                    var mi = await _apiAuthenticationService.CreateModelInformationAsync();
                     model.SetId(mi.Id);
                     CollectionCache.Models.Add(model);
                     CollectionCache.ModelInformations.Add(mi);
@@ -70,10 +68,9 @@ namespace Famoser.SyncApi.Repositories
 
         protected override async Task<bool> SyncInternalAsync()
         {
-            if (! await _apiAuthenticationService.IsAuthenticatedAsync())
+            if (!await _apiAuthenticationService.IsAuthenticatedAsync())
             {
-                if (!await _apiAuthenticationService.IsAuthenticatedAsync())
-                    return false;
+                return false;
             }
 
             var req = await _apiAuthenticationService.CreateRequestAsync<CollectionEntityRequest>(OnlineAction.SyncEntity);
@@ -163,6 +160,9 @@ namespace Famoser.SyncApi.Repositories
         {
             return ExecuteSafe(async () =>
             {
+                if (!_apiConfigurationService.CanUseWebConnection())
+                    return false;
+
                 var req = await _apiAuthenticationService.CreateRequestAsync<AuthRequestEntity>(OnlineAction.AuthUser);
                 req.CollectionEntity = new CollectionEntity()
                 {

@@ -12,6 +12,16 @@ namespace Famoser.SyncApi.Services.Interfaces
         /// <returns></returns>
         ApiInformationEntity GetApiInformations();
         /// <summary>
+        /// Return true if the library is allowed to use a web connection
+        /// </summary>
+        /// <returns></returns>
+        bool CanUseWebConnection();
+        /// <summary>
+        /// Return true if the library should sync immediately after readoing out local storage
+        /// </summary>
+        /// <returns></returns>
+        bool StartSyncAutomatically();
+        /// <summary>
         /// Get a user object. This method will be called once per user, while the application is authenticating against the api.
         /// </summary>
         /// <typeparam name="TUser"></typeparam>

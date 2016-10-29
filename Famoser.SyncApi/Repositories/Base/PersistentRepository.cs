@@ -14,7 +14,7 @@ using Famoser.SyncApi.Storage.Cache;
 
 namespace Famoser.SyncApi.Repositories.Base
 {
-    public abstract class PersistentRepository<TModel> : BasePersistentRepository<TModel>,IPersistentRespository<TModel>
+    public abstract class PersistentRepository<TModel> : BasePersistentRepository<TModel>, IPersistentRespository<TModel>
         where TModel : IUniqueSyncModel
     {
         protected readonly IManager<TModel> Manager = new Manager<TModel>();
@@ -41,7 +41,8 @@ namespace Famoser.SyncApi.Repositories.Base
         {
             return ExecuteSafe(async () =>
             {
-                await SyncInternalAsync();
+                if (_apiConfigurationService.StartSyncAutomatically())
+                    await SyncAsync();
 
                 return Manager.GetModel();
             });
@@ -75,13 +76,14 @@ namespace Famoser.SyncApi.Repositories.Base
                 return true;
             });
         }
-        
+
         protected async Task SaveCacheAsync()
         {
             try
             {
                 await _apiStorageService.SaveCacheEntityAsync<CacheEntity<TModel>>();
-                await SyncInternalAsync();
+                if (_apiConfigurationService.CanUseWebConnection())
+                    await SyncInternalAsync();
             }
             catch (Exception ex)
             {

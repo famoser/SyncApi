@@ -24,6 +24,14 @@ class LoggingMiddleware extends BaseMiddleware
                 unlink($file); // delete file
         }
 
+        $str = $request->getMethod() . ": " . $request->getUri()->getPath() . "\n";
+        $jsonObj = $request->getParsedBody();
+        if ($jsonObj == null) {
+            LogHelper::log($str . $request->getBody(), "Request.txt");
+        } else {
+            LogHelper::log($str . json_encode($request->getParsedBody(), JSON_PRETTY_PRINT), "Request.txt");
+        }
+
         $response = $next($request, $response);
         return $response;
     }

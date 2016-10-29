@@ -183,7 +183,11 @@ namespace Famoser.SyncApi.Repositories
 
         public async Task<ApiRoamingEntity> GetApiRoamingEntityAsync()
         {
-            await ExecuteSafe(async () => await SyncInternalAsync());
+            await ExecuteSafe(async () =>
+            {
+                if (_apiConfigurationService.CanUseWebConnection())
+                    await SyncInternalAsync();
+            });
             return _roaming;
         }
     }

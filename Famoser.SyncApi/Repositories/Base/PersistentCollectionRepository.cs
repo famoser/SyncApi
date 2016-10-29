@@ -36,19 +36,30 @@ namespace Famoser.SyncApi.Repositories.Base
 
         public ObservableCollection<TCollection> GetAllLazy()
         {
-            SyncAsync();
+            if (_apiConfigurationService.StartSyncAutomatically())
+                SyncAsync();
+            else
+                InitializeAsync();
 
             return CollectionManager.GetObservableCollection();
         }
 
-        public Task<ObservableCollection<TCollection>> GetAllAsync()
+        public async Task<ObservableCollection<TCollection>> GetAllAsync()
         {
-            return ExecuteSafe(async () =>
+            if (_apiConfigurationService.StartSyncAutomatically())
+                await SyncAsync();
+            else
             {
-                await SyncInternalAsync();
-
-                return CollectionManager.GetObservableCollection();
-            });
+                try
+                {
+                    await InitializeAsync();
+                }
+                catch (Exception ex)
+                {
+                    ExceptionLogger?.LogException(ex, this);
+                }
+            }
+            return CollectionManager.GetObservableCollection();
         }
 
         public Task<bool> SaveAsync(TCollection model)
@@ -138,7 +149,8 @@ namespace Famoser.SyncApi.Repositories.Base
             try
             {
                 await _apiStorageService.SaveCacheEntityAsync<CollectionCacheEntity<TCollection>>();
-                await SyncInternalAsync();
+                if (_apiConfigurationService.CanUseWebConnection())
+                    await SyncInternalAsync();
             }
             catch (Exception ex)
             {
