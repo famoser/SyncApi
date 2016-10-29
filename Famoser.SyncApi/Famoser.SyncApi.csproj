@@ -35,7 +35,6 @@
   </PropertyGroup>
   <ItemGroup>
     <!-- A reference to the entire .NET Framework is automatically included -->
-    <Folder Include="Services\Entities\" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Api\Communication\Request\SyncEntityRequest.cs" />
