@@ -11,6 +11,7 @@ using Famoser.SyncApi.Api.Configuration;
 using Famoser.SyncApi.Enums;
 using Famoser.SyncApi.Helpers;
 using Famoser.SyncApi.Managers;
+using Famoser.SyncApi.Managers.Interfaces;
 using Famoser.SyncApi.Models.Information;
 using Famoser.SyncApi.Models.Interfaces;
 using Famoser.SyncApi.Repositories.Base;
@@ -178,6 +179,7 @@ namespace Famoser.SyncApi.Repositories
                 if (_deviceCache != null)
                     return true;
 
+                _deviceManager = _apiConfigurationService.GetCollectionManager<TDevice>();
                 _deviceCache = await _apiStorageService.GetCacheEntityAsync<CollectionCacheEntity<TDevice>>(GetDeviceCacheFilePath());
                 foreach (var deviceCacheModel in _deviceCache.Models)
                 {
@@ -243,7 +245,7 @@ namespace Famoser.SyncApi.Repositories
             return true;
         }
 
-        private readonly CollectionManager<TDevice> _deviceManager = new CollectionManager<TDevice>();
+        private ICollectionManager<TDevice> _deviceManager;
         public ObservableCollection<TDevice> GetAllLazy()
         {
 #pragma warning disable 4014
@@ -273,6 +275,7 @@ namespace Famoser.SyncApi.Repositories
         }
         #endregion
 
+        #region authentication methods
         public Task<bool> UnAuthenticateAsync(TDevice device)
         {
             return ExecuteSafe(async () =>
@@ -317,6 +320,7 @@ namespace Famoser.SyncApi.Repositories
                 return resp.IsSuccessfull;
             }, true);
         }
+        #endregion
 
         private ApiRoamingEntity _apiRoamingEntity;
         public async Task<IDeviceModel> GetDeviceAsync(ApiRoamingEntity apiRoamingEntity)

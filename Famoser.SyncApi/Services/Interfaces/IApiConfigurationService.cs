@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 using Famoser.SyncApi.Api.Configuration;
+using Famoser.SyncApi.Managers.Interfaces;
 
 namespace Famoser.SyncApi.Services.Interfaces
 {
@@ -39,6 +40,18 @@ namespace Famoser.SyncApi.Services.Interfaces
         /// <typeparam name="TCollection"></typeparam>
         /// <returns></returns>
         Task<TCollection> GetCollectionObjectAsync<TCollection>() where TCollection : class;
+        /// <summary>
+        /// Construct a collection manager for the specified model
+        /// </summary>
+        /// <typeparam name="TModel"></typeparam>
+        /// <returns></returns>
+        ICollectionManager<TModel> GetCollectionManager<TModel>();
+        /// <summary>
+        /// Contruct a manager for the speicified model
+        /// </summary>
+        /// <typeparam name="TModel"></typeparam>
+        /// <returns></returns>
+        IManager<TModel> GetManager<TModel>();
         /// <summary>
         /// Each filename this library uses passes this function. If you are using the roaming & cache storage too, you may want to modify those so nothing of your data will be overwritten.
         /// </summary>

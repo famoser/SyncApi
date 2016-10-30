@@ -18,7 +18,7 @@ namespace Famoser.SyncApi.Repositories.Base
             IPersistentCollectionRespository<TCollection>
         where TCollection : IUniqueSyncModel
     {
-        protected ICollectionManager<TCollection> CollectionManager = new CollectionManager<TCollection>();
+        protected ICollectionManager<TCollection> CollectionManager;
         protected CollectionCacheEntity<TCollection> CollectionCache;
 
         private readonly IApiConfigurationService _apiConfigurationService;
@@ -32,6 +32,8 @@ namespace Famoser.SyncApi.Repositories.Base
             _apiAuthenticationService = apiAuthenticationService;
             _apiStorageService = apiStorageService;
             _apiConfigurationService = apiConfigurationService;
+
+            CollectionManager = _apiConfigurationService.GetCollectionManager<TCollection>();
         }
 
         public ObservableCollection<TCollection> GetAllLazy()
@@ -114,7 +116,7 @@ namespace Famoser.SyncApi.Repositories.Base
                 return true;
             });
         }
-
+        
         public ObservableCollection<HistoryInformations<TCollection>> GetHistoryLazy(TCollection model)
         {
             throw new NotImplementedException();

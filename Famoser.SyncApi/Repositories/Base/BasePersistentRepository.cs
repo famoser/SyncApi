@@ -69,6 +69,11 @@ namespace Famoser.SyncApi.Repositories.Base
             }
         }
 
+        protected string GetModelHistoryCacheFilePath(TModel model)
+        {
+            return _apiConfigurationService.GetFileName(model.GetId() + "_history.json", typeof(TModel));
+        }
+
         private string _modelCacheFilePath;
         protected string GetModelCacheFilePath()
         {

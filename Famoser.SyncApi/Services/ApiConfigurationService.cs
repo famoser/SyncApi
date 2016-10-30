@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Threading.Tasks;
 using Famoser.SyncApi.Api.Configuration;
+using Famoser.SyncApi.Managers;
+using Famoser.SyncApi.Managers.Interfaces;
 using Famoser.SyncApi.Models;
 using Famoser.SyncApi.Services.Interfaces;
 
@@ -11,7 +13,7 @@ namespace Famoser.SyncApi.Services
     {
         private readonly string _applicationId;
         private readonly Uri _baseUri;
-        private Func<bool> _canUseWebConnection; 
+        private readonly Func<bool> _canUseWebConnection; 
         public ApiConfigurationService(string applicationId, string baseUri = "https://public.syncapi.famoser.ch", Func<bool> canUseWebConnection = null)
         {
             _applicationId = applicationId;
@@ -61,6 +63,16 @@ namespace Famoser.SyncApi.Services
             if (typeof(TCollection) == typeof(UserModel))
                 return new CollectionModel() as TCollection;
             return default(TCollection);
+        }
+
+        public ICollectionManager<TModel> GetCollectionManager<TModel>()
+        {
+            return new CollectionManager<TModel>();
+        }
+
+        public IManager<TModel> GetManager<TModel>()
+        {
+            return new Manager<TModel>();
         }
 
         public string GetFileName(string proposedFilename, Type objectType = null)
