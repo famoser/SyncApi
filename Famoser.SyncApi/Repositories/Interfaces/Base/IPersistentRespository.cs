@@ -9,8 +9,6 @@ namespace Famoser.SyncApi.Repositories.Interfaces.Base
         Task<T> GetAsync();
         Task<bool> SaveAsync();
         Task<bool> RemoveAsync();
-        Task<ObservableCollection<HistoryInformations<T>>> GetHistoryAsync();
-        Task<bool> SyncHistoryAsync();
         CacheInformations GetCacheInformations();
     }
 }

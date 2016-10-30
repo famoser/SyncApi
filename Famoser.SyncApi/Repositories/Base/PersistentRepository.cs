@@ -97,51 +97,6 @@ namespace Famoser.SyncApi.Repositories.Base
                 ExceptionLogger?.LogException(ex, this);
             }
         }
-        private readonly AsyncLock _asyncLock = new AsyncLock();
-        private ICollectionManager<HistoryInformations<TModel>> _historyManager;
-        private CollectionCacheEntity<HistoryInformations<TModel>> _historyCache;
-        private async Task<bool> InitializeHistoryAsync()
-        {
-            using (await _asyncLock.LockAsync())
-            {
-                if (_historyCache != null)
-                    return true;
-
-                _historyManager = _apiConfigurationService.GetCollectionManager<HistoryInformations<TModel>>();
-                _historyCache = await _apiStorageService.GetCacheEntityAsync<CollectionCacheEntity<HistoryInformations<TModel>>>(GetModelHistoryCacheFilePath(Manager.GetModel()));
-                foreach (var historyInformationse in _historyCache.Models)
-                {
-                    _historyManager.Add(historyInformationse);
-                }
-
-                return true;
-            }
-        }
-
-        protected abstract Task<bool> SyncHistoryInternalAsync();
-
-        public Task<ObservableCollection<HistoryInformations<TModel>>> GetHistoryAsync()
-        {
-            return ExecuteSafe(async () =>
-            {
-                await InitializeHistoryAsync();
-                if (_apiConfigurationService.StartSyncAutomatically())
-                    await SyncHistoryAsync();
-
-                return _historyManager.GetObservableCollection();
-            });
-        }
-
-        public Task<bool> SyncHistoryAsync()
-        {
-            return ExecuteSafe(async () =>
-            {
-                await InitializeHistoryAsync();
-                await SyncHistoryInternalAsync();
-
-                return true;
-            }, true);
-        }
 
         public CacheInformations GetCacheInformations()
         {
