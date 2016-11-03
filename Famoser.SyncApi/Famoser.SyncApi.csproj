@@ -37,10 +37,12 @@
     <!-- A reference to the entire .NET Framework is automatically included -->
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Api\Communication\Request\HistoryEntityRequest.cs" />
     <Compile Include="Api\Communication\Request\SyncEntityRequest.cs" />
     <Compile Include="Api\Communication\Response\CollectionEntityResponse.cs" />
     <Compile Include="Api\ApiClient.cs" />
     <Compile Include="Api\Base\BaseApiClient.cs" />
+    <Compile Include="Api\Communication\Response\HistoryEntityResponse.cs" />
     <Compile Include="Api\Configuration\ApiInformationEntity.cs" />
     <Compile Include="Api\Communication\Entities\Base\BaseEntity.cs" />
     <Compile Include="Api\Communication\Entities\CollectionEntity.cs" />
@@ -56,6 +58,7 @@
     <Compile Include="Models\Base\BaseModel.cs" />
     <Compile Include="Models\CollectionModel.cs" />
     <Compile Include="Models\DeviceModel.cs" />
+    <Compile Include="Models\Information\Base\BaseInformations.cs" />
     <Compile Include="Models\Information\HistoryInformations.cs" />
     <Compile Include="Models\UserModel.cs" />
     <Compile Include="Repositories\ApiDeviceRepository.cs" />

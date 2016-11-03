@@ -59,31 +59,36 @@ namespace Famoser.SyncApi.Helpers
             return mdl;
         }
 
-
-        private static CacheInformations CreateModelInformation(BaseEntity entity)
+        private static T CreateCacheInformation<T>(BaseEntity entity, T existing = null)
+            where T : CacheInformations, new()
         {
-            return new CacheInformations()
-            {
-                Id = entity.Id,
-                VersionId = entity.VersionId,
-                PendingAction = PendingAction.None,
-                CreateDateTime = entity.CreateDateTime
-            };
+            if (existing == null)
+                existing = new T();
+            existing.Id = entity.Id;
+            existing.VersionId = entity.VersionId;
+            existing.PendingAction = PendingAction.None;
+            existing.CreateDateTime = entity.CreateDateTime;
+            return existing;
         }
 
-        public static CacheInformations CreateModelInformation(CollectionEntity entity)
+        public static T CreateCacheInformation<T>(CollectionEntity entity, T exisiting = null)
+            where T : CacheInformations, new()
         {
-            var mi = CreateModelInformation(entity as BaseEntity);
+            var mi = CreateCacheInformation<T>(entity as BaseEntity, exisiting);
             mi.UserId = entity.UserId;
             mi.DeviceId = entity.DeviceId;
             return mi;
         }
 
-        public static CacheInformations CreateModelInformation(SyncEntity entity)
+        public static HistoryInformations<T> CreateHistoryInformation<T>(CollectionEntity entity)
         {
-            var mi = CreateModelInformation(entity as BaseEntity);
-            mi.UserId = entity.UserId;
-            mi.DeviceId = entity.DeviceId;
+            return CreateCacheInformation(entity, new HistoryInformations<T>());
+        }
+
+        public static T CreateCacheInformation<T>(SyncEntity entity, T existing = null)
+            where T : CacheInformations, new()
+        {
+            var mi = CreateCacheInformation(entity as CollectionEntity, existing);
             mi.CollectionId = entity.CollectionId;
             return mi;
         }

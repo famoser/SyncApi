@@ -11,7 +11,7 @@ namespace Famoser.SyncApi.Api
         public ApiClient(Uri baseUri) : base(baseUri)
         {
         }
-        
+
         /// <summary>
         /// sync collections
         /// </summary>
@@ -21,7 +21,17 @@ namespace Famoser.SyncApi.Api
         {
             return DoApiRequestAsync<CollectionEntityResponse>(entity, "collection/sync");
         }
-        
+
+        /// <summary>
+        /// sync collections
+        /// </summary>
+        /// <param name="entity"></param>
+        /// <returns></returns>
+        public Task<HistoryEntityResponse> DoSyncRequestAsync(HistoryEntityRequest entity)
+        {
+            return DoApiRequestAsync<HistoryEntityResponse>(entity, "entity/sync");
+        }
+
         /// <summary>
         /// sync entities
         /// </summary>

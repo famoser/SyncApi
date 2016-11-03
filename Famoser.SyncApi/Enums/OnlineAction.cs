@@ -9,6 +9,7 @@
         Delete = 4,
         SyncVersion = 5,
         SyncEntity = 6,
-        AuthUser = 6,
+        SyncHistory = 7,
+        AuthUser = 8,
     }
 }

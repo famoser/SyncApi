@@ -1,8 +1,12 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Runtime.InteropServices.ComTypes;
 using System.Threading.Tasks;
+using Famoser.SyncApi.Api.Communication.Request;
 using Famoser.SyncApi.Enums;
+using Famoser.SyncApi.Helpers;
 using Famoser.SyncApi.Managers;
 using Famoser.SyncApi.Managers.Interfaces;
 using Famoser.SyncApi.Models.Information;
@@ -11,6 +15,7 @@ using Famoser.SyncApi.Repositories.Interfaces.Base;
 using Famoser.SyncApi.Services.Interfaces;
 using Famoser.SyncApi.Services.Interfaces.Authentication;
 using Famoser.SyncApi.Storage.Cache;
+using Newtonsoft.Json;
 using Nito.AsyncEx;
 
 namespace Famoser.SyncApi.Repositories.Base
@@ -118,80 +123,139 @@ namespace Famoser.SyncApi.Repositories.Base
             });
         }
         
+        protected readonly Dictionary<TCollection, ICollectionManager<HistoryInformations<TCollection>>>
+            HistoryCollectionManagers
+                = new Dictionary<TCollection, ICollectionManager<HistoryInformations<TCollection>>>();
+
+        protected readonly Dictionary<TCollection, CollectionCacheEntity<HistoryInformations<TCollection>>>
+            HistoryCacheEntities
+                = new Dictionary<TCollection, CollectionCacheEntity<HistoryInformations<TCollection>>>();
+
+        private void EnsureExistanceOfHistoryManager(TCollection model)
+        {
+            if (!HistoryCollectionManagers.ContainsKey(model))
+            {
+                HistoryCollectionManagers.Add(model,
+                    _apiConfigurationService.GetCollectionManager<HistoryInformations<TCollection>>());
+                HistoryCacheEntities.Add(model, null);
+            }
+        }
+
+        private readonly AsyncLock _asyncLock = new AsyncLock();
+        private async Task<bool> InitializeHistoryAsync(TCollection model)
+        {
+            using (await _asyncLock.LockAsync())
+            {
+                if (HistoryCacheEntities[model] != null)
+                    return true;
+
+                HistoryCacheEntities[model] =
+                    await
+                        _apiStorageService.GetCacheEntityAsync<CollectionCacheEntity<HistoryInformations<TCollection>>>(
+                            GetModelHistoryCacheFilePath(model));
+                foreach (var historyInformationse in HistoryCacheEntities[model].Models)
+                {
+                    HistoryCollectionManagers[model].Add(historyInformationse);
+                }
+
+                return true;
+            }
+        }
+
         public ObservableCollection<HistoryInformations<TCollection>> GetHistoryLazy(TCollection model)
         {
-            throw new NotImplementedException();
+            EnsureExistanceOfHistoryManager(model);
+            if (_apiConfigurationService.StartSyncAutomatically())
+                SyncHistoryAsync(model);
+            else
+#pragma warning disable 4014 //disabled as we do not want to wait here explicitly
+                InitializeHistoryAsync(model);
+#pragma warning restore 4014
+
+            return HistoryCollectionManagers[model].GetObservableCollection();
         }
 
         public Task<ObservableCollection<HistoryInformations<TCollection>>> GetHistoryAsync(TCollection model)
         {
-            throw new NotImplementedException();
+            return ExecuteSafe(async () =>
+            {
+                EnsureExistanceOfHistoryManager(model);
+
+                if (_apiConfigurationService.StartSyncAutomatically())
+                    await SyncHistoryAsync(model);
+                else
+                    try
+                    {
+                        await InitializeHistoryAsync(model);
+                    }
+                    catch (Exception ex)
+                    {
+                        ExceptionLogger?.LogException(ex);
+                    }
+
+                return HistoryCollectionManagers[model].GetObservableCollection();
+            });
         }
 
+        protected async Task<bool> SyncHistoryInternalAsync(TCollection model)
+        {
+            if (!await _apiAuthenticationService.IsAuthenticatedAsync())
+                return false;
 
-        //private readonly AsyncLock _asyncLock = new AsyncLock();
-        //private ICollectionManager<HistoryInformations<TModel>> _historyManager;
-        //private CollectionCacheEntity<HistoryInformations<TModel>> _historyCache;
-        //private async Task<bool> InitializeHistoryAsync()
-        //{
-        //    using (await _asyncLock.LockAsync())
-        //    {
-        //        if (_historyCache != null)
-        //            return true;
+            var client = GetApiClient();
+            var cache = HistoryCacheEntities[model];
+            var manager = HistoryCollectionManagers[model];
 
-        //        _historyManager = _apiConfigurationService.GetCollectionManager<HistoryInformations<TModel>>();
-        //        _historyCache = await _apiStorageService.GetCacheEntityAsync<CollectionCacheEntity<HistoryInformations<TModel>>>(GetModelHistoryCacheFilePath(Manager.GetModel()));
-        //        foreach (var historyInformationse in _historyCache.Models)
-        //        {
-        //            _historyManager.Add(historyInformationse);
-        //        }
+            var req = await _apiAuthenticationService.CreateRequestAsync<HistoryEntityRequest>(OnlineAction.SyncVersion);
+            if (req == null)
+                return false;
 
-        //        return true;
-        //    }
-        //}
+            req.Id = model.GetId();
+            // this will return missing entities
+            foreach (var cacheModelInformation in cache.ModelInformations)
+            {
+                req.VersionIds.Add(cacheModelInformation.VersionId);
+            }
+            var resp = await client.DoSyncRequestAsync(req);
+            if (!resp.IsSuccessfull)
+                return false;
 
-        //protected abstract Task<bool> SyncHistoryInternalAsync();
+            foreach (var syncEntity in resp.CollectionEntities)
+            {
+                //new!
+                if (syncEntity.OnlineAction == OnlineAction.Create)
+                {
+                    var tcol = JsonConvert.DeserializeObject<TCollection>(syncEntity.Content);
+                    var mi = ApiEntityHelper.CreateHistoryInformation<TCollection>(syncEntity);
+                    mi.Model = tcol;
+                    tcol.SetId(mi.Id);
+                    cache.ModelInformations.Add(mi);
+                    cache.Models.Add(mi);
+                    manager.Add(mi);
+                }
+            }
 
-        //public Task<ObservableCollection<HistoryInformations<TModel>>> GetHistoryAsync()
-        //{
-        //    return ExecuteSafe(async () =>
-        //    {
-        //        await InitializeHistoryAsync();
-        //        if (_apiConfigurationService.StartSyncAutomatically())
-        //            await SyncHistoryAsync();
+            if (resp.CollectionEntities.Any())
+                await _apiStorageService.SaveCacheEntityAsync<CollectionCacheEntity<HistoryInformations<TCollection>>>();
 
-        //        return _historyManager.GetObservableCollection();
-        //    });
-        //}
+            return true;
+        }
 
-        //public Task<bool> SyncHistoryAsync()
-        //{
-        //    return ExecuteSafe(async () =>
-        //    {
-        //        await InitializeHistoryAsync();
-        //        await SyncHistoryInternalAsync();
-
-        //        return true;
-        //    }, true);
-        //}
+        public Task<bool> SyncHistoryAsync(TCollection model)
+        {
+            return ExecuteSafe(async () =>
+            {
+                await InitializeHistoryAsync(model);
+                if (_apiConfigurationService.CanUseWebConnection())
+                    return await SyncHistoryInternalAsync(model);
+                return false;
+            });
+        }
 
         public CacheInformations GetCacheInformations(TCollection model)
         {
             var index = CollectionCache.Models.IndexOf(model);
             return CollectionCache.ModelInformations[index];
-        }
-
-        public Task<bool> RemoveAllAsync()
-        {
-            return ExecuteSafe(async () =>
-            {
-                foreach (var collectionCacheModelInformation in CollectionCache.ModelInformations)
-                {
-                    collectionCacheModelInformation.PendingAction = PendingAction.Delete;
-                }
-                await SaveCacheAsync();
-                return true;
-            });
         }
 
         protected async Task SaveCacheAsync()

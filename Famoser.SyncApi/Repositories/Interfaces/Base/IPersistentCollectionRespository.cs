@@ -14,8 +14,9 @@ namespace Famoser.SyncApi.Repositories.Interfaces.Base
         Task<bool> RemoveAsync(T model);
         ObservableCollection<HistoryInformations<T>> GetHistoryLazy(T model);
         Task<ObservableCollection<HistoryInformations<T>>> GetHistoryAsync(T model);
+        Task<bool> SyncHistoryAsync(T model);
         CacheInformations GetCacheInformations(T model);
-        
+
         void SetCollectionManager(ICollectionManager<T> manager);
         ICollectionManager<T> GetCollectionManager();
     }

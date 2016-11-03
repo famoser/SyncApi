@@ -6,6 +6,7 @@ using Famoser.SyncApi.Api.Communication.Entities;
 using Famoser.SyncApi.Api.Communication.Request;
 using Famoser.SyncApi.Enums;
 using Famoser.SyncApi.Helpers;
+using Famoser.SyncApi.Models.Information;
 using Famoser.SyncApi.Models.Interfaces;
 using Famoser.SyncApi.Repositories.Base;
 using Famoser.SyncApi.Repositories.Interfaces;
@@ -122,7 +123,7 @@ namespace Famoser.SyncApi.Repositories
                 //new!
                 if (respCollectionEntity.OnlineAction == OnlineAction.Create)
                 {
-                    var mi = ApiEntityHelper.CreateModelInformation(respCollectionEntity);
+                    var mi = ApiEntityHelper.CreateCacheInformation<CacheInformations>(respCollectionEntity);
                     var tcol = JsonConvert.DeserializeObject<TCollection>(respCollectionEntity.Content);
                     tcol.SetId(mi.Id);
                     CollectionCache.ModelInformations.Add(mi);

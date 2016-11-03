@@ -212,7 +212,7 @@ namespace Famoser.SyncApi.Repositories
                 //new!
                 if (syncEntity.OnlineAction == OnlineAction.Create)
                 {
-                    var mi = ApiEntityHelper.CreateModelInformation(syncEntity);
+                    var mi = ApiEntityHelper.CreateCacheInformation<CacheInformations>(syncEntity);
                     var tcol = JsonConvert.DeserializeObject<TDevice>(syncEntity.Content);
                     tcol.SetId(mi.Id);
                     _deviceCache.ModelInformations.Add(mi);
