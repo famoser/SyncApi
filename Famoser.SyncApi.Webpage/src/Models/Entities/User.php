@@ -21,8 +21,13 @@ use Famoser\SyncApi\Models\Entities\Base\BaseEntity;
 
 class User extends BaseEntity
 {
+    /* @var string $application_id */
     public $application_id;
+
+    /* @var string $identifier */
     public $identifier;
+    
+    /* @var string $guid type_of:guid */
     public $guid;
     
     public function getTableName()

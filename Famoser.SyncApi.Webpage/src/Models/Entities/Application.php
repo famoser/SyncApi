@@ -10,13 +10,13 @@ namespace Famoser\SyncApi\Models\Entities;
 
 /*
 CREATE TABLE 'applications' (
-  'id'               INTEGER DEFAULT NULL PRIMARY KEY AUTOINCREMENT,
-  'admin_id'         INTEGER DEFAULT NULL REFERENCES 'frontend_users' ('id'),
-  'name'             TEXT    DEFAULT NULL,
-  'description'      TEXT    DEFAULT NULL,
-  'application_id'   TEXT    DEFAULT NULL,
-  'application_seed' TEXT    DEFAULT NULL,
-  'release_date'     TEXT    DEFAULT NULL
+  'id'                INTEGER DEFAULT NULL PRIMARY KEY AUTOINCREMENT,
+  'admin_id'          INTEGER DEFAULT NULL REFERENCES 'frontend_users' ('id'),
+  'name'              TEXT    DEFAULT NULL,
+  'description'       TEXT    DEFAULT NULL,
+  'application_id'    INT    DEFAULT NULL,
+  'application_seed'  TEXT    DEFAULT NULL,
+  'release_date_time' TEXT    DEFAULT NULL
 );
 */
 
@@ -24,12 +24,23 @@ use Famoser\SyncApi\Models\Entities\Base\BaseEntity;
 
 class Application extends BaseEntity
 {
+    /* @var int $id */
     public $admin_id;
+
+    /* @var string $name */
     public $name;
+
+    /* @var string $description */
     public $description;
+
+    /* @var int $application_id */
     public $application_id;
+
+    /* @var int $application_seed */
     public $application_seed;
-    public $release_date;
+
+    /* @var \DateTime $release_date */
+    public $release_date_time;
 
     public function getTableName()
     {

@@ -49,7 +49,7 @@ namespace Famoser.SyncApi.Repositories
                     _roaming.UserId = Guid.NewGuid();
                     _roaming.AuthenticationState = AuthenticationState.NotYetAuthenticated;
 
-                    var random = new Random(ApiInformationEntity.ApplicationSeed);
+                    var random = new Random(ApiInformation.ApplicationSeed);
                     _roaming.PersonalSeed = random.Next();
                     await _apiStorageService.SaveApiRoamingEntityAsync();
 
@@ -90,7 +90,7 @@ namespace Famoser.SyncApi.Repositories
             if (CacheEntity.ModelInformation.PendingAction == PendingAction.Create)
             {
                 var resp = await _authApiClient.DoSyncRequestAsync(
-                    AuthorizeRequest(ApiInformationEntity, _roaming, new AuthRequestEntity()
+                    AuthorizeRequest(ApiInformation, _roaming, new AuthRequestEntity()
                     {
                         UserEntity = new UserEntity()
                         {
@@ -110,7 +110,7 @@ namespace Famoser.SyncApi.Repositories
             else if (CacheEntity.ModelInformation.PendingAction == PendingAction.Read)
             {
                 var resp = await _authApiClient.DoSyncRequestAsync(
-                    AuthorizeRequest(ApiInformationEntity, _roaming, new AuthRequestEntity()
+                    AuthorizeRequest(ApiInformation, _roaming, new AuthRequestEntity()
                     {
                         UserEntity = new UserEntity()
                         {
@@ -128,7 +128,7 @@ namespace Famoser.SyncApi.Repositories
             else if (CacheEntity.ModelInformation.PendingAction == PendingAction.Update)
             {
                 var resp = await _authApiClient.DoSyncRequestAsync(
-                    AuthorizeRequest(ApiInformationEntity, _roaming, new AuthRequestEntity()
+                    AuthorizeRequest(ApiInformation, _roaming, new AuthRequestEntity()
                     {
                         UserEntity = new UserEntity()
                         {
@@ -146,7 +146,7 @@ namespace Famoser.SyncApi.Repositories
             else if (CacheEntity.ModelInformation.PendingAction == PendingAction.Delete)
             {
                 var resp = await _authApiClient.DoSyncRequestAsync(
-                    AuthorizeRequest(ApiInformationEntity, _roaming, new AuthRequestEntity()
+                    AuthorizeRequest(ApiInformation, _roaming, new AuthRequestEntity()
                     {
                         UserEntity = new UserEntity()
                         {
@@ -173,10 +173,10 @@ namespace Famoser.SyncApi.Repositories
         }
 
 
-        private AuthRequestEntity AuthorizeRequest(ApiInformationEntity apiInformationEntity,
+        private AuthRequestEntity AuthorizeRequest(ApiInformation apiInformation,
             ApiRoamingEntity apiRoamingInfo, AuthRequestEntity request)
         {
-            request.AuthorizationCode = AuthorizationHelper.GenerateAuthorizationCode(apiInformationEntity, apiRoamingInfo);
+            request.AuthorizationCode = AuthorizationHelper.GenerateAuthorizationCode(apiInformation, apiRoamingInfo);
             request.UserId = _roaming.UserId;
             return request;
         }

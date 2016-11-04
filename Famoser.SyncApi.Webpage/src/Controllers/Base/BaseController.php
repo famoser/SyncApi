@@ -6,7 +6,7 @@
  * Time: 14:23
  */
 
-namespace Famoser\SyncApi\Controllers;
+namespace Famoser\SyncApi\Controllers\Base;
 
 
 use Famoser\SyncApi\Helpers\DatabaseHelper;

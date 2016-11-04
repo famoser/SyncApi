@@ -78,7 +78,7 @@ namespace Famoser.SyncApi.Repositories
             if (CacheEntity.ModelInformation.PendingAction == PendingAction.Create)
             {
                 var resp = await _authApiClient.DoSyncRequestAsync(
-                    AuthorizeRequest(ApiInformationEntity, _apiRoamingEntity, new AuthRequestEntity()
+                    AuthorizeRequest(ApiInformation, _apiRoamingEntity, new AuthRequestEntity()
                     {
                         DeviceEntity = new DeviceEntity()
                         {
@@ -100,7 +100,7 @@ namespace Famoser.SyncApi.Repositories
             else if (CacheEntity.ModelInformation.PendingAction == PendingAction.Update)
             {
                 var resp = await _authApiClient.DoSyncRequestAsync(
-                    AuthorizeRequest(ApiInformationEntity, _apiRoamingEntity, new AuthRequestEntity()
+                    AuthorizeRequest(ApiInformation, _apiRoamingEntity, new AuthRequestEntity()
                     {
                         DeviceEntity = new DeviceEntity()
                         {
@@ -118,7 +118,7 @@ namespace Famoser.SyncApi.Repositories
             else if (CacheEntity.ModelInformation.PendingAction == PendingAction.Delete)
             {
                 var resp = await _authApiClient.DoSyncRequestAsync(
-                    AuthorizeRequest(ApiInformationEntity, _apiRoamingEntity, new AuthRequestEntity()
+                    AuthorizeRequest(ApiInformation, _apiRoamingEntity, new AuthRequestEntity()
                     {
                         UserEntity = new UserEntity()
                         {
@@ -203,7 +203,7 @@ namespace Famoser.SyncApi.Repositories
                     VersionId = collectionCacheModelInformation.VersionId
                 });
             }
-            var resp = await _authApiClient.GetDevicesAsync(AuthorizeRequest(ApiInformationEntity, _apiRoamingEntity, req));
+            var resp = await _authApiClient.GetDevicesAsync(AuthorizeRequest(ApiInformation, _apiRoamingEntity, req));
             if (!resp.IsSuccessfull)
                 return false;
 
@@ -280,7 +280,7 @@ namespace Famoser.SyncApi.Repositories
         {
             return ExecuteSafe(async () =>
             {
-                var resp = await _authApiClient.UnAuthenticateDeviceAsync(AuthorizeRequest(ApiInformationEntity, _apiRoamingEntity, new AuthRequestEntity()
+                var resp = await _authApiClient.UnAuthenticateDeviceAsync(AuthorizeRequest(ApiInformation, _apiRoamingEntity, new AuthRequestEntity()
                 {
                     ClientMessage = device.GetId().ToString()
                 }));
@@ -292,7 +292,7 @@ namespace Famoser.SyncApi.Repositories
         {
             return ExecuteSafe(async () =>
             {
-                var resp = await _authApiClient.AuthenticateDeviceAsync(AuthorizeRequest(ApiInformationEntity, _apiRoamingEntity, new AuthRequestEntity()
+                var resp = await _authApiClient.AuthenticateDeviceAsync(AuthorizeRequest(ApiInformation, _apiRoamingEntity, new AuthRequestEntity()
                 {
                     ClientMessage = device.GetId().ToString()
                 }));
@@ -304,7 +304,7 @@ namespace Famoser.SyncApi.Repositories
         {
             return ExecuteSafe(async () =>
             {
-                var resp = await _authApiClient.CreateAuthorizationCodeAsync(AuthorizeRequest(ApiInformationEntity, _apiRoamingEntity, new AuthRequestEntity()));
+                var resp = await _authApiClient.CreateAuthorizationCodeAsync(AuthorizeRequest(ApiInformation, _apiRoamingEntity, new AuthRequestEntity()));
                 return resp.IsSuccessfull ? resp.ServerMessage : default(string);
             }, true);
         }
@@ -313,7 +313,7 @@ namespace Famoser.SyncApi.Repositories
         {
             return ExecuteSafe(async () =>
             {
-                var resp = await _authApiClient.UseAuthenticationCodeAsync(AuthorizeRequest(ApiInformationEntity, _apiRoamingEntity, new AuthRequestEntity()
+                var resp = await _authApiClient.UseAuthenticationCodeAsync(AuthorizeRequest(ApiInformation, _apiRoamingEntity, new AuthRequestEntity()
                 {
                     ClientMessage = authenticationCode
                 }));
@@ -330,26 +330,26 @@ namespace Famoser.SyncApi.Repositories
             return Manager.GetModel();
         }
 
-        private T AuthorizeRequestBase<T>(ApiInformationEntity apiInformationEntity,
+        private T AuthorizeRequestBase<T>(ApiInformation apiInformation,
             ApiRoamingEntity apiRoamingInfo, T request)
             where T : BaseRequest
         {
-            request.AuthorizationCode = AuthorizationHelper.GenerateAuthorizationCode(apiInformationEntity, apiRoamingInfo);
+            request.AuthorizationCode = AuthorizationHelper.GenerateAuthorizationCode(apiInformation, apiRoamingInfo);
             request.UserId = _apiRoamingEntity.UserId;
             request.DeviceId = CacheEntity.Model.GetId();
             return request;
         }
 
-        private AuthRequestEntity AuthorizeRequest(ApiInformationEntity apiInformationEntity,
+        private AuthRequestEntity AuthorizeRequest(ApiInformation apiInformation,
             ApiRoamingEntity apiRoamingInfo, AuthRequestEntity request)
         {
-            return AuthorizeRequestBase(apiInformationEntity, apiRoamingInfo, request);
+            return AuthorizeRequestBase(apiInformation, apiRoamingInfo, request);
         }
 
-        private CollectionEntityRequest AuthorizeRequest(ApiInformationEntity apiInformationEntity,
+        private CollectionEntityRequest AuthorizeRequest(ApiInformation apiInformation,
             ApiRoamingEntity apiRoamingInfo, CollectionEntityRequest request)
         {
-            return AuthorizeRequestBase(apiInformationEntity, apiRoamingInfo, request);
+            return AuthorizeRequestBase(apiInformation, apiRoamingInfo, request);
         }
     }
 }

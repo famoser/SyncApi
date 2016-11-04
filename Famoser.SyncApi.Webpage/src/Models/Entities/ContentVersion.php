@@ -23,10 +23,19 @@ use Famoser\SyncApi\Models\Entities\Base\BaseEntity;
 
 class ContentVersion extends BaseEntity
 {
+    /* @var int $content_type const_of:ContentType */
     public $content_type;
+
+    /* @var string $entity_guid type_of:guid */
     public $entity_guid;
+
+    /* @var string $version_guid type_of:guid */
     public $version_guid;
+
+    /* @var string $content */
     public $content;
+
+    /* @var \DateTime $create_date_time */
     public $create_date_time;
 
     public function getTableName()

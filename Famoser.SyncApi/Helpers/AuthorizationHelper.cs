@@ -6,7 +6,7 @@ namespace Famoser.SyncApi.Helpers
 {
     public class AuthorizationHelper
     {
-        public static string GenerateAuthorizationCode(ApiInformationEntity info, ApiRoamingEntity apiRoamingEntity)
+        public static string GenerateAuthorizationCode(ApiInformation info, ApiRoamingEntity apiRoamingEntity)
         {
             var baseNumber = DateTime.Now.Second + DateTime.Now.Minute*100 + DateTime.Now.Hour*10000 +
                              DateTime.Now.DayOfYear + 1000000;

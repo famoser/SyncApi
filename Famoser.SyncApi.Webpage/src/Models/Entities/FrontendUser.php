@@ -21,8 +21,13 @@ use Famoser\SyncApi\Models\Entities\Base\BaseEntity;
 
 class FrontendUser extends BaseEntity
 {
+    /* @var string $email type_of:email */
     public $email;
+
+    /* @var string $username */
     public $username;
+
+    /* @var string $password type_of:password_hash */
     public $password;
 
     public function getTableName()

@@ -1,0 +1,28 @@
+<?php
+/**
+ * Created by PhpStorm.
+ * User: famoser
+ * Date: 04.11.2016
+ * Time: 19:10
+ */
+
+namespace Famoser\SyncApi\Models\Communication\Request\Base;
+
+
+class BaseRequest
+{
+    /* @var string $UserId type_of:guid*/
+    public $UserId;
+
+    /* @var string $DeviceId type_of:guid */
+    public $DeviceId;
+
+    /* @var string $AuthorizationCode */
+    public $AuthorizationCode;
+
+    /* @var string $ApplicationId */
+    public $ApplicationId;
+    
+    /* @var string $OnlineAction const_of:OnlineAction */
+    public $OnlineAction;
+}

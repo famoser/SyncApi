@@ -11,7 +11,7 @@ namespace Famoser.SyncApi.Services.Interfaces
         /// Resolve your api informations
         /// </summary>
         /// <returns></returns>
-        ApiInformationEntity GetApiInformations();
+        ApiInformation GetApiInformations();
         /// <summary>
         /// Return true if the library is allowed to use a web connection
         /// </summary>

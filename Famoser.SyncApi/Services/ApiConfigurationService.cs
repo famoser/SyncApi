@@ -21,9 +21,9 @@ namespace Famoser.SyncApi.Services
             _canUseWebConnection = canUseWebConnection;
         }
 
-        public ApiInformationEntity GetApiInformations()
+        public ApiInformation GetApiInformations()
         {
-            return new ApiInformationEntity()
+            return new ApiInformation()
             {
                 Uri = _baseUri,
                 Modulo = 10000019,

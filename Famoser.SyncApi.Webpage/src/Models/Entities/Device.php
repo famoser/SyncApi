@@ -21,8 +21,13 @@ use Famoser\SyncApi\Models\Entities\Base\BaseEntity;
 
 class Device extends BaseEntity
 {
+    /* @var string $user_guid type_of:guid */
     public $user_guid;
+    
+    /* @var string $identifier */
     public $identifier;
+
+    /* @var string $guid type_of:guid */
     public $guid;
 
     public function getTableName()

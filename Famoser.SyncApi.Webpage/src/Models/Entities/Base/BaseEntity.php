@@ -11,6 +11,7 @@ namespace Famoser\SyncApi\Models\Entities\Base;
 
 abstract class BaseEntity
 {
+    /* @var int $id */
     public $id;
     abstract public function getTableName();
 }

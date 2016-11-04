@@ -21,8 +21,13 @@ use Famoser\SyncApi\Models\Entities\Base\BaseEntity;
 
 class UserCollection extends BaseEntity
 {
+    /* @var string $user_guid type_of:guid */
     public $user_guid;
+
+    /* @var string $collection_guid type_of:guid */
     public $collection_guid;
+
+    /* @var \DateTime $create_date_time */
     public $create_date_time;
     
     public function getTableName()

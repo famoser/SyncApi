@@ -1,11 +1,11 @@
 CREATE TABLE 'applications' (
-  'id'               INTEGER DEFAULT NULL PRIMARY KEY AUTOINCREMENT,
-  'admin_id'         INTEGER DEFAULT NULL REFERENCES 'frontend_users' ('id'),
-  'name'             TEXT    DEFAULT NULL,
-  'description'      TEXT    DEFAULT NULL,
-  'application_id'   TEXT    DEFAULT NULL,
-  'application_seed' TEXT    DEFAULT NULL,
-  'release_date'     TEXT    DEFAULT NULL
+  'id'                INTEGER DEFAULT NULL PRIMARY KEY AUTOINCREMENT,
+  'admin_id'          INTEGER DEFAULT NULL REFERENCES 'frontend_users' ('id'),
+  'name'              TEXT    DEFAULT NULL,
+  'description'       TEXT    DEFAULT NULL,
+  'application_id'    INT    DEFAULT NULL,
+  'application_seed'  TEXT    DEFAULT NULL,
+  'release_date_time' TEXT    DEFAULT NULL
 );
 
 CREATE TABLE 'users' (

@@ -25,7 +25,7 @@ namespace Famoser.SyncApi.Repositories.Base
     {
         protected readonly IManager<TModel> Manager;
         protected CacheEntity<TModel> CacheEntity;
-        protected readonly ApiInformationEntity ApiInformationEntity;
+        protected readonly ApiInformation ApiInformation;
         private readonly IApiConfigurationService _apiConfigurationService;
         private readonly IApiStorageService _apiStorageService;
 
@@ -36,12 +36,12 @@ namespace Famoser.SyncApi.Repositories.Base
             _apiStorageService = apiStorageService;
 
             Manager = _apiConfigurationService.GetManager<TModel>();
-            ApiInformationEntity = apiConfigurationService.GetApiInformations();
+            ApiInformation = apiConfigurationService.GetApiInformations();
         }
 
         protected ApiClient GetAuthApiClient()
         {
-            return new ApiClient(ApiInformationEntity.Uri);
+            return new ApiClient(ApiInformation.Uri);
         }
 
         public Task<TModel> GetAsync()

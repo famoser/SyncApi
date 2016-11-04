@@ -22,11 +22,11 @@ namespace Famoser.SyncApi.Services
         private readonly AsyncLock _asyncLock = new AsyncLock();
         private readonly IApiUserAuthenticationService _apiUserAuthenticationService;
         private readonly IApiDeviceAuthenticationService _apiDeviceAuthenticationService;
-        private readonly ApiInformationEntity _apiInformationEntity;
+        private readonly ApiInformation _apiInformation;
 
         public ApiAuthenticationService(IApiConfigurationService apiConfigurationService,IApiUserAuthenticationService apiUserAuthenticationService, IApiDeviceAuthenticationService apiDeviceAuthenticationService)
         {
-            _apiInformationEntity = apiConfigurationService.GetApiInformations();
+            _apiInformation = apiConfigurationService.GetApiInformations();
 
             _apiUserAuthenticationService = apiUserAuthenticationService;
             _apiDeviceAuthenticationService = apiDeviceAuthenticationService;
@@ -65,11 +65,11 @@ namespace Famoser.SyncApi.Services
 
             var request = new T
             {
-                AuthorizationCode = AuthorizationHelper.GenerateAuthorizationCode(_apiInformationEntity, _apiRoamingEntity),
+                AuthorizationCode = AuthorizationHelper.GenerateAuthorizationCode(_apiInformation, _apiRoamingEntity),
                 UserId = _apiRoamingEntity.UserId,
                 DeviceId = _deviceModel.GetId(),
                 OnlineAction = action,
-                ApplicationId = _apiInformationEntity.ApplicationId
+                ApplicationId = _apiInformation.ApplicationId
             };
 
             return request;

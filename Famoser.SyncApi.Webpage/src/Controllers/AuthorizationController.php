@@ -9,14 +9,13 @@
 namespace Famoser\SyncApi\Controllers;
 
 
+use Famoser\SyncApi\Controllers\Base\BaseController;
 use Famoser\SyncApi\Helpers\DatabaseHelper;
 use Famoser\SyncApi\Helpers\FormatHelper;
 use Famoser\SyncApi\Helpers\RequestHelper;
 use Famoser\SyncApi\Helpers\ResponseHelper;
-use Famoser\SyncApi\Models\Entities\AuthorizationCode;
 use Famoser\SyncApi\Models\Entities\Device;
 use Famoser\SyncApi\Models\Entities\User;
-use Famoser\SyncApi\Models\Request\Authorization\AuthorizedDevicesRequest;
 use Famoser\SyncApi\Models\Response\Authorization\AuthorizationResponse;
 use Famoser\SyncApi\Models\Response\Authorization\AuthorizationStatusResponse;
 use Famoser\SyncApi\Models\Response\Authorization\AuthorizedDevicesResponse;
@@ -25,8 +24,6 @@ use Famoser\SyncApi\Models\Response\Authorization\UnAuthorizationResponse;
 use Famoser\SyncApi\Models\Response\Base\ApiResponse;
 use Famoser\SyncApi\Models\Response\Entities\AuthorizedDeviceEntity;
 use Famoser\SyncApi\Types\ApiError;
-use Interop\Container\ContainerInterface;
-use Models\Request\Authorization\WipeUserRequest;
 use Models\Response\Authorization\CreateUserResponse;
 use Models\Response\Authorization\WipeUserResponse;
 use Slim\Http\Request;
