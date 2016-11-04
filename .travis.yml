@@ -1,2 +1,9 @@
-language: csharp
-solution: Famoser.SyncApi.sln
+language: php
+php:
+    - 7.0
+    - 7.1
+    - nightly
+    
+install:
+    - cd Famoser.SyncApi.Webpage
+    - composer install

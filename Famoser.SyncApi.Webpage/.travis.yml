@@ -1,8 +1,0 @@
-language: php
-php:
-    - '7.0'
-    - nightly
-install:
-    - composer install
-    
-script: vendor/bin/phpunit
