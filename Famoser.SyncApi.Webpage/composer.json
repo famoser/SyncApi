@@ -19,7 +19,8 @@
     "slim/slim": "^3.0",
     "slim/twig-view": "^2.1",
     "famoser/jsonmapper": "*",
-    "codeguy/upload": "*"
+    "codeguy/upload": "*",
+    "phpunit/phpunit": "^5.6"
   },
   "autoload": {
     "psr-4": {
