@@ -9,7 +9,23 @@
 namespace Famoser\SyncApi\Controllers;
 
 
+use Slim\Http\Request;
+use Slim\Http\Response;
+
 class DeviceController
 {
+    public function get(Request $request, Response $response, $args)
+    {
+        throw new \Exception("not implemented");
+    }
 
+    public function auth(Request $request, Response $response, $args)
+    {
+        throw new \Exception("not implemented");
+    }
+    
+    public function unAuth(Request $request, Response $response, $args)
+    {
+        throw new \Exception("not implemented");
+    }
 }

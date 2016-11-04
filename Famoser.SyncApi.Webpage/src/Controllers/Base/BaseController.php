@@ -12,10 +12,10 @@ namespace Famoser\SyncApi\Controllers\Base;
 use Famoser\SyncApi\Helpers\DatabaseHelper;
 use Famoser\SyncApi\Helpers\LogHelper;
 use Famoser\SyncApi\Helpers\ResponseHelper;
+use Famoser\SyncApi\Models\Communication\Request\Base\BaseRequest;
+use Famoser\SyncApi\Models\Communication\Response\Base\BaseResponse;
 use Famoser\SyncApi\Models\Entities\Device;
 use Famoser\SyncApi\Models\Entities\User;
-use Famoser\SyncApi\Models\Request\Base\ApiRequest;
-use Famoser\SyncApi\Models\Response\Base\ApiResponse;
 use Famoser\SyncApi\Types\ApiError;
 use Interop\Container\ContainerInterface;
 use Slim\Http\Response;
@@ -32,50 +32,18 @@ class BaseController
 
     protected function returnServerError(Response $response, $debugMessage = null)
     {
+        return $response->withStatus(500);
+    }
 
-        return $response->withStatus($apiError[$apiErrorType])->withJson($resp);
-        }
     protected function returnApiError($apiErrorType, Response $response, $debugMessage = null)
     {
-        $apiError = array(
-            ApiError::DatabaseFailure => 500,
-            ApiError::ApiVersionInvalid => 406,
-            ApiError::AuthorizationCodeInvalid => 401,
-            ApiError::ContentNotFound => 404,
-            ApiError::DeviceNotFound => 401,
-            ApiError::Forbidden => 401,
-            ApiError::NoDevicesFound => 500,
-            ApiError::None => 200,
-            ApiError::NotAuthorized => 401,
-            ApiError::NotWellDefined => 400,
-            ApiError::RequestJsonFailure => 400,
-            ApiError::DeviceNotFound => 401,
-            ApiError::RequestUriInvalid => 404,
-            ApiError::Unauthorized => 401
-        );
-
-        if (!in_array($apiErrorType, $apiError)) {
-            $apiError[$apiErrorType] = 500;
-        }
-
-        $resp = new ApiResponse(false, $apiErrorType);
-        $resp->ApiMessage = $debugMessage;
-
-        return $response->withStatus($apiError[$apiErrorType])->withJson($resp);
+        $resp = new BaseResponse();
+        $resp->RequestFailed = true;
+        $resp->ApiError = $apiErrorType;
+        return $response->withJson($resp);
     }
 
-    protected function isAuthorized(ApiRequest $request)
-    {
-        $user = $this->getAuthorizedUser($request);
-        if ($user == null)
-            return false;
-        $device = $this->getAuthorizedDevice($request);
-        if ($device != null)
-            return $device->has_access;
-        return false;
-    }
-
-    protected function isWellDefined(ApiRequest $request, $neededProps, $neededArrays = null)
+    protected function isWellDefined(BaseRequest $request, $neededProps, $neededArrays = null)
     {
         if ($neededProps != null)
             foreach ($neededProps as $neededProp) {
@@ -94,51 +62,7 @@ class BaseController
         return true;
     }
 
-    private $authorizedUser;
-
-    /**
-     * @param ApiRequest $request
-     * @return User
-     */
-    protected function getAuthorizedUser(ApiRequest $request)
-    {
-        if ($this->authorizedUser == null) {
-            if ($request->UserId != null) {
-                $helper = $this->getDatabaseHelper();
-                $this->authorizedUser = $helper->getSingleFromDatabase(new User(), "user_id=:user_id", array("user_id" => $request->UserId));
-            }
-        }
-        return $this->authorizedUser;
-    }
-
-    private $authorizedDevice;
-
-    /**
-     * @param ApiRequest $request
-     * @return Device
-     */
-    protected function getAuthorizedDevice(ApiRequest $request)
-    {
-        if ($this->authorizedDevice == null) {
-            if ($request->DeviceId != null) {
-                $authorizedUser = $this->getAuthorizedUser($request);
-
-                if ($authorizedUser != null) {
-                    $helper = $this->getDatabaseHelper();
-                    $this->authorizedDevice = $helper->getSingleFromDatabase(new Device(), "device_id=:device_id AND user_id=:user_id", array("device_id" => $request->DeviceId, "user_id" => $authorizedUser->id));
-
-                    if ($this->authorizedDevice != null) {
-                        $this->authorizedDevice->last_request_date_time = time();
-                        $helper->saveToDatabase($this->authorizedDevice);
-                    }
-                }
-            }
-        }
-        return $this->authorizedDevice;
-    }
-
     private $databaseHelper;
-
     protected function getDatabaseHelper()
     {
         if ($this->databaseHelper == null)

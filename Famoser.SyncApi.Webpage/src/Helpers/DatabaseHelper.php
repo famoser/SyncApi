@@ -9,12 +9,19 @@
 namespace Famoser\SyncApi\Helpers;
 
 
+use Famoser\SyncApi\Models\Communication\Request\CollectionEntityRequest;
+use Famoser\SyncApi\Models\Entities\Application;
 use Famoser\SyncApi\Models\Entities\AuthorizationCode;
 use Famoser\SyncApi\Models\Entities\Base\BaseEntity;
+use Famoser\SyncApi\Models\Entities\Collection;
 use Famoser\SyncApi\Models\Entities\Content;
 use Famoser\SyncApi\Models\Entities\ContentHistory;
+use Famoser\SyncApi\Models\Entities\ContentVersion;
 use Famoser\SyncApi\Models\Entities\Device;
+use Famoser\SyncApi\Models\Entities\Entity;
+use Famoser\SyncApi\Models\Entities\FrontendUser;
 use Famoser\SyncApi\Models\Entities\User;
+use Famoser\SyncApi\Models\Entities\UserCollection;
 use Interop\Container\ContainerInterface;
 use PDO;
 use Slim\Container;
@@ -131,7 +138,7 @@ class DatabaseHelper
      * @param null $parameters
      * @param null $orderBy
      * @param int $limit
-     * @return AuthorizationCode[]|Content[]|Device[]|User[]|bool
+     * @return Application[]|Collection[]|ContentVersion[]|Device[]|Entity[]|FrontendUser[]|User[]|UserCollection[]|bool
      */
     public function getFromDatabase(BaseEntity $entity, $where = null, $parameters = null, $orderBy = null, $limit = 1000)
     {
@@ -149,7 +156,7 @@ class DatabaseHelper
      * @param null $parameters
      * @param null $orderBy
      * @param int $limit
-     * @return AuthorizationCode[]|Content[]|Device[]|User[]|bool
+     * @return Application[]|Collection[]|ContentVersion[]|Device[]|Entity[]|FrontendUser[]|User[]|UserCollection[]|bool
      */
     public function getWithInFromDatabase(BaseEntity $entity, $property, $values, $invertIn = false, $where = null, $parameters = null, $orderBy = null, $limit = 1000)
     {
@@ -176,7 +183,7 @@ class DatabaseHelper
      * @param null $parameters
      * @param null $orderBy
      * @param int $limit
-     * @return AuthorizationCode|Content|Device|User|bool
+     * @return Application|Collection|ContentVersion|Device|Entity|FrontendUser|User|UserCollection|bool
      */
     public function getSingleFromDatabase(BaseEntity $entity, $where = null, $parameters = null, $orderBy = null, $limit = 1000)
     {

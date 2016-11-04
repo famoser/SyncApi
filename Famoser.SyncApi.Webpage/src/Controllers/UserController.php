@@ -9,7 +9,13 @@
 namespace Famoser\SyncApi\Controllers;
 
 
+use Slim\Http\Request;
+use Slim\Http\Response;
+
 class UserController
 {
-
+    public function auth(Request $request, Response $response, $args)
+    {
+        throw new \Exception("not implemented");
+    }
 }

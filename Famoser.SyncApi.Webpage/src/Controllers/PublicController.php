@@ -9,9 +9,7 @@
 namespace Famoser\SyncApi\Controllers;
 
 
-use Famoser\SyncApi\Models\ApiConfiguration;
-use PHPQRCode\Constants;
-use PHPQRCode\QRcode;
+use Famoser\SyncApi\Controllers\Base\BaseController;
 use Slim\Http\Request;
 use Slim\Http\Response;
 
@@ -19,12 +17,11 @@ class PublicController extends BaseController
 {
     public function index(Request $request, Response $response, $args)
     {
-        $this->createImageIfNecessary();
         return $this->renderTemplate($response, "index", $args);
     }
 
     public function indexAsJson(Request $request, Response $response, $args)
     {
-        return $response->withJson($infos);
+        return $response->withJson($args);
     }
 }

@@ -82,9 +82,9 @@ $controllerNamespace = 'Famoser\SyncApi\Controllers\\';
 $app = new App($c);
 $app->add(new LoggingMiddleware($c));
 
-$routes = function () use ($controllerNamespace) {
+$apiRoutes = function () use ($controllerNamespace) {
     $this->group("/auth", function () use ($controllerNamespace) {
-        $this->post('/use', $controllerNamespace . 'AuthorizationController:use');
+        $this->post('/use', $controllerNamespace . 'AuthorizationController:useCode');
         $this->post('/generate', $controllerNamespace . 'AuthorizationController:generate');
         $this->post('/sync', $controllerNamespace . 'AuthorizationController:sync');
     });
@@ -105,9 +105,31 @@ $routes = function () use ($controllerNamespace) {
     });
 };
 
-$app->group("/1.0", $routes);
+$webAppRoutes = function () use ($controllerNamespace) {
+    $this->get('/', $controllerNamespace . 'PublicController:index');
 
-$app->get("/", $controllerNamespace . 'PublicController:index');
-$app->post("/", $controllerNamespace . 'PublicController:indexAsJson');
+    $this->get('/login', $controllerNamespace . 'LoginController:login');
+    $this->post('/login', $controllerNamespace . 'LoginController:loginPost');
+
+    $this->get('/register', $controllerNamespace . 'LoginController:register');
+    $this->post('/register', $controllerNamespace . 'LoginController:registerPost');
+
+    $this->group("/dashboard", function () use ($controllerNamespace) {
+        $this->get('/', $controllerNamespace . 'ApplicationController:index');
+        $this->get('/show/:id', $controllerNamespace . 'ApplicationController:show'); //todo: fix id syntax
+
+        $this->get('/new', $controllerNamespace . 'ApplicationController:create');
+        $this->post('/new', $controllerNamespace . 'ApplicationController:createPost');
+
+        $this->get('/edit/:id', $controllerNamespace . 'ApplicationController:edit');
+        $this->post('/edit/:id', $controllerNamespace . 'ApplicationController:editPost');
+
+        $this->get('/delete/:id', $controllerNamespace . 'AuthorizationController:delete');
+        $this->post('/delete/:id', $controllerNamespace . 'AuthorizationController:deletePost');
+    });
+};
+
+$app->group("/1.0", $apiRoutes);
+$app->group("", $webAppRoutes);
 
 $app->run();
