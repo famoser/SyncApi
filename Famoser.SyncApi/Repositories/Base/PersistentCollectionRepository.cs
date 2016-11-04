@@ -216,7 +216,7 @@ namespace Famoser.SyncApi.Repositories.Base
             {
                 req.VersionIds.Add(cacheModelInformation.VersionId);
             }
-            var resp = await client.DoSyncRequestAsync(req);
+            var resp = await client.DoEntityHistoryRequestAsync(req);
             if (!resp.IsSuccessfull)
                 return false;
 

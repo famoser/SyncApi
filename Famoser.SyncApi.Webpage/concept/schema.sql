@@ -12,20 +12,14 @@ CREATE TABLE 'users' (
   'id'               INTEGER DEFAULT NULL PRIMARY KEY AUTOINCREMENT,
   'application_id'   INTEGER DEFAULT NULL REFERENCES 'applications' ('id'),
   'identifier'       TEXT    DEFAULT NULL,
-  'guid'             TEXT    DEFAULT NULL,
-  'version_guid'     TEXT    DEFAULT NULL,
-  'content'          TEXT    DEFAULT NULL,
-  'create_date_time' TEXT    DEFAULT NULL
+  'guid'             TEXT    DEFAULT NULL
 );
 
 CREATE TABLE 'devices' (
   'id'               INTEGER DEFAULT NULL PRIMARY KEY AUTOINCREMENT,
   'user_guid'        TEXT    DEFAULT NULL,
   'identifier'       TEXT    DEFAULT NULL,
-  'guid'             TEXT    DEFAULT NULL,
-  'version_guid'     TEXT    DEFAULT NULL,
-  'content'          TEXT    DEFAULT NULL,
-  'create_date_time' TEXT    DEFAULT NULL
+  'guid'             TEXT    DEFAULT NULL
 );
 
 CREATE TABLE 'collections' (
@@ -33,10 +27,7 @@ CREATE TABLE 'collections' (
   'user_guid'        TEXT    DEFAULT NULL,
   'device_guid'      TEXT    DEFAULT NULL,
   'identifier'       TEXT    DEFAULT NULL,
-  'guid'             TEXT    DEFAULT NULL,
-  'version_guid'     TEXT    DEFAULT NULL,
-  'content'          TEXT    DEFAULT NULL,
-  'create_date_time' TEXT    DEFAULT NULL
+  'guid'             TEXT    DEFAULT NULL
 );
 
 CREATE TABLE 'user_collections' (
@@ -52,7 +43,13 @@ CREATE TABLE 'entities' (
   'device_guid'      TEXT    DEFAULT NULL,
   'collection_guid'  TEXT    DEFAULT NULL,
   'identifier'       TEXT    DEFAULT NULL,
-  'guid'             TEXT    DEFAULT NULL,
+  'guid'             TEXT    DEFAULT NULL
+);
+
+CREATE TABLE 'content_versions' (
+  'id'               INTEGER DEFAULT NULL PRIMARY KEY AUTOINCREMENT,
+  'content_type'     INTEGER DEFAULT NULL,
+  'entity_guid'      TEXT    DEFAULT NULL,
   'version_guid'     TEXT    DEFAULT NULL,
   'content'          TEXT    DEFAULT NULL,
   'create_date_time' TEXT    DEFAULT NULL

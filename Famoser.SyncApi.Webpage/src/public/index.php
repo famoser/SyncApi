@@ -83,30 +83,31 @@ $app = new App($c);
 $app->add(new LoggingMiddleware($c));
 
 $routes = function () use ($controllerNamespace) {
+    $this->group("/auth", function () use ($controllerNamespace) {
+        $this->post('/use', $controllerNamespace . 'AuthorizationController:use');
+        $this->post('/generate', $controllerNamespace . 'AuthorizationController:generate');
+        $this->post('/sync', $controllerNamespace . 'AuthorizationController:sync');
+    });
     $this->group("/users", function () use ($controllerNamespace) {
-        $this->post('/auth', $controllerNamespace . 'UserController:createUser');
+        $this->post('/auth', $controllerNamespace . 'UserController:auth');
     });
     $this->group("/devices", function () use ($controllerNamespace) {
-        $this->post('/get', $controllerNamespace . 'DeviceController:createUser');
-        $this->post('/auth', $controllerNamespace . 'DeviceController:wipeUser');
-        $this->post('/unauth', $controllerNamespace . 'DeviceController:authorize');
-    });
-    $this->group("/auth", function () use ($controllerNamespace) {
-        $this->post('/use', $controllerNamespace . 'AuthorizationController:createUser');
-        $this->post('/generate', $controllerNamespace . 'AuthorizationController:createUser');
-        $this->post('/sync', $controllerNamespace . 'AuthorizationController:createUser');
-    });
-    $this->group("/entity", function () use ($controllerNamespace) {
-        $this->post('/sync', $controllerNamespace . 'EntityController:sync');
+        $this->post('/get', $controllerNamespace . 'DeviceController:get');
+        $this->post('/auth', $controllerNamespace . 'DeviceController:auth');
+        $this->post('/unauth', $controllerNamespace . 'DeviceController:unAuth');
     });
     $this->group("/collection", function () use ($controllerNamespace) {
         $this->post('/sync', $controllerNamespace . 'CollectionController:sync');
+    });
+    $this->group("/entity", function () use ($controllerNamespace) {
+        $this->post('/sync', $controllerNamespace . 'EntityController:sync');
+        $this->post('/history/sync', $controllerNamespace . 'EntityController:historySync');
     });
 };
 
 $app->group("/1.0", $routes);
 
-$app->get("/1.0/", $controllerNamespace . 'PublicController:index');
-$app->post("/1.0/", $controllerNamespace . 'PublicController:indexAsJson');
+$app->get("/", $controllerNamespace . 'PublicController:index');
+$app->post("/", $controllerNamespace . 'PublicController:indexAsJson');
 
 $app->run();

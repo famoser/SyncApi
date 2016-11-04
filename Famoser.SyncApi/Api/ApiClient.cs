@@ -27,9 +27,9 @@ namespace Famoser.SyncApi.Api
         /// </summary>
         /// <param name="entity"></param>
         /// <returns></returns>
-        public Task<HistoryEntityResponse> DoSyncRequestAsync(HistoryEntityRequest entity)
+        public Task<HistoryEntityResponse> DoEntityHistoryRequestAsync(HistoryEntityRequest entity)
         {
-            return DoApiRequestAsync<HistoryEntityResponse>(entity, "entity/sync");
+            return DoApiRequestAsync<HistoryEntityResponse>(entity, "entity/history/sync");
         }
 
         /// <summary>

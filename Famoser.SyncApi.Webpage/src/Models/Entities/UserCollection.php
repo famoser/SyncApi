@@ -3,30 +3,30 @@
  * Created by PhpStorm.
  * User: famoser
  * Date: 04.11.2016
- * Time: 17:10
+ * Time: 17:07
  */
 
 namespace Famoser\SyncApi\Models\Entities;
 
 /*
-CREATE TABLE 'devices' (
+CREATE TABLE 'user_collections' (
   'id'               INTEGER DEFAULT NULL PRIMARY KEY AUTOINCREMENT,
   'user_guid'        TEXT    DEFAULT NULL,
-  'identifier'       TEXT    DEFAULT NULL,
-  'guid'             TEXT    DEFAULT NULL
+  'collection_guid'  TEXT    DEFAULT NULL,
+  'create_date_time' TEXT    DEFAULT NULL
 );
 */
 
 use Famoser\SyncApi\Models\Entities\Base\BaseEntity;
 
-class Device extends BaseEntity
+class UserCollection extends BaseEntity
 {
     public $user_guid;
-    public $identifier;
-    public $guid;
-
+    public $collection_guid;
+    public $create_date_time;
+    
     public function getTableName()
     {
-        return "devices";
+        return "user_collections";
     }
 }
