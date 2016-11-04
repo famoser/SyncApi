@@ -1,8 +1,9 @@
 # SyncApi
-[![Build Status](https://travis-ci.org/famoser/SyncApi.svg?branch=master)](https://travis-ci.org/famoser/SyncApi)
-[![Build status](https://ci.appveyor.com/api/projects/status/un5aq493586670k3?svg=true)](https://ci.appveyor.com/project/famoser/syncapi)
+C#: [![Build status](https://ci.appveyor.com/api/projects/status/un5aq493586670k3?svg=true)](https://ci.appveyor.com/project/famoser/syncapi)
+php: [![Build Status](https://travis-ci.org/famoser/SyncApi.svg?branch=master)](https://travis-ci.org/famoser/SyncApi)
 [![Issue Count](https://codeclimate.com/github/famoser/SyncApi/badges/issue_count.svg)](https://codeclimate.com/github/famoser/SyncApi)
 [![Code Climate](https://codeclimate.com/github/famoser/SyncApi/badges/gpa.svg)](https://codeclimate.com/github/famoser/SyncApi)
+[![Test Coverage](https://codeclimate.com/github/famoser/SyncApi/badges/coverage.svg)](https://codeclimate.com/github/famoser/SyncApi/coverage)
 
 a nuget portable library to sync models in a very convenient way.
 

@@ -1,4 +1,5 @@
 language: php
+
 php:
     - 7.0
     - 7.1
@@ -7,3 +8,7 @@ php:
 install:
     - cd Famoser.SyncApi.Webpage
     - composer install
+    
+addons:
+    code_climate:
+        repo_token: c751ad853eaaaebea4f251b9bf6bbf180e8284933ef90ac559b0929cb0d28c52
