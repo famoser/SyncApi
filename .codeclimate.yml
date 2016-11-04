@@ -3,5 +3,5 @@ engines:
   fixme:
     enabled: true
 ratings:
-  paths: []
-exclude_paths: []
+  paths: ["Famoser.SyncApi.Webpage/src/**/*"]
+exclude_paths: ["Famoser.SyncApi.Webpage/src/public/assets/**/*"]
