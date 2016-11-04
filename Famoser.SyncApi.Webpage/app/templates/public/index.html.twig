@@ -1,0 +1,16 @@
+{% extends "layout.html.twig" %}
+
+{% block content %}
+    <header>
+        <h1>welcome to SyncApi</h1>
+        <p><a href="{{ path("login") }}">login</a> to see your applications or <a href="{{ path("register") }}">register</a> to get started</p>
+        <hr/>
+    </header>
+
+    <footer>
+        <ul class="icons">
+            <li><a href="http://famoser.ch" class="fa-link">famoser.ch</a></li>
+            <li><a href="http://github.com/famoser/SyncApi" class="fa-github">github</a></li>
+        </ul>
+    </footer>
+{% endblock %}

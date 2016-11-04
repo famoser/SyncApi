@@ -6,18 +6,7 @@
  * Time: 22:40
  */
 
-use Famoser\SyncApi\Helpers\DatabaseHelper;
-use Famoser\SyncApi\Helpers\RequestHelper;
-use Famoser\SyncApi\Helpers\ResponseHelper;
-use Famoser\SyncApi\Middleware\ApiVersionMiddleware;
-use Famoser\SyncApi\Middleware\AuthorizationMiddleware;
-use Famoser\SyncApi\Middleware\JsonMiddleware;
 use Famoser\SyncApi\Middleware\LoggingMiddleware;
-use Famoser\SyncApi\Middleware\TestsMiddleware;
-use Famoser\SyncApi\Models\Request\Base\ApiRequest;
-use Famoser\SyncApi\Models\Request\SyncRequest;
-use Famoser\SyncApi\Models\Response\Base\ApiResponse;
-use Famoser\SyncApi\Types\ApiError;
 use \Psr\Http\Message\ServerRequestInterface as Request;
 use \Psr\Http\Message\ResponseInterface as Response;
 use Slim\App;

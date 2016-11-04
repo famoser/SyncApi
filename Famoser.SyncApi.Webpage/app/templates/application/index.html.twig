@@ -1,0 +1,20 @@
+{% extends "application_layout.html.twig" %}
+
+{% block title %}your applications{% endblock title %}
+
+{% block application_content %}
+    {% if (application | length == 0) %}
+        <p>You do not have any applications yet</p>
+    {% elseif %}
+        <table class="table">
+            <tbody>
+            {% for app in applications %}
+                <tr>
+                    <td>{{ app.name }}</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    {% endif %}
+    <p>create a <a href="{{ path("new_application") }}">new application</a></p>
+{% endblock application_content %}
