@@ -14,4 +14,4 @@ addons:
         repo_token: c751ad853eaaaebea4f251b9bf6bbf180e8284933ef90ac559b0929cb0d28c52
         
 after_script:
-  - vendor/bin/test-reporter
+  - vendor/bin/test-reporter        
