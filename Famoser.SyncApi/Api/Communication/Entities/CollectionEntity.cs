@@ -3,9 +3,8 @@ using Famoser.SyncApi.Api.Communication.Entities.Base;
 
 namespace Famoser.SyncApi.Api.Communication.Entities
 {
-    public class CollectionEntity : BaseEntity
+    public class CollectionEntity : DeviceEntity
     {
-        public Guid UserId { get; set; }
         public Guid DeviceId { get; set; }
     }
 }

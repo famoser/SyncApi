@@ -5,7 +5,7 @@ namespace Famoser.SyncApi.Api.Configuration
     /// <summary>
     /// The information about your API
     /// </summary>
-    public class ApiInformationEntity
+    public class ApiInformation
     {
         /// <summary>
         /// the URI of your API
