@@ -4,30 +4,30 @@ CREATE TABLE 'applications' (
   'name'              TEXT    DEFAULT NULL,
   'description'       TEXT    DEFAULT NULL,
   'application_id'    TEST    DEFAULT NULL,
-  'application_seed'  INT    DEFAULT NULL,
+  'application_seed'  INT     DEFAULT NULL,
   'release_date_time' TEXT    DEFAULT NULL
 );
 
 CREATE TABLE 'users' (
-  'id'               INTEGER DEFAULT NULL PRIMARY KEY AUTOINCREMENT,
-  'application_id'   INTEGER DEFAULT NULL REFERENCES 'applications' ('id'),
-  'identifier'       TEXT    DEFAULT NULL,
-  'guid'             TEXT    DEFAULT NULL
+  'id'             INTEGER DEFAULT NULL PRIMARY KEY AUTOINCREMENT,
+  'application_id' INTEGER DEFAULT NULL REFERENCES 'applications' ('id'),
+  'identifier'     TEXT    DEFAULT NULL,
+  'guid'           TEXT    DEFAULT NULL
 );
 
 CREATE TABLE 'devices' (
-  'id'               INTEGER DEFAULT NULL PRIMARY KEY AUTOINCREMENT,
-  'user_guid'        TEXT    DEFAULT NULL,
-  'identifier'       TEXT    DEFAULT NULL,
-  'guid'             TEXT    DEFAULT NULL
+  'id'         INTEGER DEFAULT NULL PRIMARY KEY AUTOINCREMENT,
+  'user_guid'  TEXT    DEFAULT NULL,
+  'identifier' TEXT    DEFAULT NULL,
+  'guid'       TEXT    DEFAULT NULL
 );
 
 CREATE TABLE 'collections' (
-  'id'               INTEGER DEFAULT NULL PRIMARY KEY AUTOINCREMENT,
-  'user_guid'        TEXT    DEFAULT NULL,
-  'device_guid'      TEXT    DEFAULT NULL,
-  'identifier'       TEXT    DEFAULT NULL,
-  'guid'             TEXT    DEFAULT NULL
+  'id'          INTEGER DEFAULT NULL PRIMARY KEY AUTOINCREMENT,
+  'user_guid'   TEXT    DEFAULT NULL,
+  'device_guid' TEXT    DEFAULT NULL,
+  'identifier'  TEXT    DEFAULT NULL,
+  'guid'        TEXT    DEFAULT NULL
 );
 
 CREATE TABLE 'user_collections' (
@@ -38,12 +38,12 @@ CREATE TABLE 'user_collections' (
 );
 
 CREATE TABLE 'entities' (
-  'id'               INTEGER DEFAULT NULL PRIMARY KEY AUTOINCREMENT,
-  'user_guid'        TEXT    DEFAULT NULL,
-  'device_guid'      TEXT    DEFAULT NULL,
-  'collection_guid'  TEXT    DEFAULT NULL,
-  'identifier'       TEXT    DEFAULT NULL,
-  'guid'             TEXT    DEFAULT NULL
+  'id'              INTEGER DEFAULT NULL PRIMARY KEY AUTOINCREMENT,
+  'user_guid'       TEXT    DEFAULT NULL,
+  'device_guid'     TEXT    DEFAULT NULL,
+  'collection_guid' TEXT    DEFAULT NULL,
+  'identifier'      TEXT    DEFAULT NULL,
+  'guid'            TEXT    DEFAULT NULL
 );
 
 CREATE TABLE 'content_versions' (
@@ -60,4 +60,17 @@ CREATE TABLE 'frontend_users' (
   'email'    TEXT    DEFAULT NULL,
   'username' TEXT    DEFAULT NULL,
   'password' TEXT    DEFAULT NULL
+);
+
+CREATE TABLE 'authorization_code' (
+  'id'                   INTEGER DEFAULT NULL PRIMARY KEY AUTOINCREMENT,
+  'user_guid'            TEXT    DEFAULT NULL,
+  'valid_till_date_time' TEXT    DEFAULT NULL
+);
+
+CREATE TABLE 'application_settings' (
+  'id'             INTEGER DEFAULT NULL PRIMARY KEY AUTOINCREMENT,
+  'application_id' INTEGER DEFAULT NULL REFERENCES 'applications' ('id'),
+  'key'            TEXT    DEFAULT NULL,
+  'val'            TEXT    DEFAULT NULL
 );
