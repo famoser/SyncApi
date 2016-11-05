@@ -10,7 +10,7 @@
             <tbody>
             {% for app in applications %}
                 <tr>
-                    <td>{{ app.name }}</td>
+                    <td><a href="{{ path_for('application_show', {'id': app.id}) }}">{{ app.name }}</a></td>
                 </tr>
             {% endfor %}
             </tbody>

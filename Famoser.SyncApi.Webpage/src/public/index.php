@@ -95,26 +95,26 @@ $apiRoutes = function () use ($controllerNamespace) {
 };
 
 $webAppRoutes = function () use ($controllerNamespace) {
-    $this->get('/', $controllerNamespace . 'PublicController:index');
+    $this->get('/', $controllerNamespace . 'PublicController:index')->setName("index");
 
-    $this->get('/login', $controllerNamespace . 'LoginController:login');
+    $this->get('/login', $controllerNamespace . 'LoginController:login')->setName("login");
     $this->post('/login', $controllerNamespace . 'LoginController:loginPost');
 
-    $this->get('/register', $controllerNamespace . 'LoginController:register');
+    $this->get('/register', $controllerNamespace . 'LoginController:register')->setName("register");
     $this->post('/register', $controllerNamespace . 'LoginController:registerPost');
 
     $this->group("/dashboard", function () use ($controllerNamespace) {
-        $this->get('/', $controllerNamespace . 'ApplicationController:index');
-        $this->get('/show/:id', $controllerNamespace . 'ApplicationController:show'); //todo: fix id syntax
+        $this->get('/', $controllerNamespace . 'ApplicationController:index')->setName("application_index");
+        $this->get('/show/{id}', $controllerNamespace . 'ApplicationController:show')->setName("application_show");
 
-        $this->get('/new', $controllerNamespace . 'ApplicationController:create');
+        $this->get('/new', $controllerNamespace . 'ApplicationController:create')->setName("application_new");
         $this->post('/new', $controllerNamespace . 'ApplicationController:createPost');
 
-        $this->get('/edit/:id', $controllerNamespace . 'ApplicationController:edit');
-        $this->post('/edit/:id', $controllerNamespace . 'ApplicationController:editPost');
+        $this->get('/edit/{id}', $controllerNamespace . 'ApplicationController:edit')->setName("application_edit");
+        $this->post('/edit/{id}', $controllerNamespace . 'ApplicationController:editPost');
 
-        $this->get('/delete/:id', $controllerNamespace . 'AuthorizationController:delete');
-        $this->post('/delete/:id', $controllerNamespace . 'AuthorizationController:deletePost');
+        $this->get('/delete/{id}', $controllerNamespace . 'AuthorizationController:delete')->setName("application_delete");
+        $this->post('/delete/{id}', $controllerNamespace . 'AuthorizationController:deletePost');
     });
 };
 

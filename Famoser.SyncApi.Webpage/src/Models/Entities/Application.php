@@ -14,8 +14,8 @@ CREATE TABLE 'applications' (
   'admin_id'          INTEGER DEFAULT NULL REFERENCES 'frontend_users' ('id'),
   'name'              TEXT    DEFAULT NULL,
   'description'       TEXT    DEFAULT NULL,
-  'application_id'    INT    DEFAULT NULL,
-  'application_seed'  TEXT    DEFAULT NULL,
+  'application_id'    TEST    DEFAULT NULL,
+  'application_seed'  INT    DEFAULT NULL,
   'release_date_time' TEXT    DEFAULT NULL
 );
 */
@@ -33,7 +33,7 @@ class Application extends BaseEntity
     /* @var string $description */
     public $description;
 
-    /* @var int $application_id */
+    /* @var string $application_id */
     public $application_id;
 
     /* @var int $application_seed */
