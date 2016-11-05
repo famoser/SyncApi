@@ -14,7 +14,7 @@ class SettingKeys
     const AuthorizationCodeValidTime = 0;
     const DeviceAuthenticationRequired = 1;
 
-    public function getSettingDescription($val)
+    public static function getSettingDescription($val)
     {
         switch ($val) {
             case SettingKeys::AuthorizationCodeValidTime:
@@ -26,7 +26,7 @@ class SettingKeys
         }
     }
 
-    public function getDefaultValue($val)
+    public static function getDefaultValue($val)
     {
         switch ($val) {
             case SettingKeys::AuthorizationCodeValidTime:
@@ -38,7 +38,7 @@ class SettingKeys
         }
     }
 
-    public function isValidValue($val)
+    public static function isValidValue($val)
     {
         switch ($val) {
             case SettingKeys::AuthorizationCodeValidTime:

@@ -57,6 +57,14 @@ class RequestHelper
         return RequestHelper::executeJsonMapper($request, new SyncEntityRequest());
     }
 
+    public static function validateAuthCode($authCode, $applicationSeed, $personSeed, $modulo = 10000019)
+    {
+        $content = explode("_", $authCode);
+        $expectedAuthCode = $content[0] * $applicationSeed * $personSeed;
+        $expectedAuthCode %= $modulo;
+        return $authCode == $expectedAuthCode;
+    }
+
     private static function executeJsonMapper(Request $request, $model)
     {
         if (isset($_POST["json"]))

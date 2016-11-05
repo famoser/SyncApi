@@ -66,7 +66,7 @@ class ApplicationController extends BaseController
         $message = "";
         if ($this->writeFromPost($application, $message)) {
             $application->admin_id = $this->getFrontendUser()->id;
-            $application->release_date_time = new \DateTime();
+            $application->release_date_time = time();
 
             if ($this->getDatabaseHelper()->saveToDatabase($application))
                 return $this->redirect($request, $response, "application_index");

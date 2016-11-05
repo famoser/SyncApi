@@ -12,7 +12,8 @@ CREATE TABLE 'users' (
   'id'             INTEGER DEFAULT NULL PRIMARY KEY AUTOINCREMENT,
   'application_id' INTEGER DEFAULT NULL REFERENCES 'applications' ('id'),
   'identifier'     TEXT    DEFAULT NULL,
-  'guid'           TEXT    DEFAULT NULL
+  'guid'           TEXT    DEFAULT NULL,
+  'personal_seed'  TEXT    DEFAULT NULL
 );
 
 CREATE TABLE 'devices' (
@@ -65,6 +66,7 @@ CREATE TABLE 'frontend_users' (
 CREATE TABLE 'authorization_code' (
   'id'                   INTEGER DEFAULT NULL PRIMARY KEY AUTOINCREMENT,
   'user_guid'            TEXT    DEFAULT NULL,
+  'code'                 TEXT    DEFAULT NULL,
   'valid_till_date_time' TEXT    DEFAULT NULL
 );
 

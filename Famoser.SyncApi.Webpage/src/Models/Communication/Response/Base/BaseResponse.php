@@ -20,5 +20,5 @@ class BaseResponse
     public $ServerMessage;
 
     /* @var bool $RequestFailed */
-    public $RequestFailed;
+    public $RequestFailed = false;
 }

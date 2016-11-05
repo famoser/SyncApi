@@ -11,6 +11,7 @@ namespace Famoser\SyncApi\Helpers;
 
 use Famoser\SyncApi\Models\Communication\Request\CollectionEntityRequest;
 use Famoser\SyncApi\Models\Entities\Application;
+use Famoser\SyncApi\Models\Entities\ApplicationSetting;
 use Famoser\SyncApi\Models\Entities\AuthorizationCode;
 use Famoser\SyncApi\Models\Entities\Base\BaseEntity;
 use Famoser\SyncApi\Models\Entities\Collection;
@@ -138,7 +139,7 @@ class DatabaseHelper
      * @param null $parameters
      * @param null $orderBy
      * @param int $limit
-     * @return Application[]|Collection[]|ContentVersion[]|Device[]|Entity[]|FrontendUser[]|User[]|UserCollection[]|bool
+     * @return Application[]|ApplicationSetting[]|AuthorizationCode[]|Collection[]|ContentVersion[]|Device[]|Entity[]|FrontendUser[]|User[]|UserCollection[]|bool
      */
     public function getFromDatabase(BaseEntity $entity, $where = null, $parameters = null, $orderBy = null, $limit = 1000)
     {
@@ -156,7 +157,7 @@ class DatabaseHelper
      * @param null $parameters
      * @param null $orderBy
      * @param int $limit
-     * @return Application[]|Collection[]|ContentVersion[]|Device[]|Entity[]|FrontendUser[]|User[]|UserCollection[]|bool
+     * @return Application[]|ApplicationSetting[]|AuthorizationCode[]|Collection[]|ContentVersion[]|Device[]|Entity[]|FrontendUser[]|User[]|UserCollection[]|bool
      */
     public function getWithInFromDatabase(BaseEntity $entity, $property, $values, $invertIn = false, $where = null, $parameters = null, $orderBy = null, $limit = 1000)
     {
@@ -183,7 +184,7 @@ class DatabaseHelper
      * @param null $parameters
      * @param null $orderBy
      * @param int $limit
-     * @return Application|Collection|ContentVersion|Device|Entity|FrontendUser|User|UserCollection|bool
+     * @return Application|ApplicationSetting|AuthorizationCode|Collection|ContentVersion|Device|Entity|FrontendUser|User|UserCollection|bool
      */
     public function getSingleFromDatabase(BaseEntity $entity, $where = null, $parameters = null, $orderBy = null, $limit = 1000)
     {
@@ -239,6 +240,16 @@ class DatabaseHelper
         return true;
     }
 
+    /**
+     * @param $sql
+     * @param $arr
+     * @return bool
+     */
+    public function execute($sql, $arr = null)
+    {
+        $prep = $this->getConnection()->prepare($sql);
+        return $prep->execute($arr);
+    }
     /**
      * @param BaseEntity $entity
      * @return bool

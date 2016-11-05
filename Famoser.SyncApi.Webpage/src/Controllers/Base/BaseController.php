@@ -17,6 +17,7 @@ use Famoser\SyncApi\Models\Communication\Response\Base\BaseResponse;
 use Famoser\SyncApi\Models\Entities\Device;
 use Famoser\SyncApi\Models\Entities\FrontendUser;
 use Famoser\SyncApi\Models\Entities\User;
+use Famoser\SyncApi\Repositories\SettingsRepository;
 use Famoser\SyncApi\Types\ApiError;
 use Interop\Container\ContainerInterface;
 use Slim\Http\Request;
@@ -74,6 +75,11 @@ class BaseController
         return $this->databaseHelper;
     }
 
+    protected function getSettingRepository($applicationId)
+    {
+        return new SettingsRepository($this->getDatabaseHelper(), $applicationId);
+    }
+
     protected function renderTemplate(Response $response, $path, $args)
     {
         return $this->container->get("view")->render($response, $path . ".html.twig", $args);
@@ -110,7 +116,6 @@ class BaseController
         $this->frontendUser = $helper->getSingleFromDatabase(new FrontendUser(), "id = :id", array("id" => $_SESSION["admin_id"]));
         return $this->frontendUser;
     }
-
 
     /**
      * writes all properties from array to object, and returns all missing ones

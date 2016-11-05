@@ -39,7 +39,7 @@ class Application extends BaseEntity
     /* @var int $application_seed */
     public $application_seed;
 
-    /* @var \DateTime $release_date */
+    /* @var int $release_date type_of:DateTime */
     public $release_date_time;
 
     public function getTableName()
