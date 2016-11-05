@@ -7,7 +7,7 @@ php:
     
 install:
     - cd Famoser.SyncApi.Webpage
-    - composer install
+    - composer install --dev
     
 after_script:
   - ./vendor/bin/test-reporter
