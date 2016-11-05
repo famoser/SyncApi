@@ -15,15 +15,17 @@ The library is heavily customizable, while allowing an easy and straightforward 
 
 Code example:
 
-    //construct the api helper (storage service is implementated in Famoser.UniversalEssentials for UWP)
-    IStorageService ss = new StorageService();
-    var helper = new SyncApiHelper(ss, "my_application_name", "https://api.mywebpage.ch");
+```c#
+//construct the api helper (storage service is implementated in Famoser.UniversalEssentials for UWP)
+IStorageService ss = new StorageService();
+var helper = new SyncApiHelper(ss, "my_application_name", "https://api.mywebpage.ch");
 
-    //get my repository
-    var repo = helper.ResolveRepository<NoteModel>();
+//get my repository
+var repo = helper.ResolveRepository<NoteModel>();
 
-    //save my model
-    await repo.SaveAsync(new NoteModel { Content = "Hallo Welt!" });
+//save my model
+await repo.SaveAsync(new NoteModel { Content = "Hallo Welt!" });
 
-    //retrieve it later on
-    ObservableCollection<NoteModel> coll = await repo.GetAllAsync();
+//retrieve it later on
+ObservableCollection<NoteModel> coll = await repo.GetAllAsync();
+```
