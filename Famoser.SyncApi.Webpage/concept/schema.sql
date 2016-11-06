@@ -17,10 +17,11 @@ CREATE TABLE 'users' (
 );
 
 CREATE TABLE 'devices' (
-  'id'         INTEGER DEFAULT NULL PRIMARY KEY AUTOINCREMENT,
-  'user_guid'  TEXT    DEFAULT NULL,
-  'identifier' TEXT    DEFAULT NULL,
-  'guid'       TEXT    DEFAULT NULL
+  'id'               INTEGER DEFAULT NULL PRIMARY KEY AUTOINCREMENT,
+  'user_guid'        TEXT    DEFAULT NULL,
+  'identifier'       TEXT    DEFAULT NULL,
+  'guid'             TEXT    DEFAULT NULL,
+  'is_authenticated' BOOLEAN DEFAULT NULL
 );
 
 CREATE TABLE 'collections' (
@@ -63,7 +64,7 @@ CREATE TABLE 'frontend_users' (
   'password' TEXT    DEFAULT NULL
 );
 
-CREATE TABLE 'authorization_code' (
+CREATE TABLE 'authorization_codes' (
   'id'                   INTEGER DEFAULT NULL PRIMARY KEY AUTOINCREMENT,
   'user_guid'            TEXT    DEFAULT NULL,
   'code'                 TEXT    DEFAULT NULL,

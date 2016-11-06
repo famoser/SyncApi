@@ -34,12 +34,13 @@ class BaseController
         $this->container = $ci;
     }
 
-    protected function returnServerError(Response $response, $debugMessage = null)
+    protected function returnServerError(Response $response, $serverError, $debugMessage = null)
     {
+        LogHelper::log("server error occurred: " . $serverError . (($debugMessage != null) ? " debug message: " . $debugMessage : ""), "BaseController", false);
         return $response->withStatus(500);
     }
 
-    protected function returnApiError($apiErrorType, Response $response, $debugMessage = null)
+    protected function returnApiError(Response $response, $apiErrorType, $debugMessage = null)
     {
         $resp = new BaseResponse();
         $resp->RequestFailed = true;

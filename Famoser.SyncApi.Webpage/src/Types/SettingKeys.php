@@ -13,6 +13,7 @@ class SettingKeys
 {
     const AuthorizationCodeValidTime = 0;
     const DeviceAuthenticationRequired = 1;
+    const AuthorizationCodeLength = 2;
 
     public static function getSettingDescription($val)
     {
@@ -21,6 +22,8 @@ class SettingKeys
                 return "authorization code valid time";
             case SettingKeys::DeviceAuthenticationRequired:
                 return "device authentication required";
+            case SettingKeys::AuthorizationCodeLength:
+                return "length of the authorization code";
             default:
                 return "unknown setting";
         }
@@ -33,6 +36,8 @@ class SettingKeys
                 return "300";
             case SettingKeys::DeviceAuthenticationRequired:
                 return "false";
+            case SettingKeys::AuthorizationCodeLength:
+                return "6";
             default:
                 return "unknown";
         }
@@ -45,6 +50,8 @@ class SettingKeys
                 return is_numeric($val);
             case SettingKeys::DeviceAuthenticationRequired:
                 return $val == "false" || $val == "true";
+            case SettingKeys::AuthorizationCodeLength:
+                return is_numeric($val);
             default:
                 return false;
         }

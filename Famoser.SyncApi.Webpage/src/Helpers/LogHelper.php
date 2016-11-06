@@ -24,6 +24,6 @@ class LogHelper
         if ($clearOld && file_exists($path)) {
             unlink($path);
         }
-        file_put_contents($path, $message);
+        file_put_contents($path, $message, FILE_APPEND);
     }
 }

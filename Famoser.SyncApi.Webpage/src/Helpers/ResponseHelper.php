@@ -13,6 +13,11 @@ use \Psr\Http\Message\ResponseInterface as Response;
 
 class ResponseHelper
 {
+    /**
+     * @param Response $response
+     * @param $model
+     * @return Response
+     */
     public static function getJsonResponse(Response $response, $model)
     {
         $response->getBody()->write(json_encode($model));

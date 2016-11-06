@@ -17,4 +17,7 @@ class ServerError
     const Forbidden = 104;
 //[Description("Some required properties were missing")]
     const NotWellDefined = 105;
+
+//[Description("Json request could not be deserialized")]
+    const DatabaseSaveFailure = 201;
 }

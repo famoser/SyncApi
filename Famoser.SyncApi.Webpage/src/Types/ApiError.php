@@ -19,8 +19,10 @@ class ApiError
     const UserNotAuthorized = 1000;
 //[Description("Your device is not authorized at the API")]
     const DeviceNotAuthorized = 1001;
+//[Description("Your device is not authorized at the API")]
+    const DeviceNotFound = 1002;
 //[Description("Your device was unauthorized")]
-    const DeviceUnAuthorized = 1002;
+    const DeviceUnAuthorized = 1003;
     #endregion
 
     #region general error

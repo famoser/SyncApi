@@ -11,6 +11,7 @@ namespace Famoser\SyncApi\Repositories;
 /*
     const AuthorizationCodeValidTime = 0;
     const DeviceAuthenticationRequired = 1;
+    const AuthorizationCodeLength = 2;
 */
 
 use Famoser\SyncApi\Helpers\DatabaseHelper;
@@ -65,5 +66,10 @@ class SettingsRepository
     public function getDeviceAuthenticationRequired()
     {
         return $this->getOrCreateValue(SettingKeys::DeviceAuthenticationRequired);
+    }
+
+    public function getAuthorizationCodeLength()
+    {
+        return $this->getOrCreateValue(SettingKeys::AuthorizationCodeLength);
     }
 }

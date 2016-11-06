@@ -13,7 +13,8 @@ CREATE TABLE 'devices' (
   'id'               INTEGER DEFAULT NULL PRIMARY KEY AUTOINCREMENT,
   'user_guid'        TEXT    DEFAULT NULL,
   'identifier'       TEXT    DEFAULT NULL,
-  'guid'             TEXT    DEFAULT NULL
+  'guid'             TEXT    DEFAULT NULL,
+  'is_authenticated' BOOLEAN DEFAULT NULL
 );
 */
 
@@ -29,6 +30,9 @@ class Device extends BaseEntity
 
     /* @var string $guid type_of:guid */
     public $guid;
+
+    /* @var bool $is_authenticated */
+    public $is_authenticated;
 
     public function getTableName()
     {

@@ -9,7 +9,7 @@
 namespace Famoser\SyncApi\Models\Entities;
 
 /*
-CREATE TABLE 'authorization_code' (
+CREATE TABLE 'authorization_codes' (
   'id'                   INTEGER DEFAULT NULL PRIMARY KEY AUTOINCREMENT,
   'user_guid'            TEXT    DEFAULT NULL,
   'code'                 TEXT    DEFAULT NULL,

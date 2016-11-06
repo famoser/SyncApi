@@ -57,30 +57,116 @@ class AuthorizationController extends BaseController
         return true;
     }
 
+    /**
+     * @param BaseRequest $req
+     * @return Device
+     */
+    private function getDevice(BaseRequest $req)
+    {
+        return $this->getDatabaseHelper()->getSingleFromDatabase(new Device(), "guid = :guid AND user_guid = :user_guid", array("guid" => $req->DeviceId, "user_guid" => $req->UserId));
+    }
+
+    /**
+     * generates easely readable random string
+     * @param int $length
+     * @return string
+     */
+    function generateReadableRandomString($length = 6)
+    {
+        $consonants = array("b", "c", "d", "f", "g", "h", "j", "k", "l", "m", "n", "p", "r", "s", "t", "v", "w", "x", "y", "z");
+        $vocals = array("a", "e", "i", "o", "u");
+        $random = "";
+        srand((double)microtime() * 1000000);
+        $max = $length / 2;
+        for ($i = 1; $i <= $max; $i++) {
+            $random .= $consonants[rand(0, 19)];
+            $random .= $vocals[rand(0, 4)];
+        }
+        return $random;
+    }
+
+    /**
+     * Use an authentication code to authenticate an existing device.
+     * @param Request $request
+     * @param Response $response
+     * @param $args
+     * @return Response
+     */
     public function useCode(Request $request, Response $response, $args)
     {
         $req = RequestHelper::parseAuthorizationRequest($request);
         $this->authorizeRequest($req);
 
-        //clean up
+        //clean up old ones
         $settingRepo = $this->getSettingRepository($req->ApplicationId);
         $expireTime = $settingRepo->getAuthorizationCodeValidTime();
         $this->getDatabaseHelper()->execute("DELETE FROM authorization_codes WHERE valid_till_date_time < :valid_till_date_time", array("valid_till_date_time" => time() - $expireTime));
 
+        //try to get new one
         $authCode = $this->getDatabaseHelper()->getSingleFromDatabase(new AuthorizationCode(), "code = :code AND user_guid = :user_guid", array("code" => $req->ClientMessage, "user_guid" => $req->UserId));
         if ($authCode == null) {
-            $resp = new AuthorizationResponse();
-            $resp->RequestFailed = true;
-            $resp->ApiError = ApiError::AuthorizationCodeInvalid;
-            return ResponseHelper::getJsonResponse($response, $resp);
+            return $this->returnApiError($response, ApiError::AuthorizationCodeInvalid);
         }
 
-        $device = new Device();
-        $device->user_guid = $req->UserId;
-        $device->guid = $req->DeviceId;
-        $device->identifier = $req->DeviceEntity->Identifier;
+        //try to get existing device
+        $device = $this->getDevice($req);
+        if ($device == null) {
+            return $this->returnApiError($response, ApiError::DeviceNotFound);
+        }
+
+        //delete auth code
+        if (!$this->getDatabaseHelper()->deleteFromDatabase($authCode))
+            return $this->returnServerError($response, ServerError::DatabaseSaveFailure);
+
+        //authenticate device
+        $device->is_authenticated = true;
         if (!$this->getDatabaseHelper()->saveToDatabase($device))
-            return $this->returnServerError($response, "database error");
+            return $this->returnServerError($response, ServerError::DatabaseSaveFailure);
+
+        //return successful notice
+        return ResponseHelper::getJsonResponse($response, new AuthorizationResponse());
+    }
+
+    /**
+     * Generate an authentication code for the user. Device must be authenticated to do this.
+     * Return the authentication code in the server message
+     * @param Request $request
+     * @param Response $response
+     * @param $args
+     * @return \Psr\Http\Message\ResponseInterface|Response
+     */
+    public function generate(Request $request, Response $response, $args)
+    {
+        $req = RequestHelper::parseAuthorizationRequest($request);
+        $this->authorizeRequest($req);
+
+        //get device
+        $device = $this->getDevice($req);
+        if (!$device->is_authenticated)
+            return $this->returnApiError($response, ApiError::DeviceNotAuthorized);
+
+        //get settings repo
+        $settingRepo = $this->getSettingRepository($req->ApplicationId);
+
+        //create auth code
+        $authCode = new AuthorizationCode();
+        $authCode->user_guid = $req->UserId;
+        $authCode->code = $this->generateReadableRandomString($settingRepo->getAuthorizationCodeLength());
+        $authCode->valid_till_date_time = time() + $settingRepo->getAuthorizationCodeValidTime();
+        if (!$this->getDatabaseHelper()->saveToDatabase($authCode))
+            return $this->returnServerError($response, ServerError::DatabaseSaveFailure);
+
+        //return auth code to device
+        $resp = new AuthorizationResponse();
+        $resp->ServerMessage = $authCode->code;
+        return ResponseHelper::getJsonResponse($response, $resp);
+    }
+
+    public function sync(Request $request, Response $response, $args)
+    {
+        /*
+         *
+            $device->identifier = $req->DeviceEntity->Identifier;
 
         $entityVersion = new ContentVersion();
         $entityVersion->content = $req->DeviceEntity->Content;
@@ -91,17 +177,7 @@ class AuthorizationController extends BaseController
         if (!$this->getDatabaseHelper()->saveToDatabase($entityVersion))
             return $this->returnServerError($response, "database error");
 
-        $resp = new AuthorizationResponse();
-        return ResponseHelper::getJsonResponse($response, $resp);
-    }
-
-    public function generate(Request $request, Response $response, $args)
-    {
-        throw new \Exception("not implemented");
-    }
-
-    public function sync(Request $request, Response $response, $args)
-    {
+         */
         throw new \Exception("not implemented");
     }
 }
