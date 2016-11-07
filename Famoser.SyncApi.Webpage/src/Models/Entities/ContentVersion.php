@@ -19,7 +19,14 @@ CREATE TABLE 'content_versions' (
 );
 */
 
+use Famoser\SyncApi\Helpers\FormatHelper;
+use Famoser\SyncApi\Models\Communication\Entities\CollectionEntity;
+use Famoser\SyncApi\Models\Communication\Entities\DeviceEntity;
+use Famoser\SyncApi\Models\Communication\Entities\SyncEntity;
+use Famoser\SyncApi\Models\Communication\Entities\UserEntity;
 use Famoser\SyncApi\Models\Entities\Base\BaseEntity;
+use Famoser\SyncApi\Types\ContentType;
+use Famoser\SyncApi\Models\Communication\Entities\Base\BaseEntity as SyncBaseEntity;
 
 class ContentVersion extends BaseEntity
 {
@@ -37,6 +44,75 @@ class ContentVersion extends BaseEntity
 
     /* @var \DateTime $create_date_time */
     public $create_date_time;
+
+    /**
+     * create new version for user
+     * @param UserEntity $entity
+     * @return static
+     */
+    public static function createNewForUser(UserEntity $entity)
+    {
+        return static::createNew($entity, ContentType::User);
+    }
+
+    /**
+     * create new version for device
+     * @param DeviceEntity $entity
+     * @return static
+     */
+    public static function createNewForDevice(DeviceEntity $entity)
+    {
+        return static::createNew($entity, ContentType::Device);
+    }
+
+    /**
+     * create new version for collection
+     * @param CollectionEntity $entity
+     * @return static
+     */
+    public static function createNewForCollection(CollectionEntity $entity)
+    {
+        return static::createNew($entity, ContentType::Collection);
+    }
+
+    /**
+     * create new version for entity
+     * @param SyncEntity $entity
+     * @return static
+     */
+    public static function createNewForEntity(SyncEntity $entity)
+    {
+        return static::createNew($entity, ContentType::Entity);
+    }
+
+    /**
+     * creates a new instance of this class and fills out all available properties
+     * @param SyncBaseEntity $entity
+     * @param $contentType
+     * @return static
+     */
+    private static function createNew(SyncBaseEntity $entity, $contentType)
+    {
+        $content = new static();
+        $content->content_type = $contentType;
+        $content->entity_guid = $entity->Id;
+        $content->version_guid = $entity->VersionId;
+        $content->content = $entity->Content;
+        $content->create_date_time = time();
+        return $content;
+    }
+
+    /**
+     * write available properties into BaseEntity
+     * @param SyncBaseEntity $entity
+     */
+    public function writeToEntity(SyncBaseEntity $entity)
+    {
+        $entity->Id = $this->entity_guid;
+        $entity->Content = $this->content;
+        $entity->CreateDateTime = FormatHelper::toCSharpDateTime($this->create_date_time);
+        $entity->VersionId = $this->version_guid;
+    }
 
     public function getTableName()
     {

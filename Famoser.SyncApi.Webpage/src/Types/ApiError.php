@@ -16,14 +16,19 @@ class ApiError
     const ApplicationNotFound = 900;
 
     const UserNotFound = 1000;
-    const UserNotAuthorized = 1000;
+    const PersonalSeedMissing = 1000;
+    const PersonalSeedNotNumeric = 1000;
+    const PersonalSeedTooSmall = 1000;
 
     const DeviceNotFound = 1002;
     const DeviceNotAuthorized = 1001;
     const DeviceUnAuthorized = 1003;
 
     const ResourceAlreadyExists = 200;
+    const ResourceNotFound = 200;
     const AuthorizationCodeInvalid = 2000;
+
+    const ActionNotSupported = 3000;
 
     public static function toString($apiError)
     {
@@ -34,8 +39,6 @@ class ApiError
                 return "application not found";
             case ApiError::UserNotFound:
                 return "user not found";
-            case ApiError::UserNotAuthorized:
-                return "user not authorized";
             case ApiError::DeviceNotFound:
                 return "device not found";
             case ApiError::DeviceNotAuthorized:
@@ -46,6 +49,8 @@ class ApiError
                 return "resource already exists";
             case ApiError::AuthorizationCodeInvalid:
                 return "authorization code invalid";
+            case ApiError::ActionNotSupported:
+                return "action not supported";
             default:
                 return "unknown api error occurred with code " . $apiError;
         }

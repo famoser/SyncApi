@@ -38,7 +38,7 @@ class ApiRequestController extends BaseController
 
         return $this->application;
     }
-    
+
     /**
      * checks if request is valid: checks authentication code & existence of user & application
      * @param BaseRequest $req
@@ -91,5 +91,19 @@ class ApiRequestController extends BaseController
         if ($this->device == null)
             throw new ApiException(ApiError::DeviceNotFound);
         return $this->device;
+    }
+
+    /**
+     * checks if request is authenticated: checks if device is authenticated
+     * @param BaseRequest $req
+     * @return bool
+     * @throws ApiException
+     */
+    protected function authenticateRequest(BaseRequest $req)
+    {
+        $device = $this->getDevice($req);
+        if (!$device->is_authenticated)
+            throw new ApiException(ApiError::DeviceNotAuthorized);
+        return $device->is_authenticated;
     }
 }

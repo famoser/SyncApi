@@ -18,6 +18,8 @@ use Famoser\SyncApi\Helpers\DatabaseHelper;
 use Famoser\SyncApi\Helpers\FormatHelper;
 use Famoser\SyncApi\Helpers\RequestHelper;
 use Famoser\SyncApi\Helpers\ResponseHelper;
+use Famoser\SyncApi\Models\Communication\Entities\DeviceEntity;
+use Famoser\SyncApi\Models\Communication\Entities\UserEntity;
 use Famoser\SyncApi\Models\Communication\Request\AuthorizationRequest;
 use Famoser\SyncApi\Models\Communication\Request\Base\BaseRequest;
 use Famoser\SyncApi\Models\Communication\Response\AuthorizationResponse;
@@ -28,6 +30,7 @@ use Famoser\SyncApi\Models\Entities\Device;
 use Famoser\SyncApi\Models\Entities\User;
 use Famoser\SyncApi\Types\ApiError;
 use Famoser\SyncApi\Types\ContentType;
+use Famoser\SyncApi\Types\OnlineAction;
 use Famoser\SyncApi\Types\ServerError;
 use Slim\Http\Request;
 use Slim\Http\Response;
@@ -51,6 +54,27 @@ class AuthorizationController extends ApiRequestController
             $random .= $vocals[rand(0, 4)];
         }
         return $random;
+    }
+
+    /**
+     * ensures personal seed is valid. checks if it is:
+     * - not missing
+     * - numeric
+     * - bigger than 1000
+     * @param $personalSeed
+     * @throws ApiException
+     */
+    private function ensureValidPersonalSeed($personalSeed)
+    {
+        if ($personalSeed == "") {
+            throw new ApiException(ApiError::PersonalSeedMissing);
+        }
+        if (!is_numeric($personalSeed)) {
+            throw new ApiException(ApiError::PersonalSeedNotNumeric);
+        }
+        if ($personalSeed > 1000) {
+            throw new ApiException(ApiError::PersonalSeedTooSmall);
+        }
     }
 
     /**
@@ -139,25 +163,110 @@ class AuthorizationController extends ApiRequestController
      * @param Request $request
      * @param Response $response
      * @param $args
+     * @return \Psr\Http\Message\ResponseInterface
      * @throws Exception
      */
     public function sync(Request $request, Response $response, $args)
     {
+        $req = RequestHelper::parseAuthorizationRequest($request);
+        $this->authorizeRequest($req);
+        $this->authenticateRequest($req);
 
-        /*
-         *
-            $device->identifier = $req->DeviceEntity->Identifier;
+        $resp = new AuthorizationResponse();
 
-        $entityVersion = new ContentVersion();
-        $entityVersion->content = $req->DeviceEntity->Content;
-        $entityVersion->content_type = ContentType::Device;
-        $entityVersion->create_date_time = time();
-        $entityVersion->entity_guid = $req->DeviceEntity->Id;
-        $entityVersion->version_guid = $req->DeviceEntity->VersionId;
-        if (!$this->getDatabaseHelper()->saveToDatabase($entityVersion))
-            return $this->returnServerError($response, "database error");
+        //sync user
+        if ($req->UserEntity != null) {
+            $entity = $req->UserEntity;
+            if ($entity->OnlineAction == OnlineAction::Create) {
+                $this->ensureValidPersonalSeed($req->ClientMessage);
 
-         */
-        throw new \Exception("not implemented");
+                $user = new User();
+                $user->writeFromEntity($entity);
+                $user->application_id = $req->ApplicationId;
+                $user->personal_seed = $req->ClientMessage;
+                if (!$this->getDatabaseHelper()->saveToDatabase($user))
+                    throw new ServerException(ServerError::DatabaseSaveFailure);
+
+                $content = ContentVersion::createNewForUser($entity);
+                if (!$this->getDatabaseHelper()->saveToDatabase($content))
+                    throw new ServerException(ServerError::DatabaseSaveFailure);
+
+            } else if ($entity->OnlineAction == OnlineAction::Read) {
+                $user = $this->getUser($req);
+                //get newest version
+                $userVersion = $this->getDatabaseHelper()->getSingleFromDatabase(
+                    new ContentVersion(),
+                    "entity_guid = :guid AND content_type =:content_type",
+                    array("guid" => $user->guid, "content_type" => ContentType::User),
+                    "create_date_time DESC");
+
+                if ($userVersion == null) {
+                    throw new ApiException(ApiError::ResourceNotFound);
+                }
+
+                $entity = new UserEntity();
+                $entity->Identifier = $user->identifier;
+                $userVersion->writeToEntity($entity);
+                $resp->UserEntity = $entity;
+            } else if ($entity->OnlineAction == OnlineAction::Update) {
+                $user = $this->getUser($req);;
+
+                if ($user == null)
+                    throw new ApiException(ApiError::UserNotFound);
+
+                $content = ContentVersion::createNewForUser($entity);
+                if (!$this->getDatabaseHelper()->saveToDatabase($content))
+                    throw new ServerException(ServerError::DatabaseSaveFailure);
+            } else if ($entity->OnlineAction == OnlineAction::Delete) {
+                $user = $this->getUser($req);;
+
+                if ($user == null)
+                    throw new ApiException(ApiError::UserNotFound);
+
+                if (!$this->getDatabaseHelper()->deleteFromDatabase($user))
+                    throw new ServerException(ServerError::DatabaseSaveFailure);
+            } else {
+                throw new ApiException(ApiError::ActionNotSupported);
+            }
+        }
+
+        //sync device
+        if ($req->DeviceEntity != null) {
+            $entity = $req->DeviceEntity;
+            if ($entity->OnlineAction == OnlineAction::Create) {
+                $devices = $this->getDatabaseHelper()->countFromDatabase(new Device(), "user_guid = :user_guid", array("user_guid" => $this->getUser($req)->guid));
+                $device = new Device();
+                $device->writeFromEntity($entity);
+                $device->is_authenticated = $devices == 0;
+                if (!$this->getDatabaseHelper()->saveToDatabase($device))
+                    throw new ServerException(ServerError::DatabaseSaveFailure);
+
+                $content = ContentVersion::createNewForDevice($entity);
+                if (!$this->getDatabaseHelper()->saveToDatabase($content))
+                    throw new ServerException(ServerError::DatabaseSaveFailure);
+
+            } else if ($entity->OnlineAction == OnlineAction::Update) {
+                $device = $this->getDevice($req);;
+
+                if ($device == null)
+                    throw new ApiException(ApiError::DeviceNotFound);
+
+                $content = ContentVersion::createNewForDevice($entity);
+                if (!$this->getDatabaseHelper()->saveToDatabase($content))
+                    throw new ServerException(ServerError::DatabaseSaveFailure);
+            } else if ($entity->OnlineAction == OnlineAction::Delete) {
+                $device = $this->getDevice($req);;
+
+                if ($device == null)
+                    throw new ApiException(ApiError::DeviceNotFound);
+
+                if (!$this->getDatabaseHelper()->deleteFromDatabase($device))
+                    throw new ServerException(ServerError::DatabaseSaveFailure);
+            } else {
+                throw new ApiException(ApiError::ActionNotSupported);
+            }
+        }
+
+        return ResponseHelper::getJsonResponse($response, $resp);
     }
 }

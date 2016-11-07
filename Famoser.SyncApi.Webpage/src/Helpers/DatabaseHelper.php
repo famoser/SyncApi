@@ -105,9 +105,9 @@ class DatabaseHelper
         return true;
     }
 
-    private function createQuery(BaseEntity $entity, $where = null, $parameters = null, $orderBy = null, $limit = 1000)
+    private function createQuery(BaseEntity $entity, $where = null, $parameters = null, $orderBy = null, $limit = 1000, $selector = "*")
     {
-        $sql = "SELECT * FROM " . $entity->getTableName();
+        $sql = "SELECT " . $selector . " FROM " . $entity->getTableName();
         if ($where != null) {
             $sql .= " WHERE " . $where;
         }
@@ -150,6 +150,21 @@ class DatabaseHelper
 
     /**
      * @param BaseEntity $entity
+     * @param null $where
+     * @param null $parameters
+     * @param null $orderBy
+     * @param int $limit
+     * @return int
+     */
+    public function countFromDatabase(BaseEntity $entity, $where = null, $parameters = null, $orderBy = null, $limit = 1000)
+    {
+        $sql = $this->createQuery($entity, $where, $parameters, $orderBy, $limit, "COUNT(*)");
+        $res = $this->execute($sql, $parameters);
+        return $res;
+    }
+
+    /**
+     * @param BaseEntity $entity
      * @param string $property
      * @param int[] $values
      * @param bool $invertIn
@@ -183,12 +198,11 @@ class DatabaseHelper
      * @param null $where
      * @param null $parameters
      * @param null $orderBy
-     * @param int $limit
      * @return Application|ApplicationSetting|AuthorizationCode|Collection|ContentVersion|Device|Entity|FrontendUser|User|UserCollection|bool
      */
-    public function getSingleFromDatabase(BaseEntity $entity, $where = null, $parameters = null, $orderBy = null, $limit = 1000)
+    public function getSingleFromDatabase(BaseEntity $entity, $where = null, $parameters = null, $orderBy = null)
     {
-        $sql = $this->createQuery($entity, $where, $parameters, $orderBy, $limit);
+        $sql = $this->createQuery($entity, $where, $parameters, $orderBy, 1);
         $res = $this->executeAndFetch($entity, $sql, $parameters);
         if (count($res) > 0)
             return $res[0];

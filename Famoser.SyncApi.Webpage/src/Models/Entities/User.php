@@ -18,6 +18,7 @@ CREATE TABLE 'users' (
 );
 */
 
+use Famoser\SyncApi\Models\Communication\Entities\DeviceEntity;
 use Famoser\SyncApi\Models\Entities\Base\BaseEntity;
 
 class User extends BaseEntity
@@ -37,5 +38,11 @@ class User extends BaseEntity
     public function getTableName()
     {
         return "users";
+    }
+
+    public function writeFromEntity(DeviceEntity $entity)
+    {
+        $this->identifier = $entity->Identifier;
+        $this->guid = $entity->Id;
     }
 }
