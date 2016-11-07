@@ -9,7 +9,9 @@
 namespace Famoser\SyncApi\Controllers;
 
 
+use Exception;
 use Famoser\SyncApi\Controllers\Base\BaseController;
+use Famoser\SyncApi\Exceptions\ApiException;
 use Famoser\SyncApi\Helpers\DatabaseHelper;
 use Famoser\SyncApi\Helpers\FormatHelper;
 use Famoser\SyncApi\Helpers\RequestHelper;
@@ -27,7 +29,6 @@ use Famoser\SyncApi\Types\ContentType;
 use Famoser\SyncApi\Types\ServerError;
 use Slim\Http\Request;
 use Slim\Http\Response;
-use Symfony\Component\Config\Definition\Exception\Exception;
 
 class AuthorizationController extends BaseController
 {
@@ -41,7 +42,7 @@ class AuthorizationController extends BaseController
         $dh = $this->getDatabaseHelper();
         $this->application = $dh->getSingleFromDatabase(new Application(), "application_id = :application_id", array("application_id" => $applicationId));
         if ($this->application == null)
-            throw new Exception("application not found");
+            throw new ApiException("application not found", ApiError::ApplicationNotFound);
 
         return $this->application;
     }
@@ -56,7 +57,7 @@ class AuthorizationController extends BaseController
             throw new Exception("authentication code invalid");
         return true;
     }
-
+    
     /**
      * @param BaseRequest $req
      * @return Device
