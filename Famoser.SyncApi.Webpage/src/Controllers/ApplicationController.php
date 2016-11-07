@@ -10,6 +10,7 @@ namespace Famoser\SyncApi\Controllers;
 
 
 use Famoser\SyncApi\Controllers\Base\BaseController;
+use Famoser\SyncApi\Controllers\Base\FrontendController;
 use Famoser\SyncApi\Exceptions\AccessDeniedException;
 use Famoser\SyncApi\Models\Entities\Application;
 use Famoser\SyncApi\Models\Entities\FrontendUser;
@@ -20,7 +21,7 @@ use Slim\Handlers\NotAllowed;
 use Slim\Http\Request;
 use Slim\Http\Response;
 
-class ApplicationController extends BaseController
+class ApplicationController extends FrontendController
 {
     private function ensureHasAccess()
     {

@@ -25,9 +25,9 @@ class ApiError
     const ResourceAlreadyExists = 200;
     const AuthorizationCodeInvalid = 2000;
 
-    public static function toString($code)
+    public static function toString($apiError)
     {
-        switch ($code) {
+        switch ($apiError) {
             case ApiError::None:
                 return "no error occurred";
             case ApiError::ApplicationNotFound:
@@ -47,7 +47,7 @@ class ApiError
             case ApiError::AuthorizationCodeInvalid:
                 return "authorization code invalid";
             default:
-                return "unknown api error occurred with code " . $code;
+                return "unknown api error occurred with code " . $apiError;
         }
     }
 }

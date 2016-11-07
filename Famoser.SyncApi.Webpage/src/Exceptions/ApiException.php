@@ -14,8 +14,8 @@ use Famoser\SyncApi\Types\ApiError;
 
 class ApiException extends Exception
 {
-    public function __construct($apiCode, Exception $previous = null)
+    public function __construct($apiCode)
     {
-        parent::__construct(ApiError::toString($apiCode), $apiCode, $previous);
+        parent::__construct(ApiError::toString($apiCode), $apiCode, null);
     }
 }

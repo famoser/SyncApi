@@ -7,6 +7,7 @@
  */
 
 use Famoser\SyncApi\Middleware\LoggingMiddleware;
+use Famoser\SyncApi\Models\Communication\Response\Base\BaseResponse;
 use \Psr\Http\Message\ServerRequestInterface as Request;
 use \Psr\Http\Message\ResponseInterface as Response;
 use Slim\App;
@@ -49,7 +50,17 @@ $c['notAllowedHandler'] = function (Container $c) {
 };
 $c['errorHandler'] = function (Container $c) {
     return function (Request $request, Response $response, Exception $exception) use ($c) {
-        return $response->withStatus(500, "Server failure");
+        if ($exception instanceof \Famoser\SyncApi\Exceptions\ServerException) {
+            return $response->withStatus(500, $exception->getMessage());
+        } else if ($exception instanceof \Famoser\SyncApi\Exceptions\ApiException) {
+            $resp = new BaseResponse();
+            $resp->RequestFailed = true;
+            $resp->ApiError = $exception->getCode();
+            $resp->ServerMessage = $exception->getMessage();
+            return $response->withJson($resp);
+        } else {
+            return $response->withStatus(500, "unknown exception occurred: " . $exception->getMessage());
+        }
     };
 };
 // Register component on container

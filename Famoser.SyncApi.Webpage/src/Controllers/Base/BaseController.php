@@ -26,28 +26,70 @@ use Slim\Interfaces\RouterInterface;
 
 class BaseController
 {
+    /* @var ContainerInterface $container */
     protected $container;
 
-    //Constructor
+    /**
+     * BaseController constructor.
+     * @param ContainerInterface $ci
+     */
     public function __construct(ContainerInterface $ci)
     {
         $this->container = $ci;
     }
 
-    protected function returnServerError(Response $response, $serverError, $debugMessage = null)
+    private $databaseHelper;
+
+    /**
+     * get database helper, used for database access
+     * @return DatabaseHelper
+     */
+    protected function getDatabaseHelper()
     {
-        LogHelper::log("server error occurred: " . $serverError . (($debugMessage != null) ? " debug message: " . $debugMessage : ""), "BaseController", false);
-        return $response->withStatus(500);
+        if ($this->databaseHelper == null)
+            $this->databaseHelper = new DatabaseHelper($this->container);
+        return $this->databaseHelper;
     }
 
-    protected function returnApiError(Response $response, $apiErrorType, $debugMessage = null)
+    /**
+     * get SettingsRepository for the specified application
+     * @param $applicationId
+     * @return SettingsRepository
+     */
+    protected function getSettingRepository($applicationId)
     {
-        $resp = new BaseResponse();
-        $resp->RequestFailed = true;
-        $resp->ApiError = $apiErrorType;
-        return $response->withJson($resp);
+        return new SettingsRepository($this->getDatabaseHelper(), $applicationId);
     }
 
+    /**
+     * get router
+     * @return RouterInterface
+     */
+    protected function getRouter()
+    {
+        return $this->container->get("router");
+    }
+
+    /**
+     * redirects to the route specified in $slug
+     * @param Request $request
+     * @param Response $response
+     * @param $slug
+     * @return static
+     */
+    protected function redirect(Request $request, Response $response, $slug)
+    {
+        $reqUri = $request->getUri()->withPath($this->getRouter()->pathFor($slug));
+        return $response->withRedirect($reqUri);
+    }
+
+    /**
+     * check if $request contrails all specified properties
+     * @param BaseRequest $request
+     * @param $neededProps
+     * @param null $neededArrays
+     * @return bool
+     */
     protected function isWellDefined(BaseRequest $request, $neededProps, $neededArrays = null)
     {
         if ($neededProps != null)
@@ -65,57 +107,6 @@ class BaseController
                 }
             }
         return true;
-    }
-
-    private $databaseHelper;
-
-    protected function getDatabaseHelper()
-    {
-        if ($this->databaseHelper == null)
-            $this->databaseHelper = new DatabaseHelper($this->container);
-        return $this->databaseHelper;
-    }
-
-    protected function getSettingRepository($applicationId)
-    {
-        return new SettingsRepository($this->getDatabaseHelper(), $applicationId);
-    }
-
-    protected function renderTemplate(Response $response, $path, $args)
-    {
-        return $this->container->get("view")->render($response, $path . ".html.twig", $args);
-    }
-
-    /**
-     * @return RouterInterface
-     */
-    protected function getRouter()
-    {
-        return $this->container->get("router");
-    }
-
-    protected function redirect(Request $request, Response $response, $slug)
-    {
-        $reqUri = $request->getUri()->withPath($this->getRouter()->pathFor($slug));
-        return $response->withRedirect($reqUri);
-    }
-
-    private $frontendUser;
-
-    /**
-     * @return FrontendUser|null
-     */
-    protected function getFrontendUser()
-    {
-        if ($this->frontendUser != null)
-            return $this->frontendUser;
-
-        if (!isset($_SESSION["admin_id"]))
-            return null;
-
-        $helper = $this->getDatabaseHelper();
-        $this->frontendUser = $helper->getSingleFromDatabase(new FrontendUser(), "id = :id", array("id" => $_SESSION["admin_id"]));
-        return $this->frontendUser;
     }
 
     /**
