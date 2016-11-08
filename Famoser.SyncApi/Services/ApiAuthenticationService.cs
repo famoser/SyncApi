@@ -57,7 +57,7 @@ namespace Famoser.SyncApi.Services
             return IsAuthenticated();
         }
 
-        public async Task<T> CreateRequestAsync<T>(OnlineAction action) where T : BaseRequest, new()
+        public async Task<T> CreateRequestAsync<T>() where T : BaseRequest, new()
         {
             await IsAuthenticatedAsync();
             if (!IsAuthenticated())
@@ -68,19 +68,18 @@ namespace Famoser.SyncApi.Services
                 AuthorizationCode = AuthorizationHelper.GenerateAuthorizationCode(_apiInformation, _apiRoamingEntity),
                 UserId = _apiRoamingEntity.UserId,
                 DeviceId = _deviceModel.GetId(),
-                OnlineAction = action,
                 ApplicationId = _apiInformation.ApplicationId
             };
 
             return request;
         }
 
-        public async Task<T> CreateRequestAsync<T, TCollection>(OnlineAction action) where T : SyncEntityRequest, new() where TCollection : ICollectionModel
+        public async Task<T> CreateRequestAsync<T, TCollection>() where T : SyncEntityRequest, new() where TCollection : ICollectionModel
         {
             await InitializeAsync();
 
-            var req = await CreateRequestAsync<T>(action);
-            if (action == OnlineAction.SyncVersion && _dictionary.ContainsKey(typeof(TCollection)))
+            var req = await CreateRequestAsync<T>();
+            if (_dictionary.ContainsKey(typeof(TCollection)))
             {
                 var ss = _dictionary[typeof(TCollection)] as IApiCollectionRepository<TCollection>;
                 if (ss != null)
@@ -90,7 +89,8 @@ namespace Famoser.SyncApi.Services
                     {
                         req.CollectionEntities.Add(new CollectionEntity()
                         {
-                            Id = collection.GetId()
+                            Id = collection.GetId(),
+                            OnlineAction = OnlineAction.ConfirmAccess
                         });
                     }
                 }

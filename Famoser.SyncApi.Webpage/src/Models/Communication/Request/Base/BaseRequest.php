@@ -22,7 +22,4 @@ class BaseRequest
 
     /* @var string $ApplicationId */
     public $ApplicationId;
-    
-    /* @var string $OnlineAction const_of:OnlineAction */
-    public $OnlineAction;
 }

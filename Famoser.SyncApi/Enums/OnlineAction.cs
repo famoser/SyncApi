@@ -7,9 +7,7 @@
         Read = 2,
         Update = 3,
         Delete = 4,
-        SyncVersion = 5,
-        SyncEntity = 6,
-        SyncHistory = 7,
-        AuthUser = 8,
+        ConfirmVersion = 5,
+        ConfirmAccess = 6
     }
 }

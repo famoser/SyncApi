@@ -206,7 +206,7 @@ namespace Famoser.SyncApi.Repositories.Base
             var cache = HistoryCacheEntities[model];
             var manager = HistoryCollectionManagers[model];
 
-            var req = await _apiAuthenticationService.CreateRequestAsync<HistoryEntityRequest>(OnlineAction.SyncVersion);
+            var req = await _apiAuthenticationService.CreateRequestAsync<HistoryEntityRequest>();
             if (req == null)
                 return false;
 

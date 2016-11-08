@@ -74,7 +74,7 @@ namespace Famoser.SyncApi.Repositories
                 return false;
             }
 
-            var req = await _apiAuthenticationService.CreateRequestAsync<CollectionEntityRequest>(OnlineAction.SyncEntity);
+            var req = await _apiAuthenticationService.CreateRequestAsync<CollectionEntityRequest>();
             if (req == null)
                 return false;
 
@@ -100,27 +100,10 @@ namespace Famoser.SyncApi.Repositories
 
             foreach (var modelInformation in synced)
                 CollectionCache.ModelInformations[modelInformation].PendingAction = PendingAction.None;
-
-            await _apiStorageService.SaveCacheEntityAsync<CollectionCacheEntity<TCollection>>();
-
-            req = await _apiAuthenticationService.CreateRequestAsync<CollectionEntityRequest>(OnlineAction.SyncVersion);
-            //second request: get active version ids for all
-            // this will return missing, updated & removed entities
-            foreach (var collectionCacheModelInformation in CollectionCache.ModelInformations)
-            {
-                req.CollectionEntities.Add(new CollectionEntity()
-                {
-                    Id = collectionCacheModelInformation.Id,
-                    VersionId = collectionCacheModelInformation.VersionId
-                });
-            }
-            resp = await client.DoSyncRequestAsync(req);
-            if (!resp.IsSuccessfull)
-                return false;
-
+           
             foreach (var respCollectionEntity in resp.CollectionEntities)
             {
-                //new!
+                //new
                 if (respCollectionEntity.OnlineAction == OnlineAction.Create)
                 {
                     var mi = ApiEntityHelper.CreateCacheInformation<CacheInformations>(respCollectionEntity);
@@ -149,7 +132,7 @@ namespace Famoser.SyncApi.Repositories
                 }
             }
 
-            if (resp.CollectionEntities.Any())
+            if (resp.CollectionEntities.Any() || synced.Any())
             {
                 await _apiStorageService.SaveCacheEntityAsync<CollectionCacheEntity<TCollection>>();
             }
@@ -164,7 +147,7 @@ namespace Famoser.SyncApi.Repositories
                 if (!_apiConfigurationService.CanUseWebConnection())
                     return false;
 
-                var req = await _apiAuthenticationService.CreateRequestAsync<AuthRequestEntity>(OnlineAction.AuthUser);
+                var req = await _apiAuthenticationService.CreateRequestAsync<AuthRequestEntity>();
                 req.CollectionEntity = new CollectionEntity()
                 {
                     Id = collection.GetId()

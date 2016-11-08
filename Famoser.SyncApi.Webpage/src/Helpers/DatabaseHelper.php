@@ -139,11 +139,12 @@ class DatabaseHelper
      * @param null $parameters
      * @param null $orderBy
      * @param int $limit
-     * @return Application[]|ApplicationSetting[]|AuthorizationCode[]|Collection[]|ContentVersion[]|Device[]|Entity[]|FrontendUser[]|User[]|UserCollection[]|bool
+     * @param string $selector
+     * @return bool|\Famoser\SyncApi\Models\Entities\Application[]|\Famoser\SyncApi\Models\Entities\ApplicationSetting[]|\Famoser\SyncApi\Models\Entities\AuthorizationCode[]|\Famoser\SyncApi\Models\Entities\Collection[]|\Famoser\SyncApi\Models\Entities\ContentVersion[]|\Famoser\SyncApi\Models\Entities\Device[]|\Famoser\SyncApi\Models\Entities\Entity[]|\Famoser\SyncApi\Models\Entities\FrontendUser[]|\Famoser\SyncApi\Models\Entities\User[]|\Famoser\SyncApi\Models\Entities\UserCollection[]
      */
-    public function getFromDatabase(BaseEntity $entity, $where = null, $parameters = null, $orderBy = null, $limit = 1000)
+    public function getFromDatabase(BaseEntity $entity, $where = null, $parameters = null, $orderBy = null, $limit = 1000, $selector = "*")
     {
-        $sql = $this->createQuery($entity, $where, $parameters, $orderBy, $limit);
+        $sql = $this->createQuery($entity, $where, $parameters, $orderBy, $limit, $selector);
         $res = $this->executeAndFetch($entity, $sql, $parameters);
         return $res;
     }

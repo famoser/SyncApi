@@ -13,7 +13,7 @@ namespace Famoser.SyncApi.Api.Configuration
         public Uri Uri { get; set; }
         /// <summary>
         /// A modulo unique to the api, you can generate one here: http://www.numberempire.com/primenumbers.php
-        /// Why: Is used to authenticate your request, also so the genrated number is not that large. 
+        /// Why: Is used to authenticate your request. 
         /// </summary>
         public int Modulo { get; set; }
         /// <summary>

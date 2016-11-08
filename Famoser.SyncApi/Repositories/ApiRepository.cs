@@ -57,7 +57,7 @@ namespace Famoser.SyncApi.Repositories
             if (!await _apiAuthenticationService.IsAuthenticatedAsync())
                 return false;
 
-            var req = await _apiAuthenticationService.CreateRequestAsync<SyncEntityRequest, TCollection>(OnlineAction.SyncVersion);
+            var req = await _apiAuthenticationService.CreateRequestAsync<SyncEntityRequest, TCollection>();
             if (req == null)
                 return false;
 
@@ -82,24 +82,7 @@ namespace Famoser.SyncApi.Repositories
 
             foreach (var modelInformation in synced)
                 CollectionCache.ModelInformations[modelInformation].PendingAction = PendingAction.None;
-
-            await _apiStorageService.SaveCacheEntityAsync<CollectionCacheEntity<TCollection>>();
-
-            req = await _apiAuthenticationService.CreateRequestAsync<SyncEntityRequest, TCollection>(OnlineAction.SyncVersion);
-            // second request: get active version ids for all
-            // this will return missing, updated & removed entities
-            foreach (var collectionCacheModelInformation in CollectionCache.ModelInformations)
-            {
-                req.SyncEntities.Add(new SyncEntity()
-                {
-                    Id = collectionCacheModelInformation.Id,
-                    VersionId = collectionCacheModelInformation.VersionId
-                });
-            }
-            resp = await client.DoSyncRequestAsync(req);
-            if (!resp.IsSuccessfull)
-                return false;
-
+            
             foreach (var syncEntity in resp.SyncEntities)
             {
                 //new!
@@ -131,7 +114,7 @@ namespace Famoser.SyncApi.Repositories
                 }
             }
 
-            if (resp.SyncEntities.Any())
+            if (resp.SyncEntities.Any() || synced.Any())
             {
                 await _apiStorageService.SaveCacheEntityAsync<CollectionCacheEntity<TModel>>();
             }

@@ -27,9 +27,8 @@ namespace Famoser.SyncApi.Services.Interfaces.Authentication
         ///     - OnlineAction
         /// </summary>
         /// <typeparam name="T"></typeparam>
-        /// <param name="action"></param>
         /// <returns></returns>
-        Task<T> CreateRequestAsync<T>(OnlineAction action) where T : BaseRequest, new();
+        Task<T> CreateRequestAsync<T>() where T : BaseRequest, new();
 
         /// <summary>
         /// create a valid, authenticated request.
@@ -44,9 +43,8 @@ namespace Famoser.SyncApi.Services.Interfaces.Authentication
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <typeparam name="TCollection"></typeparam>
-        /// <param name="action"></param>
         /// <returns></returns>
-        Task<T> CreateRequestAsync<T, TCollection>(OnlineAction action) where T : SyncEntityRequest, new()
+        Task<T> CreateRequestAsync<T, TCollection>() where T : SyncEntityRequest, new()
              where TCollection : ICollectionModel;
 
         /// <summary>

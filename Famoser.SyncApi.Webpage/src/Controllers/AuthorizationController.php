@@ -11,17 +11,11 @@ namespace Famoser\SyncApi\Controllers;
 
 use Exception;
 use Famoser\SyncApi\Controllers\Base\ApiRequestController;
-use Famoser\SyncApi\Controllers\Base\BaseController;
 use Famoser\SyncApi\Exceptions\ApiException;
 use Famoser\SyncApi\Exceptions\ServerException;
-use Famoser\SyncApi\Helpers\DatabaseHelper;
-use Famoser\SyncApi\Helpers\FormatHelper;
 use Famoser\SyncApi\Helpers\RequestHelper;
 use Famoser\SyncApi\Helpers\ResponseHelper;
-use Famoser\SyncApi\Models\Communication\Entities\DeviceEntity;
 use Famoser\SyncApi\Models\Communication\Entities\UserEntity;
-use Famoser\SyncApi\Models\Communication\Request\AuthorizationRequest;
-use Famoser\SyncApi\Models\Communication\Request\Base\BaseRequest;
 use Famoser\SyncApi\Models\Communication\Response\AuthorizationResponse;
 use Famoser\SyncApi\Models\Entities\Application;
 use Famoser\SyncApi\Models\Entities\AuthorizationCode;
@@ -181,7 +175,8 @@ class AuthorizationController extends ApiRequestController
                 $this->ensureValidPersonalSeed($req->ClientMessage);
 
                 $user = new User();
-                $user->writeFromEntity($entity);
+                $user->identifier = $entity->Identifier;
+                $user->guid = $entity->Id;
                 $user->application_id = $req->ApplicationId;
                 $user->personal_seed = $req->ClientMessage;
                 if (!$this->getDatabaseHelper()->saveToDatabase($user))
@@ -236,7 +231,9 @@ class AuthorizationController extends ApiRequestController
             if ($entity->OnlineAction == OnlineAction::Create) {
                 $devices = $this->getDatabaseHelper()->countFromDatabase(new Device(), "user_guid = :user_guid", array("user_guid" => $this->getUser($req)->guid));
                 $device = new Device();
-                $device->writeFromEntity($entity);
+                $device->guid = $entity->Id;
+                $device->identifier = $entity->Identifier;
+                $device->user_guid = $entity->UserId;
                 $device->is_authenticated = $devices == 0;
                 if (!$this->getDatabaseHelper()->saveToDatabase($device))
                     throw new ServerException(ServerError::DatabaseSaveFailure);

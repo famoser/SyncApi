@@ -9,10 +9,11 @@
 namespace Famoser\SyncApi\Controllers;
 
 
+use Famoser\SyncApi\Controllers\Base\ApiRequestController;
 use Slim\Http\Request;
 use Slim\Http\Response;
 
-class UserController
+class UserController extends ApiRequestController
 {
     public function auth(Request $request, Response $response, $args)
     {

@@ -35,13 +35,6 @@ class Device extends BaseEntity
     /* @var bool $is_authenticated */
     public $is_authenticated;
 
-    public function writeFromEntity(DeviceEntity $entity)
-    {
-        $this->guid = $entity->Id;
-        $this->identifier = $entity->Identifier;
-        $this->user_guid = $entity->UserId;
-    }
-
     public function getTableName()
     {
         return "devices";

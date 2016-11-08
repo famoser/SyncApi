@@ -98,7 +98,7 @@ class ContentVersion extends BaseEntity
         $content->entity_guid = $entity->Id;
         $content->version_guid = $entity->VersionId;
         $content->content = $entity->Content;
-        $content->create_date_time = time();
+        $content->create_date_time = strtotime($entity->CreateDateTime);
         return $content;
     }
 

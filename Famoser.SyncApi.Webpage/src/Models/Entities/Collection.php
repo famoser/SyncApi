@@ -18,6 +18,7 @@ CREATE TABLE 'collections' (
 );
 */
 
+use Famoser\SyncApi\Models\Communication\Entities\CollectionEntity;
 use Famoser\SyncApi\Models\Entities\Base\BaseEntity;
 
 class Collection extends BaseEntity
@@ -33,6 +34,12 @@ class Collection extends BaseEntity
 
     /* @var string $guid type_of:guid */
     public $guid;
+
+    public function writeFromEntity(CollectionEntity $entity)
+    {
+        $this->identifier = $entity->Identifier;
+        $this->guid = $entity->Id;
+    }
 
     public function getTableName()
     {

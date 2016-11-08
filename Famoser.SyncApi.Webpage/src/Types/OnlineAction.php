@@ -16,8 +16,6 @@ class OnlineAction
     const Read = 2;
     const Update = 3;
     const Delete = 4;
-    const SyncVersion = 5;
-    const SyncEntity = 6;
-    const SyncHistory = 7;
-    const AuthUser = 8;
+    const ConfirmVersion = 5;
+    const ConfirmAccess = 6;
 }
