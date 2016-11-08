@@ -199,10 +199,9 @@ class AuthorizationController extends ApiRequestController
                     throw new ApiException(ApiError::ResourceNotFound);
                 }
 
-                $entity = new UserEntity();
-                $entity->Identifier = $user->identifier;
-                $userVersion->writeToEntity($entity);
-                $resp->UserEntity = $entity;
+                $ver = $userVersion->createUserEntity($user);
+                $ver->PersonalSeed = null;
+                $resp->UserEntity = $ver;
             } else if ($entity->OnlineAction == OnlineAction::Update) {
                 $user = $this->getUser($req);;
 

@@ -54,11 +54,6 @@ class CollectionController extends ApiRequestController
                 if ($coll != null) {
                     $ver = $this->getActiveVersion($coll->guid);
 
-                    $ce = new CollectionEntity();
-                    $ce->Id = $coll->guid;
-                    $ver->writeToEntity($ce);
-                    $ce->DeviceId = $coll->device_guid;
-                    $ce->UserId = $coll->user_guid;
                     //todo: continue. refactor writeToEntity as it is ambiguous?
                 }
             }

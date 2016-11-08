@@ -52,6 +52,7 @@ CREATE TABLE 'content_versions' (
   'id'               INTEGER DEFAULT NULL PRIMARY KEY AUTOINCREMENT,
   'content_type'     INTEGER DEFAULT NULL,
   'entity_guid'      TEXT    DEFAULT NULL,
+  'device_guid'      TEXT    DEFAULT NULL,
   'version_guid'     TEXT    DEFAULT NULL,
   'content'          TEXT    DEFAULT NULL,
   'create_date_time' TEXT    DEFAULT NULL

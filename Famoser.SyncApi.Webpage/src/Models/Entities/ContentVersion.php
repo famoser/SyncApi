@@ -13,6 +13,7 @@ CREATE TABLE 'content_versions' (
   'id'               INTEGER DEFAULT NULL PRIMARY KEY AUTOINCREMENT,
   'content_type'     INTEGER DEFAULT NULL,
   'entity_guid'      TEXT    DEFAULT NULL,
+  'device_guid'      TEXT    DEFAULT NULL,
   'version_guid'     TEXT    DEFAULT NULL,
   'content'          TEXT    DEFAULT NULL,
   'create_date_time' TEXT    DEFAULT NULL
@@ -35,6 +36,9 @@ class ContentVersion extends BaseEntity
 
     /* @var string $entity_guid type_of:guid */
     public $entity_guid;
+
+    /* @var string $device_guid type_of:guid */
+    public $device_guid;
 
     /* @var string $version_guid type_of:guid */
     public $version_guid;
@@ -98,17 +102,91 @@ class ContentVersion extends BaseEntity
         $content->entity_guid = $entity->Id;
         $content->version_guid = $entity->VersionId;
         $content->content = $entity->Content;
-        $content->create_date_time = strtotime($entity->CreateDateTime);
+        $content->create_date_time = time();
         return $content;
+    }
+
+    /**
+     * create UserEntity from this instance
+     * @param User $user
+     * @return UserEntity
+     */
+    public function createUserEntity(User $user)
+    {
+        $entity = new UserEntity();
+        $entity->Identifier = $user->identifier;
+        $entity->Id = $user->guid;
+
+        $entity->PersonalSeed = $user->personal_seed;
+
+        $this->writeToEntity($entity);
+
+        return $entity;
+    }
+
+    /**
+     * create DeviceEntity from this instance
+     * @param Device $device
+     * @return DeviceEntity
+     */
+    public function createDeviceEntity(Device $device)
+    {
+        $entity = new DeviceEntity();
+        $entity->Identifier = $device->identifier;
+        $entity->Id = $device->guid;
+
+        $entity->UserId = $device->user_guid;
+
+        $this->writeToEntity($entity);
+
+        return $entity;
+    }
+
+    /**
+     * create CollectionEntity from this instance
+     * @param Collection $collection
+     * @return CollectionEntity
+     */
+    public function createCollectionEntity(Collection $collection)
+    {
+        $entity = new CollectionEntity();
+        $entity->Identifier = $collection->identifier;
+        $entity->Id = $collection->guid;
+
+        $entity->UserId = $collection->user_guid;
+        $entity->DeviceId = $this->device_guid;
+
+        $this->writeToEntity($entity);
+
+        return $entity;
+    }
+
+    /**
+     * create SyncEntity from this instance
+     * @param Entity $ent
+     * @return SyncEntity
+     */
+    public function createSyncEntity(Entity $ent)
+    {
+        $entity = new SyncEntity();
+        $entity->Identifier = $ent->identifier;
+        $entity->Id = $ent->guid;
+
+        $entity->UserId = $ent->user_guid;
+        $entity->DeviceId = $this->device_guid;
+        $entity->CollectionId = $ent->collection_guid;
+
+        $this->writeToEntity($entity);
+
+        return $entity;
     }
 
     /**
      * write available properties into BaseEntity
      * @param SyncBaseEntity $entity
      */
-    public function writeToEntity(SyncBaseEntity $entity)
+    private function writeToEntity(SyncBaseEntity $entity)
     {
-        $entity->Id = $this->entity_guid;
         $entity->Content = $this->content;
         $entity->CreateDateTime = FormatHelper::toCSharpDateTime($this->create_date_time);
         $entity->VersionId = $this->version_guid;
