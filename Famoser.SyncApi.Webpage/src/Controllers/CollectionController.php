@@ -11,6 +11,7 @@ namespace Famoser\SyncApi\Controllers;
 
 use Famoser\SyncApi\Controllers\Base\ApiRequestController;
 use Famoser\SyncApi\Controllers\Base\BaseController;
+use Famoser\SyncApi\Exceptions\ApiException;
 use Famoser\SyncApi\Exceptions\ServerException;
 use Famoser\SyncApi\Helpers\RequestHelper;
 use Famoser\SyncApi\Models\Communication\Entities\CollectionEntity;
@@ -19,6 +20,7 @@ use Famoser\SyncApi\Models\Communication\Response\CollectionEntityResponse;
 use Famoser\SyncApi\Models\Entities\Collection;
 use Famoser\SyncApi\Models\Entities\ContentVersion;
 use Famoser\SyncApi\Models\Entities\UserCollection;
+use Famoser\SyncApi\Types\ApiError;
 use Famoser\SyncApi\Types\ContentType;
 use Famoser\SyncApi\Types\OnlineAction;
 use Famoser\SyncApi\Types\ServerError;
@@ -51,6 +53,16 @@ class CollectionController extends ApiRequestController
                     throw new ServerException(ServerError::DatabaseSaveFailure);
             } else if ($entity->OnlineAction == OnlineAction::Update) {
                 $coll = $this->getCollectionById($req, $entity->Id);
+                if ($coll == null)
+                    throw new ApiException(ApiError::ResourceNotFound);
+
+                $content = ContentVersion::createNewForCollection($entity);
+                if (!$this->getDatabaseHelper()->saveToDatabase($content))
+                    throw new ServerException(ServerError::DatabaseSaveFailure);
+            } else if ($entity->OnlineAction == OnlineAction::Delete)
+            {
+                $coll = $this->getCollectionById($req, $entity->Id);
+                $coll->is_deleted = true; //todo: do delete refactor
                 if ($coll != null) {
                     $ver = $this->getActiveVersion($coll->guid);
 
