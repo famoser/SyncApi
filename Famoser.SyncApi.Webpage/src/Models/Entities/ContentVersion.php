@@ -46,7 +46,7 @@ class ContentVersion extends BaseEntity
     /* @var string $content */
     public $content;
 
-    /* @var \DateTime $create_date_time */
+    /* @var int $create_date_time type_of:DateTime */
     public $create_date_time;
 
     /**

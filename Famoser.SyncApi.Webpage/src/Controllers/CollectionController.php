@@ -59,15 +59,19 @@ class CollectionController extends ApiRequestController
                 $content = ContentVersion::createNewForCollection($entity);
                 if (!$this->getDatabaseHelper()->saveToDatabase($content))
                     throw new ServerException(ServerError::DatabaseSaveFailure);
-            } else if ($entity->OnlineAction == OnlineAction::Delete)
-            {
+            } else if ($entity->OnlineAction == OnlineAction::Delete) {
                 $coll = $this->getCollectionById($req, $entity->Id);
-                $coll->is_deleted = true; //todo: do delete refactor
-                if ($coll != null) {
-                    $ver = $this->getActiveVersion($coll->guid);
 
-                    //todo: continue. refactor writeToEntity as it is ambiguous?
-                }
+                if ($coll == null)
+                    throw new ApiException(ApiError::ResourceNotFound);
+
+                $coll->is_deleted = true;
+                if (!$this->getDatabaseHelper()->saveToDatabase($coll))
+                    throw new ServerException(ServerError::DatabaseSaveFailure);
+            } else if ($entity->OnlineAction == OnlineAction::Read) {
+                $ver = $this->getActiveVersion($entity->Id);
+
+
             }
         }
     }
@@ -112,6 +116,8 @@ class CollectionController extends ApiRequestController
      */
     private function getActiveVersion($guid)
     {
-        return $this->getDatabaseHelper()->getSingleFromDatabase(new ContentVersion(), "content_type = :content_type AND entity_guid = :entity_guid", array("content_type" => ContentType::Collection, "entity_guid" => $guid), "create_date_time DESC");
+        return $this->getDatabaseHelper()->getSingleFromDatabase(new ContentVersion(), "content_type = :content_type AND entity_guid = :entity_guid AND is_deleted = :is_deleted",
+            array("content_type" => ContentType::Collection, "entity_guid" => $guid, "is_deleted" => false),
+            "create_date_time DESC");
     }
 }

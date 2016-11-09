@@ -33,7 +33,10 @@ class Device extends BaseEntity
     public $guid;
 
     /* @var bool $is_authenticated */
-    public $is_authenticated;
+    public $is_authenticated = false;
+
+    /* @var bool $is_deleted */
+    public $is_deleted = false;
 
     public function getTableName()
     {

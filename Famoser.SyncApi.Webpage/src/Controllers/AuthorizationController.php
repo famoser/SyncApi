@@ -212,12 +212,13 @@ class AuthorizationController extends ApiRequestController
                 if (!$this->getDatabaseHelper()->saveToDatabase($content))
                     throw new ServerException(ServerError::DatabaseSaveFailure);
             } else if ($entity->OnlineAction == OnlineAction::Delete) {
-                $user = $this->getUser($req);;
+                $user = $this->getUser($req);
 
                 if ($user == null)
                     throw new ApiException(ApiError::UserNotFound);
 
-                if (!$this->getDatabaseHelper()->deleteFromDatabase($user))
+                $user->is_deleted = true;
+                if (!$this->getDatabaseHelper()->saveToDatabase($user))
                     throw new ServerException(ServerError::DatabaseSaveFailure);
             } else {
                 throw new ApiException(ApiError::ActionNotSupported);
@@ -251,12 +252,13 @@ class AuthorizationController extends ApiRequestController
                 if (!$this->getDatabaseHelper()->saveToDatabase($content))
                     throw new ServerException(ServerError::DatabaseSaveFailure);
             } else if ($entity->OnlineAction == OnlineAction::Delete) {
-                $device = $this->getDevice($req);;
+                $device = $this->getDevice($req);
 
                 if ($device == null)
                     throw new ApiException(ApiError::DeviceNotFound);
 
-                if (!$this->getDatabaseHelper()->deleteFromDatabase($device))
+                $device->is_deleted = true;
+                if (!$this->getDatabaseHelper()->saveToDatabase($device))
                     throw new ServerException(ServerError::DatabaseSaveFailure);
             } else {
                 throw new ApiException(ApiError::ActionNotSupported);

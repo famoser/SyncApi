@@ -37,6 +37,9 @@ class Entity extends BaseEntity
 
     /* @var string $guid type_of:guid */
     public $guid;
+
+    /* @var bool $is_deleted */
+    public $is_deleted = false;
     
     public function getTableName()
     {

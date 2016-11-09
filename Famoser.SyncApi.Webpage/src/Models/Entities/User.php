@@ -35,6 +35,9 @@ class User extends BaseEntity
 
     /* @var string $personal_seed */
     public $personal_seed;
+
+    /* @var bool $is_deleted */
+    public $is_deleted = false;
     
     public function getTableName()
     {

@@ -35,6 +35,9 @@ class Collection extends BaseEntity
     /* @var string $guid type_of:guid */
     public $guid;
 
+    /* @var bool $is_deleted */
+    public $is_deleted = false;
+
     public function writeFromEntity(CollectionEntity $entity)
     {
         $this->identifier = $entity->Identifier;

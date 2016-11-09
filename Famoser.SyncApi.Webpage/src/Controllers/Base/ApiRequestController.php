@@ -32,7 +32,8 @@ class ApiRequestController extends BaseController
             return $this->application;
 
         $dh = $this->getDatabaseHelper();
-        $this->application = $dh->getSingleFromDatabase(new Application(), "application_id = :application_id", array("application_id" => $applicationId));
+        $this->application = $dh->getSingleFromDatabase(new Application(), "application_id = :application_id AND is_deleted =:is_deleted",
+            array("application_id" => $applicationId, "is_deleted" => false));
         if ($this->application == null)
             throw new ApiException(ApiError::ApplicationNotFound);
 
@@ -69,7 +70,8 @@ class ApiRequestController extends BaseController
         if ($this->user != null)
             return $this->user;
 
-        $this->user = $this->getDatabaseHelper()->getSingleFromDatabase(new User(), "guid = :guid AND application_id = :application_id", array("guid" => $req->UserId, "application_id" => $req->ApplicationId));
+        $this->user = $this->getDatabaseHelper()->getSingleFromDatabase(new User(), "guid = :guid AND application_id = :application_id AND is_deleted = :is_deleted",
+            array("guid" => $req->UserId, "application_id" => $req->ApplicationId, "is_deleted" => false));
         if ($this->user == null)
             throw new ApiException(ApiError::UserNotFound);
         return $this->user;
@@ -87,7 +89,8 @@ class ApiRequestController extends BaseController
         if ($this->device != null)
             return $this->device;
 
-        $this->device = $this->getDatabaseHelper()->getSingleFromDatabase(new Device(), "guid = :guid AND user_guid = :user_guid", array("guid" => $req->DeviceId, "user_guid" => $this->getUser($req)->guid));
+        $this->device = $this->getDatabaseHelper()->getSingleFromDatabase(new Device(), "guid = :guid AND user_guid = :user_guid AND is_deleted = :is_deleted",
+            array("guid" => $req->DeviceId, "user_guid" => $this->getUser($req)->guid, "is_deleted" => false));
         if ($this->device == null)
             throw new ApiException(ApiError::DeviceNotFound);
         return $this->device;

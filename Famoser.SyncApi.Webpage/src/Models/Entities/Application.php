@@ -42,6 +42,9 @@ class Application extends BaseEntity
     /* @var int $release_date type_of:DateTime */
     public $release_date_time;
 
+    /* @var bool $is_deleted */
+    public $is_deleted = false;
+
     public function getTableName()
     {
         return "applications";
