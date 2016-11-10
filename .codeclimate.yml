@@ -2,6 +2,13 @@
 engines:
   fixme:
     enabled: true
+  phpcodesniffer:
+    enabled: true
+  phpmd:
+    enabled: true  
+  duplication:
+    enabled: true
+
 ratings:
   paths: ["Famoser.SyncApi.Webpage/src/**/*"]
 exclude_paths: ["Famoser.SyncApi.Webpage/src/public/assets/**/*"]
