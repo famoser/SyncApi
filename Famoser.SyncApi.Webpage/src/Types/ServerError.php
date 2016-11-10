@@ -24,16 +24,16 @@ class ServerError
     public static function toString($serverError)
     {
         switch ($serverError) {
-        case ServerError::RequestJsonFailure:
-            return "json request could not be processed";
-        case ServerError::Forbidden:
-            return "you are not allowed to view this resource";
-        case ServerError::NotWellDefined:
-            return "the request is not well defined";
-        case ServerError::DatabaseSaveFailure:
-            return "changes could not be written to database";
-        default:
-            return "unknown server error occurred with code " . $serverError;
+            case ServerError::RequestJsonFailure:
+                return "json request could not be processed";
+            case ServerError::Forbidden:
+                return "you are not allowed to view this resource";
+            case ServerError::NotWellDefined:
+                return "the request is not well defined";
+            case ServerError::DatabaseSaveFailure:
+                return "changes could not be written to database";
+            default:
+                return "unknown server error occurred with code " . $serverError;
         }
     }
 }
