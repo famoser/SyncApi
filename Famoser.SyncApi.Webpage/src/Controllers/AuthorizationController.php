@@ -111,7 +111,7 @@ class AuthorizationController extends ApiRequestController
             throw new ServerException(ServerError::DatabaseSaveFailure);
 
         //return successful notice
-        return ResponseHelper::getJsonResponse($response, new AuthorizationResponse());
+        return $this->returnJson($response, new AuthorizationResponse());
     }
 
     /**
@@ -149,7 +149,7 @@ class AuthorizationController extends ApiRequestController
         //return auth code to device
         $resp = new AuthorizationResponse();
         $resp->ServerMessage = $authCode->code;
-        return ResponseHelper::getJsonResponse($response, $resp);
+        return $this->returnJson($response, $resp);
     }
 
     /**
@@ -199,7 +199,7 @@ class AuthorizationController extends ApiRequestController
                     throw new ApiException(ApiError::ResourceNotFound);
                 }
 
-                $ver = $userVersion->createUserEntity($user);
+                $ver = $userVersion->createUserEntity($user, OnlineAction::Read);
                 $ver->PersonalSeed = null;
                 $resp->UserEntity = $ver;
             } else if ($entity->OnlineAction == OnlineAction::Update) {
@@ -265,6 +265,6 @@ class AuthorizationController extends ApiRequestController
             }
         }
 
-        return ResponseHelper::getJsonResponse($response, $resp);
+        return $this->returnJson($response, $resp);
     }
 }

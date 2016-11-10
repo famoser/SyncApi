@@ -16,11 +16,13 @@ class ApiError
     const ApplicationNotFound = 900;
 
     const UserNotFound = 1000;
+    const UserRemoved = 1000;
     const PersonalSeedMissing = 1000;
     const PersonalSeedNotNumeric = 1000;
     const PersonalSeedTooSmall = 1000;
 
     const DeviceNotFound = 1002;
+    const DeviceRemoved = 1002;
     const DeviceNotAuthorized = 1001;
     const DeviceUnAuthorized = 1003;
 

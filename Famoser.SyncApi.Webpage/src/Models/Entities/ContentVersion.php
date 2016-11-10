@@ -109,9 +109,10 @@ class ContentVersion extends BaseEntity
     /**
      * create UserEntity from this instance
      * @param User $user
+     * @param $onlineAction
      * @return UserEntity
      */
-    public function createUserEntity(User $user)
+    public function createUserEntity(User $user, $onlineAction)
     {
         $entity = new UserEntity();
         $entity->Identifier = $user->identifier;
@@ -119,7 +120,7 @@ class ContentVersion extends BaseEntity
 
         $entity->PersonalSeed = $user->personal_seed;
 
-        $this->writeToEntity($entity);
+        $this->writeToEntity($entity, $onlineAction);
 
         return $entity;
     }
@@ -127,9 +128,10 @@ class ContentVersion extends BaseEntity
     /**
      * create DeviceEntity from this instance
      * @param Device $device
+     * @param $onlineAction
      * @return DeviceEntity
      */
-    public function createDeviceEntity(Device $device)
+    public function createDeviceEntity(Device $device, $onlineAction)
     {
         $entity = new DeviceEntity();
         $entity->Identifier = $device->identifier;
@@ -137,7 +139,7 @@ class ContentVersion extends BaseEntity
 
         $entity->UserId = $device->user_guid;
 
-        $this->writeToEntity($entity);
+        $this->writeToEntity($entity, $onlineAction);
 
         return $entity;
     }
@@ -145,9 +147,10 @@ class ContentVersion extends BaseEntity
     /**
      * create CollectionEntity from this instance
      * @param Collection $collection
+     * @param $onlineAction
      * @return CollectionEntity
      */
-    public function createCollectionEntity(Collection $collection)
+    public function createCollectionEntity(Collection $collection, $onlineAction)
     {
         $entity = new CollectionEntity();
         $entity->Identifier = $collection->identifier;
@@ -155,8 +158,8 @@ class ContentVersion extends BaseEntity
 
         $entity->UserId = $collection->user_guid;
         $entity->DeviceId = $this->device_guid;
-
-        $this->writeToEntity($entity);
+        
+        $this->writeToEntity($entity, $onlineAction);
 
         return $entity;
     }
@@ -164,9 +167,10 @@ class ContentVersion extends BaseEntity
     /**
      * create SyncEntity from this instance
      * @param Entity $ent
+     * @param $onlineAction
      * @return SyncEntity
      */
-    public function createSyncEntity(Entity $ent)
+    public function createSyncEntity(Entity $ent, $onlineAction)
     {
         $entity = new SyncEntity();
         $entity->Identifier = $ent->identifier;
@@ -176,7 +180,7 @@ class ContentVersion extends BaseEntity
         $entity->DeviceId = $this->device_guid;
         $entity->CollectionId = $ent->collection_guid;
 
-        $this->writeToEntity($entity);
+        $this->writeToEntity($entity, $onlineAction);
 
         return $entity;
     }
@@ -184,12 +188,14 @@ class ContentVersion extends BaseEntity
     /**
      * write available properties into BaseEntity
      * @param SyncBaseEntity $entity
+     * @param $onlineAction
      */
-    private function writeToEntity(SyncBaseEntity $entity)
+    private function writeToEntity(SyncBaseEntity $entity, $onlineAction)
     {
         $entity->Content = $this->content;
         $entity->CreateDateTime = FormatHelper::toCSharpDateTime($this->create_date_time);
         $entity->VersionId = $this->version_guid;
+        $entity->OnlineAction = $onlineAction;
     }
 
     public function getTableName()

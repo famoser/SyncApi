@@ -200,7 +200,8 @@ namespace Famoser.SyncApi.Repositories
                 req.CollectionEntities.Add(new SyncEntity()
                 {
                     Id = collectionCacheModelInformation.Id,
-                    VersionId = collectionCacheModelInformation.VersionId
+                    VersionId = collectionCacheModelInformation.VersionId,
+                    OnlineAction = OnlineAction.ConfirmVersion
                 });
             }
             var resp = await _authApiClient.GetDevicesAsync(AuthorizeRequest(ApiInformation, _apiRoamingEntity, req));
