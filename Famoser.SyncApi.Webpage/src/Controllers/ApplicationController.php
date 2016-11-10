@@ -25,15 +25,17 @@ class ApplicationController extends FrontendController
 {
     private function ensureHasAccess()
     {
-        if (!$this->getFrontendUser())
+        if (!$this->getFrontendUser()) {
             throw new AccessDeniedException();
+        }
     }
 
     private function getAuthorizedApplication($id)
     {
         $application = $this->getDatabaseHelper()->getSingleFromDatabase(new Application(), "id = :id", array("id" => $id));
-        if ($this->getFrontendUser() && $this->getFrontendUser()->id == $application->admin_id)
+        if ($this->getFrontendUser() && $this->getFrontendUser()->id == $application->admin_id) {
             return;
+        }
 
         throw new AccessDeniedException();
     }
@@ -69,11 +71,13 @@ class ApplicationController extends FrontendController
             $application->admin_id = $this->getFrontendUser()->id;
             $application->release_date_time = time();
 
-            if ($this->getDatabaseHelper()->saveToDatabase($application))
+            if ($this->getDatabaseHelper()->saveToDatabase($application)) {
                 return $this->redirect($request, $response, "application_index");
+            }
             $args["message"] = "application could not be saved (database error)";
-        } else
+        } else {
             $args["message"] = $message;
+        }
         return $this->renderTemplate($response, "application/create", $args);
     }
 
@@ -90,10 +94,12 @@ class ApplicationController extends FrontendController
         $this->ensureHasAccess();
         $application = $this->getAuthorizedApplication($args["id"]);
         if ($this->writeFromPost($application, $message)) {
-            if (!$this->getDatabaseHelper()->saveToDatabase($application))
+            if (!$this->getDatabaseHelper()->saveToDatabase($application)) {
                 $args["message"] = "application could not be saved (database error)";
-        } else
+            }
+        } else {
             $args["message"] = $message;
+        }
         return $this->renderTemplate($response, "application/edit", $args);
     }
 
@@ -122,9 +128,9 @@ class ApplicationController extends FrontendController
         $arr = $this->writePropertiesFromArray($_POST, $application, array("name", "description", "application_id", "application_seed"));
         if (count($arr) == 0) {
             //validate application seed
-            if (!is_numeric($application->application_seed))
+            if (!is_numeric($application->application_seed)) {
                 $message = "the application seed has to be numeric";
-            else {
+            } else {
                 return true;
             }
         } else {

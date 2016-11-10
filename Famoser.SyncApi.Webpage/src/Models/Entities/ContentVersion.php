@@ -51,7 +51,8 @@ class ContentVersion extends BaseEntity
 
     /**
      * create new version for user
-     * @param UserEntity $entity
+     *
+     * @param  UserEntity $entity
      * @return static
      */
     public static function createNewForUser(UserEntity $entity)
@@ -61,7 +62,8 @@ class ContentVersion extends BaseEntity
 
     /**
      * create new version for device
-     * @param DeviceEntity $entity
+     *
+     * @param  DeviceEntity $entity
      * @return static
      */
     public static function createNewForDevice(DeviceEntity $entity)
@@ -71,7 +73,8 @@ class ContentVersion extends BaseEntity
 
     /**
      * create new version for collection
-     * @param CollectionEntity $entity
+     *
+     * @param  CollectionEntity $entity
      * @return static
      */
     public static function createNewForCollection(CollectionEntity $entity)
@@ -81,7 +84,8 @@ class ContentVersion extends BaseEntity
 
     /**
      * create new version for entity
-     * @param SyncEntity $entity
+     *
+     * @param  SyncEntity $entity
      * @return static
      */
     public static function createNewForEntity(SyncEntity $entity)
@@ -91,8 +95,9 @@ class ContentVersion extends BaseEntity
 
     /**
      * creates a new instance of this class and fills out all available properties
-     * @param SyncBaseEntity $entity
-     * @param $contentType
+     *
+     * @param  SyncBaseEntity $entity
+     * @param  $contentType
      * @return static
      */
     private static function createNew(SyncBaseEntity $entity, $contentType)
@@ -108,8 +113,9 @@ class ContentVersion extends BaseEntity
 
     /**
      * create UserEntity from this instance
-     * @param User $user
-     * @param $onlineAction
+     *
+     * @param  User         $user
+     * @param  $onlineAction
      * @return UserEntity
      */
     public function createUserEntity(User $user, $onlineAction)
@@ -127,8 +133,9 @@ class ContentVersion extends BaseEntity
 
     /**
      * create DeviceEntity from this instance
-     * @param Device $device
-     * @param $onlineAction
+     *
+     * @param  Device       $device
+     * @param  $onlineAction
      * @return DeviceEntity
      */
     public function createDeviceEntity(Device $device, $onlineAction)
@@ -146,8 +153,9 @@ class ContentVersion extends BaseEntity
 
     /**
      * create CollectionEntity from this instance
-     * @param Collection $collection
-     * @param $onlineAction
+     *
+     * @param  Collection   $collection
+     * @param  $onlineAction
      * @return CollectionEntity
      */
     public function createCollectionEntity(Collection $collection, $onlineAction)
@@ -166,8 +174,9 @@ class ContentVersion extends BaseEntity
 
     /**
      * create SyncEntity from this instance
-     * @param Entity $ent
-     * @param $onlineAction
+     *
+     * @param  Entity       $ent
+     * @param  $onlineAction
      * @return SyncEntity
      */
     public function createSyncEntity(Entity $ent, $onlineAction)
@@ -187,6 +196,7 @@ class ContentVersion extends BaseEntity
 
     /**
      * write available properties into BaseEntity
+     *
      * @param SyncBaseEntity $entity
      * @param $onlineAction
      */

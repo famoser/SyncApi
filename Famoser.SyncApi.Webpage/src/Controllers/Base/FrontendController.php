@@ -22,11 +22,13 @@ class FrontendController extends BaseController
      */
     protected function getFrontendUser()
     {
-        if ($this->frontendUser != null)
+        if ($this->frontendUser != null) {
             return $this->frontendUser;
+        }
 
-        if (!isset($_SESSION["admin_id"]))
+        if (!isset($_SESSION["admin_id"])) {
             return null;
+        }
 
         $helper = $this->getDatabaseHelper();
         $this->frontendUser = $helper->getSingleFromDatabase(new FrontendUser(), "id = :id", array("id" => $_SESSION["admin_id"]));

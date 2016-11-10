@@ -27,8 +27,10 @@ class DeviceController extends ApiRequestController
         $this->authorizeRequest($req);
         $this->authenticateRequest($req);
 
-        $devices = $this->getDatabaseHelper()->getFromDatabase(new Device(), "user_guid = :user_guid AND is_deleted =:is_deleted",
-            array("user_guid" => $this->getUser($req)->guid, "is_deleted" => false));
+        $devices = $this->getDatabaseHelper()->getFromDatabase(
+            new Device(), "user_guid = :user_guid AND is_deleted =:is_deleted",
+            array("user_guid" => $this->getUser($req)->guid, "is_deleted" => false)
+        );
 
         $devicesByGuid = [];
         foreach ($devices as $device) {
@@ -46,8 +48,10 @@ class DeviceController extends ApiRequestController
                     $ce->Id = $entity->Id;
                     $resp->CollectionEntities[] = $ce;
                 } else {
-                    $ver = $this->getDatabaseHelper()->getSingleFromDatabase(new ContentVersion(), "entity_guid = :entity_guid AND content_type = :content_type",
-                        array("entity_guid" => $entity->Id));
+                    $ver = $this->getDatabaseHelper()->getSingleFromDatabase(
+                        new ContentVersion(), "entity_guid = :entity_guid AND content_type = :content_type",
+                        array("entity_guid" => $entity->Id)
+                    );
                     //todo: return as update, implement create
 
                 }

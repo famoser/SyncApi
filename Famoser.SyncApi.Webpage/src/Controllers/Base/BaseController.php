@@ -31,6 +31,7 @@ class BaseController
 
     /**
      * BaseController constructor.
+     *
      * @param ContainerInterface $ci
      */
     public function __construct(ContainerInterface $ci)
@@ -42,18 +43,21 @@ class BaseController
 
     /**
      * get database helper, used for database access
+     *
      * @return DatabaseHelper
      */
     protected function getDatabaseHelper()
     {
-        if ($this->databaseHelper == null)
+        if ($this->databaseHelper == null) {
             $this->databaseHelper = new DatabaseHelper($this->container);
+        }
         return $this->databaseHelper;
     }
 
     /**
      * get SettingsRepository for the specified application
-     * @param $applicationId
+     *
+     * @param  $applicationId
      * @return SettingsRepository
      */
     protected function getSettingRepository($applicationId)
@@ -63,6 +67,7 @@ class BaseController
 
     /**
      * get router
+     *
      * @return RouterInterface
      */
     protected function getRouter()
@@ -72,9 +77,10 @@ class BaseController
 
     /**
      * redirects to the route specified in $slug
-     * @param Request $request
-     * @param Response $response
-     * @param $slug
+     *
+     * @param  Request  $request
+     * @param  Response $response
+     * @param  $slug
      * @return static
      */
     protected function redirect(Request $request, Response $response, $slug)
@@ -85,35 +91,39 @@ class BaseController
 
     /**
      * check if $request contrails all specified properties
-     * @param BaseRequest $request
-     * @param $neededProps
-     * @param null $neededArrays
+     *
+     * @param  BaseRequest $request
+     * @param  $neededProps
+     * @param  null        $neededArrays
      * @return bool
      */
     protected function isWellDefined(BaseRequest $request, $neededProps, $neededArrays = null)
     {
-        if ($neededProps != null)
+        if ($neededProps != null) {
             foreach ($neededProps as $neededProp) {
                 if ($request->$neededProp == null) {
                     LogHelper::log("not a property: " . $neededProp . " in object " . json_encode($request, JSON_PRETTY_PRINT), "isWellDefined_" . uniqid() . ".txt");
                     return false;
                 }
             }
-        if ($neededArrays != null)
+        }
+        if ($neededArrays != null) {
             foreach ($neededArrays as $neededArray) {
                 if (!is_array($request->$neededArray)) {
                     LogHelper::log("not an array: " . $neededArray . " in object " . json_encode($request, JSON_PRETTY_PRINT), "isWellDefined_" . uniqid() . ".txt");
                     return false;
                 }
             }
+        }
         return true;
     }
 
     /**
      * writes all properties from array to object, and returns all missing ones
-     * @param array $source
-     * @param object $targetObject
-     * @param array $properties
+     *
+     * @param  array  $source
+     * @param  object $targetObject
+     * @param  array  $properties
      * @return array
      */
     protected function writePropertiesFromArray($source, $targetObject, $properties)

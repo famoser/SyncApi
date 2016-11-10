@@ -18,42 +18,42 @@ class SettingKeys
     public static function getSettingDescription($val)
     {
         switch ($val) {
-            case SettingKeys::AuthorizationCodeValidTime:
-                return "authorization code valid time";
-            case SettingKeys::DeviceAuthenticationRequired:
-                return "device authentication required";
-            case SettingKeys::AuthorizationCodeLength:
-                return "length of the authorization code";
-            default:
-                return "unknown setting";
+        case SettingKeys::AuthorizationCodeValidTime:
+            return "authorization code valid time";
+        case SettingKeys::DeviceAuthenticationRequired:
+            return "device authentication required";
+        case SettingKeys::AuthorizationCodeLength:
+            return "length of the authorization code";
+        default:
+            return "unknown setting";
         }
     }
 
     public static function getDefaultValue($val)
     {
         switch ($val) {
-            case SettingKeys::AuthorizationCodeValidTime:
-                return "300";
-            case SettingKeys::DeviceAuthenticationRequired:
-                return "false";
-            case SettingKeys::AuthorizationCodeLength:
-                return "6";
-            default:
-                return "unknown";
+        case SettingKeys::AuthorizationCodeValidTime:
+            return "300";
+        case SettingKeys::DeviceAuthenticationRequired:
+            return "false";
+        case SettingKeys::AuthorizationCodeLength:
+            return "6";
+        default:
+            return "unknown";
         }
     }
 
     public static function isValidValue($val)
     {
         switch ($val) {
-            case SettingKeys::AuthorizationCodeValidTime:
-                return is_numeric($val);
-            case SettingKeys::DeviceAuthenticationRequired:
-                return $val == "false" || $val == "true";
-            case SettingKeys::AuthorizationCodeLength:
-                return is_numeric($val);
-            default:
-                return false;
+        case SettingKeys::AuthorizationCodeValidTime:
+            return is_numeric($val);
+        case SettingKeys::DeviceAuthenticationRequired:
+            return $val == "false" || $val == "true";
+        case SettingKeys::AuthorizationCodeLength:
+            return is_numeric($val);
+        default:
+            return false;
         }
     }
 }

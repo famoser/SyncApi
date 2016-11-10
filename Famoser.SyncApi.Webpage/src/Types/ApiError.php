@@ -8,7 +8,6 @@
 
 namespace Famoser\SyncApi\Types;
 
-
 class ApiError
 {
     const None = 0;
@@ -35,26 +34,26 @@ class ApiError
     public static function toString($apiError)
     {
         switch ($apiError) {
-            case ApiError::None:
-                return "no error occurred";
-            case ApiError::ApplicationNotFound:
-                return "application not found";
-            case ApiError::UserNotFound:
-                return "user not found";
-            case ApiError::DeviceNotFound:
-                return "device not found";
-            case ApiError::DeviceNotAuthorized:
-                return "device not authorized";
-            case ApiError::DeviceUnAuthorized:
-                return "device unauthorized";
-            case ApiError::ResourceAlreadyExists:
-                return "resource already exists";
-            case ApiError::AuthorizationCodeInvalid:
-                return "authorization code invalid";
-            case ApiError::ActionNotSupported:
-                return "action not supported";
-            default:
-                return "unknown api error occurred with code " . $apiError;
+        case ApiError::None:
+            return "no error occurred";
+        case ApiError::ApplicationNotFound:
+            return "application not found";
+        case ApiError::UserNotFound:
+            return "user not found";
+        case ApiError::DeviceNotFound:
+            return "device not found";
+        case ApiError::DeviceNotAuthorized:
+            return "device not authorized";
+        case ApiError::DeviceUnAuthorized:
+            return "device unauthorized";
+        case ApiError::ResourceAlreadyExists:
+            return "resource already exists";
+        case ApiError::AuthorizationCodeInvalid:
+            return "authorization code invalid";
+        case ApiError::ActionNotSupported:
+            return "action not supported";
+        default:
+            return "unknown api error occurred with code " . $apiError;
         }
     }
 }
