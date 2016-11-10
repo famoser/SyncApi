@@ -8,6 +8,10 @@ engines:
     enabled: true  
   duplication:
     enabled: true
+    config:
+      languages:
+      - php
+
 
 ratings:
   paths: ["Famoser.SyncApi.Webpage/src/**/*"]
