@@ -28,7 +28,8 @@ class DeviceController extends ApiRequestController
         $this->authenticateRequest($req);
 
         $devices = $this->getDatabaseHelper()->getFromDatabase(
-            new Device(), "user_guid = :user_guid AND is_deleted =:is_deleted",
+            new Device(),
+            "user_guid = :user_guid AND is_deleted =:is_deleted",
             array("user_guid" => $this->getUser($req)->guid, "is_deleted" => false)
         );
 

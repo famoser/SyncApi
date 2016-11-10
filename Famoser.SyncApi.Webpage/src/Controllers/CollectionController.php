@@ -40,10 +40,10 @@ class CollectionController extends ApiRequestController
         foreach ($req->CollectionEntities as $collectionEntity) {
             $entity = $collectionEntity;
             $askedForGuids[] = $entity->Id;
-            if ($entity->OnlineAction == OnlineAction::Create) {
+            if ($entity->OnlineAction == OnlineAction::CREATE) {
                 $coll = $this->getCollectionById($req, $entity->Id);
                 if ($coll != null) {
-                    throw new ApiException(ApiError::ResourceAlreadyExists); //this happens if id guid is set twice. can not happen under normal circumstances
+                    throw new ApiException(ApiError::RESOURCE_ALREADY_EXISTS); //this happens if id guid is set twice. can not happen under normal circumstances
                 }
 
                 $coll = new Collection();
@@ -53,77 +53,77 @@ class CollectionController extends ApiRequestController
                 $coll->identifier = $entity->Identifier;
 
                 if (!$this->getDatabaseHelper()->saveToDatabase($coll)) {
-                    throw new ServerException(ServerError::DatabaseSaveFailure);
+                    throw new ServerException(ServerError::DATABASE_SAVE_FAILURE);
                 }
 
                 $content = ContentVersion::createNewForCollection($entity);
                 if (!$this->getDatabaseHelper()->saveToDatabase($content)) {
-                    throw new ServerException(ServerError::DatabaseSaveFailure);
+                    throw new ServerException(ServerError::DATABASE_SAVE_FAILURE);
                 }
-            } else if ($entity->OnlineAction == OnlineAction::Update) {
+            } elseif ($entity->OnlineAction == OnlineAction::UPDATE) {
                 $coll = $this->getCollectionById($req, $entity->Id);
                 if ($coll == null) {
-                    throw new ApiException(ApiError::ResourceNotFound);
+                    throw new ApiException(ApiError::RESOURCE_NOT_FOUND);
                 }
 
                 //un-delete if already deleted
                 if ($coll->is_deleted) {
                     $coll->is_deleted = false;
                     if (!$this->getDatabaseHelper()->saveToDatabase($coll)) {
-                        throw new ServerException(ServerError::DatabaseSaveFailure);
+                        throw new ServerException(ServerError::DATABASE_SAVE_FAILURE);
                     }
                 }
 
                 $content = ContentVersion::createNewForCollection($entity);
                 if (!$this->getDatabaseHelper()->saveToDatabase($content)) {
-                    throw new ServerException(ServerError::DatabaseSaveFailure);
+                    throw new ServerException(ServerError::DATABASE_SAVE_FAILURE);
                 }
-            } else if ($entity->OnlineAction == OnlineAction::Delete) {
+            } elseif ($entity->OnlineAction == OnlineAction::DELETE) {
                 $coll = $this->getCollectionById($req, $entity->Id);
 
                 if ($coll == null) {
-                    throw new ApiException(ApiError::ResourceNotFound);
+                    throw new ApiException(ApiError::RESOURCE_NOT_FOUND);
                 }
 
                 $coll->is_deleted = true;
                 if (!$this->getDatabaseHelper()->saveToDatabase($coll)) {
-                    throw new ServerException(ServerError::DatabaseSaveFailure);
+                    throw new ServerException(ServerError::DATABASE_SAVE_FAILURE);
                 }
-            } else if ($entity->OnlineAction == OnlineAction::Read) {
+            } elseif ($entity->OnlineAction == OnlineAction::READ) {
                 $coll = $this->getCollectionById($req, $entity->Id);
 
                 if ($coll == null) {
-                    throw new ApiException(ApiError::ResourceNotFound);
+                    throw new ApiException(ApiError::RESOURCE_NOT_FOUND);
                 }
 
                 $ver = $this->getActiveVersion($coll);
 
                 if ($coll == null) {
-                    throw new ApiException(ApiError::ResourceNotFound);
+                    throw new ApiException(ApiError::RESOURCE_NOT_FOUND);
                 }
 
-                $resp->CollectionEntities[] = $ver->createCollectionEntity($coll, OnlineAction::Read);
-            } else if ($entity->OnlineAction == OnlineAction::ConfirmVersion) {
+                $resp->CollectionEntities[] = $ver->createCollectionEntity($coll, OnlineAction::READ);
+            } elseif ($entity->OnlineAction == OnlineAction::CONFIRM_VERSION) {
                 $coll = $this->getCollectionById($req, $entity->Id);
 
 
                 if ($coll == null) {
-                    throw new ApiException(ApiError::ResourceNotFound);
+                    throw new ApiException(ApiError::RESOURCE_NOT_FOUND);
                 }
 
                 $ver = $this->getActiveVersion($coll);
 
                 if ($coll == null) {
-                    throw new ApiException(ApiError::ResourceNotFound);
+                    throw new ApiException(ApiError::RESOURCE_NOT_FOUND);
                 }
 
                 if ($coll->is_deleted) {
-                    $resp->CollectionEntities[] = $ver->createCollectionEntity($coll, OnlineAction::Delete);
-                } else if ($entity->VersionId != $ver->version_guid) {
-                    $resp->CollectionEntities[] = $ver->createCollectionEntity($coll, OnlineAction::Update);
+                    $resp->CollectionEntities[] = $ver->createCollectionEntity($coll, OnlineAction::DELETE);
+                } elseif ($entity->VersionId != $ver->version_guid) {
+                    $resp->CollectionEntities[] = $ver->createCollectionEntity($coll, OnlineAction::UPDATE);
                 }
             } else {
-                throw new ApiException(ApiError::ActionNotSupported);
+                throw new ApiException(ApiError::ACTION_NOT_SUPPORTED);
             }
         }
 
@@ -132,7 +132,7 @@ class CollectionController extends ApiRequestController
         foreach ($newOnes as $newOne) {
             if (!$collections[$newOne]->is_deleted) {
                 $ver = $this->getActiveVersion($collections[$newOne]);
-                $resp->CollectionEntities[] = $ver->createCollectionEntity($collections[$newOne], OnlineAction::Create);
+                $resp->CollectionEntities[] = $ver->createCollectionEntity($collections[$newOne], OnlineAction::CREATE);
             }
         }
 
@@ -207,7 +207,7 @@ class CollectionController extends ApiRequestController
     {
         return $this->getDatabaseHelper()->getSingleFromDatabase(
             new ContentVersion(), "content_type = :content_type AND entity_guid = :entity_guid",
-            array("content_type" => ContentType::Collection, "entity_guid" => $coll->guid),
+            array("content_type" => ContentType::COLLECTION, "entity_guid" => $coll->guid),
             "create_date_time DESC"
         );
     }
