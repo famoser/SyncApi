@@ -10,13 +10,17 @@ namespace Famoser\SyncApi\Controllers\Base;
 
 
 use Famoser\SyncApi\Exceptions\ApiException;
+use Famoser\SyncApi\Exceptions\ServerException;
 use Famoser\SyncApi\Helpers\RequestHelper;
+use Famoser\SyncApi\Models\Communication\Entities\Base\BaseEntity;
 use Famoser\SyncApi\Models\Communication\Request\Base\BaseRequest;
 use Famoser\SyncApi\Models\Communication\Response\Base\BaseResponse;
 use Famoser\SyncApi\Models\Entities\Application;
+use Famoser\SyncApi\Models\Entities\Base\BaseSyncEntity;
 use Famoser\SyncApi\Models\Entities\Device;
 use Famoser\SyncApi\Models\Entities\User;
 use Famoser\SyncApi\Types\ApiError;
+use Famoser\SyncApi\Types\ServerError;
 use Slim\Http\Response;
 
 class ApiRequestController extends BaseController
@@ -139,5 +143,37 @@ class ApiRequestController extends BaseController
     {
         $response->getBody()->write(json_encode($model));
         return $response->withHeader('Content-Type', 'application/json');
+    }
+
+    protected function updateSyncEntity(BaseSyncEntity $entity, BaseEntity $syncEntity)
+    {
+        if ($entity == null) {
+            throw new ApiException(ApiError::RESOURCE_NOT_FOUND);
+        }
+
+        //un-delete if already deleted
+        if ($entity->is_deleted) {
+            $entity->is_deleted = false;
+            if (!$this->getDatabaseHelper()->saveToDatabase($entity)) {
+                throw new ServerException(ServerError::DATABASE_SAVE_FAILURE);
+            }
+        }
+
+        $content = $entity->createContentVersion($syncEntity);
+        if (!$this->getDatabaseHelper()->saveToDatabase($content)) {
+            throw new ServerException(ServerError::DATABASE_SAVE_FAILURE);
+        }
+    }
+
+    protected function deleteSyncEntity(BaseSyncEntity $entity)
+    {
+        if ($entity == null) {
+            throw new ApiException(ApiError::RESOURCE_NOT_FOUND);
+        }
+
+        $entity->is_deleted = true;
+        if (!$this->getDatabaseHelper()->saveToDatabase($entity)) {
+            throw new ServerException(ServerError::DATABASE_SAVE_FAILURE);
+        }
     }
 }

@@ -21,26 +21,34 @@ CREATE TABLE 'users' (
 use Famoser\SyncApi\Models\Communication\Entities\DeviceEntity;
 use Famoser\SyncApi\Models\Communication\Entities\UserEntity;
 use Famoser\SyncApi\Models\Entities\Base\BaseEntity;
+use Famoser\SyncApi\Models\Entities\Base\BaseSyncEntity;
+use Famoser\SyncApi\Types\ContentType;
 
-class User extends BaseEntity
+class User extends BaseSyncEntity
 {
     /* @var string $application_id */
     public $application_id;
 
-    /* @var string $identifier */
-    public $identifier;
-
-    /* @var string $guid type_of:guid */
-    public $guid;
-
     /* @var string $personal_seed */
     public $personal_seed;
 
-    /* @var bool $is_deleted */
-    public $is_deleted = false;
-    
+    /**
+     * get the name of the table from the database
+     *
+     * @return string
+     */
     public function getTableName()
     {
         return "users";
+    }
+
+    /**
+     * get the content type for the implementing model
+     *
+     * @return int
+     */
+    protected function getContentType()
+    {
+        return ContentType::USER;
     }
 }

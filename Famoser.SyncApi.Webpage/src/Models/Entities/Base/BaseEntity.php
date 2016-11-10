@@ -13,5 +13,11 @@ abstract class BaseEntity
 {
     /* @var int $id */
     public $id;
+
+    /**
+     * get the name of the table from the database
+     *
+     * @return string
+     */
     abstract public function getTableName();
 }

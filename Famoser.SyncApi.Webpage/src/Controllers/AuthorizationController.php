@@ -8,7 +8,6 @@
 
 namespace Famoser\SyncApi\Controllers;
 
-
 use Exception;
 use Famoser\SyncApi\Controllers\Base\ApiRequestController;
 use Famoser\SyncApi\Exceptions\ApiException;
@@ -79,7 +78,7 @@ class AuthorizationController extends ApiRequestController
     /**
      * Use an authentication code to authenticate an existing device.
      *
-     * @param  Request  $request
+     * @param  Request $request
      * @param  Response $response
      * @param  $args
      * @return Response
@@ -99,7 +98,8 @@ class AuthorizationController extends ApiRequestController
         $authCode = $this->getDatabaseHelper()->getSingleFromDatabase(
             new AuthorizationCode(),
             "code = :code AND user_guid = :user_guid",
-            array("code" => $req->ClientMessage, "user_guid" => $req->UserId));
+            array("code" => $req->ClientMessage, "user_guid" => $req->UserId)
+        );
 
         if ($authCode == null) {
             throw new ApiException(ApiError::AUTHORIZATION_CODE_INVALID);
@@ -130,7 +130,7 @@ class AuthorizationController extends ApiRequestController
      * Generate an authentication code for the user. Device must be authenticated to do this.
      * Return the authentication code in the server message
      *
-     * @param  Request  $request
+     * @param  Request $request
      * @param  Response $response
      * @param  $args
      * @return \Psr\Http\Message\ResponseInterface|Response
@@ -169,7 +169,7 @@ class AuthorizationController extends ApiRequestController
     /**
      * syncs user & device objects.
      *
-     * @param  Request  $request
+     * @param  Request $request
      * @param  Response $response
      * @param  $args
      * @return \Psr\Http\Message\ResponseInterface
@@ -202,7 +202,6 @@ class AuthorizationController extends ApiRequestController
                 if (!$this->getDatabaseHelper()->saveToDatabase($content)) {
                     throw new ServerException(ServerError::DATABASE_SAVE_FAILURE);
                 }
-
             } elseif ($entity->OnlineAction == OnlineAction::READ) {
                 $user = $this->getUser($req);
                 //get newest version
@@ -220,7 +219,7 @@ class AuthorizationController extends ApiRequestController
                 $ver->PersonalSeed = null;
                 $resp->UserEntity = $ver;
             } elseif ($entity->OnlineAction == OnlineAction::UPDATE) {
-                $user = $this->getUser($req);;
+                $user = $this->getUser($req);
 
                 if ($user == null)
                     throw new ApiException(ApiError::USER_NOT_FOUND);
@@ -231,15 +230,7 @@ class AuthorizationController extends ApiRequestController
                 }
             } elseif ($entity->OnlineAction == OnlineAction::DELETE) {
                 $user = $this->getUser($req);
-
-                if ($user == null) {
-                    throw new ApiException(ApiError::USER_NOT_FOUND);
-                }
-
-                $user->is_deleted = true;
-                if (!$this->getDatabaseHelper()->saveToDatabase($user)) {
-                    throw new ServerException(ServerError::DATABASE_SAVE_FAILURE);
-                }
+                $this->deleteSyncEntity($user, ApiError::USER_NOT_FOUND);
             } else {
                 throw new ApiException(ApiError::ACTION_NOT_SUPPORTED);
             }
@@ -249,7 +240,12 @@ class AuthorizationController extends ApiRequestController
         if ($req->DeviceEntity != null) {
             $entity = $req->DeviceEntity;
             if ($entity->OnlineAction == OnlineAction::CREATE) {
-                $devices = $this->getDatabaseHelper()->countFromDatabase(new Device(), "user_guid = :user_guid", array("user_guid" => $this->getUser($req)->guid));
+                $devices = $this->getDatabaseHelper()->countFromDatabase(
+                    new Device(),
+                    "user_guid = :user_guid",
+                    array("user_guid" => $this->getUser($req)->guid)
+                );
+
                 $device = new Device();
                 $device->guid = $entity->Id;
                 $device->identifier = $entity->Identifier;
@@ -277,15 +273,7 @@ class AuthorizationController extends ApiRequestController
                 }
             } elseif ($entity->OnlineAction == OnlineAction::DELETE) {
                 $device = $this->getDevice($req);
-
-                if ($device == null) {
-                    throw new ApiException(ApiError::DEVICE_NOT_FOUND);
-                }
-
-                $device->is_deleted = true;
-                if (!$this->getDatabaseHelper()->saveToDatabase($device)) {
-                    throw new ServerException(ServerError::DATABASE_SAVE_FAILURE);
-                }
+                $this->deleteSyncEntity($device, ApiError::DEVICE_NOT_FOUND);
             } else {
                 throw new ApiException(ApiError::ACTION_NOT_SUPPORTED);
             }

@@ -20,8 +20,10 @@ CREATE TABLE 'collections' (
 
 use Famoser\SyncApi\Models\Communication\Entities\CollectionEntity;
 use Famoser\SyncApi\Models\Entities\Base\BaseEntity;
+use Famoser\SyncApi\Models\Entities\Base\BaseSyncEntity;
+use Famoser\SyncApi\Types\ContentType;
 
-class Collection extends BaseEntity
+class Collection extends BaseSyncEntity
 {
     /* @var string $user_guid type_of:guid */
     public $user_guid;
@@ -29,23 +31,29 @@ class Collection extends BaseEntity
     /* @var string $device_guid type_of:guid */
     public $device_guid;
 
-    /* @var string $identifier */
-    public $identifier;
-
-    /* @var string $guid type_of:guid */
-    public $guid;
-
-    /* @var bool $is_deleted */
-    public $is_deleted = false;
-
     public function writeFromEntity(CollectionEntity $entity)
     {
         $this->identifier = $entity->Identifier;
         $this->guid = $entity->Id;
     }
 
+    /**
+     * get the name of the table from the database
+     *
+     * @return string
+     */
     public function getTableName()
     {
         return "collections";
+    }
+
+    /**
+     * get the content type for the implementing model
+     *
+     * @return int
+     */
+    protected function getContentType()
+    {
+        return ContentType::COLLECTION;
     }
 }

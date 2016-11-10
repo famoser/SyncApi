@@ -18,28 +18,34 @@ CREATE TABLE 'devices' (
 );
 */
 
-use Famoser\SyncApi\Models\Communication\Entities\DeviceEntity;
-use Famoser\SyncApi\Models\Entities\Base\BaseEntity;
+use Famoser\SyncApi\Models\Entities\Base\BaseSyncEntity;
+use Famoser\SyncApi\Types\ContentType;
 
-class Device extends BaseEntity
+class Device extends BaseSyncEntity
 {
     /* @var string $user_guid type_of:guid */
     public $user_guid;
-    
-    /* @var string $identifier */
-    public $identifier;
-
-    /* @var string $guid type_of:guid */
-    public $guid;
 
     /* @var bool $is_authenticated */
     public $is_authenticated = false;
 
-    /* @var bool $is_deleted */
-    public $is_deleted = false;
-
+    /**
+     * get the name of the table from the database
+     *
+     * @return string
+     */
     public function getTableName()
     {
         return "devices";
+    }
+
+    /**
+     * get the content type for the implementing model
+     *
+     * @return int
+     */
+    protected function getContentType()
+    {
+        return ContentType::DEVICE;
     }
 }

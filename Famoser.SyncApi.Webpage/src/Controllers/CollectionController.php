@@ -8,7 +8,6 @@
 
 namespace Famoser\SyncApi\Controllers;
 
-
 use Famoser\SyncApi\Controllers\Base\ApiRequestController;
 use Famoser\SyncApi\Controllers\Base\BaseController;
 use Famoser\SyncApi\Exceptions\ApiException;
@@ -43,7 +42,8 @@ class CollectionController extends ApiRequestController
             if ($entity->OnlineAction == OnlineAction::CREATE) {
                 $coll = $this->getCollectionById($req, $entity->Id);
                 if ($coll != null) {
-                    throw new ApiException(ApiError::RESOURCE_ALREADY_EXISTS); //this happens if id guid is set twice. can not happen under normal circumstances
+                    //this happens if id guid is set twice. can not happen under normal circumstances
+                    throw new ApiException(ApiError::RESOURCE_ALREADY_EXISTS);
                 }
 
                 $coll = new Collection();
@@ -56,40 +56,18 @@ class CollectionController extends ApiRequestController
                     throw new ServerException(ServerError::DATABASE_SAVE_FAILURE);
                 }
 
-                $content = ContentVersion::createNewForCollection($entity);
+                $content = $coll->createContentVersion($entity);
                 if (!$this->getDatabaseHelper()->saveToDatabase($content)) {
                     throw new ServerException(ServerError::DATABASE_SAVE_FAILURE);
                 }
             } elseif ($entity->OnlineAction == OnlineAction::UPDATE) {
                 $coll = $this->getCollectionById($req, $entity->Id);
-                if ($coll == null) {
-                    throw new ApiException(ApiError::RESOURCE_NOT_FOUND);
-                }
-
-                //un-delete if already deleted
-                if ($coll->is_deleted) {
-                    $coll->is_deleted = false;
-                    if (!$this->getDatabaseHelper()->saveToDatabase($coll)) {
-                        throw new ServerException(ServerError::DATABASE_SAVE_FAILURE);
-                    }
-                }
-
-                $content = ContentVersion::createNewForCollection($entity);
-                if (!$this->getDatabaseHelper()->saveToDatabase($content)) {
-                    throw new ServerException(ServerError::DATABASE_SAVE_FAILURE);
-                }
+                $this->updateSyncEntity($coll, $entity);
             } elseif ($entity->OnlineAction == OnlineAction::DELETE) {
                 $coll = $this->getCollectionById($req, $entity->Id);
-
-                if ($coll == null) {
-                    throw new ApiException(ApiError::RESOURCE_NOT_FOUND);
-                }
-
-                $coll->is_deleted = true;
-                if (!$this->getDatabaseHelper()->saveToDatabase($coll)) {
-                    throw new ServerException(ServerError::DATABASE_SAVE_FAILURE);
-                }
+                $this->deleteSyncEntity($coll);
             } elseif ($entity->OnlineAction == OnlineAction::READ) {
+                //todo: refactor sync for less code duplication
                 $coll = $this->getCollectionById($req, $entity->Id);
 
                 if ($coll == null) {
@@ -105,7 +83,6 @@ class CollectionController extends ApiRequestController
                 $resp->CollectionEntities[] = $ver->createCollectionEntity($coll, OnlineAction::READ);
             } elseif ($entity->OnlineAction == OnlineAction::CONFIRM_VERSION) {
                 $coll = $this->getCollectionById($req, $entity->Id);
-
 
                 if ($coll == null) {
                     throw new ApiException(ApiError::RESOURCE_NOT_FOUND);
@@ -182,15 +159,25 @@ class CollectionController extends ApiRequestController
     private function cacheCollections(BaseRequest $req)
     {
         //get all accessible collection guids
-        $db = $this->getDatabaseHelper();
-        $userCollections = $db->getFromDatabase(new UserCollection(), "user_guid =:user_guid", array("user_guid" => $this->getUser($req)->guid), null, 1000, "collection_guid");
+        $dbh = $this->getDatabaseHelper();
+        $userCollections = $dbh->getFromDatabase(
+            new UserCollection(),
+            "user_guid =:user_guid",
+            array("user_guid" => $this->getUser($req)->guid),
+            null,
+            1000,
+            "collection_guid");
+
         $collectionIds = [];
         foreach ($userCollections as $co) {
             $collectionIds[] = $co->collection_guid;
         }
 
         //get all collections
-        $collections = $db->getFromDatabase(new Collection(), "guid IN (" . implode(',:', array_keys($collectionIds)) . ")", $collectionIds);
+        $collections = $dbh->getFromDatabase(
+            new Collection(),
+            "guid IN (" . implode(',:', array_keys($collectionIds)) . ")",
+            $collectionIds);
 
         //save them in temp collections
         $this->tempCollections = array();
@@ -206,7 +193,8 @@ class CollectionController extends ApiRequestController
     private function getActiveVersion(Collection $coll)
     {
         return $this->getDatabaseHelper()->getSingleFromDatabase(
-            new ContentVersion(), "content_type = :content_type AND entity_guid = :entity_guid",
+            new ContentVersion(),
+            "content_type = :content_type AND entity_guid = :entity_guid",
             array("content_type" => ContentType::COLLECTION, "entity_guid" => $coll->guid),
             "create_date_time DESC"
         );

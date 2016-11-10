@@ -50,68 +50,6 @@ class ContentVersion extends BaseEntity
     public $create_date_time;
 
     /**
-     * create new version for user
-     *
-     * @param  UserEntity $entity
-     * @return static
-     */
-    public static function createNewForUser(UserEntity $entity)
-    {
-        return static::createNew($entity, ContentType::USER);
-    }
-
-    /**
-     * create new version for device
-     *
-     * @param  DeviceEntity $entity
-     * @return static
-     */
-    public static function createNewForDevice(DeviceEntity $entity)
-    {
-        return static::createNew($entity, ContentType::DEVICE);
-    }
-
-    /**
-     * create new version for collection
-     *
-     * @param  CollectionEntity $entity
-     * @return static
-     */
-    public static function createNewForCollection(CollectionEntity $entity)
-    {
-        return static::createNew($entity, ContentType::COLLECTION);
-    }
-
-    /**
-     * create new version for entity
-     *
-     * @param  SyncEntity $entity
-     * @return static
-     */
-    public static function createNewForEntity(SyncEntity $entity)
-    {
-        return static::createNew($entity, ContentType::ENTITY);
-    }
-
-    /**
-     * creates a new instance of this class and fills out all available properties
-     *
-     * @param  SyncBaseEntity $entity
-     * @param  $contentType
-     * @return static
-     */
-    private static function createNew(SyncBaseEntity $entity, $contentType)
-    {
-        $content = new static();
-        $content->content_type = $contentType;
-        $content->entity_guid = $entity->Id;
-        $content->version_guid = $entity->VersionId;
-        $content->content = $entity->Content;
-        $content->create_date_time = time();
-        return $content;
-    }
-
-    /**
      * create UserEntity from this instance
      *
      * @param  User         $user
