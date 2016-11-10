@@ -60,16 +60,16 @@ class SettingsRepository
 
     public function getAuthorizationCodeValidTime()
     {
-        return $this->getOrCreateValue(SettingKeys::AuthorizationCodeValidTime);
+        return $this->getOrCreateValue(SettingKeys::AUTHORIZATION_CODE_VALID_TIME);
     }
 
     public function getDeviceAuthenticationRequired()
     {
-        return $this->getOrCreateValue(SettingKeys::DeviceAuthenticationRequired);
+        return $this->getOrCreateValue(SettingKeys::DEVICE_AUTHENTICATION_REQUIRED);
     }
 
     public function getAuthorizationCodeLength()
     {
-        return $this->getOrCreateValue(SettingKeys::AuthorizationCodeLength);
+        return $this->getOrCreateValue(SettingKeys::AUTHORIZATION_CODE_LENGTH);
     }
 }

@@ -11,18 +11,18 @@ namespace Famoser\SyncApi\Types;
 
 class SettingKeys
 {
-    const AuthorizationCodeValidTime = 0;
-    const DeviceAuthenticationRequired = 1;
-    const AuthorizationCodeLength = 2;
+    const AUTHORIZATION_CODE_VALID_TIME = 0;
+    const DEVICE_AUTHENTICATION_REQUIRED = 1;
+    const AUTHORIZATION_CODE_LENGTH = 2;
 
     public static function getSettingDescription($val)
     {
         switch ($val) {
-            case SettingKeys::AuthorizationCodeValidTime:
+            case SettingKeys::AUTHORIZATION_CODE_VALID_TIME:
                 return "authorization code valid time";
-            case SettingKeys::DeviceAuthenticationRequired:
+            case SettingKeys::DEVICE_AUTHENTICATION_REQUIRED:
                 return "device authentication required";
-            case SettingKeys::AuthorizationCodeLength:
+            case SettingKeys::AUTHORIZATION_CODE_LENGTH:
                 return "length of the authorization code";
             default:
                 return "unknown setting";
@@ -32,11 +32,11 @@ class SettingKeys
     public static function getDefaultValue($val)
     {
         switch ($val) {
-            case SettingKeys::AuthorizationCodeValidTime:
+            case SettingKeys::AUTHORIZATION_CODE_VALID_TIME:
                 return "300";
-            case SettingKeys::DeviceAuthenticationRequired:
+            case SettingKeys::DEVICE_AUTHENTICATION_REQUIRED:
                 return "false";
-            case SettingKeys::AuthorizationCodeLength:
+            case SettingKeys::AUTHORIZATION_CODE_LENGTH:
                 return "6";
             default:
                 return "unknown";
@@ -46,11 +46,11 @@ class SettingKeys
     public static function isValidValue($val)
     {
         switch ($val) {
-            case SettingKeys::AuthorizationCodeValidTime:
+            case SettingKeys::AUTHORIZATION_CODE_VALID_TIME:
                 return is_numeric($val);
-            case SettingKeys::DeviceAuthenticationRequired:
+            case SettingKeys::DEVICE_AUTHENTICATION_REQUIRED:
                 return $val == "false" || $val == "true";
-            case SettingKeys::AuthorizationCodeLength:
+            case SettingKeys::AUTHORIZATION_CODE_LENGTH:
                 return is_numeric($val);
             default:
                 return false;

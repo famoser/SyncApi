@@ -56,7 +56,7 @@ class ContentVersion extends BaseEntity
      */
     public static function createNewForUser(UserEntity $entity)
     {
-        return static::createNew($entity, ContentType::User);
+        return static::createNew($entity, ContentType::USER);
     }
 
     /**
@@ -66,7 +66,7 @@ class ContentVersion extends BaseEntity
      */
     public static function createNewForDevice(DeviceEntity $entity)
     {
-        return static::createNew($entity, ContentType::Device);
+        return static::createNew($entity, ContentType::DEVICE);
     }
 
     /**
@@ -76,7 +76,7 @@ class ContentVersion extends BaseEntity
      */
     public static function createNewForCollection(CollectionEntity $entity)
     {
-        return static::createNew($entity, ContentType::Collection);
+        return static::createNew($entity, ContentType::COLLECTION);
     }
 
     /**
@@ -86,7 +86,7 @@ class ContentVersion extends BaseEntity
      */
     public static function createNewForEntity(SyncEntity $entity)
     {
-        return static::createNew($entity, ContentType::Entity);
+        return static::createNew($entity, ContentType::ENTITY);
     }
 
     /**

@@ -35,7 +35,7 @@ class ApiRequestController extends BaseController
         $this->application = $dh->getSingleFromDatabase(new Application(), "application_id = :application_id AND is_deleted =:is_deleted",
             array("application_id" => $applicationId, "is_deleted" => false));
         if ($this->application == null)
-            throw new ApiException(ApiError::ApplicationNotFound);
+            throw new ApiException(ApiError::APPLICATION_NOT_FOUND);
 
         return $this->application;
     }
@@ -53,7 +53,7 @@ class ApiRequestController extends BaseController
         $user = $this->getUser($req);
 
         if (RequestHelper::validateAuthCode($req->AuthorizationCode, $application->application_seed, $user->personal_seed))
-            throw new ApiException(ApiError::AuthorizationCodeInvalid);
+            throw new ApiException(ApiError::AUTHORIZATION_CODE_INVALID);
         return true;
     }
 
@@ -92,7 +92,7 @@ class ApiRequestController extends BaseController
         $this->device = $this->getDatabaseHelper()->getSingleFromDatabase(new Device(), "guid = :guid AND user_guid = :user_guid AND is_deleted = :is_deleted",
             array("guid" => $req->DeviceId, "user_guid" => $this->getUser($req)->guid, "is_deleted" => false));
         if ($this->device == null)
-            throw new ApiException(ApiError::DeviceNotFound);
+            throw new ApiException(ApiError::DEVICE_NOT_FOUND);
         return $this->device;
     }
 
@@ -106,7 +106,7 @@ class ApiRequestController extends BaseController
     {
         $device = $this->getDevice($req);
         if (!$device->is_authenticated)
-            throw new ApiException(ApiError::DeviceNotAuthorized);
+            throw new ApiException(ApiError::DEVICE_NOT_AUTHORIZED);
         return $device->is_authenticated;
     }
 }

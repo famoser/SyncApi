@@ -11,45 +11,45 @@ namespace Famoser\SyncApi\Types;
 
 class ApiError
 {
-    const None = 0;
+    const NONE = 0;
 
-    const ApplicationNotFound = 900;
+    const APPLICATION_NOT_FOUND = 900;
 
-    const UserNotFound = 1000;
-    const PersonalSeedMissing = 1000;
-    const PersonalSeedNotNumeric = 1000;
-    const PersonalSeedTooSmall = 1000;
+    const USER_NOT_FOUND = 1000;
+    const PERSONAL_SEED_MISSING = 1000;
+    const PERSONAL_SEED_NOT_NUMERIC = 1000;
+    const PERSONAL_SEED_TOO_SMALL = 1000;
 
-    const DeviceNotFound = 1002;
-    const DeviceNotAuthorized = 1001;
-    const DeviceUnAuthorized = 1003;
+    const DEVICE_NOT_FOUND = 1002;
+    const DEVICE_NOT_AUTHORIZED = 1001;
+    const DEVICE_UNAUTHORIZED = 1003;
 
-    const ResourceAlreadyExists = 200;
-    const ResourceNotFound = 200;
-    const AuthorizationCodeInvalid = 2000;
+    const RESOURCE_ALREADY_EXISTS = 200;
+    const RESOURCE_NOT_FOUND = 200;
+    const AUTHORIZATION_CODE_INVALID = 2000;
 
-    const ActionNotSupported = 3000;
+    const ACTION_NOT_SUPPORTED = 3000;
 
     public static function toString($apiError)
     {
         switch ($apiError) {
-            case ApiError::None:
+            case ApiError::NONE:
                 return "no error occurred";
-            case ApiError::ApplicationNotFound:
+            case ApiError::APPLICATION_NOT_FOUND:
                 return "application not found";
-            case ApiError::UserNotFound:
+            case ApiError::USER_NOT_FOUND:
                 return "user not found";
-            case ApiError::DeviceNotFound:
+            case ApiError::DEVICE_NOT_FOUND:
                 return "device not found";
-            case ApiError::DeviceNotAuthorized:
+            case ApiError::DEVICE_NOT_AUTHORIZED:
                 return "device not authorized";
-            case ApiError::DeviceUnAuthorized:
+            case ApiError::DEVICE_UNAUTHORIZED:
                 return "device unauthorized";
-            case ApiError::ResourceAlreadyExists:
+            case ApiError::RESOURCE_ALREADY_EXISTS:
                 return "resource already exists";
-            case ApiError::AuthorizationCodeInvalid:
+            case ApiError::AUTHORIZATION_CODE_INVALID:
                 return "authorization code invalid";
-            case ApiError::ActionNotSupported:
+            case ApiError::ACTION_NOT_SUPPORTED:
                 return "action not supported";
             default:
                 return "unknown api error occurred with code " . $apiError;

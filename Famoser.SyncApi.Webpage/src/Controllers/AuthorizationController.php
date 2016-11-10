@@ -61,13 +61,13 @@ class AuthorizationController extends ApiRequestController
     private function ensureValidPersonalSeed($personalSeed)
     {
         if ($personalSeed == "") {
-            throw new ApiException(ApiError::PersonalSeedMissing);
+            throw new ApiException(ApiError::PERSONAL_SEED_MISSING);
         }
         if (!is_numeric($personalSeed)) {
-            throw new ApiException(ApiError::PersonalSeedNotNumeric);
+            throw new ApiException(ApiError::PERSONAL_SEED_NOT_NUMERIC);
         }
         if ($personalSeed > 1000) {
-            throw new ApiException(ApiError::PersonalSeedTooSmall);
+            throw new ApiException(ApiError::PERSONAL_SEED_TOO_SMALL);
         }
     }
 
@@ -92,23 +92,23 @@ class AuthorizationController extends ApiRequestController
         //try to get new one
         $authCode = $this->getDatabaseHelper()->getSingleFromDatabase(new AuthorizationCode(), "code = :code AND user_guid = :user_guid", array("code" => $req->ClientMessage, "user_guid" => $req->UserId));
         if ($authCode == null) {
-            throw new ApiException(ApiError::AuthorizationCodeInvalid);
+            throw new ApiException(ApiError::AUTHORIZATION_CODE_INVALID);
         }
 
         //try to get existing device
         $device = $this->getDevice($req);
         if ($device == null) {
-            throw new ApiException(ApiError::DeviceNotFound);
+            throw new ApiException(ApiError::DEVICE_NOT_FOUND);
         }
 
         //delete auth code
         if (!$this->getDatabaseHelper()->deleteFromDatabase($authCode))
-            throw new ServerException(ServerError::DatabaseSaveFailure);
+            throw new ServerException(ServerError::DATABASE_SAVE_FAILURE);
 
         //authenticate device
         $device->is_authenticated = true;
         if (!$this->getDatabaseHelper()->saveToDatabase($device))
-            throw new ServerException(ServerError::DatabaseSaveFailure);
+            throw new ServerException(ServerError::DATABASE_SAVE_FAILURE);
 
         //return successful notice
         return ResponseHelper::getJsonResponse($response, new AuthorizationResponse());
@@ -132,7 +132,7 @@ class AuthorizationController extends ApiRequestController
         //get device
         $device = $this->getDevice($req);
         if (!$device->is_authenticated) {
-            throw new ApiException(ApiError::DeviceNotAuthorized);
+            throw new ApiException(ApiError::DEVICE_NOT_AUTHORIZED);
         }
 
         //get settings repo
@@ -144,7 +144,7 @@ class AuthorizationController extends ApiRequestController
         $authCode->code = $this->generateReadableRandomString($settingRepo->getAuthorizationCodeLength());
         $authCode->valid_till_date_time = time() + $settingRepo->getAuthorizationCodeValidTime();
         if (!$this->getDatabaseHelper()->saveToDatabase($authCode))
-            throw new ServerException(ServerError::DatabaseSaveFailure);
+            throw new ServerException(ServerError::DATABASE_SAVE_FAILURE);
 
         //return auth code to device
         $resp = new AuthorizationResponse();
@@ -171,7 +171,7 @@ class AuthorizationController extends ApiRequestController
         //sync user
         if ($req->UserEntity != null) {
             $entity = $req->UserEntity;
-            if ($entity->OnlineAction == OnlineAction::Create) {
+            if ($entity->OnlineAction == OnlineAction::CREATE) {
                 $this->ensureValidPersonalSeed($req->ClientMessage);
 
                 $user = new User();
@@ -180,55 +180,55 @@ class AuthorizationController extends ApiRequestController
                 $user->application_id = $req->ApplicationId;
                 $user->personal_seed = $req->ClientMessage;
                 if (!$this->getDatabaseHelper()->saveToDatabase($user))
-                    throw new ServerException(ServerError::DatabaseSaveFailure);
+                    throw new ServerException(ServerError::DATABASE_SAVE_FAILURE);
 
                 $content = ContentVersion::createNewForUser($entity);
                 if (!$this->getDatabaseHelper()->saveToDatabase($content))
-                    throw new ServerException(ServerError::DatabaseSaveFailure);
+                    throw new ServerException(ServerError::DATABASE_SAVE_FAILURE);
 
-            } else if ($entity->OnlineAction == OnlineAction::Read) {
+            } else if ($entity->OnlineAction == OnlineAction::READ) {
                 $user = $this->getUser($req);
                 //get newest version
                 $userVersion = $this->getDatabaseHelper()->getSingleFromDatabase(
                     new ContentVersion(),
                     "entity_guid = :guid AND content_type =:content_type",
-                    array("guid" => $user->guid, "content_type" => ContentType::User),
+                    array("guid" => $user->guid, "content_type" => ContentType::USER),
                     "create_date_time DESC");
 
                 if ($userVersion == null) {
-                    throw new ApiException(ApiError::ResourceNotFound);
+                    throw new ApiException(ApiError::RESOURCE_NOT_FOUND);
                 }
 
                 $ver = $userVersion->createUserEntity($user);
                 $ver->PersonalSeed = null;
                 $resp->UserEntity = $ver;
-            } else if ($entity->OnlineAction == OnlineAction::Update) {
+            } else if ($entity->OnlineAction == OnlineAction::UPDATE) {
                 $user = $this->getUser($req);;
 
                 if ($user == null)
-                    throw new ApiException(ApiError::UserNotFound);
+                    throw new ApiException(ApiError::USER_NOT_FOUND);
 
                 $content = ContentVersion::createNewForUser($entity);
                 if (!$this->getDatabaseHelper()->saveToDatabase($content))
-                    throw new ServerException(ServerError::DatabaseSaveFailure);
-            } else if ($entity->OnlineAction == OnlineAction::Delete) {
+                    throw new ServerException(ServerError::DATABASE_SAVE_FAILURE);
+            } else if ($entity->OnlineAction == OnlineAction::DELETE) {
                 $user = $this->getUser($req);
 
                 if ($user == null)
-                    throw new ApiException(ApiError::UserNotFound);
+                    throw new ApiException(ApiError::USER_NOT_FOUND);
 
                 $user->is_deleted = true;
                 if (!$this->getDatabaseHelper()->saveToDatabase($user))
-                    throw new ServerException(ServerError::DatabaseSaveFailure);
+                    throw new ServerException(ServerError::DATABASE_SAVE_FAILURE);
             } else {
-                throw new ApiException(ApiError::ActionNotSupported);
+                throw new ApiException(ApiError::ACTION_NOT_SUPPORTED);
             }
         }
 
         //sync device
         if ($req->DeviceEntity != null) {
             $entity = $req->DeviceEntity;
-            if ($entity->OnlineAction == OnlineAction::Create) {
+            if ($entity->OnlineAction == OnlineAction::CREATE) {
                 $devices = $this->getDatabaseHelper()->countFromDatabase(new Device(), "user_guid = :user_guid", array("user_guid" => $this->getUser($req)->guid));
                 $device = new Device();
                 $device->guid = $entity->Id;
@@ -236,32 +236,32 @@ class AuthorizationController extends ApiRequestController
                 $device->user_guid = $entity->UserId;
                 $device->is_authenticated = $devices == 0;
                 if (!$this->getDatabaseHelper()->saveToDatabase($device))
-                    throw new ServerException(ServerError::DatabaseSaveFailure);
+                    throw new ServerException(ServerError::DATABASE_SAVE_FAILURE);
 
                 $content = ContentVersion::createNewForDevice($entity);
                 if (!$this->getDatabaseHelper()->saveToDatabase($content))
-                    throw new ServerException(ServerError::DatabaseSaveFailure);
+                    throw new ServerException(ServerError::DATABASE_SAVE_FAILURE);
 
-            } else if ($entity->OnlineAction == OnlineAction::Update) {
+            } else if ($entity->OnlineAction == OnlineAction::UPDATE) {
                 $device = $this->getDevice($req);;
 
                 if ($device == null)
-                    throw new ApiException(ApiError::DeviceNotFound);
+                    throw new ApiException(ApiError::DEVICE_NOT_FOUND);
 
                 $content = ContentVersion::createNewForDevice($entity);
                 if (!$this->getDatabaseHelper()->saveToDatabase($content))
-                    throw new ServerException(ServerError::DatabaseSaveFailure);
-            } else if ($entity->OnlineAction == OnlineAction::Delete) {
+                    throw new ServerException(ServerError::DATABASE_SAVE_FAILURE);
+            } else if ($entity->OnlineAction == OnlineAction::DELETE) {
                 $device = $this->getDevice($req);
 
                 if ($device == null)
-                    throw new ApiException(ApiError::DeviceNotFound);
+                    throw new ApiException(ApiError::DEVICE_NOT_FOUND);
 
                 $device->is_deleted = true;
                 if (!$this->getDatabaseHelper()->saveToDatabase($device))
-                    throw new ServerException(ServerError::DatabaseSaveFailure);
+                    throw new ServerException(ServerError::DATABASE_SAVE_FAILURE);
             } else {
-                throw new ApiException(ApiError::ActionNotSupported);
+                throw new ApiException(ApiError::ACTION_NOT_SUPPORTED);
             }
         }
 

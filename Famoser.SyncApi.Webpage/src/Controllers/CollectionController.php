@@ -38,7 +38,7 @@ class CollectionController extends ApiRequestController
         $resp = new CollectionEntityResponse();
         foreach ($req->CollectionEntities as $collectionEntity) {
             $entity = $collectionEntity;
-            if ($entity->OnlineAction == OnlineAction::Create) {
+            if ($entity->OnlineAction == OnlineAction::CREATE) {
                 $coll = new Collection();
                 $coll->user_guid = $this->getUser($req)->guid;
                 $coll->device_guid = $this->getDevice($req)->guid;
@@ -46,29 +46,29 @@ class CollectionController extends ApiRequestController
                 $coll->identifier = $entity->Identifier;
 
                 if (!$this->getDatabaseHelper()->saveToDatabase($coll))
-                    throw new ServerException(ServerError::DatabaseSaveFailure);
+                    throw new ServerException(ServerError::DATABASE_SAVE_FAILURE);
 
                 $content = ContentVersion::createNewForCollection($entity);
                 if (!$this->getDatabaseHelper()->saveToDatabase($content))
-                    throw new ServerException(ServerError::DatabaseSaveFailure);
-            } else if ($entity->OnlineAction == OnlineAction::Update) {
+                    throw new ServerException(ServerError::DATABASE_SAVE_FAILURE);
+            } else if ($entity->OnlineAction == OnlineAction::UPDATE) {
                 $coll = $this->getCollectionById($req, $entity->Id);
                 if ($coll == null)
-                    throw new ApiException(ApiError::ResourceNotFound);
+                    throw new ApiException(ApiError::RESOURCE_NOT_FOUND);
 
                 $content = ContentVersion::createNewForCollection($entity);
                 if (!$this->getDatabaseHelper()->saveToDatabase($content))
-                    throw new ServerException(ServerError::DatabaseSaveFailure);
-            } else if ($entity->OnlineAction == OnlineAction::Delete) {
+                    throw new ServerException(ServerError::DATABASE_SAVE_FAILURE);
+            } else if ($entity->OnlineAction == OnlineAction::DELETE) {
                 $coll = $this->getCollectionById($req, $entity->Id);
 
                 if ($coll == null)
-                    throw new ApiException(ApiError::ResourceNotFound);
+                    throw new ApiException(ApiError::RESOURCE_NOT_FOUND);
 
                 $coll->is_deleted = true;
                 if (!$this->getDatabaseHelper()->saveToDatabase($coll))
-                    throw new ServerException(ServerError::DatabaseSaveFailure);
-            } else if ($entity->OnlineAction == OnlineAction::Read) {
+                    throw new ServerException(ServerError::DATABASE_SAVE_FAILURE);
+            } else if ($entity->OnlineAction == OnlineAction::READ) {
                 $ver = $this->getActiveVersion($entity->Id);
 
 
@@ -117,7 +117,7 @@ class CollectionController extends ApiRequestController
     private function getActiveVersion($guid)
     {
         return $this->getDatabaseHelper()->getSingleFromDatabase(new ContentVersion(), "content_type = :content_type AND entity_guid = :entity_guid AND is_deleted = :is_deleted",
-            array("content_type" => ContentType::Collection, "entity_guid" => $guid, "is_deleted" => false),
+            array("content_type" => ContentType::COLLECTION, "entity_guid" => $guid, "is_deleted" => false),
             "create_date_time DESC");
     }
 }

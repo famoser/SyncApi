@@ -11,11 +11,11 @@ namespace Famoser\SyncApi\Types;
 
 class OnlineAction
 {
-    const None = 0;
-    const Create = 1;
-    const Read = 2;
-    const Update = 3;
-    const Delete = 4;
-    const ConfirmVersion = 5;
-    const ConfirmAccess = 6;
+    const NONE = 0;
+    const CREATE = 1;
+    const READ = 2;
+    const UPDATE = 3;
+    const DELETE = 4;
+    const CONFIRM_VERSION = 5;
+    const CONFIRM_ACCESS = 6;
 }

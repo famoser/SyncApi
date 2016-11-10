@@ -11,26 +11,21 @@ namespace Famoser\SyncApi\Types;
 
 class ServerError
 {
-//[Description("Json request could not be deserialized")]
-    const RequestJsonFailure = 101;
-//[Description("You tried to access a resource you have no access to")]
-    const Forbidden = 104;
-//[Description("Some required properties were missing")]
-    const NotWellDefined = 105;
-
-//[Description("Json request could not be deserialized")]
-    const DatabaseSaveFailure = 201;
+    const REQUEST_JSON_FAILURE = 101;
+    const FORBIDDEN = 104;
+    const NOT_WELL_DEFINED = 105;
+    const DATABASE_SAVE_FAILURE = 201;
 
     public static function toString($serverError)
     {
         switch ($serverError) {
-            case ServerError::RequestJsonFailure:
+            case ServerError::REQUEST_JSON_FAILURE:
                 return "json request could not be processed";
-            case ServerError::Forbidden:
+            case ServerError::FORBIDDEN:
                 return "you are not allowed to view this resource";
-            case ServerError::NotWellDefined:
+            case ServerError::NOT_WELL_DEFINED:
                 return "the request is not well defined";
-            case ServerError::DatabaseSaveFailure:
+            case ServerError::DATABASE_SAVE_FAILURE:
                 return "changes could not be written to database";
             default:
                 return "unknown server error occurred with code " . $serverError;

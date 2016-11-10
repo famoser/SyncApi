@@ -11,8 +11,8 @@ namespace Famoser\SyncApi\Types;
 
 class ContentType
 {
-    const User = 0;
-    const Device = 1;
-    const Collection = 2;
-    const Entity = 3;
+    const USER = 0;
+    const DEVICE = 1;
+    const COLLECTION = 2;
+    const ENTITY = 3;
 }
