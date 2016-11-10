@@ -41,10 +41,10 @@ class DeviceController extends ApiRequestController
         foreach ($req->CollectionEntities as $collectionEntity) {
             $entity = $collectionEntity;
             $device = array_key_exists($entity->Id, $devicesByGuid) ? $devicesByGuid[$entity->Id] : null;
-            if ($entity->OnlineAction == OnlineAction::ConfirmVersion) {
+            if ($entity->OnlineAction == OnlineAction::CONFIRM_VERSION) {
                 if ($device == null) {
                     $ce = new CollectionEntity();
-                    $ce->OnlineAction = OnlineAction::Delete;
+                    $ce->OnlineAction = OnlineAction::DELETE;
                     $ce->Id = $entity->Id;
                     $resp->CollectionEntities[] = $ce;
                 } else {

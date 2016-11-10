@@ -79,10 +79,10 @@ class ApiRequestController extends BaseController
             array("guid" => $req->UserId, "application_id" => $req->ApplicationId, "is_deleted" => false)
         );
         if ($this->user == null) {
-            throw new ApiException(ApiError::UserNotFound);
+            throw new ApiException(ApiError::USER_NOT_FOUND);
         }
         if ($this->user->is_deleted) {
-            throw new ApiException(ApiError::UserRemoved);
+            throw new ApiException(ApiError::USER_NOT_FOUND);
         }
         return $this->user;
     }
@@ -105,7 +105,7 @@ class ApiRequestController extends BaseController
             array("guid" => $req->DeviceId, "user_guid" => $this->getUser($req)->guid, "is_deleted" => false)
         );
         if ($this->device == null) {
-            throw new ApiException(ApiError::DeviceNotFound);
+            throw new ApiException(ApiError::DEVICE_NOT_FOUND);
         }
         if ($this->device->is_deleted) {
             throw new ApiException(ApiError::DeviceRemoved);

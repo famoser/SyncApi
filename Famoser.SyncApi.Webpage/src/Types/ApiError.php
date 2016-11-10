@@ -14,7 +14,7 @@ class ApiError
 
     const APPLICATION_NOT_FOUND = 900;
 
-    const UserRemoved = 1000;
+    const USER_REMOVED = 1000;
     const USER_NOT_FOUND = 1000;
     const PERSONAL_SEED_MISSING = 1000;
     const PERSONAL_SEED_NOT_NUMERIC = 1000;
