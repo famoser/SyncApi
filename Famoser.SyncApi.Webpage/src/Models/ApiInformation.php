@@ -8,7 +8,6 @@
 
 namespace Famoser\SyncApi\Models;
 
-
 class ApiInformation
 {
     /* @var int $Modulo */

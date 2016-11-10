@@ -8,13 +8,13 @@
 
 namespace Famoser\SyncApi\Types;
 
-
 class ApiError
 {
     const NONE = 0;
 
     const APPLICATION_NOT_FOUND = 900;
 
+    const UserRemoved = 1000;
     const USER_NOT_FOUND = 1000;
     const PERSONAL_SEED_MISSING = 1000;
     const PERSONAL_SEED_NOT_NUMERIC = 1000;
@@ -23,6 +23,7 @@ class ApiError
     const DEVICE_NOT_FOUND = 1002;
     const DEVICE_NOT_AUTHORIZED = 1001;
     const DEVICE_UNAUTHORIZED = 1003;
+    const DeviceRemoved = 1002;
 
     const RESOURCE_ALREADY_EXISTS = 200;
     const RESOURCE_NOT_FOUND = 200;

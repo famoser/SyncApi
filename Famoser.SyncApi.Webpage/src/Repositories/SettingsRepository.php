@@ -34,8 +34,9 @@ class SettingsRepository
 
     private function ensureInitialized()
     {
-        if ($this->isInitialized)
+        if ($this->isInitialized) {
             return;
+        }
 
         $settings = $this->helper->getFromDatabase(new ApplicationSetting(), "application_id = :application_id", array("application_id" => $this->applicationId));
         foreach ($settings as $setting) {
@@ -47,8 +48,9 @@ class SettingsRepository
     private function getOrCreateValue($val)
     {
         $this->ensureInitialized();
-        if (in_array($val, $this->dic))
+        if (in_array($val, $this->dic)) {
             return $this->dic[$val];
+        }
         $setting = new ApplicationSetting();
         $setting->application_id = $this->applicationId;
         $setting->key = $val;

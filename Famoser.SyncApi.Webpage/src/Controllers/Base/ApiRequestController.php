@@ -12,10 +12,12 @@ namespace Famoser\SyncApi\Controllers\Base;
 use Famoser\SyncApi\Exceptions\ApiException;
 use Famoser\SyncApi\Helpers\RequestHelper;
 use Famoser\SyncApi\Models\Communication\Request\Base\BaseRequest;
+use Famoser\SyncApi\Models\Communication\Response\Base\BaseResponse;
 use Famoser\SyncApi\Models\Entities\Application;
 use Famoser\SyncApi\Models\Entities\Device;
 use Famoser\SyncApi\Models\Entities\User;
 use Famoser\SyncApi\Types\ApiError;
+use Slim\Http\Response;
 
 class ApiRequestController extends BaseController
 {
@@ -28,8 +30,9 @@ class ApiRequestController extends BaseController
      */
     protected function getApplication($applicationId)
     {
-        if ($this->application != null)
+        if ($this->application != null) {
             return $this->application;
+        }
 
         $dh = $this->getDatabaseHelper();
         $this->application = $dh->getSingleFromDatabase(new Application(), "application_id = :application_id AND is_deleted =:is_deleted",
@@ -42,13 +45,13 @@ class ApiRequestController extends BaseController
 
     /**
      * checks if request is valid: checks authentication code & existence of user & application
-     * @param BaseRequest $req
+     *
+     * @param  BaseRequest $req
      * @return bool
      * @throws ApiException
      */
     protected function authorizeRequest(BaseRequest $req)
     {
-        $dh = $this->getDatabaseHelper();
         $application = $this->getApplication($req->ApplicationId);
         $user = $this->getUser($req);
 
@@ -67,13 +70,20 @@ class ApiRequestController extends BaseController
      */
     protected function getUser(BaseRequest $req)
     {
-        if ($this->user != null)
+        if ($this->user != null) {
             return $this->user;
+        }
 
-        $this->user = $this->getDatabaseHelper()->getSingleFromDatabase(new User(), "guid = :guid AND application_id = :application_id AND is_deleted = :is_deleted",
-            array("guid" => $req->UserId, "application_id" => $req->ApplicationId, "is_deleted" => false));
-        if ($this->user == null)
+        $this->user = $this->getDatabaseHelper()->getSingleFromDatabase(
+            new User(), "guid = :guid AND application_id = :application_id AND is_deleted = :is_deleted",
+            array("guid" => $req->UserId, "application_id" => $req->ApplicationId, "is_deleted" => false)
+        );
+        if ($this->user == null) {
             throw new ApiException(ApiError::UserNotFound);
+        }
+        if ($this->user->is_deleted) {
+            throw new ApiException(ApiError::UserRemoved);
+        }
         return $this->user;
     }
 
@@ -86,19 +96,27 @@ class ApiRequestController extends BaseController
      */
     protected function getDevice(BaseRequest $req)
     {
-        if ($this->device != null)
+        if ($this->device != null) {
             return $this->device;
+        }
 
-        $this->device = $this->getDatabaseHelper()->getSingleFromDatabase(new Device(), "guid = :guid AND user_guid = :user_guid AND is_deleted = :is_deleted",
-            array("guid" => $req->DeviceId, "user_guid" => $this->getUser($req)->guid, "is_deleted" => false));
-        if ($this->device == null)
-            throw new ApiException(ApiError::DEVICE_NOT_FOUND);
+        $this->device = $this->getDatabaseHelper()->getSingleFromDatabase(
+            new Device(), "guid = :guid AND user_guid = :user_guid AND is_deleted = :is_deleted",
+            array("guid" => $req->DeviceId, "user_guid" => $this->getUser($req)->guid, "is_deleted" => false)
+        );
+        if ($this->device == null) {
+            throw new ApiException(ApiError::DeviceNotFound);
+        }
+        if ($this->device->is_deleted) {
+            throw new ApiException(ApiError::DeviceRemoved);
+        }
         return $this->device;
     }
 
     /**
      * checks if request is authenticated: checks if device is authenticated
-     * @param BaseRequest $req
+     *
+     * @param  BaseRequest $req
      * @return bool
      * @throws ApiException
      */
@@ -108,5 +126,18 @@ class ApiRequestController extends BaseController
         if (!$device->is_authenticated)
             throw new ApiException(ApiError::DEVICE_NOT_AUTHORIZED);
         return $device->is_authenticated;
+    }
+
+    /**
+     * returns model as json
+     *
+     * @param  Response $response
+     * @param  $model
+     * @return Response
+     */
+    protected function returnJson(Response $response, BaseResponse $model)
+    {
+        $response->getBody()->write(json_encode($model));
+        return $response->withHeader('Content-Type', 'application/json');
     }
 }

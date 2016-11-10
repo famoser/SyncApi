@@ -33,7 +33,8 @@ class AuthorizationController extends ApiRequestController
 {
     /**
      * generates easily readable random string
-     * @param int $length
+     *
+     * @param  int $length
      * @return string
      */
     private function generateReadableRandomString($length = 6)
@@ -55,7 +56,8 @@ class AuthorizationController extends ApiRequestController
      * - not missing
      * - numeric
      * - bigger than 1000
-     * @param $personalSeed
+     *
+     * @param  $personalSeed
      * @throws ApiException
      */
     private function ensureValidPersonalSeed($personalSeed)
@@ -73,9 +75,10 @@ class AuthorizationController extends ApiRequestController
 
     /**
      * Use an authentication code to authenticate an existing device.
-     * @param Request $request
-     * @param Response $response
-     * @param $args
+     *
+     * @param  Request  $request
+     * @param  Response $response
+     * @param  $args
      * @return Response
      * @throws ApiException|ServerException
      */
@@ -111,15 +114,16 @@ class AuthorizationController extends ApiRequestController
             throw new ServerException(ServerError::DATABASE_SAVE_FAILURE);
 
         //return successful notice
-        return ResponseHelper::getJsonResponse($response, new AuthorizationResponse());
+        return $this->returnJson($response, new AuthorizationResponse());
     }
 
     /**
      * Generate an authentication code for the user. Device must be authenticated to do this.
      * Return the authentication code in the server message
-     * @param Request $request
-     * @param Response $response
-     * @param $args
+     *
+     * @param  Request  $request
+     * @param  Response $response
+     * @param  $args
      * @return \Psr\Http\Message\ResponseInterface|Response
      * @throws ApiException
      * @throws ServerException
@@ -149,14 +153,15 @@ class AuthorizationController extends ApiRequestController
         //return auth code to device
         $resp = new AuthorizationResponse();
         $resp->ServerMessage = $authCode->code;
-        return ResponseHelper::getJsonResponse($response, $resp);
+        return $this->returnJson($response, $resp);
     }
 
     /**
      * syncs user & device objects.
-     * @param Request $request
-     * @param Response $response
-     * @param $args
+     *
+     * @param  Request  $request
+     * @param  Response $response
+     * @param  $args
      * @return \Psr\Http\Message\ResponseInterface
      * @throws Exception
      */
@@ -199,7 +204,7 @@ class AuthorizationController extends ApiRequestController
                     throw new ApiException(ApiError::RESOURCE_NOT_FOUND);
                 }
 
-                $ver = $userVersion->createUserEntity($user);
+                $ver = $userVersion->createUserEntity($user, OnlineAction::Read);
                 $ver->PersonalSeed = null;
                 $resp->UserEntity = $ver;
             } else if ($entity->OnlineAction == OnlineAction::UPDATE) {
@@ -265,6 +270,6 @@ class AuthorizationController extends ApiRequestController
             }
         }
 
-        return ResponseHelper::getJsonResponse($response, $resp);
+        return $this->returnJson($response, $resp);
     }
 }

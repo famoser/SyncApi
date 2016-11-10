@@ -20,8 +20,9 @@ class LoggingMiddleware extends BaseMiddleware
         LogHelper::configure($this->container->get("settings")["log_path"]);
         $files = glob($this->container->get("settings")["log_path"] . '/*'); // get all file names
         foreach ($files as $file) { // iterate files
-            if (is_file($file))
+            if (is_file($file)) {
                 unlink($file); // delete file
+            }
         }
 
         $str = $request->getMethod() . ": " . $request->getUri()->getPath() . "\n";

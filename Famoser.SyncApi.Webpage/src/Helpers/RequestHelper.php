@@ -67,10 +67,11 @@ class RequestHelper
 
     private static function executeJsonMapper(Request $request, $model)
     {
-        if (isset($_POST["json"]))
+        if (isset($_POST["json"])) {
             $jsonObj = json_decode($_POST["json"]);
-        else
+        } else {
             $jsonObj = json_decode($request->getBody()->getContents());
+        }
 
         $mapper = new JsonMapper();
         $mapper->bExceptionOnUndefinedProperty = true;

@@ -93,10 +93,12 @@ class DatabaseHelper
 
             $scriptsPath = $this->container["settings"]["asset_path"] . "/sql/initialize";
 
-            if (!file_exists($testPath))
+            if (!file_exists($testPath)) {
                 $this->executeScripts($this->constructPdo($testPath), $scriptsPath);
-            if (!file_exists($prodPath))
+            }
+            if (!file_exists($prodPath)) {
                 $this->executeScripts($this->constructPdo($prodPath), $scriptsPath);
+            }
 
             file_put_contents($tempFilePath, time());
         }
@@ -135,11 +137,11 @@ class DatabaseHelper
 
     /**
      * @param BaseEntity $entity
-     * @param null $where
-     * @param null $parameters
-     * @param null $orderBy
-     * @param int $limit
-     * @param string $selector
+     * @param null       $where
+     * @param null       $parameters
+     * @param null       $orderBy
+     * @param int        $limit
+     * @param string     $selector
      * @return bool|\Famoser\SyncApi\Models\Entities\Application[]|\Famoser\SyncApi\Models\Entities\ApplicationSetting[]|\Famoser\SyncApi\Models\Entities\AuthorizationCode[]|\Famoser\SyncApi\Models\Entities\Collection[]|\Famoser\SyncApi\Models\Entities\ContentVersion[]|\Famoser\SyncApi\Models\Entities\Device[]|\Famoser\SyncApi\Models\Entities\Entity[]|\Famoser\SyncApi\Models\Entities\FrontendUser[]|\Famoser\SyncApi\Models\Entities\User[]|\Famoser\SyncApi\Models\Entities\UserCollection[]
      */
     public function getFromDatabase(BaseEntity $entity, $where = null, $parameters = null, $orderBy = null, $limit = 1000, $selector = "*")
@@ -151,10 +153,10 @@ class DatabaseHelper
 
     /**
      * @param BaseEntity $entity
-     * @param null $where
-     * @param null $parameters
-     * @param null $orderBy
-     * @param int $limit
+     * @param null       $where
+     * @param null       $parameters
+     * @param null       $orderBy
+     * @param int        $limit
      * @return int
      */
     public function countFromDatabase(BaseEntity $entity, $where = null, $parameters = null, $orderBy = null, $limit = 1000)
@@ -166,23 +168,25 @@ class DatabaseHelper
 
     /**
      * @param BaseEntity $entity
-     * @param string $property
-     * @param int[] $values
-     * @param bool $invertIn
-     * @param null $where
-     * @param null $parameters
-     * @param null $orderBy
-     * @param int $limit
+     * @param string     $property
+     * @param int[]      $values
+     * @param bool       $invertIn
+     * @param null       $where
+     * @param null       $parameters
+     * @param null       $orderBy
+     * @param int        $limit
      * @return Application[]|ApplicationSetting[]|AuthorizationCode[]|Collection[]|ContentVersion[]|Device[]|Entity[]|FrontendUser[]|User[]|UserCollection[]|bool
      */
     public function getWithInFromDatabase(BaseEntity $entity, $property, $values, $invertIn = false, $where = null, $parameters = null, $orderBy = null, $limit = 1000)
     {
-        if ($parameters == null)
+        if ($parameters == null) {
             $parameters = [];
-        if ($where == null)
+        }
+        if ($where == null) {
             $where = " ";
-        else
+        } else {
             $where .= " AND ";
+        }
         $variables = [];
         for ($i = 0; $i < count($values); $i++) {
             $parameters[":" . $property . $i] = $values[$i];
@@ -196,17 +200,18 @@ class DatabaseHelper
 
     /**
      * @param BaseEntity $entity
-     * @param null $where
-     * @param null $parameters
-     * @param null $orderBy
+     * @param null       $where
+     * @param null       $parameters
+     * @param null       $orderBy
      * @return Application|ApplicationSetting|AuthorizationCode|Collection|ContentVersion|Device|Entity|FrontendUser|User|UserCollection|bool
      */
     public function getSingleFromDatabase(BaseEntity $entity, $where = null, $parameters = null, $orderBy = null)
     {
         $sql = $this->createQuery($entity, $where, $parameters, $orderBy, 1);
         $res = $this->executeAndFetch($entity, $sql, $parameters);
-        if (count($res) > 0)
+        if (count($res) > 0) {
             return $res[0];
+        }
         return null;
     }
 

@@ -1,0 +1,2 @@
+# fix all style errors / warnings
+php ./vendor/squizlabs/php_codesniffer/scripts/phpcbf ./src
