@@ -10,16 +10,23 @@ namespace Famoser\SyncApi\Controllers;
 
 
 use Famoser\SyncApi\Controllers\Base\ApiRequestController;
+use Famoser\SyncApi\Controllers\Base\ApiSyncController;
+use Famoser\SyncApi\Exceptions\ServerException;
 use Famoser\SyncApi\Helpers\RequestHelper;
-use Famoser\SyncApi\Models\Communication\Entities\CollectionEntity;
+use Famoser\SyncApi\Models\Communication\Entities\CollectionCommunicationEntity;
+use Famoser\SyncApi\Models\Communication\Entities\DeviceCommunicationEntity;
+use Famoser\SyncApi\Models\Communication\Request\Base\BaseRequest;
 use Famoser\SyncApi\Models\Communication\Response\CollectionEntityResponse;
+use Famoser\SyncApi\Models\Entities\Base\BaseSyncEntity;
 use Famoser\SyncApi\Models\Entities\ContentVersion;
 use Famoser\SyncApi\Models\Entities\Device;
+use Famoser\SyncApi\Types\ContentType;
 use Famoser\SyncApi\Types\OnlineAction;
+use Famoser\SyncApi\Types\ServerError;
 use Slim\Http\Request;
 use Slim\Http\Response;
 
-class DeviceController extends ApiRequestController
+class DeviceController extends ApiSyncController
 {
     public function get(Request $request, Response $response, $args)
     {
@@ -27,39 +34,14 @@ class DeviceController extends ApiRequestController
         $this->authorizeRequest($req);
         $this->authenticateRequest($req);
 
-        $devices = $this->getDatabaseHelper()->getFromDatabase(
-            new Device(),
-            "user_guid = :user_guid AND is_deleted =:is_deleted",
-            array("user_guid" => $this->getUser($req)->guid, "is_deleted" => false)
+        $resp = new CollectionEntityResponse();
+        $resp->CollectionEntities = $this->syncInternal(
+            $req,
+            $req->CollectionEntities,
+            ContentType::DEVICE
         );
 
-        $devicesByGuid = [];
-        foreach ($devices as $device) {
-            $devicesByGuid[$device->guid] = $device;
-        }
-
-        $resp = new CollectionEntityResponse();
-        foreach ($req->CollectionEntities as $collectionEntity) {
-            $entity = $collectionEntity;
-            $device = array_key_exists($entity->Id, $devicesByGuid) ? $devicesByGuid[$entity->Id] : null;
-            if ($entity->OnlineAction == OnlineAction::CONFIRM_VERSION) {
-                if ($device == null) {
-                    $ce = new CollectionEntity();
-                    $ce->OnlineAction = OnlineAction::DELETE;
-                    $ce->Id = $entity->Id;
-                    $resp->CollectionEntities[] = $ce;
-                } else {
-                    $ver = $this->getDatabaseHelper()->getSingleFromDatabase(
-                        new ContentVersion(), "entity_guid = :entity_guid AND content_type = :content_type",
-                        array("entity_guid" => $entity->Id)
-                    );
-                    //todo: return as update, implement create
-
-                }
-            }
-        }
-
-        throw new \Exception("not implemented");
+        return $this->returnJson($response, $resp);
     }
 
     public function auth(Request $request, Response $response, $args)
@@ -70,5 +52,46 @@ class DeviceController extends ApiRequestController
     public function unAuth(Request $request, Response $response, $args)
     {
         throw new \Exception("not implemented");
+    }
+
+    /**
+     * get all entities the user has access to
+     *
+     * @param BaseRequest $req
+     * @param $contentType
+     * @return \Famoser\SyncApi\Models\Entities\Base\BaseSyncEntity[]
+     * @throws ServerException
+     */
+    protected function getAll(BaseRequest $req, $contentType)
+    {
+        if ($contentType != ContentType::DEVICE) {
+            throw new ServerException(ServerError::FORBIDDEN);
+        }
+
+        return $this->getDatabaseHelper()->getFromDatabase(
+            new Device(),
+            "user_guid = :user_guid",
+            array("user_guid" => $this->getUser($req)->guid)
+        );
+    }
+
+    /**
+     * create a new entity ready to insert into database
+     *
+     * @param BaseRequest $req
+     * @param $contentType
+     * @return BaseSyncEntity
+     * @throws ServerException
+     */
+    protected function createEntity(BaseRequest $req, $contentType)
+    {
+        if ($contentType != ContentType::DEVICE) {
+            throw new ServerException(ServerError::FORBIDDEN);
+        }
+
+        $entity = new Device();
+        $entity->is_authenticated = false;
+        $entity->user_guid = $this->getUser($req)->guid;
+        return $entity;
     }
 }

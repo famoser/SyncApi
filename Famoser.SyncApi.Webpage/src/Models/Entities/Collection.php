@@ -18,7 +18,8 @@ CREATE TABLE 'collections' (
 );
 */
 
-use Famoser\SyncApi\Models\Communication\Entities\CollectionEntity;
+use Famoser\SyncApi\Models\Communication\Entities\Base\BaseCommunicationEntity;
+use Famoser\SyncApi\Models\Communication\Entities\CollectionCommunicationEntity;
 use Famoser\SyncApi\Models\Entities\Base\BaseEntity;
 use Famoser\SyncApi\Models\Entities\Base\BaseSyncEntity;
 use Famoser\SyncApi\Types\ContentType;
@@ -31,7 +32,7 @@ class Collection extends BaseSyncEntity
     /* @var string $device_guid type_of:guid */
     public $device_guid;
 
-    public function writeFromEntity(CollectionEntity $entity)
+    public function writeFromEntity(CollectionCommunicationEntity $entity)
     {
         $this->identifier = $entity->Identifier;
         $this->guid = $entity->Id;
@@ -55,5 +56,20 @@ class Collection extends BaseSyncEntity
     protected function getContentType()
     {
         return ContentType::COLLECTION;
+    }
+
+    /**
+     * create the communication entity for the implementing model
+     *
+     * @return BaseCommunicationEntity
+     */
+    protected function createSpecificCommunicationEntity()
+    {
+        $entity = new CollectionCommunicationEntity();
+
+        $entity->UserId = $this->user_guid;
+        $entity->DeviceId = $this->device_guid;
+
+        return $entity;
     }
 }

@@ -8,7 +8,8 @@
 
 namespace Famoser\SyncApi\Models\Entities\Base;
 
-use Famoser\SyncApi\Models\Communication\Entities\Base\BaseEntity as CommunicationBaseEntity;
+use Famoser\SyncApi\Helpers\FormatHelper;
+use Famoser\SyncApi\Models\Communication\Entities\Base\BaseCommunicationEntity;
 use Famoser\SyncApi\Models\Entities\ContentVersion;
 
 abstract class BaseSyncEntity extends BaseEntity
@@ -30,12 +31,19 @@ abstract class BaseSyncEntity extends BaseEntity
     abstract protected function getContentType();
 
     /**
+     * create the communication entity for the implementing model
+     * 
+     * @return BaseCommunicationEntity
+     */
+    abstract protected function createSpecificCommunicationEntity();
+
+    /**
      * generate content version for a new entity
      *
-     * @param CommunicationBaseEntity $entity
+     * @param BaseCommunicationEntity $entity
      * @return ContentVersion
      */
-    public function createContentVersion(CommunicationBaseEntity $entity)
+    public function createContentVersion(BaseCommunicationEntity $entity)
     {
         $content = new ContentVersion();
         $content->content_type = $this->getContentType();
@@ -44,5 +52,28 @@ abstract class BaseSyncEntity extends BaseEntity
         $content->content = $entity->Content;
         $content->create_date_time = time();
         return $content;
+    }
+
+    /**
+     * creates an entity which can be used by the api for communication
+     * 
+     * @param ContentVersion $version
+     * @param $onlineAction
+     * @return BaseCommunicationEntity
+     */
+    public function createCommunicationEntity(ContentVersion $version, $onlineAction)
+    {
+
+        $entity = $this->createSpecificCommunicationEntity();
+        $entity->Identifier = $this->identifier;
+        $entity->Id = $this->guid;
+        
+        $entity->Content = $version->content;
+        $entity->CreateDateTime = FormatHelper::toCSharpDateTime($version->create_date_time);
+        $entity->VersionId = $version->version_guid;
+        
+        $entity->OnlineAction = $onlineAction;
+
+        return $entity;
     }
 }

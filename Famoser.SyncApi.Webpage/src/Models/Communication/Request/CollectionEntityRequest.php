@@ -9,11 +9,11 @@
 namespace Famoser\SyncApi\Models\Communication\Request;
 
 
-use Famoser\SyncApi\Models\Communication\Entities\CollectionEntity;
+use Famoser\SyncApi\Models\Communication\Entities\CollectionCommunicationEntity;
 use Famoser\SyncApi\Models\Communication\Request\Base\BaseRequest;
 
 class CollectionEntityRequest extends BaseRequest
 {
-    /* @var CollectionEntity[] $CollectionEntities */
+    /* @var CollectionCommunicationEntity[] $CollectionEntities */
     public $CollectionEntities;
 }

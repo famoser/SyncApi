@@ -9,9 +9,9 @@
 namespace Famoser\SyncApi\Models\Communication\Entities;
 
 
-use Famoser\SyncApi\Models\Communication\Entities\Base\BaseEntity;
+use Famoser\SyncApi\Models\Communication\Entities\Base\BaseCommunicationEntity;
 
-class UserEntity extends BaseEntity
+class UserCommunicationEntity extends BaseCommunicationEntity
 {
     /* @var string $PersonalSeed */
     public $PersonalSeed;

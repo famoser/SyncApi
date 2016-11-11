@@ -18,4 +18,12 @@ class OnlineAction
     const DELETE = 4;
     const CONFIRM_VERSION = 5;
     const CONFIRM_ACCESS = 6;
+
+    const ALL_SYNC_ACTIONS = array(
+        OnlineAction::CONFIRM_VERSION,
+        OnlineAction::CREATE,
+        OnlineAction::READ,
+        OnlineAction::UPDATE,
+        OnlineAction::DELETE,
+    );
 }

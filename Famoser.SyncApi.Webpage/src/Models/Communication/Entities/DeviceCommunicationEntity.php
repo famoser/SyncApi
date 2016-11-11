@@ -9,9 +9,9 @@
 namespace Famoser\SyncApi\Models\Communication\Entities;
 
 
-use Famoser\SyncApi\Models\Communication\Entities\Base\BaseEntity;
+use Famoser\SyncApi\Models\Communication\Entities\Base\BaseCommunicationEntity;
 
-class DeviceEntity extends BaseEntity
+class DeviceCommunicationEntity extends BaseCommunicationEntity
 {
     /* @var string $UserId type_of:guid */
     public $UserId;

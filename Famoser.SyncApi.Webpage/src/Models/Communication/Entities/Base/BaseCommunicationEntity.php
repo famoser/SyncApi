@@ -9,7 +9,7 @@
 namespace Famoser\SyncApi\Models\Communication\Entities\Base;
 
 
-class BaseEntity
+class BaseCommunicationEntity
 {
     /* @var string $Id type_of:guid*/
     public $Id;

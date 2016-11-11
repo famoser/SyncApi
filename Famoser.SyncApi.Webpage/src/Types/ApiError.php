@@ -31,6 +31,8 @@ class ApiError
 
     const ACTION_NOT_SUPPORTED = 3000;
 
+    const ACTION_PROHIBITED = 3000;
+
     public static function toString($apiError)
     {
         switch ($apiError) {

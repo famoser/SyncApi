@@ -18,9 +18,8 @@ CREATE TABLE 'users' (
 );
 */
 
-use Famoser\SyncApi\Models\Communication\Entities\DeviceEntity;
-use Famoser\SyncApi\Models\Communication\Entities\UserEntity;
-use Famoser\SyncApi\Models\Entities\Base\BaseEntity;
+use Famoser\SyncApi\Models\Communication\Entities\Base\BaseCommunicationEntity;
+use Famoser\SyncApi\Models\Communication\Entities\UserCommunicationEntity;
 use Famoser\SyncApi\Models\Entities\Base\BaseSyncEntity;
 use Famoser\SyncApi\Types\ContentType;
 
@@ -50,5 +49,15 @@ class User extends BaseSyncEntity
     protected function getContentType()
     {
         return ContentType::USER;
+    }
+
+    /**
+     * create the communication entity for the implementing model
+     *
+     * @return BaseCommunicationEntity
+     */
+    protected function createSpecificCommunicationEntity()
+    {
+        return new UserCommunicationEntity();
     }
 }

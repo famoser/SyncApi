@@ -12,7 +12,7 @@ namespace Famoser\SyncApi\Controllers\Base;
 use Famoser\SyncApi\Exceptions\ApiException;
 use Famoser\SyncApi\Exceptions\ServerException;
 use Famoser\SyncApi\Helpers\RequestHelper;
-use Famoser\SyncApi\Models\Communication\Entities\Base\BaseEntity;
+use Famoser\SyncApi\Models\Communication\Entities\Base\BaseCommunicationEntity;
 use Famoser\SyncApi\Models\Communication\Request\Base\BaseRequest;
 use Famoser\SyncApi\Models\Communication\Response\Base\BaseResponse;
 use Famoser\SyncApi\Models\Entities\Application;
@@ -68,6 +68,8 @@ class ApiRequestController extends BaseController
     private $user;
 
     /**
+     * tries to get the current user. throws exception if not found or user removed!
+     *
      * @param BaseRequest $req
      * @return User
      * @throws ApiException
@@ -78,17 +80,28 @@ class ApiRequestController extends BaseController
             return $this->user;
         }
 
-        $this->user = $this->getDatabaseHelper()->getSingleFromDatabase(
-            new User(), "guid = :guid AND application_id = :application_id AND is_deleted = :is_deleted",
-            array("guid" => $req->UserId, "application_id" => $req->ApplicationId, "is_deleted" => false)
-        );
+        $this->user = $this->tryGetUser($req);
         if ($this->user == null) {
             throw new ApiException(ApiError::USER_NOT_FOUND);
         }
         if ($this->user->is_deleted) {
-            throw new ApiException(ApiError::USER_NOT_FOUND);
+            throw new ApiException(ApiError::USER_REMOVED);
         }
         return $this->user;
+    }
+
+    /**
+     * tries to get the user. does not fail if not found!
+     *
+     * @param BaseRequest $req
+     * @return User
+     */
+    protected function tryGetUser(BaseRequest $req)
+    {
+        return $this->getDatabaseHelper()->getSingleFromDatabase(
+            new User(), "guid = :guid AND application_id = :application_id",
+            array("guid" => $req->UserId, "application_id" => $req->ApplicationId)
+        );
     }
 
     private $device;
@@ -104,10 +117,7 @@ class ApiRequestController extends BaseController
             return $this->device;
         }
 
-        $this->device = $this->getDatabaseHelper()->getSingleFromDatabase(
-            new Device(), "guid = :guid AND user_guid = :user_guid AND is_deleted = :is_deleted",
-            array("guid" => $req->DeviceId, "user_guid" => $this->getUser($req)->guid, "is_deleted" => false)
-        );
+        $this->device = $this->tryGetDevice($req);
         if ($this->device == null) {
             throw new ApiException(ApiError::DEVICE_NOT_FOUND);
         }
@@ -116,6 +126,20 @@ class ApiRequestController extends BaseController
         }
         return $this->device;
     }
+
+    /**
+     * @param BaseRequest $req
+     * @return Device
+     * @throws ApiException
+     */
+    protected function tryGetDevice(BaseRequest $req)
+    {
+        return $this->getDatabaseHelper()->getSingleFromDatabase(
+            new Device(), "guid = :guid AND user_guid = :user_guid AND is_deleted = :is_deleted",
+            array("guid" => $req->DeviceId, "user_guid" => $this->getUser($req)->guid, "is_deleted" => false)
+        );
+    }
+
 
     /**
      * checks if request is authenticated: checks if device is authenticated
@@ -145,7 +169,7 @@ class ApiRequestController extends BaseController
         return $response->withHeader('Content-Type', 'application/json');
     }
 
-    protected function updateSyncEntity(BaseSyncEntity $entity, BaseEntity $syncEntity)
+    protected function updateSyncEntity(BaseSyncEntity $entity, BaseCommunicationEntity $syncEntity)
     {
         if ($entity == null) {
             throw new ApiException(ApiError::RESOURCE_NOT_FOUND);

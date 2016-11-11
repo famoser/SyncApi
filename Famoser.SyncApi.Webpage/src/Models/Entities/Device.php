@@ -18,6 +18,8 @@ CREATE TABLE 'devices' (
 );
 */
 
+use Famoser\SyncApi\Models\Communication\Entities\Base\BaseCommunicationEntity;
+use Famoser\SyncApi\Models\Communication\Entities\DeviceCommunicationEntity;
 use Famoser\SyncApi\Models\Entities\Base\BaseSyncEntity;
 use Famoser\SyncApi\Types\ContentType;
 
@@ -47,5 +49,19 @@ class Device extends BaseSyncEntity
     protected function getContentType()
     {
         return ContentType::DEVICE;
+    }
+
+    /**
+     * create the communication entity for the implementing model
+     *
+     * @return BaseCommunicationEntity
+     */
+    protected function createSpecificCommunicationEntity()
+    {
+        $entity = new DeviceCommunicationEntity();
+
+        $entity->UserId = $this->user_guid;
+
+        return $entity;
     }
 }

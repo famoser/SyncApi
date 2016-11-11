@@ -9,7 +9,7 @@
 namespace Famoser\SyncApi\Models\Communication\Entities;
 
 
-class SyncEntity extends CollectionEntity
+class SyncCommunicationCommunicationEntity extends CollectionCommunicationEntity
 {
     /* @var string $CollectionId type_of:guid */ 
     public $CollectionId;

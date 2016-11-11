@@ -10,14 +10,18 @@ namespace Famoser\SyncApi\Controllers;
 
 use Exception;
 use Famoser\SyncApi\Controllers\Base\ApiRequestController;
+use Famoser\SyncApi\Controllers\Base\ApiSyncController;
 use Famoser\SyncApi\Exceptions\ApiException;
 use Famoser\SyncApi\Exceptions\ServerException;
 use Famoser\SyncApi\Helpers\RequestHelper;
 use Famoser\SyncApi\Helpers\ResponseHelper;
-use Famoser\SyncApi\Models\Communication\Entities\UserEntity;
+use Famoser\SyncApi\Models\Communication\Entities\UserCommunicationEntity;
+use Famoser\SyncApi\Models\Communication\Request\AuthorizationRequest;
+use Famoser\SyncApi\Models\Communication\Request\Base\BaseRequest;
 use Famoser\SyncApi\Models\Communication\Response\AuthorizationResponse;
 use Famoser\SyncApi\Models\Entities\Application;
 use Famoser\SyncApi\Models\Entities\AuthorizationCode;
+use Famoser\SyncApi\Models\Entities\Base\BaseSyncEntity;
 use Famoser\SyncApi\Models\Entities\ContentVersion;
 use Famoser\SyncApi\Models\Entities\Device;
 use Famoser\SyncApi\Models\Entities\User;
@@ -25,10 +29,11 @@ use Famoser\SyncApi\Types\ApiError;
 use Famoser\SyncApi\Types\ContentType;
 use Famoser\SyncApi\Types\OnlineAction;
 use Famoser\SyncApi\Types\ServerError;
+use Guzzle\Tests\Http\Server;
 use Slim\Http\Request;
 use Slim\Http\Response;
 
-class AuthorizationController extends ApiRequestController
+class AuthorizationController extends ApiSyncController
 {
     /**
      * generates easily readable random string
@@ -185,100 +190,93 @@ class AuthorizationController extends ApiRequestController
 
         //sync user
         if ($req->UserEntity != null) {
-            $entity = $req->UserEntity;
-            if ($entity->OnlineAction == OnlineAction::CREATE) {
-                $this->ensureValidPersonalSeed($req->ClientMessage);
+            $res = $this->syncInternal(
+                $req,
+                array($req->UserEntity),
+                ContentType::USER
+            );
 
-                $user = new User();
-                $user->identifier = $entity->Identifier;
-                $user->guid = $entity->Id;
-                $user->application_id = $req->ApplicationId;
-                $user->personal_seed = $req->ClientMessage;
-                if (!$this->getDatabaseHelper()->saveToDatabase($user)) {
-                    throw new ServerException(ServerError::DATABASE_SAVE_FAILURE);
-                }
-
-                $content = ContentVersion::createNewForUser($entity);
-                if (!$this->getDatabaseHelper()->saveToDatabase($content)) {
-                    throw new ServerException(ServerError::DATABASE_SAVE_FAILURE);
-                }
-            } elseif ($entity->OnlineAction == OnlineAction::READ) {
-                $user = $this->getUser($req);
-                //get newest version
-                $userVersion = $this->getDatabaseHelper()->getSingleFromDatabase(
-                    new ContentVersion(),
-                    "entity_guid = :guid AND content_type =:content_type",
-                    array("guid" => $user->guid, "content_type" => ContentType::USER),
-                    "create_date_time DESC");
-
-                if ($userVersion == null) {
-                    throw new ApiException(ApiError::RESOURCE_NOT_FOUND);
-                }
-
-                $ver = $userVersion->createUserEntity($user, OnlineAction::READ);
-                $ver->PersonalSeed = null;
-                $resp->UserEntity = $ver;
-            } elseif ($entity->OnlineAction == OnlineAction::UPDATE) {
-                $user = $this->getUser($req);
-
-                if ($user == null)
-                    throw new ApiException(ApiError::USER_NOT_FOUND);
-
-                $content = ContentVersion::createNewForUser($entity);
-                if (!$this->getDatabaseHelper()->saveToDatabase($content)) {
-                    throw new ServerException(ServerError::DATABASE_SAVE_FAILURE);
-                }
-            } elseif ($entity->OnlineAction == OnlineAction::DELETE) {
-                $user = $this->getUser($req);
-                $this->deleteSyncEntity($user, ApiError::USER_NOT_FOUND);
-            } else {
-                throw new ApiException(ApiError::ACTION_NOT_SUPPORTED);
+            if (count($res) > 0) {
+                $resp->UserEntity = $res;
             }
         }
 
         //sync device
         if ($req->DeviceEntity != null) {
-            $entity = $req->DeviceEntity;
-            if ($entity->OnlineAction == OnlineAction::CREATE) {
-                $devices = $this->getDatabaseHelper()->countFromDatabase(
-                    new Device(),
-                    "user_guid = :user_guid",
-                    array("user_guid" => $this->getUser($req)->guid)
-                );
-
-                $device = new Device();
-                $device->guid = $entity->Id;
-                $device->identifier = $entity->Identifier;
-                $device->user_guid = $entity->UserId;
-                $device->is_authenticated = $devices == 0;
-                if (!$this->getDatabaseHelper()->saveToDatabase($device)) {
-                    throw new ServerException(ServerError::DATABASE_SAVE_FAILURE);
-                }
-
-                $content = ContentVersion::createNewForDevice($entity);
-                if (!$this->getDatabaseHelper()->saveToDatabase($content)) {
-                    throw new ServerException(ServerError::DATABASE_SAVE_FAILURE);
-                }
-
-            } elseif ($entity->OnlineAction == OnlineAction::UPDATE) {
-                $device = $this->getDevice($req);;
-
-                if ($device == null) {
-                    throw new ApiException(ApiError::DEVICE_NOT_FOUND);
-                }
-
-                $content = ContentVersion::createNewForDevice($entity);
-                if (!$this->getDatabaseHelper()->saveToDatabase($content)) {
-                    throw new ServerException(ServerError::DATABASE_SAVE_FAILURE);
-                }
-            } elseif ($entity->OnlineAction == OnlineAction::DELETE) {
-                $device = $this->getDevice($req);
-                $this->deleteSyncEntity($device, ApiError::DEVICE_NOT_FOUND);
-            } else {
-                throw new ApiException(ApiError::ACTION_NOT_SUPPORTED);
+            $res = $this->syncInternal(
+                $req,
+                array($req->DeviceEntity),
+                ContentType::DEVICE
+            );
+            if (count($res) > 0) {
+                $resp->DeviceEntity = $res;
             }
         }
 
         return $this->returnJson($response, $resp);
+    }
+
+    /**
+     * get all entities the user has access to
+     *
+     * @param BaseRequest $req
+     * @param $contentType
+     * @return \Famoser\SyncApi\Models\Entities\Base\BaseSyncEntity[]
+     * @throws ServerException
+     */
+    protected function getAll(BaseRequest $req, $contentType)
+    {
+        if ($contentType == ContentType::USER) {
+            //get all accessible users (which is obv. only one)
+            $user = $this->tryGetUser($req);
+            if ($user != null)
+                return array($user);
+            return array();
+        } else if ($contentType == ContentType::DEVICE) {
+            $device = $this->tryGetDevice($req);
+            if ($device != null)
+                return array($device);
+            return array();
+        } else {
+            throw new ServerException(ServerError::FORBIDDEN);
+        }
+    }
+
+    /**
+     * create a new entity ready to insert into database
+     *
+     * @param BaseRequest $req
+     * @param $contentType
+     * @return BaseSyncEntity
+     * @throws ServerException
+     */
+    protected function createEntity(BaseRequest $req, $contentType)
+    {
+        if (!$req instanceof AuthorizationRequest) {
+            throw new ServerException(ServerError::FORBIDDEN);
+        }
+        if ($contentType == ContentType::USER) {
+            $this->ensureValidPersonalSeed($req->ClientMessage);
+
+            $user = new User();
+            $user->application_id = $req->ApplicationId;
+            $user->personal_seed = $req->ClientMessage;
+
+            return $user;
+        } else if ($contentType == ContentType::DEVICE) {
+            $devices = $this->getDatabaseHelper()->countFromDatabase(
+                new Device(),
+                "user_guid = :user_guid AND is_deleted = :is_deleted",
+                array("user_guid" => $this->getUser($req)->guid, "is_deleted" => false)
+            );
+
+            $device = new Device();
+            $device->user_guid = $this->getUser($req)->guid;
+            $device->is_authenticated = $devices == 0;
+
+            return $device;
+        } else {
+            throw new ServerException(ServerError::FORBIDDEN);
+        }
     }
 }

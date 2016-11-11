@@ -9,20 +9,20 @@
 namespace Famoser\SyncApi\Models\Communication\Request;
 
 
-use Famoser\SyncApi\Models\Communication\Entities\CollectionEntity;
-use Famoser\SyncApi\Models\Communication\Entities\DeviceEntity;
-use Famoser\SyncApi\Models\Communication\Entities\UserEntity;
+use Famoser\SyncApi\Models\Communication\Entities\CollectionCommunicationEntity;
+use Famoser\SyncApi\Models\Communication\Entities\DeviceCommunicationEntity;
+use Famoser\SyncApi\Models\Communication\Entities\UserCommunicationEntity;
 use Famoser\SyncApi\Models\Communication\Request\Base\BaseRequest;
 
 class AuthorizationRequest extends BaseRequest
 {
-    /* @var UserEntity $UserEntity */
+    /* @var UserCommunicationEntity $UserEntity */
     public $UserEntity;
     
-    /* @var DeviceEntity $DeviceEntity */
+    /* @var DeviceCommunicationEntity $DeviceEntity */
     public $DeviceEntity;
     
-    /* @var CollectionEntity $CollectionEntity */
+    /* @var CollectionCommunicationEntity $CollectionEntity */
     public $CollectionEntity;
     
     /* @var string $ClientMessage */
