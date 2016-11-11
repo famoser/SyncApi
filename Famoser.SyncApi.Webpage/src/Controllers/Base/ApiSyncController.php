@@ -59,7 +59,7 @@ abstract class ApiSyncController extends ApiRequestController
             $askedForGuids[] = $communicationEntity->Id;
             if ($communicationEntity->OnlineAction == OnlineAction::NONE)
                 continue;
-            
+
             //check if no action can be executed which is not explicitly allowed
             if (!in_array($communicationEntity->OnlineAction, $allowedOnlineActions))
                 throw new ApiException(ApiError::ACTION_PROHIBITED);
@@ -169,6 +169,10 @@ abstract class ApiSyncController extends ApiRequestController
 
         if ($entity == null) {
             throw new ApiException(ApiError::RESOURCE_NOT_FOUND);
+        }
+
+        if ($entity->is_deleted) {
+            return $entity->createCommunicationEntity($ver, OnlineAction::DELETE);
         }
         return $entity->createCommunicationEntity($ver, OnlineAction::READ);
     }
