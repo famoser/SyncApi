@@ -14,6 +14,7 @@ use Famoser\SyncApi\Controllers\Base\BaseController;
 use Famoser\SyncApi\Exceptions\ApiException;
 use Famoser\SyncApi\Exceptions\ServerException;
 use Famoser\SyncApi\Helpers\RequestHelper;
+use Famoser\SyncApi\Models\Communication\Entities\Base\BaseCommunicationEntity;
 use Famoser\SyncApi\Models\Communication\Entities\CollectionCommunicationEntity;
 use Famoser\SyncApi\Models\Communication\Request\Base\BaseRequest;
 use Famoser\SyncApi\Models\Communication\Response\CollectionEntityResponse;
@@ -45,14 +46,12 @@ class CollectionController extends ApiSyncController
         $this->authorizeRequest($req);
         $this->authenticateRequest($req);
 
-        $res = $this->syncInternal(
-            $req, 
-            $req->CollectionEntities, 
-            ContentType::COLLECTION
-        );
-
         $resp = new CollectionEntityResponse();
-        $resp->CollectionEntities = $res;
+        $resp->CollectionEntities = $this->syncInternal(
+            $req,
+            $req->CollectionEntities,
+            ContentType::COLLECTION
+        );;
 
         return $this->returnJson($response, $resp);
     }
@@ -73,24 +72,12 @@ class CollectionController extends ApiSyncController
         }
 
         //get all accessible collection guids
-        $dbh = $this->getDatabaseHelper();
-        $userCollections = $dbh->getFromDatabase(
-            new UserCollection(),
-            "user_guid =:user_guid",
-            array("user_guid" => $this->getUser($req)->guid),
-            null,
-            1000,
-            "collection_guid");
-
-        $collectionIds = [];
-        foreach ($userCollections as $co) {
-            $collectionIds[] = $co->collection_guid;
-        }
+        $collectionIds = $this->getCollectionIds($req);
 
         //get all collections
-        return $dbh->getFromDatabase(
+        return $this->getDatabaseHelper()->getFromDatabase(
             new Collection(),
-            "guid IN (" . implode(',:', array_keys($collectionIds)) . ")",
+            "guid IN (:" . implode(',:', array_keys($collectionIds)) . ")",
             $collectionIds);
     }
 
@@ -99,11 +86,12 @@ class CollectionController extends ApiSyncController
      *
      * @param BaseRequest $req
      * @param $contentType
+     * @param BaseCommunicationEntity $communicationEntity
      * @return BaseSyncEntity
      * @throws ApiException
      * @throws ServerException
      */
-    protected function createEntity(BaseRequest $req, $contentType)
+    protected function createEntity(BaseRequest $req, $contentType, BaseCommunicationEntity $communicationEntity)
     {
         if ($contentType != ContentType::COLLECTION) {
             throw new ServerException(ServerError::FORBIDDEN);

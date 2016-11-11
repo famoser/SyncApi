@@ -13,9 +13,11 @@ use Famoser\SyncApi\Controllers\Base\ApiRequestController;
 use Famoser\SyncApi\Controllers\Base\ApiSyncController;
 use Famoser\SyncApi\Exceptions\ServerException;
 use Famoser\SyncApi\Helpers\RequestHelper;
+use Famoser\SyncApi\Models\Communication\Entities\Base\BaseCommunicationEntity;
 use Famoser\SyncApi\Models\Communication\Entities\CollectionCommunicationEntity;
 use Famoser\SyncApi\Models\Communication\Entities\DeviceCommunicationEntity;
 use Famoser\SyncApi\Models\Communication\Request\Base\BaseRequest;
+use Famoser\SyncApi\Models\Communication\Response\AuthorizationResponse;
 use Famoser\SyncApi\Models\Communication\Response\CollectionEntityResponse;
 use Famoser\SyncApi\Models\Entities\Base\BaseSyncEntity;
 use Famoser\SyncApi\Models\Entities\ContentVersion;
@@ -28,6 +30,15 @@ use Slim\Http\Response;
 
 class DeviceController extends ApiSyncController
 {
+    /**
+     * gets all devices from a specific user
+     *
+     * @param Request $request
+     * @param Response $response
+     * @param $args
+     * @return Response
+     * @throws \Famoser\SyncApi\Exceptions\ApiException
+     */
     public function get(Request $request, Response $response, $args)
     {
         $req = RequestHelper::parseCollectionEntityRequest($request);
@@ -44,14 +55,61 @@ class DeviceController extends ApiSyncController
         return $this->returnJson($response, $resp);
     }
 
+    /**
+     * authenticates a device
+     *
+     * @param Request $request
+     * @param Response $response
+     * @param $args
+     * @return Response
+     * @throws ServerException
+     */
     public function auth(Request $request, Response $response, $args)
     {
-        throw new \Exception("not implemented");
+        return $this->authInternal($request, $response, false);
     }
 
+    /**
+     * unauthenticates a device
+     * 
+     * @param Request $request
+     * @param Response $response
+     * @param $args
+     * @return Response
+     * @throws ServerException
+     */
     public function unAuth(Request $request, Response $response, $args)
     {
-        throw new \Exception("not implemented");
+        return $this->authInternal($request, $response, false);
+    }
+
+    /**
+     * auth / de auth device based on the value specified in action
+     *
+     * @param Request $request
+     * @param Response $response
+     * @param $action
+     * @return Response
+     * @throws ServerException
+     * @throws \Famoser\SyncApi\Exceptions\ApiException
+     */
+    private function authInternal(Request $request, Response $response, $action)
+    {
+        $req = RequestHelper::parseAuthorizationRequest($request);
+        $this->authorizeRequest($req);
+        $this->authenticateRequest($req);
+
+        $dev = $this->getDatabaseHelper()->getSingleFromDatabase(
+            new Device(),
+            "user_guid = :user_guid AND guid = :guid",
+            array("user_guid" => $this->getUser($req)->guid, "guid" => $req->ClientMessage)
+        );
+        $dev->is_authenticated = $action;
+        if (!$this->getDatabaseHelper()->saveToDatabase($dev)) {
+            throw new ServerException(ServerError::DATABASE_SAVE_FAILURE);
+        }
+
+        return $this->returnJson($response, new AuthorizationResponse());
     }
 
     /**
@@ -80,10 +138,12 @@ class DeviceController extends ApiSyncController
      *
      * @param BaseRequest $req
      * @param $contentType
+     * @param BaseCommunicationEntity $communicationEntity
      * @return BaseSyncEntity
      * @throws ServerException
+     * @throws \Famoser\SyncApi\Exceptions\ApiException
      */
-    protected function createEntity(BaseRequest $req, $contentType)
+    protected function createEntity(BaseRequest $req, $contentType, BaseCommunicationEntity $communicationEntity)
     {
         if ($contentType != ContentType::DEVICE) {
             throw new ServerException(ServerError::FORBIDDEN);

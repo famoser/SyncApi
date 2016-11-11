@@ -10,13 +10,72 @@ namespace Famoser\SyncApi\Controllers;
 
 
 use Famoser\SyncApi\Controllers\Base\ApiRequestController;
+use Famoser\SyncApi\Exceptions\ServerException;
+use Famoser\SyncApi\Helpers\RequestHelper;
+use Famoser\SyncApi\Models\Communication\Response\AuthorizationResponse;
+use Famoser\SyncApi\Models\Entities\UserCollection;
+use Famoser\SyncApi\Types\ServerError;
 use Slim\Http\Request;
 use Slim\Http\Response;
 
 class UserController extends ApiRequestController
 {
+    /**
+     * authenticate other users against collection
+     * 
+     * @param Request $request
+     * @param Response $response
+     * @param $args
+     * @return Response
+     * @throws ServerException
+     * @throws \Famoser\SyncApi\Exceptions\ApiException
+     */
     public function auth(Request $request, Response $response, $args)
     {
-        throw new \Exception("not implemented");
+        $req = RequestHelper::parseAuthorizationRequest($request);
+        $this->authorizeRequest($req);
+        $this->authenticateRequest($req);
+
+        //check if requesting user has access to collection, if yes, add to $guidsToSetFree
+        $allowedGuids = $this->getCollectionIds($req);
+        $guidsToSetFree = [];
+        foreach ($req->CollectionEntity as $item) {
+            if (in_array($item->Id, $allowedGuids)) {
+                $guidsToSetFree[] = $item->Id;
+            }
+        }
+
+        foreach ($req->UserEntity as $item) {
+            //check if user has already access to one or more of the collections
+            $sqlArr = $guidsToSetFree;
+            $sqlArr["user_guid"] = $item->Id;
+            $userCollections = $this->getDatabaseHelper()->getFromDatabase(
+                new UserCollection(),
+                "user_guid =:user_guid AND collection_guid IN (:" . implode(",:", array_keys($guidsToSetFree)),
+                $sqlArr,
+                null,
+                1000,
+                "collection_guid");
+
+            //remove guids which user already has access to
+            $guidsForUser = $guidsToSetFree;
+            foreach ($userCollections as $userCollection) {
+                //there is very likely a better way to do this, but as this special case should not happen at all, I'll leave it as it is
+                $guidsForUser = array_diff(array($userCollection->collection_guid), $guidsForUser);
+            }
+
+            //add new accesses
+            foreach ($guidsForUser as $collectionGuid) {
+                $userCollection = new UserCollection();
+                $userCollection->user_guid = $item->Id;
+                $userCollection->create_date_time = time();
+                $userCollection->collection_guid = $collectionGuid;
+                if (!$this->getDatabaseHelper()->saveToDatabase($userCollection)) {
+                    throw new ServerException(ServerError::DATABASE_SAVE_FAILURE);
+                }
+            }
+        }
+
+        return $this->returnJson($response, new AuthorizationResponse());
     }
 }

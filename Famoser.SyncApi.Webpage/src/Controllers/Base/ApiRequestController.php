@@ -17,8 +17,10 @@ use Famoser\SyncApi\Models\Communication\Request\Base\BaseRequest;
 use Famoser\SyncApi\Models\Communication\Response\Base\BaseResponse;
 use Famoser\SyncApi\Models\Entities\Application;
 use Famoser\SyncApi\Models\Entities\Base\BaseSyncEntity;
+use Famoser\SyncApi\Models\Entities\Collection;
 use Famoser\SyncApi\Models\Entities\Device;
 use Famoser\SyncApi\Models\Entities\User;
+use Famoser\SyncApi\Models\Entities\UserCollection;
 use Famoser\SyncApi\Types\ApiError;
 use Famoser\SyncApi\Types\ServerError;
 use Slim\Http\Response;
@@ -138,6 +140,34 @@ class ApiRequestController extends BaseController
             new Device(), "guid = :guid AND user_guid = :user_guid AND is_deleted = :is_deleted",
             array("guid" => $req->DeviceId, "user_guid" => $this->getUser($req)->guid, "is_deleted" => false)
         );
+    }
+
+    private $collectionIds;
+
+    /**
+     * @param BaseRequest $req
+     * @return array
+     * @throws ApiException
+     */
+    protected function getCollectionIds(BaseRequest $req)
+    {
+        if ($this->collectionIds != null)
+            return $this->collectionIds;
+
+        $userCollectionIds = $this->getDatabaseHelper()->getFromDatabase(
+            new UserCollection(),
+            "user_guid =:user_guid",
+            array("user_guid" => $this->getUser($req)->guid),
+            null,
+            1000,
+            "collection_guid");
+
+        $this->collectionIds = [];
+        foreach ($userCollectionIds as $co) {
+            $this->collectionIds[] = $co->collection_guid;
+        }
+
+        return $this->collectionIds;
     }
 
 

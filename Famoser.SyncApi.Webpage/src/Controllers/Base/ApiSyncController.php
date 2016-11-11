@@ -36,9 +36,10 @@ abstract class ApiSyncController extends ApiRequestController
      *
      * @param BaseRequest $req
      * @param $contentType
+     * @param BaseCommunicationEntity $communicationEntity
      * @return BaseSyncEntity
      */
-    abstract protected function createEntity(BaseRequest $req, $contentType);
+    abstract protected function createEntity(BaseRequest $req, $contentType, BaseCommunicationEntity $communicationEntity);
 
     /**
      * does the sync in a generic fashion
@@ -223,7 +224,7 @@ abstract class ApiSyncController extends ApiRequestController
             throw new ApiException(ApiError::RESOURCE_ALREADY_EXISTS);
         }
 
-        $entity = $this->createEntity($req, $contentType);
+        $entity = $this->createEntity($req, $contentType, $communicationEntity);
         $entity->guid = $communicationEntity->Id;
         $entity->identifier = $communicationEntity->Identifier;
         $entity->is_deleted = false;

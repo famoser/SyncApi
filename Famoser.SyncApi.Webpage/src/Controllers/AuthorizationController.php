@@ -15,6 +15,7 @@ use Famoser\SyncApi\Exceptions\ApiException;
 use Famoser\SyncApi\Exceptions\ServerException;
 use Famoser\SyncApi\Helpers\RequestHelper;
 use Famoser\SyncApi\Helpers\ResponseHelper;
+use Famoser\SyncApi\Models\Communication\Entities\Base\BaseCommunicationEntity;
 use Famoser\SyncApi\Models\Communication\Entities\UserCommunicationEntity;
 use Famoser\SyncApi\Models\Communication\Request\AuthorizationRequest;
 use Famoser\SyncApi\Models\Communication\Request\Base\BaseRequest;
@@ -247,10 +248,12 @@ class AuthorizationController extends ApiSyncController
      *
      * @param BaseRequest $req
      * @param $contentType
+     * @param BaseCommunicationEntity $communicationEntity
      * @return BaseSyncEntity
+     * @throws ApiException
      * @throws ServerException
      */
-    protected function createEntity(BaseRequest $req, $contentType)
+    protected function createEntity(BaseRequest $req, $contentType, BaseCommunicationEntity $communicationEntity)
     {
         if (!$req instanceof AuthorizationRequest) {
             throw new ServerException(ServerError::FORBIDDEN);

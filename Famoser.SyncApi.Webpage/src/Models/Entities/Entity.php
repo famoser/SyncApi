@@ -20,7 +20,7 @@ CREATE TABLE 'entities' (
 */
 
 use Famoser\SyncApi\Models\Communication\Entities\Base\BaseCommunicationEntity;
-use Famoser\SyncApi\Models\Communication\Entities\SyncCommunicationCommunicationEntity;
+use Famoser\SyncApi\Models\Communication\Entities\SyncCommunicationEntity;
 use Famoser\SyncApi\Models\Entities\Base\BaseSyncEntity;
 use Famoser\SyncApi\Types\ContentType;
 
@@ -62,7 +62,7 @@ class Entity extends BaseSyncEntity
      */
     protected function createSpecificCommunicationEntity()
     {
-        $entity = new SyncCommunicationCommunicationEntity();
+        $entity = new SyncCommunicationEntity();
 
         $entity->UserId = $this->user_guid;
         $entity->DeviceId = $this->device_guid;
