@@ -62,7 +62,8 @@ CREATE TABLE 'frontend_users' (
   'id'       INTEGER DEFAULT NULL PRIMARY KEY AUTOINCREMENT,
   'email'    TEXT    DEFAULT NULL,
   'username' TEXT    DEFAULT NULL,
-  'password' TEXT    DEFAULT NULL
+  'password' TEXT    DEFAULT NULL,
+  'reset_key' TEXT    DEFAULT NULL
 );
 
 CREATE TABLE 'authorization_codes' (

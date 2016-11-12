@@ -107,3 +107,12 @@ a:after {
 .centered {
 	text-align: center;
 }
+
+.form-control {
+    border-radius: 0;
+    margin-bottom: 5px;
+}
+
+.btn {
+    border-radius: 0;
+}

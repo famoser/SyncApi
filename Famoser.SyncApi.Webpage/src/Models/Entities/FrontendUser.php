@@ -13,7 +13,8 @@ CREATE TABLE 'frontend_users' (
   'id'       INTEGER DEFAULT NULL PRIMARY KEY AUTOINCREMENT,
   'email'    TEXT    DEFAULT NULL,
   'username' TEXT    DEFAULT NULL,
-  'password' TEXT    DEFAULT NULL
+  'password' TEXT    DEFAULT NULL,
+  'reset_key' TEXT    DEFAULT NULL
 );
 */
 
@@ -29,6 +30,9 @@ class FrontendUser extends BaseEntity
 
     /* @var string $password type_of:password_hash */
     public $password;
+
+    /* @var string $reset_key type_of:random_hash */
+    public $reset_key;
 
     public function getTableName()
     {

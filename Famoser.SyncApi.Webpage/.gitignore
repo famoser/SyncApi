@@ -2,3 +2,4 @@ vendor/*
 .idea
 app/cache/*
 app/logs/*
+app/data.sqlite
