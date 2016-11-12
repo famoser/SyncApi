@@ -50,15 +50,12 @@ class DatabaseHelper
         return $this->database;
     }
 
-    private function constructPdo($path)
-    {
-        $pdo = new PDO("sqlite:" . $path);
-        $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-        $pdo->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
-        return $pdo;
-    }
-
-    private function executeScripts(PDO $connection, $scriptsPath)
+    /**
+     * execute scripts from an .sql file
+     * 
+     * @param $scriptsPath
+     */
+    public function executeScripts($scriptsPath)
     {
         $files = scandir($scriptsPath);
         foreach ($files as $file) {
@@ -67,44 +64,33 @@ class DatabaseHelper
                 $queryArray = explode(";", $queries);
                 foreach ($queryArray as $item) {
                     if (trim($item) != "") {
-                        $connection->query($item);
+                        $this->getConnection()->query($item);
                     }
                 }
             }
         }
     }
 
-    private static $activePathKey = 'path';
-
-    public static function setPathKey($newPathKey)
+    private function initializeDatabase()
     {
-        DatabaseHelper::$activePathKey = $newPathKey;
-    }
+        $activePath = $this->container["settings"]["data_path"] . "/" . $this->container['settings']['db']["path"];
 
-    public function initializeDatabase()
-    {
-        $activePath = $this->container["settings"]["data_path"] . "/" . $this->container['settings']['db'][DatabaseHelper::$activePathKey];
-
-        $tempFilePath = $this->container["settings"]["data_path"] . "/.db_created";
-        if (!file_exists($tempFilePath)) {
-
-            $testPath = $this->container["settings"]["data_path"] . "/" . $this->container['settings']['db']['test_path'];
-            $prodPath = $this->container["settings"]["data_path"] . "/" . $this->container['settings']['db']["path"];
-
-            $scriptsPath = $this->container["settings"]["asset_path"] . "/sql/initialize";
-
-            if (!file_exists($testPath)) {
-                $this->executeScripts($this->constructPdo($testPath), $scriptsPath);
-            }
-            if (!file_exists($prodPath)) {
-                $this->executeScripts($this->constructPdo($prodPath), $scriptsPath);
-            }
-
-            file_put_contents($tempFilePath, time());
+        if (!file_exists($activePath)) {
+            copy(
+                $activePath = $this->container["settings"]["data_path"] . "/" . $this->container['settings']['db']["template_path"],
+                $activePath = $this->container["settings"]["data_path"] . "/" . $this->container['settings']['db']["path"]
+            );
         }
 
         $this->database = $this->constructPdo($activePath);
-        return true;
+    }
+
+    private function constructPdo($path)
+    {
+        $pdo = new PDO("sqlite:" . $path);
+        $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+        $pdo->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
+        return $pdo;
     }
 
     private function createQuery(BaseEntity $entity, $where = null, $parameters = null, $orderBy = null, $limit = 1000, $selector = "*")
@@ -120,6 +106,14 @@ class DatabaseHelper
         return $sql;
     }
 
+    /**
+     * executes query and fetches all results
+     * 
+     * @param BaseEntity $entity
+     * @param $sql
+     * @param $parameters
+     * @return array|bool|null
+     */
     private function executeAndFetch(BaseEntity $entity, $sql, $parameters)
     {
         try {
@@ -137,11 +131,11 @@ class DatabaseHelper
 
     /**
      * @param BaseEntity $entity
-     * @param null       $where
-     * @param null       $parameters
-     * @param null       $orderBy
-     * @param int        $limit
-     * @param string     $selector
+     * @param null $where
+     * @param null $parameters
+     * @param null $orderBy
+     * @param int $limit
+     * @param string $selector
      * @return bool|\Famoser\SyncApi\Models\Entities\Application[]|\Famoser\SyncApi\Models\Entities\ApplicationSetting[]|\Famoser\SyncApi\Models\Entities\AuthorizationCode[]|\Famoser\SyncApi\Models\Entities\Collection[]|\Famoser\SyncApi\Models\Entities\ContentVersion[]|\Famoser\SyncApi\Models\Entities\Device[]|\Famoser\SyncApi\Models\Entities\Entity[]|\Famoser\SyncApi\Models\Entities\FrontendUser[]|\Famoser\SyncApi\Models\Entities\User[]|\Famoser\SyncApi\Models\Entities\UserCollection[]
      */
     public function getFromDatabase(BaseEntity $entity, $where = null, $parameters = null, $orderBy = null, $limit = 1000, $selector = "*")
@@ -153,10 +147,10 @@ class DatabaseHelper
 
     /**
      * @param BaseEntity $entity
-     * @param null       $where
-     * @param null       $parameters
-     * @param null       $orderBy
-     * @param int        $limit
+     * @param null $where
+     * @param null $parameters
+     * @param null $orderBy
+     * @param int $limit
      * @return int
      */
     public function countFromDatabase(BaseEntity $entity, $where = null, $parameters = null, $orderBy = null, $limit = 1000)
@@ -168,13 +162,13 @@ class DatabaseHelper
 
     /**
      * @param BaseEntity $entity
-     * @param string     $property
-     * @param int[]      $values
-     * @param bool       $invertIn
-     * @param null       $where
-     * @param null       $parameters
-     * @param null       $orderBy
-     * @param int        $limit
+     * @param string $property
+     * @param int[] $values
+     * @param bool $invertIn
+     * @param null $where
+     * @param null $parameters
+     * @param null $orderBy
+     * @param int $limit
      * @return Application[]|ApplicationSetting[]|AuthorizationCode[]|Collection[]|ContentVersion[]|Device[]|Entity[]|FrontendUser[]|User[]|UserCollection[]|bool
      */
     public function getWithInFromDatabase(BaseEntity $entity, $property, $values, $invertIn = false, $where = null, $parameters = null, $orderBy = null, $limit = 1000)
@@ -200,9 +194,9 @@ class DatabaseHelper
 
     /**
      * @param BaseEntity $entity
-     * @param null       $where
-     * @param null       $parameters
-     * @param null       $orderBy
+     * @param null $where
+     * @param null $parameters
+     * @param null $orderBy
      * @return Application|ApplicationSetting|AuthorizationCode|Collection|ContentVersion|Device|Entity|FrontendUser|User|UserCollection|bool
      */
     public function getSingleFromDatabase(BaseEntity $entity, $where = null, $parameters = null, $orderBy = null)
@@ -270,6 +264,7 @@ class DatabaseHelper
         $prep = $this->getConnection()->prepare($sql);
         return $prep->execute($arr);
     }
+
     /**
      * @param BaseEntity $entity
      * @return bool

@@ -20,8 +20,8 @@ $configuration = [
         'displayErrorDetails' => false,
         'debug_mode' => true,
         'db' => [
-            'path' => "sqlite.db",
-            'test_path' => "sqlite_tests.db"
+            'path' => "data.sqlite",
+            'template_path' => "data_template.sqlite"
         ],
         'data_path' => realpath("../../app"),
         'asset_path' => realpath("../Assets"),
@@ -57,7 +57,7 @@ $c['errorHandler'] = function (Container $c) {
             $resp->RequestFailed = true;
             $resp->ApiError = $exception->getCode();
             $resp->ServerMessage = $exception->getMessage();
-            return $response->withJson($resp);
+            return $response->withStatus(500)->withJson($resp);
         } else {
             return $response->withStatus(500)->getBody()->write("exception occurred: " . $exception->getMessage());
         }
@@ -127,6 +127,12 @@ $webAppRoutes = function () use ($controllerNamespace) {
 
     $this->get('/register', $controllerNamespace . 'LoginController:register')->setName("register");
     $this->post('/register', $controllerNamespace . 'LoginController:registerPost');
+
+    $this->get('/forgot', $controllerNamespace . 'LoginController:forgot')->setName("forgot");
+    $this->post('/forgot', $controllerNamespace . 'LoginController:forgotPost');
+
+    $this->get('/recover/{id}', $controllerNamespace . 'LoginController:recover')->setName("recover");
+    $this->post('/recover/{id}', $controllerNamespace . 'LoginController:recoverPost');
 
     $this->group(
         "/dashboard", function () use ($controllerNamespace) {
