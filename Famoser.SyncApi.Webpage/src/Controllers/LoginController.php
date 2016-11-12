@@ -10,14 +10,15 @@ namespace Famoser\SyncApi\Controllers;
 
 
 use Famoser\SyncApi\Controllers\Base\BaseController;
+use Famoser\SyncApi\Controllers\Base\FrontendController;
 use Slim\Http\Request;
 use Slim\Http\Response;
 
-class LoginController extends BaseController
+class LoginController extends FrontendController
 {
     public function login(Request $request, Response $response, $args)
     {
-        throw new \Exception("not implemented");
+        return $this->renderTemplate($response, "login/login", $args);
     }
 
     public function loginPost(Request $request, Response $response, $args)
@@ -27,7 +28,7 @@ class LoginController extends BaseController
 
     public function register(Request $request, Response $response, $args)
     {
-        throw new \Exception("not implemented");
+        return $this->renderTemplate($response, "login/register", $args);
     }
 
     public function registerPost(Request $request, Response $response, $args)

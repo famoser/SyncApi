@@ -18,7 +18,7 @@ class PublicController extends FrontendController
 {
     public function index(Request $request, Response $response, $args)
     {
-        return $this->renderTemplate($response, "index", $args);
+        return $this->renderTemplate($response, "public/index", $args);
     }
 
     public function indexAsJson(Request $request, Response $response, $args)

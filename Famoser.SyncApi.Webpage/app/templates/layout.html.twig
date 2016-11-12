@@ -1,48 +1,54 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="description" content="LastPass: The last application you need for your passwords">
     <meta name="author" content="Florian Moser">
+    <link rel="shortcut icon" href="/assets/ico/favicon.ico">
 
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <!--[if lte IE 8]><script src="/assets/js/html5shiv.js"></script><![endif]-->
-    <link rel="stylesheet" href="/assets/css/main.css" />
-    <!--[if lte IE 9]><link rel="stylesheet" href="/assets/css/ie9.css" /><![endif]-->
-    <!--[if lte IE 8]><link rel="stylesheet" href="/assets/css/ie8.css" /><![endif]-->
-    <noscript><link rel="stylesheet" href="/assets/css/noscript.css" /></noscript>
+    <title>SyncApi</title>
 
+    <!-- Bootstrap core CSS -->
+    <link href="/assets/css/bootstrap.css" rel="stylesheet">
 
+    <!-- Custom styles for this template -->
+    <link href="/assets/css/style.css" rel="stylesheet">
 
-    <title>LastPass - a password manager</title>
+    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+    <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+    <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
 </head>
-<body class="is-loading">
 
-<!-- Wrapper -->
-<div id="wrapper">
+<body>
 
-    <!-- Main -->
-    <section id="main">
-  {% block content %} {% endblock %}
-    </section>
+<section id="content">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-6 col-md-offset-3 site">
+                <div class="site-title">
+                    <h2>{% block title %} {% endblock %}</h2>
+                </div>
 
-    <!-- Footer -->
-    <footer id="footer">
-        <ul class="copyright">
-            <li>&copy; MassPass @ Florian Moser</li><li>Design: <a href="http://html5up.net">HTML5 UP</a></li>
-        </ul>
-    </footer>
+                <div class="content">
+                    {% block content %} {% endblock %}
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
 
-</div>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+<script src="/assets/js/bootstrap.min.js"></script>
 
-<!-- Scripts -->
-<!--[if lte IE 8]><script src="/assets/js/respond.min.js"></script><![endif]-->
+<!--BACKSTRETCH-->
+<!-- You can use an image of whatever size. This script will stretch to fit in any screen size.-->
+<script type="text/javascript" src="assets/js/jquery.backstretch.min.js"></script>
 <script>
-    if ('addEventListener' in window) {
-        window.addEventListener('load', function() { document.body.className = document.body.className.replace(/\bis-loading\b/, ''); });
-        document.body.className += (navigator.userAgent.match(/(MSIE|rv:11\.0)/) ? ' is-ie' : '');
-    }
+    $.backstretch("assets/img/bg01.jpg", {speed: 500});
 </script>
 
 </body>
