@@ -29,10 +29,11 @@ class LoginController extends FrontendController
         if (isset($req["username"]) && isset($req["password"])) {
             $user = $this->getDatabaseHelper()->getSingleFromDatabase(
                 new FrontendUser(),
-                "username = :username"
+                "username = :username",
+                array("username" => $req["username"])
             );
-            if (password_verify($req["password"], $user->password)) {
-                $_SESSION["user"] = $user;
+            if ($user != null && password_verify($req["password"], $user->password)) {
+                $this->setFrontendUser($user);
                 return $this->redirect($request, $response, "application_index");
             }
         }
@@ -69,7 +70,7 @@ class LoginController extends FrontendController
                 $frontendUser->email = $req["email"];
                 $frontendUser->password = password_hash($req["password"], PASSWORD_BCRYPT);
                 $frontendUser->username = $req["username"];
-                $frontendUser->reset_key = md5(time());
+                $frontendUser->reset_key = md5(rand(0,100000));
                 if (!$this->getDatabaseHelper()->saveToDatabase($frontendUser)) {
                     throw new ServerException(ServerError::DATABASE_SAVE_FAILURE);
                 }

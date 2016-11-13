@@ -72,7 +72,7 @@ class BaseController
     /**
      * redirects to the route specified in $slug
      *
-     * @param  Request  $request
+     * @param  Request $request
      * @param  Response $response
      * @param  $slug
      * @return static
@@ -88,7 +88,7 @@ class BaseController
      *
      * @param  BaseRequest $request
      * @param  $neededProps
-     * @param  null        $neededArrays
+     * @param  null $neededArrays
      * @return bool
      */
     protected function isWellDefined(BaseRequest $request, $neededProps, $neededArrays = null)
@@ -115,16 +115,17 @@ class BaseController
     /**
      * writes all properties from array to object, and returns all missing ones
      *
-     * @param  array  $source
+     * @param  array $source
      * @param  object $targetObject
-     * @param  array  $properties
+     * @param  array $properties
      * @return array
      */
     protected function writePropertiesFromArray($source, $targetObject, $properties)
     {
         $missing = [];
+        $keys = array_keys($source);
         foreach ($properties as $property) {
-            if (in_array($property, $source)) {
+            if (in_array($property, $keys)) {
                 $targetObject->$property = $source[$property];
             } else {
                 $missing[] = $property;

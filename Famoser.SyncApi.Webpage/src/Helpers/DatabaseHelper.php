@@ -48,7 +48,7 @@ class DatabaseHelper
 
     /**
      * execute scripts from an .sql file
-     * 
+     *
      * @param $scriptsPath
      */
     public function executeScripts($scriptsPath)
@@ -98,13 +98,15 @@ class DatabaseHelper
         if ($orderBy != null) {
             $sql .= " ORDER BY " . $orderBy;
         }
-        $sql .= " LIMIT " . $limit;
+        if ($limit > 0) {
+            $sql .= " LIMIT " . $limit;
+        }
         return $sql;
     }
 
     /**
      * executes query and fetches all results
-     * 
+     *
      * @param BaseEntity $entity
      * @param $sql
      * @param $parameters
@@ -134,7 +136,7 @@ class DatabaseHelper
      * @param string $selector
      * @return bool|\Famoser\SyncApi\Models\Entities\Application[]|\Famoser\SyncApi\Models\Entities\ApplicationSetting[]|\Famoser\SyncApi\Models\Entities\AuthorizationCode[]|\Famoser\SyncApi\Models\Entities\Collection[]|\Famoser\SyncApi\Models\Entities\ContentVersion[]|\Famoser\SyncApi\Models\Entities\Device[]|\Famoser\SyncApi\Models\Entities\Entity[]|\Famoser\SyncApi\Models\Entities\FrontendUser[]|\Famoser\SyncApi\Models\Entities\User[]|\Famoser\SyncApi\Models\Entities\UserCollection[]
      */
-    public function getFromDatabase(BaseEntity $entity, $where = null, $parameters = null, $orderBy = null, $limit = 1000, $selector = "*")
+    public function getFromDatabase(BaseEntity $entity, $where = null, $parameters = null, $orderBy = null, $limit = -1, $selector = "*")
     {
         $sql = $this->createQuery($entity, $where, $parameters, $orderBy, $limit, $selector);
         $res = $this->executeAndFetch($entity, $sql, $parameters);
@@ -149,11 +151,10 @@ class DatabaseHelper
      * @param int $limit
      * @return int
      */
-    public function countFromDatabase(BaseEntity $entity, $where = null, $parameters = null, $orderBy = null, $limit = 1000)
+    public function countFromDatabase(BaseEntity $entity, $where = null, $parameters = null, $orderBy = null, $limit = -1)
     {
         $sql = $this->createQuery($entity, $where, $parameters, $orderBy, $limit, "COUNT(*)");
-        $res = $this->execute($sql, $parameters);
-        return $res;
+        return $this->executeAndCount($sql, $parameters);
     }
 
     /**
@@ -167,7 +168,7 @@ class DatabaseHelper
      * @param int $limit
      * @return Application[]|ApplicationSetting[]|AuthorizationCode[]|Collection[]|ContentVersion[]|Device[]|Entity[]|FrontendUser[]|User[]|UserCollection[]|bool
      */
-    public function getWithInFromDatabase(BaseEntity $entity, $property, $values, $invertIn = false, $where = null, $parameters = null, $orderBy = null, $limit = 1000)
+    public function getWithInFromDatabase(BaseEntity $entity, $property, $values, $invertIn = false, $where = null, $parameters = null, $orderBy = null, $limit = -1)
     {
         if ($parameters == null) {
             $parameters = [];
@@ -252,13 +253,27 @@ class DatabaseHelper
 
     /**
      * @param $sql
-     * @param $arr
+     * @param null $arr
      * @return bool
      */
     public function execute($sql, $arr = null)
     {
         $prep = $this->getConnection()->prepare($sql);
         return $prep->execute($arr);
+    }
+
+    /**
+     * @param $sql
+     * @param null $arr
+     * @return bool
+     */
+    private function executeAndCount($sql, $arr = null)
+    {
+        $prep = $this->getConnection()->prepare($sql);
+        if (!$prep->execute($arr)) {
+            return false;
+        }
+        return $prep->fetchAll(PDO::FETCH_NUM);
     }
 
     /**

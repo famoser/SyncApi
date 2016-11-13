@@ -1,7 +1,20 @@
-{% extends "application_layout.html.twig" %}
+{% extends "layout.html.twig" %}
 
 {% block title %}create new application{% endblock title %}
 
-{% block application_content %}
+{% block content %}
+    <h3>create a new application form</h3>
+    <form action="{{ path_for("application_new") }}" method="post">
+        <div class="form-group">
+            <input placeholder="name" name="name" class="form-control"/>
+            <input placeholder="description" name="description" class="form-control"/>
+        </div>
+        <div class="form-group">
+            <input placeholder="application id" name="application_id" class="form-control"/>
+            <input placeholder="application seed" name="application_seed" type="number" class="form-control"/>
+        </div>
+        <button class="btn btn-primary" type="submit">send</button>
+    </form>
 
-{% endblock application_content %}
+    <p>go <a href="{{ path_for("application_index") }}">back</a></p>
+{% endblock content %}

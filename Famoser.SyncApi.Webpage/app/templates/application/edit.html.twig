@@ -1,7 +1,17 @@
-{% extends "application_layout.html.twig" %}
+{% extends "layout.html.twig" %}
 
-{% block title %}create new application{% endblock title %}
+{% block title %}edit application{% endblock title %}
 
-{% block application_content %}
-    
-{% endblock application_content %}
+{% block content %}
+    <h3>edit {{ application.name }}</h3>
+    <form action="{{ path_for("application_edit", {'id' : application.id}) }}" method="post">
+        <div class="form-group">
+            <input placeholder="name" name="name" value="{{ application.name }}" class="form-control"/>
+            <input placeholder="description" name="description" value="{{ application.description }}"
+                   class="form-control"/>
+        </div>
+        <button class="btn btn-primary" type="submit">send</button>
+    </form>
+    <p>go <a href="{{ path_for("application_index") }}">back</a><br>
+        <a href="{{ path_for("application_delete", {'id' : application.id}) }}">delete</a> this application</p>
+{% endblock content %}

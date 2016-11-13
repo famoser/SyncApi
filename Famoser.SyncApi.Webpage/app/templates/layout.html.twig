@@ -34,6 +34,9 @@
                 <div class="site-title">
                     <h2>{% block title %} {% endblock %}</h2>
                 </div>
+                {% if message is defined %}
+                    <p>{{ message }}</p>
+                {% endif %}
 
                 <div class="content">
                     {% block content %} {% endblock %}

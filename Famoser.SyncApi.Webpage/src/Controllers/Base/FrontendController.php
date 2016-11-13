@@ -18,6 +18,8 @@ class FrontendController extends BaseController
     private $frontendUser;
 
     /**
+     * get the frontend user
+     *
      * @return FrontendUser|null
      */
     protected function getFrontendUser()
@@ -26,13 +28,23 @@ class FrontendController extends BaseController
             return $this->frontendUser;
         }
 
-        if (!isset($_SESSION["admin_id"])) {
+        if (!isset($_SESSION["frontend_user_id"])) {
             return null;
         }
 
         $helper = $this->getDatabaseHelper();
-        $this->frontendUser = $helper->getSingleFromDatabase(new FrontendUser(), "id = :id", array("id" => $_SESSION["admin_id"]));
+        $this->frontendUser = $helper->getSingleFromDatabase(new FrontendUser(), "id = :id", array("id" => $_SESSION["frontend_user_id"]));
         return $this->frontendUser;
+    }
+
+    /**
+     * set the frontend user
+     *
+     * @param FrontendUser $user
+     */
+    protected function setFrontendUser(FrontendUser $user)
+    {
+        $_SESSION["frontend_user_id"] = $user->id;
     }
 
 

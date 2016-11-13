@@ -11,7 +11,16 @@ namespace Famoser\SyncApi\Controllers;
 
 use Famoser\SyncApi\Controllers\Base\FrontendController;
 use Famoser\SyncApi\Exceptions\AccessDeniedException;
+use Famoser\SyncApi\Exceptions\FrontendException;
+use Famoser\SyncApi\Models\Display\ApplicationStatistic;
 use Famoser\SyncApi\Models\Entities\Application;
+use Famoser\SyncApi\Models\Entities\Collection;
+use Famoser\SyncApi\Models\Entities\Device;
+use Famoser\SyncApi\Models\Entities\Entity;
+use Famoser\SyncApi\Models\Entities\FrontendUser;
+use Famoser\SyncApi\Models\Entities\User;
+use Famoser\SyncApi\Models\Entities\UserCollection;
+use Famoser\SyncApi\Types\FrontendError;
 use Slim\Http\Request;
 use Slim\Http\Response;
 
@@ -20,15 +29,20 @@ class ApplicationController extends FrontendController
     private function ensureHasAccess()
     {
         if (!$this->getFrontendUser()) {
-            throw new AccessDeniedException();
+            throw new FrontendException(FrontendError::NOT_LOGGED_IN);
         }
     }
 
+    /**
+     * @param $id
+     * @return Application
+     * @throws AccessDeniedException
+     */
     private function getAuthorizedApplication($id)
     {
         $application = $this->getDatabaseHelper()->getSingleFromDatabase(new Application(), "id = :id", array("id" => $id));
         if ($this->getFrontendUser() && $this->getFrontendUser()->id == $application->admin_id) {
-            return;
+            return $application;
         }
 
         throw new AccessDeniedException();
@@ -37,7 +51,11 @@ class ApplicationController extends FrontendController
     public function index(Request $request, Response $response, $args)
     {
         $this->ensureHasAccess();
-        $applications = $this->getDatabaseHelper()->getFromDatabase(new Application(), "admin_id = :admin_id", array("admin_id", $this->getFrontendUser()->id));
+        $applications = $this->getDatabaseHelper()->getFromDatabase(
+            new Application(),
+            "admin_id = :admin_id",
+            array("admin_id" => $this->getFrontendUser()->id)
+        );
         $args["applications"] = $applications;
         return $this->renderTemplate($response, "application/index", $args);
     }
@@ -47,7 +65,74 @@ class ApplicationController extends FrontendController
         $this->ensureHasAccess();
         $application = $this->getAuthorizedApplication($args["id"]);
         $args["application"] = $application;
+        $args["stats"] = $this->getApplicationStats($application->application_id);
         return $this->renderTemplate($response, "application/show", $args);
+    }
+
+    /**
+     * generate application statistic
+     *
+     * @param $application_id
+     * @return ApplicationStatistic
+     */
+    private function getApplicationStats($application_id)
+    {
+        $appStats = new ApplicationStatistic();
+        $users = $this->getDatabaseHelper()->getFromDatabase(
+            new User(),
+            "application_id = :application_id",
+            array("application_id" => $application_id),
+            null,
+            -1,
+            "guid"
+        );
+        $appStats->total_user_count = count($users);
+        if ($appStats->total_user_count == 0) {
+            return $appStats;
+        }
+
+        $userGuids = [];
+        foreach ($users as $user) {
+            $userGuids[] = $user->guid;
+        }
+
+        $devices = $this->getDatabaseHelper()->getFromDatabase(
+            new Device(),
+            "user_guid IN (:" . array_keys($userGuids) . ")",
+            $userGuids,
+            null,
+            -1,
+            "guid"
+        );
+        $appStats->total_devices_count = count($devices);
+        if ($appStats->total_devices_count == 0) {
+            return $appStats;
+        }
+
+        $userCollections = $this->getDatabaseHelper()->getFromDatabase(
+            new UserCollection(),
+            "user_guid IN (:" . array_keys($userGuids) . ")",
+            $userGuids,
+            null,
+            -1,
+            "collection_guid"
+        );
+        $collectionGuids = [];
+        foreach ($userCollections as $userCollection) {
+            $collectionGuids[$userCollection->collection_guid] = true;
+        }
+        $collectionGuids = array_keys($collectionGuids);
+        $appStats->total_collection_count = count($collectionGuids);
+        if ($appStats->total_collection_count == 0) {
+            return $appStats;
+        }
+
+        $appStats->total_items_count = $this->getDatabaseHelper()->countFromDatabase(
+            new Entity(),
+            "collection_guid IN (:" . array_keys($collectionGuids) . ")",
+            $collectionGuids
+        );
+        return $appStats;
     }
 
     public function create(Request $request, Response $response, $args)
@@ -61,14 +146,23 @@ class ApplicationController extends FrontendController
         $this->ensureHasAccess();
         $application = new Application();
         $message = "";
-        if ($this->writeFromPost($application, $message)) {
+        var_dump($request->getParsedBody());
+        if ($this->writeFromPost($application, $request->getParsedBody(), $message, true)) {
             $application->admin_id = $this->getFrontendUser()->id;
             $application->release_date_time = time();
 
-            if ($this->getDatabaseHelper()->saveToDatabase($application)) {
+            $existing = $this->getDatabaseHelper()->getSingleFromDatabase(
+                new Application(),
+                "application_id = :application_id",
+                array("application_id" => $application->application_id)
+            );
+            if ($existing != null) {
+                $args["message"] = "application with this id already exists";
+            } elseif ($this->getDatabaseHelper()->saveToDatabase($application)) {
                 return $this->redirect($request, $response, "application_index");
+            } else {
+                $args["message"] = "application could not be saved (database error)";
             }
-            $args["message"] = "application could not be saved (database error)";
         } else {
             $args["message"] = $message;
         }
@@ -87,17 +181,18 @@ class ApplicationController extends FrontendController
     {
         $this->ensureHasAccess();
         $application = $this->getAuthorizedApplication($args["id"]);
-        if ($this->writeFromPost($application, $message)) {
+        if ($this->writeFromPost($application, $request->getParsedBody(), $message)) {
             if (!$this->getDatabaseHelper()->saveToDatabase($application)) {
                 $args["message"] = "application could not be saved (database error)";
             }
         } else {
             $args["message"] = $message;
         }
+        $args["application"] = $application;
         return $this->renderTemplate($response, "application/edit", $args);
     }
 
-    public function delete(Request $request, Response $response, $args)
+    public function remove(Request $request, Response $response, $args)
     {
         $this->ensureHasAccess();
         $application = $this->getAuthorizedApplication($args["id"]);
@@ -105,7 +200,7 @@ class ApplicationController extends FrontendController
         return $this->renderTemplate($response, "application/delete", $args);
     }
 
-    public function deletePost(Request $request, Response $response, $args)
+    public function removePost(Request $request, Response $response, $args)
     {
         $this->ensureHasAccess();
         $application = $this->getAuthorizedApplication($args["id"]);
@@ -117,9 +212,13 @@ class ApplicationController extends FrontendController
         return $this->redirect($request, $response, "application_index");
     }
 
-    private function writeFromPost(Application $application, &$message)
+    private function writeFromPost(Application $application, array $source, &$message, $createAction = false)
     {
-        $arr = $this->writePropertiesFromArray($_POST, $application, array("name", "description", "application_id", "application_seed"));
+        $propArray = array("name", "description");
+        if ($createAction) {
+            $propArray = array("name", "description", "application_id", "application_seed");
+        }
+        $arr = $this->writePropertiesFromArray($source, $application, $propArray);
         if (count($arr) == 0) {
             //validate application seed
             if (!is_numeric($application->application_seed)) {

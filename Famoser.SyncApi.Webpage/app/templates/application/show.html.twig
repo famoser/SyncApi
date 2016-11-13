@@ -1,7 +1,38 @@
-{% extends "application_layout.html.twig" %}
+{% extends "layout.html.twig" %}
 
-{% block title %}create new application{% endblock title %}
+{% block title %}show application{% endblock title %}
 
-{% block application_content %}
-    
-{% endblock application_content %}
+{% block content %}
+    <h3>show {{ application.name }}</h3>
+    <small>{{ application.description }}</small>
+    <div class="post">
+        <h4>total users</h4>
+        <p class="lead">
+            {{ stats.total_users|default('0') }}
+        </p>
+    </div>
+
+    <div class="post">
+        <h4>total devices</h4>
+        <p class="lead">
+            {{ stats.total_devices|default('0') }}
+        </p>
+    </div>
+
+    <div class="post">
+        <h4>total collections</h4>
+        <p class="lead">
+            {{ stats.total_collections|default('0') }}
+        </p>
+    </div>
+
+    <div class="post">
+        <h4>total entities</h4>
+        <p class="lead">
+            {{ stats.total_entities|default('0') }}
+        </p>
+    </div>
+
+    <p>go <a href="{{ path_for("application_index") }}">back</a><br>
+        <a href="{{ path_for("application_edit", {'id' : application.id}) }}">edit</a> this application</p>
+{% endblock content %}

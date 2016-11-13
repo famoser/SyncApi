@@ -1,7 +1,12 @@
-{% extends "application_layout.html.twig" %}
+{% extends "layout.html.twig" %}
 
-{% block title %}create new application{% endblock title %}
+{% block title %}delete application{% endblock title %}
 
-{% block application_content %}
-    
-{% endblock application_content %}
+{% block content %}
+    <form action="{{ path_for("application_delete", {'id' : application.id}) }}" method="post">
+        <p>You cannot undo this operation!</p>
+        <button class="btn btn-primary" type="submit">delete</button>
+    </form>
+    <p>go <a href="{{ path_for("application_index") }}">back</a><br>
+        <a href="{{ path_for("application_edit", {'id' : application.id}) }}">edit</a> this application</p>
+{% endblock content %}

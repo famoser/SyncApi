@@ -6,8 +6,12 @@
  * Time: 22:40
  */
 
+session_start();
+
+use Famoser\SyncApi\Exceptions\FrontendException;
 use Famoser\SyncApi\Middleware\LoggingMiddleware;
 use Famoser\SyncApi\Models\Communication\Response\Base\BaseResponse;
+use Famoser\SyncApi\Types\FrontendError;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Slim\App;
@@ -52,23 +56,29 @@ $c['errorHandler'] = function (Container $c) {
     return function (Request $request, Response $response, Exception $exception) use ($c) {
         if ($exception instanceof \Famoser\SyncApi\Exceptions\ServerException) {
             return $response->withStatus(500)->getBody()->write("exception occurred: " . $exception->getMessage());
-        } else if ($exception instanceof \Famoser\SyncApi\Exceptions\ApiException) {
+        } elseif ($exception instanceof \Famoser\SyncApi\Exceptions\ApiException) {
             $resp = new BaseResponse();
             $resp->RequestFailed = true;
             $resp->ApiError = $exception->getCode();
             $resp->ServerMessage = $exception->getMessage();
             return $response->withStatus(500)->withJson($resp);
-        } else {
-            return $response->withStatus(500)->getBody()->write("exception occurred: " . $exception->getMessage());
+        } elseif ($exception instanceof \Famoser\SyncApi\Exceptions\FrontendException) {
+            if ($exception->getCode() == FrontendError::NOT_LOGGED_IN) {
+                $reqUri = $request->getUri()->withPath($c->get("router")->pathFor("login"));
+                return $response->withRedirect($reqUri);
+            }
         }
+        $args = [];
+        $args["error"] = $exception->getMessage();
+        return $c->get("view")->render($response, "public/server_error.html.twig", $args);
     };
 };
 // Register component on container
 $c['view'] = function (Container $c) {
     $view = new \Slim\Views\Twig(
         $c->get("settings")["template_path"], [
-        'cache' => $c->get("settings")["cache_path"],
-        'debug' => $c->get("settings")["debug_mode"]
+            'cache' => $c->get("settings")["cache_path"],
+            'debug' => $c->get("settings")["debug_mode"]
         ]
     );
     $view->addExtension(
@@ -89,33 +99,33 @@ $app->add(new LoggingMiddleware($c));
 $apiRoutes = function () use ($controllerNamespace) {
     $this->group(
         "/auth", function () use ($controllerNamespace) {
-            $this->post('/use', $controllerNamespace . 'AuthorizationController:useCode');
-            $this->post('/generate', $controllerNamespace . 'AuthorizationController:generate');
-            $this->post('/sync', $controllerNamespace . 'AuthorizationController:sync');
-        }
+        $this->post('/use', $controllerNamespace . 'AuthorizationController:useCode');
+        $this->post('/generate', $controllerNamespace . 'AuthorizationController:generate');
+        $this->post('/sync', $controllerNamespace . 'AuthorizationController:sync');
+    }
     );
     $this->group(
         "/users", function () use ($controllerNamespace) {
-            $this->post('/auth', $controllerNamespace . 'UserController:auth');
-        }
+        $this->post('/auth', $controllerNamespace . 'UserController:auth');
+    }
     );
     $this->group(
         "/devices", function () use ($controllerNamespace) {
-            $this->post('/get', $controllerNamespace . 'DeviceController:get');
-            $this->post('/auth', $controllerNamespace . 'DeviceController:auth');
-            $this->post('/unauth', $controllerNamespace . 'DeviceController:unAuth');
-        }
+        $this->post('/get', $controllerNamespace . 'DeviceController:get');
+        $this->post('/auth', $controllerNamespace . 'DeviceController:auth');
+        $this->post('/unauth', $controllerNamespace . 'DeviceController:unAuth');
+    }
     );
     $this->group(
         "/collection", function () use ($controllerNamespace) {
-            $this->post('/sync', $controllerNamespace . 'CollectionController:sync');
-        }
+        $this->post('/sync', $controllerNamespace . 'CollectionController:sync');
+    }
     );
     $this->group(
         "/entity", function () use ($controllerNamespace) {
-            $this->post('/sync', $controllerNamespace . 'EntityController:sync');
-            $this->post('/history/sync', $controllerNamespace . 'EntityController:historySync');
-        }
+        $this->post('/sync', $controllerNamespace . 'EntityController:sync');
+        $this->post('/history/sync', $controllerNamespace . 'EntityController:historySync');
+    }
     );
 };
 
@@ -136,18 +146,18 @@ $webAppRoutes = function () use ($controllerNamespace) {
 
     $this->group(
         "/dashboard", function () use ($controllerNamespace) {
-            $this->get('/', $controllerNamespace . 'ApplicationController:index')->setName("application_index");
-            $this->get('/show/{id}', $controllerNamespace . 'ApplicationController:show')->setName("application_show");
+        $this->get('/', $controllerNamespace . 'ApplicationController:index')->setName("application_index");
+        $this->get('/show/{id}', $controllerNamespace . 'ApplicationController:show')->setName("application_show");
 
-            $this->get('/new', $controllerNamespace . 'ApplicationController:create')->setName("application_new");
-            $this->post('/new', $controllerNamespace . 'ApplicationController:createPost');
+        $this->get('/new', $controllerNamespace . 'ApplicationController:create')->setName("application_new");
+        $this->post('/new', $controllerNamespace . 'ApplicationController:createPost');
 
-            $this->get('/edit/{id}', $controllerNamespace . 'ApplicationController:edit')->setName("application_edit");
-            $this->post('/edit/{id}', $controllerNamespace . 'ApplicationController:editPost');
+        $this->get('/edit/{id}', $controllerNamespace . 'ApplicationController:edit')->setName("application_edit");
+        $this->post('/edit/{id}', $controllerNamespace . 'ApplicationController:editPost');
 
-            $this->get('/delete/{id}', $controllerNamespace . 'AuthorizationController:delete')->setName("application_delete");
-            $this->post('/delete/{id}', $controllerNamespace . 'AuthorizationController:deletePost');
-        }
+        $this->get('/delete/{id}', $controllerNamespace . 'ApplicationController:remove')->setName("application_delete");
+        $this->post('/delete/{id}', $controllerNamespace . 'ApplicationController:removePost');
+    }
     );
 };
 
