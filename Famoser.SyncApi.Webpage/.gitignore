@@ -3,3 +3,9 @@ vendor/*
 app/cache/*
 app/logs/*
 app/data.sqlite
+node_modules
+bower_components
+src/public/assets/vendor/*
+src/public/dist/js/pre/*
+src/public/dist/css/pre/*
+src/public/dist/fonts/pre/*

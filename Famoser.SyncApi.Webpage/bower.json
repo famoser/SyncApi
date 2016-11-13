@@ -1,0 +1,23 @@
+{
+  "name": "syncapi",
+  "version": 0.1,
+  "homepage": "https://github.com/famoser/SyncApi",
+  "authors": [
+    "famoser &lt;git@famoser.ch&gt;"
+  ],
+  "description": "SyncApi",
+  "keywords": [
+    "php"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "tests"
+  ],
+  "dependencies": {
+    "bootstrap": "3.3.6",
+    "jquery-backstretch": "2.0.4"
+  }
+}

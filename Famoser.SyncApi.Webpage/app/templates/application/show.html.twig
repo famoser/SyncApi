@@ -8,28 +8,28 @@
     <div class="post">
         <h4>total users</h4>
         <p class="lead">
-            {{ stats.total_users|default('0') }}
+            {{ stats.users_count|default('0') }}
         </p>
     </div>
 
     <div class="post">
         <h4>total devices</h4>
         <p class="lead">
-            {{ stats.total_devices|default('0') }}
+            {{ stats.devices_count|default('0') }}
         </p>
     </div>
 
     <div class="post">
         <h4>total collections</h4>
         <p class="lead">
-            {{ stats.total_collections|default('0') }}
+            {{ stats.collections_count|default('0') }}
         </p>
     </div>
 
     <div class="post">
         <h4>total entities</h4>
         <p class="lead">
-            {{ stats.total_entities|default('0') }}
+            {{ stats.entities_count|default('0') }}
         </p>
     </div>
 

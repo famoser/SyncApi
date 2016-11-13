@@ -86,8 +86,8 @@ class ApplicationController extends FrontendController
             -1,
             "guid"
         );
-        $appStats->total_user_count = count($users);
-        if ($appStats->total_user_count == 0) {
+        $appStats->users_count = count($users);
+        if ($appStats->users_count == 0) {
             return $appStats;
         }
 
@@ -104,8 +104,8 @@ class ApplicationController extends FrontendController
             -1,
             "guid"
         );
-        $appStats->total_devices_count = count($devices);
-        if ($appStats->total_devices_count == 0) {
+        $appStats->devices_count = count($devices);
+        if ($appStats->devices_count == 0) {
             return $appStats;
         }
 
@@ -122,12 +122,12 @@ class ApplicationController extends FrontendController
             $collectionGuids[$userCollection->collection_guid] = true;
         }
         $collectionGuids = array_keys($collectionGuids);
-        $appStats->total_collection_count = count($collectionGuids);
-        if ($appStats->total_collection_count == 0) {
+        $appStats->collections_count = count($collectionGuids);
+        if ($appStats->collections_count == 0) {
             return $appStats;
         }
 
-        $appStats->total_items_count = $this->getDatabaseHelper()->countFromDatabase(
+        $appStats->items_count = $this->getDatabaseHelper()->countFromDatabase(
             new Entity(),
             "collection_guid IN (:" . array_keys($collectionGuids) . ")",
             $collectionGuids
