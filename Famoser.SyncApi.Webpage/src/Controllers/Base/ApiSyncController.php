@@ -57,12 +57,14 @@ abstract class ApiSyncController extends ApiRequestController
         $askedForGuids = [];
         foreach ($communicationEntities as $communicationEntity) {
             $askedForGuids[] = $communicationEntity->Id;
-            if ($communicationEntity->OnlineAction == OnlineAction::NONE)
+            if ($communicationEntity->OnlineAction == OnlineAction::NONE) {
                 continue;
+            }
 
             //check if no action can be executed which is not explicitly allowed
-            if (!in_array($communicationEntity->OnlineAction, $allowedOnlineActions))
+            if (!in_array($communicationEntity->OnlineAction, $allowedOnlineActions)) {
                 throw new ApiException(ApiError::ACTION_PROHIBITED);
+            }
 
             //do the sync stuff
             if ($communicationEntity->OnlineAction == OnlineAction::CREATE) {

@@ -14,10 +14,8 @@ use Famoser\SyncApi\Exceptions\AccessDeniedException;
 use Famoser\SyncApi\Exceptions\FrontendException;
 use Famoser\SyncApi\Models\Display\ApplicationStatistic;
 use Famoser\SyncApi\Models\Entities\Application;
-use Famoser\SyncApi\Models\Entities\Collection;
 use Famoser\SyncApi\Models\Entities\Device;
 use Famoser\SyncApi\Models\Entities\Entity;
-use Famoser\SyncApi\Models\Entities\FrontendUser;
 use Famoser\SyncApi\Models\Entities\User;
 use Famoser\SyncApi\Models\Entities\UserCollection;
 use Famoser\SyncApi\Types\FrontendError;
@@ -40,7 +38,11 @@ class ApplicationController extends FrontendController
      */
     private function getAuthorizedApplication($id)
     {
-        $application = $this->getDatabaseHelper()->getSingleFromDatabase(new Application(), "id = :id", array("id" => $id));
+        $application = $this->getDatabaseHelper()->getSingleFromDatabase(
+            new Application(),
+            "id = :id",
+            array("id" => $id)
+        );
         if ($this->getFrontendUser() && $this->getFrontendUser()->id == $application->admin_id) {
             return $application;
         }
@@ -72,22 +74,22 @@ class ApplicationController extends FrontendController
     /**
      * generate application statistic
      *
-     * @param $application_id
+     * @param $applicationId
      * @return ApplicationStatistic
      */
-    private function getApplicationStats($application_id)
+    private function getApplicationStats($applicationId)
     {
         $appStats = new ApplicationStatistic();
         $users = $this->getDatabaseHelper()->getFromDatabase(
             new User(),
             "application_id = :application_id",
-            array("application_id" => $application_id),
+            array("application_id" => $applicationId),
             null,
             -1,
             "guid"
         );
-        $appStats->users_count = count($users);
-        if ($appStats->users_count == 0) {
+        $appStats->usersCount = count($users);
+        if ($appStats->usersCount == 0) {
             return $appStats;
         }
 
@@ -104,8 +106,8 @@ class ApplicationController extends FrontendController
             -1,
             "guid"
         );
-        $appStats->devices_count = count($devices);
-        if ($appStats->devices_count == 0) {
+        $appStats->devicesCount = count($devices);
+        if ($appStats->devicesCount == 0) {
             return $appStats;
         }
 
@@ -122,12 +124,12 @@ class ApplicationController extends FrontendController
             $collectionGuids[$userCollection->collection_guid] = true;
         }
         $collectionGuids = array_keys($collectionGuids);
-        $appStats->collections_count = count($collectionGuids);
-        if ($appStats->collections_count == 0) {
+        $appStats->collectionsCount = count($collectionGuids);
+        if ($appStats->collectionsCount == 0) {
             return $appStats;
         }
 
-        $appStats->items_count = $this->getDatabaseHelper()->countFromDatabase(
+        $appStats->itemsCount = $this->getDatabaseHelper()->countFromDatabase(
             new Entity(),
             "collection_guid IN (:" . array_keys($collectionGuids) . ")",
             $collectionGuids
@@ -221,11 +223,10 @@ class ApplicationController extends FrontendController
         $arr = $this->writePropertiesFromArray($source, $application, $propArray);
         if (count($arr) == 0) {
             //validate application seed
-            if (!is_numeric($application->application_seed)) {
-                $message = "the application seed has to be numeric";
-            } else {
+            if (is_numeric($application->application_seed)) {
                 return true;
             }
+            $message = "the application seed has to be numeric";
         } else {
             $message = "the application could not be saved. please add the necessary information to ";
             if (count($arr) > 1) {

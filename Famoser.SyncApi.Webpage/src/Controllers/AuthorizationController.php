@@ -223,13 +223,15 @@ class AuthorizationController extends ApiSyncController
         if ($contentType == ContentType::USER) {
             //get all accessible users (which is obv. only one)
             $user = $this->tryGetUser($req);
-            if ($user != null)
+            if ($user != null) {
                 return array($user);
+            }
             return array();
         } else if ($contentType == ContentType::DEVICE) {
             $device = $this->tryGetDevice($req);
-            if ($device != null)
+            if ($device != null) {
                 return array($device);
+            }
             return array();
         } else {
             throw new ServerException(ServerError::FORBIDDEN);
@@ -259,7 +261,7 @@ class AuthorizationController extends ApiSyncController
             $user->personal_seed = $req->ClientMessage;
 
             return $user;
-        } else if ($contentType == ContentType::DEVICE) {
+        } elseif ($contentType == ContentType::DEVICE) {
             $devices = $this->getDatabaseHelper()->countFromDatabase(
                 new Device(),
                 "user_guid = :user_guid AND is_deleted = :is_deleted",
@@ -271,8 +273,7 @@ class AuthorizationController extends ApiSyncController
             $device->is_authenticated = $devices == 0;
 
             return $device;
-        } else {
-            throw new ServerException(ServerError::FORBIDDEN);
         }
+        throw new ServerException(ServerError::FORBIDDEN);
     }
 }

@@ -128,7 +128,7 @@ class ApiRequestController extends BaseController
             throw new ApiException(ApiError::DEVICE_NOT_FOUND);
         }
         if ($this->device->is_deleted) {
-            throw new ApiException(ApiError::DeviceRemoved);
+            throw new ApiException(ApiError::DEVICE_REMOVED);
         }
         return $this->device;
     }
@@ -157,8 +157,9 @@ class ApiRequestController extends BaseController
      */
     protected function getCollectionIds(BaseRequest $req)
     {
-        if ($this->collectionIds != null)
+        if ($this->collectionIds != null) {
             return $this->collectionIds;
+        }
 
         $userCollectionIds = $this->getDatabaseHelper()->getFromDatabase(
             new UserCollection(),

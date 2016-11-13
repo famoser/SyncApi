@@ -11,8 +11,8 @@ namespace Famoser\SyncApi\Models\Display;
 
 class ApplicationStatistic
 {
-    public $users_count = 0;
-    public $devices_count = 0;
-    public $collections_count = 0;
-    public $items_count = 0;
+    public $usersCount = 0;
+    public $devicesCount = 0;
+    public $collectionsCount = 0;
+    public $itemsCount = 0;
 }

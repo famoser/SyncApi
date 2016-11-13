@@ -69,12 +69,15 @@ class DatabaseHelper
 
     private function initializeDatabase()
     {
-        $activePath = $this->container["settings"]["data_path"] . "/" . $this->container['settings']['db']["path"];
+        $dataPath = $this->container["settings"]["data_path"];
+        $dbPath = $this->container['settings']['db']["path"];
+        $activePath = $dataPath . "/" . $dbPath;
 
         if (!file_exists($activePath)) {
+            $templatePath = $this->container['settings']['db']["template_path"];
             copy(
-                $activePath = $this->container["settings"]["data_path"] . "/" . $this->container['settings']['db']["template_path"],
-                $activePath = $this->container["settings"]["data_path"] . "/" . $this->container['settings']['db']["path"]
+                $activePath = $dataPath . "/" . $templatePath,
+                $activePath = $dataPath . "/" . $dbPath
             );
         }
 
@@ -89,7 +92,7 @@ class DatabaseHelper
         return $pdo;
     }
 
-    private function createQuery(BaseEntity $entity, $where = null, $parameters = null, $orderBy = null, $limit = 1000, $selector = "*")
+    private function createQuery(BaseEntity $entity, $where = null, $orderBy = null, $limit = 1000, $selector = "*")
     {
         $sql = "SELECT " . $selector . " FROM " . $entity->getTableName();
         if ($where != null) {
@@ -115,14 +118,20 @@ class DatabaseHelper
     private function executeAndFetch(BaseEntity $entity, $sql, $parameters)
     {
         try {
-            LogHelper::log($sql . "     " . json_encode($parameters), "DatabaseHelper" . uniqid() . ".txt");
+            LogHelper::log(
+                $sql . "     " . json_encode($parameters),
+                "DatabaseHelper" . uniqid() . ".txt"
+            );
             $request = $this->getConnection()->prepare($sql);
             if (!$request->execute($parameters)) {
                 return false;
             }
             return $request->fetchAll(PDO::FETCH_CLASS, get_class($entity));
         } catch (\Exception $ex) {
-            LogHelper::log($ex->getMessage() . "     " . $ex->getTraceAsString() . "     " . $sql . "     " . json_encode($parameters), "DatabaseHelper.txt");
+            LogHelper::log(
+                $ex->getMessage() . "     " . $ex->getTraceAsString() . "     " . $sql . "     " . json_encode($parameters),
+                "DatabaseHelper.txt"
+            );
         }
         return null;
     }
@@ -138,7 +147,7 @@ class DatabaseHelper
      */
     public function getFromDatabase(BaseEntity $entity, $where = null, $parameters = null, $orderBy = null, $limit = -1, $selector = "*")
     {
-        $sql = $this->createQuery($entity, $where, $parameters, $orderBy, $limit, $selector);
+        $sql = $this->createQuery($entity, $where, $orderBy, $limit, $selector);
         $res = $this->executeAndFetch($entity, $sql, $parameters);
         return $res;
     }
@@ -153,7 +162,7 @@ class DatabaseHelper
      */
     public function countFromDatabase(BaseEntity $entity, $where = null, $parameters = null, $orderBy = null, $limit = -1)
     {
-        $sql = $this->createQuery($entity, $where, $parameters, $orderBy, $limit, "COUNT(*)");
+        $sql = $this->createQuery($entity, $where, $orderBy, $limit, "COUNT(*)");
         return $this->executeAndCount($sql, $parameters);
     }
 
@@ -184,7 +193,7 @@ class DatabaseHelper
             $variables[] = ":" . $property . $i;
         }
         $where .= $property . (($invertIn) ? " NOT" : "") . " IN (" . implode(",", $variables) . ")";
-        $sql = $this->createQuery($entity, $where, $parameters, $orderBy, $limit);
+        $sql = $this->createQuery($entity, $where, $orderBy, $limit);
         $res = $this->executeAndFetch($entity, $sql, $parameters);
         return $res;
     }
@@ -198,7 +207,7 @@ class DatabaseHelper
      */
     public function getSingleFromDatabase(BaseEntity $entity, $where = null, $parameters = null, $orderBy = null)
     {
-        $sql = $this->createQuery($entity, $where, $parameters, $orderBy, 1);
+        $sql = $this->createQuery($entity, $where, $orderBy, 1);
         $res = $this->executeAndFetch($entity, $sql, $parameters);
         if (count($res) > 0) {
             return $res[0];
@@ -213,7 +222,10 @@ class DatabaseHelper
     public function saveToDatabase(BaseEntity $entity)
     {
         $properties = (array)$entity;
-        LogHelper::log(json_encode($properties, JSON_PRETTY_PRINT) . "\n\n\n" . json_encode($entity, JSON_PRETTY_PRINT), "DatabaseHelper_" . $entity->getTableName() . '_' . time() . "_" . uniqid() . ".txt");
+        LogHelper::log(
+            json_encode($properties, JSON_PRETTY_PRINT) . "\n\n\n" . json_encode($entity, JSON_PRETTY_PRINT),
+            "DatabaseHelper_" . $entity->getTableName() . '_' . time() . "_" . uniqid() . ".txt"
+        );
         unset($properties["id"]);
         if ($entity->id > 0) {
             //update
@@ -228,7 +240,6 @@ class DatabaseHelper
             if (!$request->execute($properties)) {
                 return false;
             }
-
         } else {
             //create
             $sql = "INSERT INTO " . $entity->getTableName() . "(";

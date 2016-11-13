@@ -140,6 +140,10 @@ class EntityController extends ApiSyncController
             throw new ServerException(ServerError::FORBIDDEN);
         }
 
+        if ($contentType != ContentType::ENTITY){
+            throw new ServerException(ServerError::FORBIDDEN);
+        }
+
         $entity = new Entity();
         $entity->collection_guid = $communicationEntity->CollectionId;
         $entity->device_guid = $this->getDevice($req)->guid;

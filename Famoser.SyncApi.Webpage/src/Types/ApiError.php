@@ -23,7 +23,7 @@ class ApiError
     const DEVICE_NOT_FOUND = 1002;
     const DEVICE_NOT_AUTHORIZED = 1001;
     const DEVICE_UNAUTHORIZED = 1003;
-    const DeviceRemoved = 1002;
+    const DEVICE_REMOVED = 1002;
 
     const RESOURCE_ALREADY_EXISTS = 200;
     const RESOURCE_NOT_FOUND = 200;
