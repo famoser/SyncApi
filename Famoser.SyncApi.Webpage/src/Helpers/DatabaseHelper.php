@@ -14,8 +14,6 @@ use Famoser\SyncApi\Models\Entities\ApplicationSetting;
 use Famoser\SyncApi\Models\Entities\AuthorizationCode;
 use Famoser\SyncApi\Models\Entities\Base\BaseEntity;
 use Famoser\SyncApi\Models\Entities\Collection;
-use Famoser\SyncApi\Models\Entities\Content;
-use Famoser\SyncApi\Models\Entities\ContentHistory;
 use Famoser\SyncApi\Models\Entities\ContentVersion;
 use Famoser\SyncApi\Models\Entities\Device;
 use Famoser\SyncApi\Models\Entities\Entity;

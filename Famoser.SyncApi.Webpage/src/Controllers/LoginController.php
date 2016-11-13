@@ -47,7 +47,7 @@ class LoginController extends FrontendController
     }
 
     /**
-     * register the user if possible, if not displa error message and show register form again
+     * register the user if possible, if not display error message and show register form again
      *
      * @param Request $request
      * @param Response $response

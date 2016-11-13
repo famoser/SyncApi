@@ -11,7 +11,6 @@ namespace Famoser\SyncApi\Controllers\Base;
 
 use Famoser\SyncApi\Helpers\DatabaseHelper;
 use Famoser\SyncApi\Helpers\LogHelper;
-use Famoser\SyncApi\Helpers\ResponseHelper;
 use Famoser\SyncApi\Models\Communication\Request\Base\BaseRequest;
 use Famoser\SyncApi\Repositories\SettingsRepository;
 use Interop\Container\ContainerInterface;

@@ -13,7 +13,6 @@ use Famoser\SyncApi\Controllers\Base\ApiSyncController;
 use Famoser\SyncApi\Exceptions\ApiException;
 use Famoser\SyncApi\Exceptions\ServerException;
 use Famoser\SyncApi\Helpers\RequestHelper;
-use Famoser\SyncApi\Helpers\ResponseHelper;
 use Famoser\SyncApi\Models\Communication\Entities\Base\BaseCommunicationEntity;
 use Famoser\SyncApi\Models\Communication\Request\AuthorizationRequest;
 use Famoser\SyncApi\Models\Communication\Request\Base\BaseRequest;
@@ -25,7 +24,6 @@ use Famoser\SyncApi\Models\Entities\User;
 use Famoser\SyncApi\Types\ApiError;
 use Famoser\SyncApi\Types\ContentType;
 use Famoser\SyncApi\Types\ServerError;
-use Guzzle\Tests\Http\Server;
 use Slim\Http\Request;
 use Slim\Http\Response;
 

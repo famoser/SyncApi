@@ -139,6 +139,7 @@ abstract class ApiSyncController extends ApiRequestController
 
     /**
      * @param BaseSyncEntity $syncEntity
+     * @param $contentType
      * @return bool|ContentVersion
      */
     private function getActiveVersion(BaseSyncEntity $syncEntity, $contentType)
