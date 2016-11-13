@@ -20,7 +20,6 @@ CREATE TABLE 'collections' (
 
 use Famoser\SyncApi\Models\Communication\Entities\Base\BaseCommunicationEntity;
 use Famoser\SyncApi\Models\Communication\Entities\CollectionCommunicationEntity;
-use Famoser\SyncApi\Models\Entities\Base\BaseEntity;
 use Famoser\SyncApi\Models\Entities\Base\BaseSyncEntity;
 use Famoser\SyncApi\Types\ContentType;
 

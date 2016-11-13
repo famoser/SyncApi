@@ -8,8 +8,8 @@
 
 use Famoser\SyncApi\Middleware\LoggingMiddleware;
 use Famoser\SyncApi\Models\Communication\Response\Base\BaseResponse;
-use \Psr\Http\Message\ServerRequestInterface as Request;
-use \Psr\Http\Message\ResponseInterface as Response;
+use Psr\Http\Message\ResponseInterface as Response;
+use Psr\Http\Message\ServerRequestInterface as Request;
 use Slim\App;
 use Slim\Container;
 

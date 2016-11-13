@@ -13,7 +13,6 @@ use Famoser\SyncApi\Exceptions\ApiException;
 use Famoser\SyncApi\Exceptions\ServerException;
 use Famoser\SyncApi\Models\Communication\Entities\Base\BaseCommunicationEntity;
 use Famoser\SyncApi\Models\Communication\Request\Base\BaseRequest;
-use Famoser\SyncApi\Models\Communication\Response\Base\BaseResponse;
 use Famoser\SyncApi\Models\Entities\Base\BaseSyncEntity;
 use Famoser\SyncApi\Models\Entities\ContentVersion;
 use Famoser\SyncApi\Types\ApiError;
@@ -153,32 +152,6 @@ abstract class ApiSyncController extends ApiRequestController
     }
 
     /**
-     * reads the active version of the specified entity from database
-     *
-     * @param BaseSyncEntity $entity
-     * @param $contentType
-     * @return BaseCommunicationEntity
-     * @throws ApiException
-     */
-    private function readSyncEntity(BaseSyncEntity $entity, $contentType)
-    {
-        if ($entity == null) {
-            throw new ApiException(ApiError::RESOURCE_NOT_FOUND);
-        }
-
-        $ver = $this->getActiveVersion($entity, $contentType);
-
-        if ($entity == null) {
-            throw new ApiException(ApiError::RESOURCE_NOT_FOUND);
-        }
-
-        if ($entity->is_deleted) {
-            return $entity->createCommunicationEntity($ver, OnlineAction::DELETE);
-        }
-        return $entity->createCommunicationEntity($ver, OnlineAction::READ);
-    }
-
-    /**
      * confirms if the entity is already the newest version. If not, returns the newer version
      *
      * @param BaseSyncEntity $entity
@@ -235,6 +208,79 @@ abstract class ApiSyncController extends ApiRequestController
 
         $content = $entity->createContentVersion($communicationEntity);
         if (!$this->getDatabaseHelper()->saveToDatabase($content)) {
+            throw new ServerException(ServerError::DATABASE_SAVE_FAILURE);
+        }
+    }
+
+    /**
+     * reads the active version of the specified entity from database
+     *
+     * @param BaseSyncEntity $entity
+     * @param $contentType
+     * @return BaseCommunicationEntity
+     * @throws ApiException
+     */
+    private function readSyncEntity(BaseSyncEntity $entity, $contentType)
+    {
+        if ($entity == null) {
+            throw new ApiException(ApiError::RESOURCE_NOT_FOUND);
+        }
+
+        $ver = $this->getActiveVersion($entity, $contentType);
+
+        if ($entity == null) {
+            throw new ApiException(ApiError::RESOURCE_NOT_FOUND);
+        }
+
+        if ($entity->is_deleted) {
+            return $entity->createCommunicationEntity($ver, OnlineAction::DELETE);
+        }
+        return $entity->createCommunicationEntity($ver, OnlineAction::READ);
+    }
+
+    /**
+     * updates sync entity, by creating a new content version
+     *
+     * @param BaseSyncEntity $entity
+     * @param BaseCommunicationEntity $syncEntity
+     * @throws ApiException
+     * @throws ServerException
+     */
+    protected function updateSyncEntity(BaseSyncEntity $entity, BaseCommunicationEntity $syncEntity)
+    {
+        if ($entity == null) {
+            throw new ApiException(ApiError::RESOURCE_NOT_FOUND);
+        }
+
+        //un-delete if already deleted
+        if ($entity->is_deleted) {
+            $entity->is_deleted = false;
+            if (!$this->getDatabaseHelper()->saveToDatabase($entity)) {
+                throw new ServerException(ServerError::DATABASE_SAVE_FAILURE);
+            }
+        }
+
+        $content = $entity->createContentVersion($syncEntity);
+        if (!$this->getDatabaseHelper()->saveToDatabase($content)) {
+            throw new ServerException(ServerError::DATABASE_SAVE_FAILURE);
+        }
+    }
+
+    /**
+     * marks sync entity as deleted
+     *
+     * @param BaseSyncEntity $entity
+     * @throws ApiException
+     * @throws ServerException
+     */
+    protected function deleteSyncEntity(BaseSyncEntity $entity)
+    {
+        if ($entity == null) {
+            throw new ApiException(ApiError::RESOURCE_NOT_FOUND);
+        }
+
+        $entity->is_deleted = true;
+        if (!$this->getDatabaseHelper()->saveToDatabase($entity)) {
             throw new ServerException(ServerError::DATABASE_SAVE_FAILURE);
         }
     }

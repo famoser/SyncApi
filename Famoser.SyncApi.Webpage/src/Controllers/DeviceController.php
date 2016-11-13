@@ -9,21 +9,16 @@
 namespace Famoser\SyncApi\Controllers;
 
 
-use Famoser\SyncApi\Controllers\Base\ApiRequestController;
 use Famoser\SyncApi\Controllers\Base\ApiSyncController;
 use Famoser\SyncApi\Exceptions\ServerException;
 use Famoser\SyncApi\Helpers\RequestHelper;
 use Famoser\SyncApi\Models\Communication\Entities\Base\BaseCommunicationEntity;
-use Famoser\SyncApi\Models\Communication\Entities\CollectionCommunicationEntity;
-use Famoser\SyncApi\Models\Communication\Entities\DeviceCommunicationEntity;
 use Famoser\SyncApi\Models\Communication\Request\Base\BaseRequest;
 use Famoser\SyncApi\Models\Communication\Response\AuthorizationResponse;
 use Famoser\SyncApi\Models\Communication\Response\CollectionEntityResponse;
 use Famoser\SyncApi\Models\Entities\Base\BaseSyncEntity;
-use Famoser\SyncApi\Models\Entities\ContentVersion;
 use Famoser\SyncApi\Models\Entities\Device;
 use Famoser\SyncApi\Types\ContentType;
-use Famoser\SyncApi\Types\OnlineAction;
 use Famoser\SyncApi\Types\ServerError;
 use Slim\Http\Request;
 use Slim\Http\Response;

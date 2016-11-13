@@ -9,7 +9,6 @@
 namespace Famoser\SyncApi\Controllers;
 
 
-use Famoser\SyncApi\Controllers\Base\BaseController;
 use Famoser\SyncApi\Controllers\Base\FrontendController;
 use Famoser\SyncApi\Exceptions\ServerException;
 use Famoser\SyncApi\Models\Entities\FrontendUser;

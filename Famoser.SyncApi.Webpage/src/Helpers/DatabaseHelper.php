@@ -9,7 +9,6 @@
 namespace Famoser\SyncApi\Helpers;
 
 
-use Famoser\SyncApi\Models\Communication\Request\CollectionEntityRequest;
 use Famoser\SyncApi\Models\Entities\Application;
 use Famoser\SyncApi\Models\Entities\ApplicationSetting;
 use Famoser\SyncApi\Models\Entities\AuthorizationCode;
@@ -25,7 +24,6 @@ use Famoser\SyncApi\Models\Entities\User;
 use Famoser\SyncApi\Models\Entities\UserCollection;
 use Interop\Container\ContainerInterface;
 use PDO;
-use Slim\Container;
 
 class DatabaseHelper
 {

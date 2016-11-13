@@ -20,14 +20,7 @@ CREATE TABLE 'content_versions' (
 );
 */
 
-use Famoser\SyncApi\Helpers\FormatHelper;
-use Famoser\SyncApi\Models\Communication\Entities\CollectionCommunicationEntity;
-use Famoser\SyncApi\Models\Communication\Entities\DeviceCommunicationEntity;
-use Famoser\SyncApi\Models\Communication\Entities\SyncCommunicationEntity;
-use Famoser\SyncApi\Models\Communication\Entities\UserCommunicationEntity;
 use Famoser\SyncApi\Models\Entities\Base\BaseEntity;
-use Famoser\SyncApi\Types\ContentType;
-use Famoser\SyncApi\Models\Communication\Entities\Base\BaseCommunicationEntity as SyncBaseEntity;
 
 class ContentVersion extends BaseEntity
 {
