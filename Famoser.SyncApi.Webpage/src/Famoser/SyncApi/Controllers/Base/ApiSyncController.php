@@ -21,7 +21,7 @@ use Famoser\SyncApi\Types\ServerError;
 
 /**
  * Base class for all api sync requests
- * 
+ *
  * Class ApiSyncController
  * @package Famoser\SyncApi\Controllers\Base
  */
@@ -41,12 +41,10 @@ abstract class ApiSyncController extends ApiRequestController
      *
      * @param BaseRequest $req
      * @param $contentType
-     * @param BaseCommunicationEntity $communicationEntity
+     * @param BaseCommunicationEntity $commEntity
      * @return BaseSyncEntity
      */
-    abstract protected function createEntity(
-        BaseRequest $req, $contentType, BaseCommunicationEntity $communicationEntity
-    );
+    abstract protected function createEntity(BaseRequest $req, $contentType, BaseCommunicationEntity $commEntity);
 
     /**
      * does the sync in a generic fashion
@@ -60,7 +58,9 @@ abstract class ApiSyncController extends ApiRequestController
      * @throws ServerException
      */
     protected function syncInternal(
-        BaseRequest $req, array $communicationEntities, $contentType,
+        BaseRequest $req,
+        array $communicationEntities,
+        $contentType,
         array $allowedOnlineActions = OnlineAction::ALL_SYNC_ACTIONS
     )
     {
@@ -198,29 +198,34 @@ abstract class ApiSyncController extends ApiRequestController
      * creates a new entity to be inserted into the database
      *
      * @param BaseRequest $req
-     * @param BaseSyncEntity $entity
-     * @param BaseCommunicationEntity $communicationEntity
+     * @param BaseSyncEntity $syncEntity
+     * @param BaseCommunicationEntity $commEntity
      * @param $contentType
      * @throws ApiException
      * @throws ServerException
      */
-    private function createSyncEntity(BaseRequest $req, BaseSyncEntity $entity, BaseCommunicationEntity $communicationEntity, $contentType)
+    private function createSyncEntity(
+        BaseRequest $req,
+        BaseSyncEntity $syncEntity,
+        BaseCommunicationEntity $commEntity,
+        $contentType
+    )
     {
-        if ($entity != null) {
+        if ($syncEntity != null) {
             //this happens if id guid is set twice. can not happen under normal circumstances
             throw new ApiException(ApiError::RESOURCE_ALREADY_EXISTS);
         }
 
-        $entity = $this->createEntity($req, $contentType, $communicationEntity);
-        $entity->guid = $communicationEntity->Id;
-        $entity->identifier = $communicationEntity->Identifier;
-        $entity->is_deleted = false;
+        $syncEntity = $this->createEntity($req, $contentType, $commEntity);
+        $syncEntity->guid = $commEntity->Id;
+        $syncEntity->identifier = $commEntity->Identifier;
+        $syncEntity->is_deleted = false;
 
-        if (!$this->getDatabaseHelper()->saveToDatabase($entity)) {
+        if (!$this->getDatabaseHelper()->saveToDatabase($syncEntity)) {
             throw new ServerException(ServerError::DATABASE_SAVE_FAILURE);
         }
 
-        $content = $entity->createContentVersion($communicationEntity);
+        $content = $syncEntity->createContentVersion($commEntity);
         if (!$this->getDatabaseHelper()->saveToDatabase($content)) {
             throw new ServerException(ServerError::DATABASE_SAVE_FAILURE);
         }

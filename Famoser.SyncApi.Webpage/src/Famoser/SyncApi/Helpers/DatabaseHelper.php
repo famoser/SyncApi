@@ -8,7 +8,6 @@
 
 namespace Famoser\SyncApi\Helpers;
 
-
 use Famoser\SyncApi\Models\Entities\Application;
 use Famoser\SyncApi\Models\Entities\ApplicationSetting;
 use Famoser\SyncApi\Models\Entities\AuthorizationCode;
@@ -24,7 +23,6 @@ use PDO;
 
 /**
  * the DatabaseHelper allows access to the database. It abstracts sql from logic, and is type safe
- * 
  * @package Famoser\SyncApi\Helpers
  */
 class DatabaseHelper
@@ -167,7 +165,9 @@ class DatabaseHelper
             return $request->fetchAll(PDO::FETCH_CLASS, get_class($entity));
         } catch (\Exception $ex) {
             $this->getLogger()->log(
-                $ex->getMessage() . "     " . $ex->getTraceAsString() . "     " . $sql . "     " . json_encode($parameters),
+                $ex->getMessage() . "     " .
+                $ex->getTraceAsString() . "     " .
+                $sql . "     " . json_encode($parameters),
                 "DatabaseHelper.txt"
             );
         }
@@ -185,8 +185,13 @@ class DatabaseHelper
      * FrontendUser[]|User[]|UserCollection[]|bool
      */
     public function getFromDatabase(
-        BaseEntity $entity, $where = null, $parameters = null,
-        $orderBy = null, $limit = -1, $selector = "*")
+        BaseEntity $entity,
+        $where = null,
+        $parameters = null,
+        $orderBy = null,
+        $limit = -1,
+        $selector = "*"
+    )
     {
         $sql = $this->createQuery($entity, $where, $orderBy, $limit, $selector);
         $res = $this->executeAndFetch($entity, $sql, $parameters);
@@ -202,8 +207,11 @@ class DatabaseHelper
      * @return int
      */
     public function countFromDatabase(
-        BaseEntity $entity, $where = null, $parameters = null,
-        $orderBy = null, $limit = -1)
+        BaseEntity $entity,
+        $where = null,
+        $parameters = null,
+        $orderBy = null,
+        $limit = -1)
     {
         $sql = $this->createQuery($entity, $where, $orderBy, $limit, "COUNT(*)");
         return $this->executeAndCount($sql, $parameters);
@@ -222,8 +230,15 @@ class DatabaseHelper
      * FrontendUser[]|User[]|UserCollection[]|bool
      */
     public function getWithInFromDatabase(
-        BaseEntity $entity, $property, $values, $invertIn = false,
-        $where = null, $parameters = null, $orderBy = null, $limit = -1)
+        BaseEntity $entity,
+        $property,
+        $values,
+        $invertIn = false,
+        $where = null,
+        $parameters = null,
+        $orderBy = null,
+        $limit = -1
+    )
     {
         if ($parameters == null) {
             $parameters = [];

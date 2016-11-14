@@ -6,6 +6,10 @@ engines:
     enabled: true
   phpmd:
     enabled: true  
+    checks:
+      #disable else expression checks, #savetheelse
+      CleanCode/ElseExpression:
+        enabled: false
   duplication:
     enabled: true
     config:

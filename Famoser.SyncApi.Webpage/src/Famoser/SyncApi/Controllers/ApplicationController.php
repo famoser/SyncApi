@@ -38,16 +38,16 @@ class ApplicationController extends FrontendController
     }
 
     /**
-     * @param $id
+     * @param $entityId
      * @return Application
      * @throws AccessDeniedException
      */
-    private function getAuthorizedApplication($id)
+    private function getAuthorizedApplication($entityId)
     {
         $application = $this->getDatabaseHelper()->getSingleFromDatabase(
             new Application(),
             "id = :id",
-            ["id" => $id]
+            ["id" => $entityId]
         );
         if ($this->getFrontendUser() && $this->getFrontendUser()->id == $application->admin_id) {
             return $application;
@@ -193,7 +193,8 @@ class ApplicationController extends FrontendController
         $message = "";
         var_dump($request->getParsedBody());
         if ($this->writeFromPost(
-            $application, $request->getParsedBody(),
+            $application,
+            $request->getParsedBody(),
             $message,
             ["name", "description", "application_id", "application_seed"]
         )

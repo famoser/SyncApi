@@ -78,12 +78,12 @@ class CollectionController extends ApiSyncController
      *
      * @param BaseRequest $req
      * @param $contentType
-     * @param BaseCommunicationEntity $communicationEntity
+     * @param BaseCommunicationEntity $commEntity
      * @return BaseSyncEntity
      * @throws ApiException
      * @throws ServerException
      */
-    protected function createEntity(BaseRequest $req, $contentType, BaseCommunicationEntity $communicationEntity)
+    protected function createEntity(BaseRequest $req, $contentType, BaseCommunicationEntity $commEntity)
     {
         if ($contentType != ContentType::COLLECTION) {
             throw new ServerException(ServerError::FORBIDDEN);

@@ -128,14 +128,14 @@ class EntityController extends ApiSyncController
      *
      * @param BaseRequest $req
      * @param $contentType
-     * @param BaseCommunicationEntity $communicationEntity
+     * @param BaseCommunicationEntity $commEntity
      * @return BaseSyncEntity
      * @throws ServerException
      * @throws \Famoser\SyncApi\Exceptions\ApiException
      */
-    protected function createEntity(BaseRequest $req, $contentType, BaseCommunicationEntity $communicationEntity)
+    protected function createEntity(BaseRequest $req, $contentType, BaseCommunicationEntity $commEntity)
     {
-        if (!$communicationEntity instanceof SyncCommunicationEntity) {
+        if (!$commEntity instanceof SyncCommunicationEntity) {
             throw new ServerException(ServerError::FORBIDDEN);
         }
 
@@ -144,7 +144,7 @@ class EntityController extends ApiSyncController
         }
 
         $entity = new Entity();
-        $entity->collection_guid = $communicationEntity->CollectionId;
+        $entity->collection_guid = $commEntity->CollectionId;
         $entity->device_guid = $this->getDevice($req)->guid;
         $entity->user_guid = $this->getUser($req)->guid;
         return $entity;

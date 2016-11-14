@@ -132,12 +132,12 @@ class DeviceController extends ApiSyncController
      *
      * @param BaseRequest $req
      * @param $contentType
-     * @param BaseCommunicationEntity $communicationEntity
+     * @param BaseCommunicationEntity $commEntity
      * @return BaseSyncEntity
      * @throws ServerException
      * @throws \Famoser\SyncApi\Exceptions\ApiException
      */
-    protected function createEntity(BaseRequest $req, $contentType, BaseCommunicationEntity $communicationEntity)
+    protected function createEntity(BaseRequest $req, $contentType, BaseCommunicationEntity $commEntity)
     {
         if ($contentType != ContentType::DEVICE) {
             throw new ServerException(ServerError::FORBIDDEN);
