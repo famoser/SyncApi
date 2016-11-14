@@ -6,7 +6,7 @@ engines:
     enabled: true
 	checks:
 		#disable Namespaces NamespaceDeclaration BlankLineAfter check as it does not work properly
-		PSR2 Namespaces NamespaceDeclaration BlankLineAfter:
+		Namespaces/NamespaceDeclarationSniff:
 			enabled: false
   phpmd:
     enabled: true  
