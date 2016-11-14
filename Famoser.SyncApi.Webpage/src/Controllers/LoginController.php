@@ -30,7 +30,7 @@ class LoginController extends FrontendController
             $user = $this->getDatabaseHelper()->getSingleFromDatabase(
                 new FrontendUser(),
                 "username = :username",
-                array("username" => $req["username"])
+                ["username" => $req["username"]]
             );
             if ($user != null && password_verify($req["password"], $user->password)) {
                 $this->setFrontendUser($user);
@@ -63,7 +63,7 @@ class LoginController extends FrontendController
             $usr = $this->getDatabaseHelper()->getSingleFromDatabase(
                 new FrontendUser(),
                 "username = :username OR email = :email",
-                array("username" => $req["username"], "email" => $req["email"])
+                ["username" => $req["username"], "email" => $req["email"]]
             );
             if ($usr == null) {
                 $frontendUser = new FrontendUser();
@@ -116,7 +116,7 @@ class LoginController extends FrontendController
             $user = $this->getDatabaseHelper()->getSingleFromDatabase(
                 new FrontendUser(),
                 "username = :username AND email = :email",
-                array("username" => $req["username"], "email" => $req["email"])
+                ["username" => $req["username"], "email" => $req["email"]]
             );
             if ($user != null) {
                 //generate new reset key
@@ -148,7 +148,7 @@ class LoginController extends FrontendController
             $user = $this->getDatabaseHelper()->getSingleFromDatabase(
                 new FrontendUser(),
                 "username = :username AND reset_key = :reset_key",
-                array("username" => $req["username"], "reset_key" => $req["authorization_code"])
+                ["username" => $req["username"], "reset_key" => $req["authorization_code"]]
             );
             if ($user != null) {
                 $user->password = password_hash($req["password"], PASSWORD_BCRYPT);

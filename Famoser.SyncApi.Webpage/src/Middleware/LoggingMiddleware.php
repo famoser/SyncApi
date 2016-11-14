@@ -9,7 +9,6 @@
 namespace Famoser\SyncApi\Middleware;
 
 
-use Famoser\SyncApi\Helpers\LogHelper;
 use Slim\Http\Request;
 use Slim\Http\Response;
 

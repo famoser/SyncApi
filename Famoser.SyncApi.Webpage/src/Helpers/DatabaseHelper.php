@@ -24,6 +24,11 @@ use Famoser\SyncApi\Services\Interfaces\LoggerInterface;
 use Interop\Container\ContainerInterface;
 use PDO;
 
+/**
+ * the DatabaseHelper allows access to the database. It abstracts sql from logic, and is type safe
+ * 
+ * @package Famoser\SyncApi\Helpers
+ */
 class DatabaseHelper
 {
     /*
@@ -34,6 +39,11 @@ class DatabaseHelper
     /* @var ContainerInterface $container */
     private $container;
 
+    /**
+     * DatabaseHelper constructor.
+     *
+     * @param ContainerInterface $container
+     */
     public function __construct(ContainerInterface $container)
     {
         $this->container = $container;
@@ -78,6 +88,9 @@ class DatabaseHelper
         }
     }
 
+    /**
+     * initialize the database
+     */
     private function initializeDatabase()
     {
         $dataPath = $this->container["settings"]["data_path"];
@@ -95,6 +108,12 @@ class DatabaseHelper
         $this->database = $this->constructPdo($activePath);
     }
 
+    /**
+     * construct a sqlite pdo object from a path
+     *
+     * @param $path
+     * @return PDO
+     */
     private function constructPdo($path)
     {
         $pdo = new PDO("sqlite:" . $path);
@@ -103,6 +122,16 @@ class DatabaseHelper
         return $pdo;
     }
 
+    /**
+     * creates the sql query
+     *
+     * @param BaseEntity $entity
+     * @param null $where
+     * @param null $orderBy
+     * @param int $limit
+     * @param string $selector
+     * @return string
+     */
     private function createQuery(BaseEntity $entity, $where = null, $orderBy = null, $limit = 1000, $selector = "*")
     {
         $sql = "SELECT " . $selector . " FROM " . $entity->getTableName();
@@ -154,9 +183,10 @@ class DatabaseHelper
      * @param null $orderBy
      * @param int $limit
      * @param string $selector
-     * @return bool|\Famoser\SyncApi\Models\Entities\Application[]|\Famoser\SyncApi\Models\Entities\ApplicationSetting[]|\Famoser\SyncApi\Models\Entities\AuthorizationCode[]|\Famoser\SyncApi\Models\Entities\Collection[]|\Famoser\SyncApi\Models\Entities\ContentVersion[]|\Famoser\SyncApi\Models\Entities\Device[]|\Famoser\SyncApi\Models\Entities\Entity[]|\Famoser\SyncApi\Models\Entities\FrontendUser[]|\Famoser\SyncApi\Models\Entities\User[]|\Famoser\SyncApi\Models\Entities\UserCollection[]
+     * @return Application[]|ApplicationSetting[]|AuthorizationCode[]|Collection[]|ContentVersion[]|Device[]|Entity[]|
+     * FrontendUser[]|User[]|UserCollection[]|bool
      */
-    public function getFromDatabase(BaseEntity $entity, $where = null, $parameters = null, 
+    public function getFromDatabase(BaseEntity $entity, $where = null, $parameters = null,
                                     $orderBy = null, $limit = -1, $selector = "*")
     {
         $sql = $this->createQuery($entity, $where, $orderBy, $limit, $selector);
@@ -172,7 +202,8 @@ class DatabaseHelper
      * @param int $limit
      * @return int
      */
-    public function countFromDatabase(BaseEntity $entity, $where = null, $parameters = null, $orderBy = null, $limit = -1)
+    public function countFromDatabase(BaseEntity $entity, $where = null, $parameters = null, 
+                                      $orderBy = null, $limit = -1)
     {
         $sql = $this->createQuery($entity, $where, $orderBy, $limit, "COUNT(*)");
         return $this->executeAndCount($sql, $parameters);
@@ -187,9 +218,11 @@ class DatabaseHelper
      * @param null $parameters
      * @param null $orderBy
      * @param int $limit
-     * @return Application[]|ApplicationSetting[]|AuthorizationCode[]|Collection[]|ContentVersion[]|Device[]|Entity[]|FrontendUser[]|User[]|UserCollection[]|bool
+     * @return Application[]|ApplicationSetting[]|AuthorizationCode[]|Collection[]|ContentVersion[]|Device[]|Entity[]|
+     * FrontendUser[]|User[]|UserCollection[]|bool
      */
-    public function getWithInFromDatabase(BaseEntity $entity, $property, $values, $invertIn = false, $where = null, $parameters = null, 
+    public function getWithInFromDatabase(BaseEntity $entity, $property, $values, $invertIn = false,
+                                          $where = null, $parameters = null,
                                           $orderBy = null, $limit = -1)
     {
         if ($parameters == null) {
@@ -216,7 +249,8 @@ class DatabaseHelper
      * @param null $where
      * @param null $parameters
      * @param null $orderBy
-     * @return Application|ApplicationSetting|AuthorizationCode|Collection|ContentVersion|Device|Entity|FrontendUser|User|UserCollection|bool
+     * @return Application|ApplicationSetting|AuthorizationCode|Collection|ContentVersion|Device|Entity|FrontendUser|
+     * User|UserCollection|bool
      */
     public function getSingleFromDatabase(BaseEntity $entity, $where = null, $parameters = null, $orderBy = null)
     {

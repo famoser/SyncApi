@@ -12,7 +12,6 @@ namespace Famoser\SyncApi\Controllers;
 use Famoser\SyncApi\Controllers\Base\ApiSyncController;
 use Famoser\SyncApi\Exceptions\ApiException;
 use Famoser\SyncApi\Exceptions\ServerException;
-use Famoser\SyncApi\Helpers\RequestHelper;
 use Famoser\SyncApi\Models\Communication\Entities\Base\BaseCommunicationEntity;
 use Famoser\SyncApi\Models\Communication\Entities\SyncCommunicationEntity;
 use Famoser\SyncApi\Models\Communication\Request\Base\BaseRequest;

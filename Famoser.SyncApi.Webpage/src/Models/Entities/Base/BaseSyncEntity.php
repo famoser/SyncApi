@@ -8,7 +8,6 @@
 
 namespace Famoser\SyncApi\Models\Entities\Base;
 
-use Famoser\SyncApi\Helpers\FormatHelper;
 use Famoser\SyncApi\Models\Communication\Entities\Base\BaseCommunicationEntity;
 use Famoser\SyncApi\Models\Entities\ContentVersion;
 

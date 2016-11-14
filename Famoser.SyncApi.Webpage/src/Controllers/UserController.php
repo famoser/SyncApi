@@ -11,7 +11,6 @@ namespace Famoser\SyncApi\Controllers;
 
 use Famoser\SyncApi\Controllers\Base\ApiRequestController;
 use Famoser\SyncApi\Exceptions\ServerException;
-use Famoser\SyncApi\Helpers\RequestHelper;
 use Famoser\SyncApi\Models\Communication\Response\AuthorizationResponse;
 use Famoser\SyncApi\Models\Entities\UserCollection;
 use Famoser\SyncApi\Types\ServerError;
@@ -60,8 +59,8 @@ class UserController extends ApiRequestController
             //remove guids which user already has access to
             $guidsForUser = $guidsToSetFree;
             foreach ($userCollections as $userCollection) {
-                //there is very likely a better way to do this, but as this special case should not happen at all, I'll leave it as it is
-                $guidsForUser = array_diff(array($userCollection->collection_guid), $guidsForUser);
+                //sorry for this clumsy code, but as this corner case should not happen at all, I'll leave it as it is
+                $guidsForUser = array_diff([$userCollection->collection_guid], $guidsForUser);
             }
 
             //add new accesses

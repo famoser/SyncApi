@@ -33,7 +33,11 @@ class FrontendController extends BaseController
         }
 
         $helper = $this->getDatabaseHelper();
-        $this->frontendUser = $helper->getSingleFromDatabase(new FrontendUser(), "id = :id", array("id" => $_SESSION["frontend_user_id"]));
+        $this->frontendUser = $helper->getSingleFromDatabase(
+            new FrontendUser(), 
+            "id = :id", 
+            ["id" => $_SESSION["frontend_user_id"]]
+        );
         return $this->frontendUser;
     }
 

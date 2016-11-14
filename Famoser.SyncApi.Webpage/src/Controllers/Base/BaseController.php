@@ -10,12 +10,10 @@ namespace Famoser\SyncApi\Controllers\Base;
 
 
 use Famoser\SyncApi\Helpers\DatabaseHelper;
-use Famoser\SyncApi\Helpers\LogHelper;
 use Famoser\SyncApi\Models\Communication\Request\Base\BaseRequest;
 use Famoser\SyncApi\Repositories\SettingsRepository;
 use Famoser\SyncApi\Services\Interfaces\LoggerInterface;
 use Famoser\SyncApi\Services\Interfaces\RequestServiceInterface;
-use Famoser\SyncApi\Services\RequestService;
 use Interop\Container\ContainerInterface;
 use Slim\Http\Request;
 use Slim\Http\Response;

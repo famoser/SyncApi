@@ -41,7 +41,7 @@ class ApplicationController extends FrontendController
         $application = $this->getDatabaseHelper()->getSingleFromDatabase(
             new Application(),
             "id = :id",
-            array("id" => $id)
+            ["id" => $id]
         );
         if ($this->getFrontendUser() && $this->getFrontendUser()->id == $application->admin_id) {
             return $application;
@@ -56,7 +56,7 @@ class ApplicationController extends FrontendController
         $applications = $this->getDatabaseHelper()->getFromDatabase(
             new Application(),
             "admin_id = :admin_id",
-            array("admin_id" => $this->getFrontendUser()->id)
+            ["admin_id" => $this->getFrontendUser()->id]
         );
         $args["applications"] = $applications;
         return $this->renderTemplate($response, "application/index", $args);
@@ -83,7 +83,7 @@ class ApplicationController extends FrontendController
         $users = $this->getDatabaseHelper()->getFromDatabase(
             new User(),
             "application_id = :application_id",
-            array("application_id" => $applicationId),
+            ["application_id" => $applicationId],
             null,
             -1,
             "guid"
@@ -156,7 +156,7 @@ class ApplicationController extends FrontendController
             $existing = $this->getDatabaseHelper()->getSingleFromDatabase(
                 new Application(),
                 "application_id = :application_id",
-                array("application_id" => $application->application_id)
+                ["application_id" => $application->application_id]
             );
             if ($existing != null) {
                 $args["message"] = "application with this id already exists";
@@ -216,9 +216,9 @@ class ApplicationController extends FrontendController
 
     private function writeFromPost(Application $application, array $source, &$message, $createAction = false)
     {
-        $propArray = array("name", "description");
+        $propArray = ["name", "description"];
         if ($createAction) {
-            $propArray = array("name", "description", "application_id", "application_seed");
+            $propArray = ["name", "description", "application_id", "application_seed"];
         }
         $arr = $this->writePropertiesFromArray($source, $application, $propArray);
         if (count($arr) == 0) {
