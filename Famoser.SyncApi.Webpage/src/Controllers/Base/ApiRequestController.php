@@ -8,7 +8,6 @@
 
 namespace Famoser\SyncApi\Controllers\Base;
 
-
 use Famoser\SyncApi\Exceptions\ApiException;
 use Famoser\SyncApi\Helpers\RequestHelper;
 use Famoser\SyncApi\Models\Communication\Request\Base\BaseRequest;
@@ -64,7 +63,8 @@ class ApiRequestController extends BaseController
         if (RequestHelper::validateAuthCode(
             $req->AuthorizationCode,
             $application->application_seed,
-            $user->personal_seed)
+            $user->personal_seed
+        )
         ) {
             throw new ApiException(ApiError::AUTHORIZATION_CODE_INVALID);
         }
@@ -112,7 +112,7 @@ class ApiRequestController extends BaseController
             array("guid" => $req->UserId, "application_id" => $req->ApplicationId)
         );
     }
-    
+
     /* @var Device $device */
     private $device;
 
