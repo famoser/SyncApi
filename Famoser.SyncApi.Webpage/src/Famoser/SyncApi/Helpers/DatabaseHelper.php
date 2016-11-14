@@ -186,8 +186,9 @@ class DatabaseHelper
      * @return Application[]|ApplicationSetting[]|AuthorizationCode[]|Collection[]|ContentVersion[]|Device[]|Entity[]|
      * FrontendUser[]|User[]|UserCollection[]|bool
      */
-    public function getFromDatabase(BaseEntity $entity, $where = null, $parameters = null,
-                                    $orderBy = null, $limit = -1, $selector = "*")
+    public function getFromDatabase(
+        BaseEntity $entity, $where = null, $parameters = null,
+        $orderBy = null, $limit = -1, $selector = "*")
     {
         $sql = $this->createQuery($entity, $where, $orderBy, $limit, $selector);
         $res = $this->executeAndFetch($entity, $sql, $parameters);
@@ -202,8 +203,9 @@ class DatabaseHelper
      * @param int $limit
      * @return int
      */
-    public function countFromDatabase(BaseEntity $entity, $where = null, $parameters = null, 
-                                      $orderBy = null, $limit = -1)
+    public function countFromDatabase(
+        BaseEntity $entity, $where = null, $parameters = null,
+        $orderBy = null, $limit = -1)
     {
         $sql = $this->createQuery($entity, $where, $orderBy, $limit, "COUNT(*)");
         return $this->executeAndCount($sql, $parameters);
@@ -221,9 +223,9 @@ class DatabaseHelper
      * @return Application[]|ApplicationSetting[]|AuthorizationCode[]|Collection[]|ContentVersion[]|Device[]|Entity[]|
      * FrontendUser[]|User[]|UserCollection[]|bool
      */
-    public function getWithInFromDatabase(BaseEntity $entity, $property, $values, $invertIn = false,
-                                          $where = null, $parameters = null,
-                                          $orderBy = null, $limit = -1)
+    public function getWithInFromDatabase(
+        BaseEntity $entity, $property, $values, $invertIn = false,
+        $where = null, $parameters = null, $orderBy = null, $limit = -1)
     {
         if ($parameters == null) {
             $parameters = [];
