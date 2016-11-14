@@ -22,7 +22,6 @@ use Famoser\SyncApi\Types\ServerError;
 /**
  * Base class for all api sync requests
  *
- * Class ApiSyncController
  * @package Famoser\SyncApi\Controllers\Base
  */
 abstract class ApiSyncController extends ApiRequestController
@@ -50,54 +49,60 @@ abstract class ApiSyncController extends ApiRequestController
      * does the sync in a generic fashion
      *
      * @param BaseRequest $req
-     * @param BaseSyncEntity[] $communicationEntities
+     * @param BaseSyncEntity[] $commEntities
      * @param $contentType
-     * @param array $allowedOnlineActions
+     * @param array $allowedOA
      * @return \Famoser\SyncApi\Models\Entities\Base\BaseSyncEntity[]
      * @throws ApiException
      * @throws ServerException
      */
     protected function syncInternal(
         BaseRequest $req,
-        array $communicationEntities,
+        array $commEntities,
         $contentType,
-        array $allowedOnlineActions = OnlineAction::ALL_SYNC_ACTIONS
+        array $allowedOA = OnlineAction::ALL_SYNC_ACTIONS
     )
     {
         $resultArray = [];
         $askedForGuids = [];
-        foreach ($communicationEntities as $communicationEntity) {
+        foreach ($commEntities as $communicationEntity) {
             $askedForGuids[] = $communicationEntity->Id;
-            if ($communicationEntity->OnlineAction == OnlineAction::NONE) {
-                continue;
-            }
 
-            //check if no action can be executed which is not explicitly allowed
-            if (!in_array($communicationEntity->OnlineAction, $allowedOnlineActions)) {
+            //check that no action can be executed which is not explicitly allowed
+            if (!in_array($communicationEntity->OnlineAction, $allowedOA)) {
                 throw new ApiException(ApiError::ACTION_PROHIBITED);
             }
 
-            //do the sync stuff
-            if ($communicationEntity->OnlineAction == OnlineAction::CREATE) {
-                $entity = $this->getByIdInternal($req, $communicationEntity->Id, $contentType);
-                $this->createSyncEntity($req, $entity, $communicationEntity, $contentType);
-            } elseif ($communicationEntity->OnlineAction == OnlineAction::UPDATE) {
-                $entity = $this->getByIdInternal($req, $communicationEntity->Id, $contentType);
-                $this->updateSyncEntity($entity, $communicationEntity);
-            } elseif ($communicationEntity->OnlineAction == OnlineAction::DELETE) {
-                $entity = $this->getByIdInternal($req, $communicationEntity->Id, $contentType);
-                $this->deleteSyncEntity($entity);
-            } elseif ($communicationEntity->OnlineAction == OnlineAction::READ) {
-                $entity = $this->getByIdInternal($req, $communicationEntity->Id, $contentType);
-                $resultArray[] = $this->readSyncEntity($entity, $contentType);
-            } elseif ($communicationEntity->OnlineAction == OnlineAction::CONFIRM_VERSION) {
-                $entity = $this->getByIdInternal($req, $communicationEntity->Id, $contentType);
-                $res = $this->confirmVersion($entity, $communicationEntity, $contentType);
-                if ($res != null) {
-                    $resultArray[] = $res;
-                }
-            } else {
-                throw new ApiException(ApiError::ACTION_NOT_SUPPORTED);
+            //execute the OnlineAction
+            switch ($communicationEntity->OnlineAction) {
+                case OnlineAction::NONE:
+                    continue;
+                case OnlineAction::CREATE:
+                    $entity = $this->getByIdInternal($req, $communicationEntity->Id, $contentType);
+                    $this->createSyncEntity($req, $entity, $communicationEntity, $contentType);
+                    break;
+                case OnlineAction::READ:
+                    $entity = $this->getByIdInternal($req, $communicationEntity->Id, $contentType);
+                    $resultArray[] = $this->readSyncEntity($entity, $contentType);
+                    break;
+                case OnlineAction::UPDATE:
+                    $entity = $this->getByIdInternal($req, $communicationEntity->Id, $contentType);
+                    $this->updateSyncEntity($entity, $communicationEntity);
+                    break;
+                case OnlineAction::DELETE:
+                    $entity = $this->getByIdInternal($req, $communicationEntity->Id, $contentType);
+                    $this->deleteSyncEntity($entity);
+                    break;
+                case OnlineAction::CONFIRM_VERSION:
+                    $entity = $this->getByIdInternal($req, $communicationEntity->Id, $contentType);
+                    $res = $this->confirmVersion($entity, $communicationEntity, $contentType);
+                    if ($res != null) {
+                        $resultArray[] = $res;
+                    }
+                    break;
+                case OnlineAction::CONFIRM_ACCESS:
+                default:
+                    throw new ApiException(ApiError::ACTION_NOT_SUPPORTED);
             }
         }
 
