@@ -9,6 +9,11 @@
 namespace Famoser\SyncApi\Types;
 
 
+/**
+ * the action to be executed by the api on a resource
+ * 
+ * @package Famoser\SyncApi\Types
+ */
 class OnlineAction
 {
     const NONE = 0;
@@ -19,11 +24,11 @@ class OnlineAction
     const CONFIRM_VERSION = 5;
     const CONFIRM_ACCESS = 6;
 
-    const ALL_SYNC_ACTIONS = array(
+    const ALL_SYNC_ACTIONS = [
         OnlineAction::CONFIRM_VERSION,
         OnlineAction::CREATE,
         OnlineAction::READ,
         OnlineAction::UPDATE,
         OnlineAction::DELETE,
-    );
+    ];
 }

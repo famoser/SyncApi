@@ -18,6 +18,12 @@ use Famoser\SyncApi\Models\Entities\UserCollection;
 use Famoser\SyncApi\Types\ApiError;
 use Slim\Http\Response;
 
+/**
+ * base class for all api requests
+ * 
+ * Class ApiRequestController
+ * @package Famoser\SyncApi\Controllers\Base
+ */
 class ApiRequestController extends BaseController
 {
     /* @var Application $application */
@@ -37,7 +43,7 @@ class ApiRequestController extends BaseController
         $this->application = $this->getDatabaseHelper()->getSingleFromDatabase(
             new Application(),
             "application_id = :application_id AND is_deleted =:is_deleted",
-            array("application_id" => $applicationId, "is_deleted" => false)
+            ["application_id" => $applicationId, "is_deleted" => false]
         );
 
         if ($this->application == null) {
@@ -108,7 +114,7 @@ class ApiRequestController extends BaseController
         return $this->getDatabaseHelper()->getSingleFromDatabase(
             new User(),
             "guid = :guid AND application_id = :application_id",
-            array("guid" => $req->UserId, "application_id" => $req->ApplicationId)
+            ["guid" => $req->UserId, "application_id" => $req->ApplicationId]
         );
     }
 
@@ -146,7 +152,7 @@ class ApiRequestController extends BaseController
         return $this->getDatabaseHelper()->getSingleFromDatabase(
             new Device(),
             "guid = :guid AND user_guid = :user_guid AND is_deleted = :is_deleted",
-            array("guid" => $req->DeviceId, "user_guid" => $this->getUser($req)->guid)
+            ["guid" => $req->DeviceId, "user_guid" => $this->getUser($req)->guid]
         );
     }
 
@@ -167,7 +173,7 @@ class ApiRequestController extends BaseController
         $userCollectionIds = $this->getDatabaseHelper()->getFromDatabase(
             new UserCollection(),
             "user_guid =:user_guid",
-            array("user_guid" => $this->getUser($req)->guid),
+            ["user_guid" => $this->getUser($req)->guid],
             null,
             1000,
             "collection_guid"

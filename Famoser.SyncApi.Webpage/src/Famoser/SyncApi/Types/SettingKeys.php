@@ -9,12 +9,23 @@
 namespace Famoser\SyncApi\Types;
 
 
+/**
+ * used to distinguish setting keys
+ * 
+ * @package Famoser\SyncApi\Types
+ */
 class SettingKeys
 {
     const AUTHORIZATION_CODE_VALID_TIME = 0;
     const DEVICE_AUTHENTICATION_REQUIRED = 1;
     const AUTHORIZATION_CODE_LENGTH = 2;
 
+    /**
+     * get a description of a setting to be displayed to a user
+     * 
+     * @param $val
+     * @return string
+     */
     public static function getSettingDescription($val)
     {
         switch ($val) {
@@ -29,6 +40,12 @@ class SettingKeys
         }
     }
 
+    /**
+     * get a default value of a setting
+     * 
+     * @param $val
+     * @return string
+     */
     public static function getDefaultValue($val)
     {
         switch ($val) {
@@ -43,6 +60,12 @@ class SettingKeys
         }
     }
 
+    /**
+     * checks if the value to be assigned to a setting is valid
+     * 
+     * @param $val
+     * @return bool
+     */
     public static function isValidValue($val)
     {
         switch ($val) {

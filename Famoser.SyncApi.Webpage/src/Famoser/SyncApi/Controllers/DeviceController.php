@@ -96,7 +96,7 @@ class DeviceController extends ApiSyncController
         $dev = $this->getDatabaseHelper()->getSingleFromDatabase(
             new Device(),
             "user_guid = :user_guid AND guid = :guid",
-            array("user_guid" => $this->getUser($req)->guid, "guid" => $req->ClientMessage)
+            ["user_guid" => $this->getUser($req)->guid, "guid" => $req->ClientMessage]
         );
         $dev->is_authenticated = $action;
         if (!$this->getDatabaseHelper()->saveToDatabase($dev)) {
@@ -123,7 +123,7 @@ class DeviceController extends ApiSyncController
         return $this->getDatabaseHelper()->getFromDatabase(
             new Device(),
             "user_guid = :user_guid",
-            array("user_guid" => $this->getUser($req)->guid)
+            ["user_guid" => $this->getUser($req)->guid]
         );
     }
 

@@ -9,6 +9,12 @@
 namespace Famoser\SyncApi\Types;
 
 
+/**
+ * specify the content type
+ * used in the ContentVersion entity
+ * 
+ * @package Famoser\SyncApi\Types
+ */
 class ContentType
 {
     const USER = 0;

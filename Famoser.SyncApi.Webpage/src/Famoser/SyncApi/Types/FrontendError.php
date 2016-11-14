@@ -9,10 +9,21 @@
 namespace Famoser\SyncApi\Types;
 
 
+/**
+ * used to distinguish frontend errors
+ *
+ * @package Famoser\SyncApi\Types
+ */
 class FrontendError
 {
     const NOT_LOGGED_IN = 0;
 
+    /**
+     * convert to string
+     * 
+     * @param $code
+     * @return string
+     */
     public static function toString($code)
     {
         switch ($code) {

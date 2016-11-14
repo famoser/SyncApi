@@ -18,8 +18,6 @@ use Famoser\SyncApi\Models\Entities\ContentVersion;
 use Famoser\SyncApi\Models\Entities\Device;
 use Famoser\SyncApi\Models\Entities\Entity;
 use Famoser\SyncApi\Models\Entities\FrontendUser;
-use Famoser\SyncApi\Models\Entities\User;
-use Famoser\SyncApi\Models\Entities\UserCollection;
 use Famoser\SyncApi\Services\Interfaces\LoggerInterface;
 use Interop\Container\ContainerInterface;
 use PDO;
@@ -343,7 +341,7 @@ class DatabaseHelper
     public function deleteFromDatabase(BaseEntity $entity)
     {
         $sql = "DELETE FROM " . $entity->getTableName() . " WHERE id=:id";
-        $params = array("id" => $entity->id);
+        $params = ["id" => $entity->id];
         $prep = $this->getConnection()->prepare($sql);
         return $prep->execute($params);
     }

@@ -37,10 +37,10 @@ class AuthorizationController extends ApiSyncController
     private function generateReadableRandomString($length = 6)
     {
         //only taking consonants which sound unique
-        $consonants = array(
+        $consonants = [
             "b", "c", "d", "g", "h", "k", "l",
-            "n", "p", "r", "s", "t", "x", "z");
-        $vocals = array("a", "e", "i", "o", "u");
+            "n", "p", "r", "s", "t", "x", "z"];
+        $vocals = ["a", "e", "i", "o", "u"];
         $random = "";
         srand((double)microtime() * 1000000);
         $max = $length / 2;
@@ -90,13 +90,13 @@ class AuthorizationController extends ApiSyncController
         //clean up expired auth codes
         $this->getDatabaseHelper()->execute(
             "DELETE FROM authorization_codes WHERE valid_till_date_time < :valid_till_date_time",
-            array("valid_till_date_time" => time()));
+            ["valid_till_date_time" => time()]);
 
         //try to get auth code
         $authCode = $this->getDatabaseHelper()->getSingleFromDatabase(
             new AuthorizationCode(),
             "code = :code AND user_guid = :user_guid",
-            array("code" => $req->ClientMessage, "user_guid" => $req->UserId)
+            ["code" => $req->ClientMessage, "user_guid" => $req->UserId]
         );
 
         if ($authCode == null) {
@@ -185,7 +185,7 @@ class AuthorizationController extends ApiSyncController
         if ($req->UserEntity != null) {
             $res = $this->syncInternal(
                 $req,
-                array($req->UserEntity),
+                [$req->UserEntity],
                 ContentType::USER
             );
 
@@ -198,7 +198,7 @@ class AuthorizationController extends ApiSyncController
         if ($req->DeviceEntity != null) {
             $res = $this->syncInternal(
                 $req,
-                array($req->DeviceEntity),
+                [$req->DeviceEntity],
                 ContentType::DEVICE
             );
             if (count($res) > 0) {
@@ -223,15 +223,15 @@ class AuthorizationController extends ApiSyncController
             //get all accessible users (which is obv. only one)
             $user = $this->tryGetUser($req);
             if ($user != null) {
-                return array($user);
+                return [$user];
             }
-            return array();
+            return [];
         } else if ($contentType == ContentType::DEVICE) {
             $device = $this->tryGetDevice($req);
             if ($device != null) {
-                return array($device);
+                return [$device];
             }
-            return array();
+            return [];
         } else {
             throw new ServerException(ServerError::FORBIDDEN);
         }
@@ -264,7 +264,7 @@ class AuthorizationController extends ApiSyncController
             $devices = $this->getDatabaseHelper()->countFromDatabase(
                 new Device(),
                 "user_guid = :user_guid AND is_deleted = :is_deleted",
-                array("user_guid" => $this->getUser($req)->guid, "is_deleted" => false)
+                ["user_guid" => $this->getUser($req)->guid, "is_deleted" => false]
             );
 
             $device = new Device();

@@ -16,13 +16,34 @@ use Famoser\SyncApi\Types\ServerError;
 use Slim\Http\Request;
 use Slim\Http\Response;
 
+/**
+ * this controller is concerd so a user can register & login
+ *
+ * Class LoginController
+ * @package Famoser\SyncApi\Controllers
+ */
 class LoginController extends FrontendController
 {
+    /**
+     * show the login form
+     * @param Request $request
+     * @param Response $response
+     * @param $args
+     * @return mixed
+     */
     public function login(Request $request, Response $response, $args)
     {
         return $this->renderTemplate($response, "login/login", $args);
     }
 
+    /**
+     * process the login form post request
+     *
+     * @param Request $request
+     * @param Response $response
+     * @param $args
+     * @return mixed|static
+     */
     public function loginPost(Request $request, Response $response, $args)
     {
         $req = $request->getParsedBody();
@@ -42,6 +63,14 @@ class LoginController extends FrontendController
         return $this->renderTemplate($response, "login/login", $args);
     }
 
+    /**
+     * show the register form
+     *
+     * @param Request $request
+     * @param Response $response
+     * @param $args
+     * @return mixed
+     */
     public function register(Request $request, Response $response, $args)
     {
         return $this->renderTemplate($response, "login/register", $args);
@@ -59,7 +88,12 @@ class LoginController extends FrontendController
     public function registerPost(Request $request, Response $response, $args)
     {
         $req = $request->getParsedBody();
-        if (isset($req["username"]) && isset($req["email"]) && isset($req["password"]) && $req["password"] == $req["password2"]) {
+        if (
+            isset($req["username"]) &&
+            isset($req["email"]) &&
+            isset($req["password"]) &&
+            $req["password"] == $req["password2"]
+        ) {
             $usr = $this->getDatabaseHelper()->getSingleFromDatabase(
                 new FrontendUser(),
                 "username = :username OR email = :email",
@@ -70,7 +104,7 @@ class LoginController extends FrontendController
                 $frontendUser->email = $req["email"];
                 $frontendUser->password = password_hash($req["password"], PASSWORD_BCRYPT);
                 $frontendUser->username = $req["username"];
-                $frontendUser->reset_key = md5(rand(0,100000));
+                $frontendUser->reset_key = md5(rand(0, 100000));
                 if (!$this->getDatabaseHelper()->saveToDatabase($frontendUser)) {
                     throw new ServerException(ServerError::DATABASE_SAVE_FAILURE);
                 }
@@ -136,11 +170,28 @@ class LoginController extends FrontendController
         return $this->renderTemplate($response, "login/forgot", $args);
     }
 
+    /**
+     * show the recover form
+     * 
+     * @param Request $request
+     * @param Response $response
+     * @param $args
+     * @return mixed
+     */
     public function recover(Request $request, Response $response, $args)
     {
         return $this->renderTemplate($response, "login/recover", $args);
     }
 
+    /**
+     * assign the user a new password if the reset key is correct
+     *
+     * @param Request $request
+     * @param Response $response
+     * @param $args
+     * @return mixed|static
+     * @throws ServerException
+     */
     public function recoverPost(Request $request, Response $response, $args)
     {
         $req = $request->getParsedBody();

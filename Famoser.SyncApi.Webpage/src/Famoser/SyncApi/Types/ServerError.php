@@ -9,6 +9,11 @@
 namespace Famoser\SyncApi\Types;
 
 
+/**
+ * used to distinguish server errors
+ *
+ * @package Famoser\SyncApi\Types
+ */
 class ServerError
 {
     const REQUEST_JSON_FAILURE = 101;
@@ -16,6 +21,12 @@ class ServerError
     const NOT_WELL_DEFINED = 105;
     const DATABASE_SAVE_FAILURE = 201;
 
+    /**
+     * convert to string
+     * 
+     * @param $serverError
+     * @return string
+     */
     public static function toString($serverError)
     {
         switch ($serverError) {

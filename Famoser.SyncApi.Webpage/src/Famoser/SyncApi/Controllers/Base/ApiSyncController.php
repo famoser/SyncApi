@@ -19,6 +19,12 @@ use Famoser\SyncApi\Types\ApiError;
 use Famoser\SyncApi\Types\OnlineAction;
 use Famoser\SyncApi\Types\ServerError;
 
+/**
+ * Base class for all api sync requests
+ * 
+ * Class ApiSyncController
+ * @package Famoser\SyncApi\Controllers\Base
+ */
 abstract class ApiSyncController extends ApiRequestController
 {
     /**
@@ -38,7 +44,9 @@ abstract class ApiSyncController extends ApiRequestController
      * @param BaseCommunicationEntity $communicationEntity
      * @return BaseSyncEntity
      */
-    abstract protected function createEntity(BaseRequest $req, $contentType, BaseCommunicationEntity $communicationEntity);
+    abstract protected function createEntity(
+        BaseRequest $req, $contentType, BaseCommunicationEntity $communicationEntity
+    );
 
     /**
      * does the sync in a generic fashion
@@ -51,7 +59,10 @@ abstract class ApiSyncController extends ApiRequestController
      * @throws ApiException
      * @throws ServerException
      */
-    protected function syncInternal(BaseRequest $req, array $communicationEntities, $contentType, array $allowedOnlineActions = OnlineAction::ALL_SYNC_ACTIONS)
+    protected function syncInternal(
+        BaseRequest $req, array $communicationEntities, $contentType,
+        array $allowedOnlineActions = OnlineAction::ALL_SYNC_ACTIONS
+    )
     {
         $resultArray = [];
         $askedForGuids = [];
@@ -149,7 +160,7 @@ abstract class ApiSyncController extends ApiRequestController
         return $this->getDatabaseHelper()->getSingleFromDatabase(
             new ContentVersion(),
             "content_type = :content_type AND entity_guid = :entity_guid",
-            array("content_type" => $contentType, "entity_guid" => $syncEntity->guid),
+            ["content_type" => $contentType, "entity_guid" => $syncEntity->guid],
             "create_date_time DESC"
         );
     }

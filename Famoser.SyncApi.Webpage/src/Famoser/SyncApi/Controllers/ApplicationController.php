@@ -22,6 +22,12 @@ use Famoser\SyncApi\Types\FrontendError;
 use Slim\Http\Request;
 use Slim\Http\Response;
 
+/**
+ * a frontend controller which allows access to the applications
+ *
+ * Class ApplicationController
+ * @package Famoser\SyncApi\Controllers
+ */
 class ApplicationController extends FrontendController
 {
     private function ensureHasAccess()
@@ -50,6 +56,15 @@ class ApplicationController extends FrontendController
         throw new AccessDeniedException();
     }
 
+    /**
+     * display all applications
+     *
+     * @param Request $request
+     * @param Response $response
+     * @param $args
+     * @return mixed
+     * @throws FrontendException
+     */
     public function index(Request $request, Response $response, $args)
     {
         $this->ensureHasAccess();
@@ -62,6 +77,16 @@ class ApplicationController extends FrontendController
         return $this->renderTemplate($response, "application/index", $args);
     }
 
+    /**
+     * show a single application
+     *
+     * @param Request $request
+     * @param Response $response
+     * @param $args
+     * @return mixed
+     * @throws AccessDeniedException
+     * @throws FrontendException
+     */
     public function show(Request $request, Response $response, $args)
     {
         $this->ensureHasAccess();
@@ -137,19 +162,42 @@ class ApplicationController extends FrontendController
         return $appStats;
     }
 
+    /**
+     * show a form to display a new application
+     *
+     * @param Request $request
+     * @param Response $response
+     * @param $args
+     * @return mixed
+     * @throws FrontendException
+     */
     public function create(Request $request, Response $response, $args)
     {
         $this->ensureHasAccess();
         return $this->renderTemplate($response, "application/create", $args);
     }
 
+    /**
+     * the post request for creating a new application
+     *
+     * @param Request $request
+     * @param Response $response
+     * @param $args
+     * @return mixed|static
+     * @throws FrontendException
+     */
     public function createPost(Request $request, Response $response, $args)
     {
         $this->ensureHasAccess();
         $application = new Application();
         $message = "";
         var_dump($request->getParsedBody());
-        if ($this->writeFromPost($application, $request->getParsedBody(), $message, true)) {
+        if ($this->writeFromPost(
+            $application, $request->getParsedBody(),
+            $message,
+            ["name", "description", "application_id", "application_seed"]
+        )
+        ) {
             $application->admin_id = $this->getFrontendUser()->id;
             $application->release_date_time = time();
 
@@ -171,6 +219,16 @@ class ApplicationController extends FrontendController
         return $this->renderTemplate($response, "application/create", $args);
     }
 
+    /**
+     * show a form to edit an application
+     *
+     * @param Request $request
+     * @param Response $response
+     * @param $args
+     * @return mixed
+     * @throws AccessDeniedException
+     * @throws FrontendException
+     */
     public function edit(Request $request, Response $response, $args)
     {
         $this->ensureHasAccess();
@@ -179,11 +237,21 @@ class ApplicationController extends FrontendController
         return $this->renderTemplate($response, "application/edit", $args);
     }
 
+    /**
+     * the post request from the edit form
+     *
+     * @param Request $request
+     * @param Response $response
+     * @param $args
+     * @return mixed
+     * @throws AccessDeniedException
+     * @throws FrontendException
+     */
     public function editPost(Request $request, Response $response, $args)
     {
         $this->ensureHasAccess();
         $application = $this->getAuthorizedApplication($args["id"]);
-        if ($this->writeFromPost($application, $request->getParsedBody(), $message)) {
+        if ($this->writeFromPost($application, $request->getParsedBody(), $message, ["name", "description"])) {
             if (!$this->getDatabaseHelper()->saveToDatabase($application)) {
                 $args["message"] = "application could not be saved (database error)";
             }
@@ -194,6 +262,16 @@ class ApplicationController extends FrontendController
         return $this->renderTemplate($response, "application/edit", $args);
     }
 
+    /**
+     * show a form to remove an applciation
+     *
+     * @param Request $request
+     * @param Response $response
+     * @param $args
+     * @return mixed
+     * @throws AccessDeniedException
+     * @throws FrontendException
+     */
     public function remove(Request $request, Response $response, $args)
     {
         $this->ensureHasAccess();
@@ -202,6 +280,16 @@ class ApplicationController extends FrontendController
         return $this->renderTemplate($response, "application/delete", $args);
     }
 
+    /**
+     * the post request to remove a form lands here
+     *
+     * @param Request $request
+     * @param Response $response
+     * @param $args
+     * @return mixed|static
+     * @throws AccessDeniedException
+     * @throws FrontendException
+     */
     public function removePost(Request $request, Response $response, $args)
     {
         $this->ensureHasAccess();
@@ -214,12 +302,17 @@ class ApplicationController extends FrontendController
         return $this->redirect($request, $response, "application_index");
     }
 
-    private function writeFromPost(Application $application, array $source, &$message, $createAction = false)
+    /**
+     * write all specified application properties
+     *
+     * @param Application $application
+     * @param array $source
+     * @param $message
+     * @param array $propArray
+     * @return bool
+     */
+    private function writeFromPost(Application $application, array $source, &$message, array $propArray)
     {
-        $propArray = ["name", "description"];
-        if ($createAction) {
-            $propArray = ["name", "description", "application_id", "application_seed"];
-        }
         $arr = $this->writePropertiesFromArray($source, $application, $propArray);
         if (count($arr) == 0) {
             //validate application seed

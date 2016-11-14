@@ -19,6 +19,12 @@ use Slim\Http\Request;
 use Slim\Http\Response;
 use Slim\Interfaces\RouterInterface;
 
+/**
+ * the base controller which provides access to the environment
+ *
+ * Class BaseController
+ * @package Famoser\SyncApi\Controllers\Base
+ */
 class BaseController
 {
     /* @var ContainerInterface $container */

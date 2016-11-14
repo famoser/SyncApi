@@ -13,15 +13,23 @@ use Famoser\SyncApi\Controllers\Base\FrontendController;
 use Slim\Http\Request;
 use Slim\Http\Response;
 
+/**
+ * the public controller displays the index page & other pages accessible to everyone
+ * 
+ * @package Famoser\SyncApi\Controllers
+ */
 class PublicController extends FrontendController
 {
+    /**
+     * show basic infos about this application
+     * 
+     * @param Request $request
+     * @param Response $response
+     * @param $args
+     * @return mixed
+     */
     public function index(Request $request, Response $response, $args)
     {
         return $this->renderTemplate($response, "public/index", $args);
-    }
-
-    public function indexAsJson(Request $request, Response $response, $args)
-    {
-        return $response->withJson($args);
     }
 }
