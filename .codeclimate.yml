@@ -4,10 +4,10 @@ engines:
     enabled: true
   phpcodesniffer:
     enabled: true
-	checks:
-		#disable Namespaces NamespaceDeclaration BlankLineAfter check as it does not work properly
-		Namespaces/NamespaceDeclarationSniff:
-			enabled: false
+    checks:
+        #disable Namespaces NamespaceDeclaration BlankLineAfter check as it does not work properly
+        Namespaces/NamespaceDeclarationSniff:
+            enabled: false
   phpmd:
     enabled: true  
     checks:
