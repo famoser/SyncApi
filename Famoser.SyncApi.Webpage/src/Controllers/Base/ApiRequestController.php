@@ -61,7 +61,11 @@ class ApiRequestController extends BaseController
         $application = $this->getApplication($req->ApplicationId);
         $user = $this->getUser($req);
 
-        if (RequestHelper::validateAuthCode($req->AuthorizationCode, $application->application_seed, $user->personal_seed)) {
+        if (RequestHelper::validateAuthCode(
+            $req->AuthorizationCode,
+            $application->application_seed,
+            $user->personal_seed)
+        ) {
             throw new ApiException(ApiError::AUTHORIZATION_CODE_INVALID);
         }
         return true;
@@ -108,7 +112,7 @@ class ApiRequestController extends BaseController
             array("guid" => $req->UserId, "application_id" => $req->ApplicationId)
         );
     }
-
+    
     /* @var Device $device */
     private $device;
 
@@ -167,7 +171,8 @@ class ApiRequestController extends BaseController
             array("user_guid" => $this->getUser($req)->guid),
             null,
             1000,
-            "collection_guid");
+            "collection_guid"
+        );
 
         $this->collectionIds = [];
         foreach ($userCollectionIds as $co) {
