@@ -10,6 +10,7 @@ namespace Famoser\SyncApi\Controllers;
 
 
 use Famoser\SyncApi\Controllers\Base\FrontendController;
+use Famoser\SyncApi\Models\ApiInformation;
 use Slim\Http\Request;
 use Slim\Http\Response;
 
@@ -21,8 +22,8 @@ use Slim\Http\Response;
 class PublicController extends FrontendController
 {
     /**
-     * show basic infos about this application
-     * 
+     * show basic info about this application
+     *
      * @param Request $request
      * @param Response $response
      * @param $args
@@ -31,5 +32,20 @@ class PublicController extends FrontendController
     public function index(Request $request, Response $response, $args)
     {
         return $this->renderTemplate($response, "public/index", $args);
+    }
+
+    /**
+     * show api info as json. Should be anough to configure C# library
+     *
+     * @param Request $request
+     * @param Response $response
+     * @param $args
+     * @return Response
+     */
+    public function info(Request $request, Response $response, $args)
+    {
+        $apiInfo = new ApiInformation();
+        $apiInfo->Modulo = $this->container->get("settings")["api_modulo"];
+        return $this->returnJsonObject($response, $apiInfo);
     }
 }

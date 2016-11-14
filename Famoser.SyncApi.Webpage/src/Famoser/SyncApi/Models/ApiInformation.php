@@ -8,6 +8,11 @@
 
 namespace Famoser\SyncApi\Models;
 
+/**
+ * information about this API
+ * 
+ * @package Famoser\SyncApi\Models
+ */
 class ApiInformation
 {
     /* @var int $Modulo */

@@ -21,14 +21,19 @@ class RequestService
 {
     /* @var LoggerInterface $logger */
     private $logger;
+    
+    /* int $modulo */
+    private $modulo;
 
     /**
      * RequestService constructor.
      * @param LoggerInterface $logger
+     * @param int $modulo
      */
-    public function __construct(LoggerInterface $logger)
+    public function __construct(LoggerInterface $logger, $modulo)
     {
         $this->logger = $logger;
+        $this->modulo = $modulo;
     }
 
     /**
@@ -78,11 +83,11 @@ class RequestService
      * @param int $modulo
      * @return bool
      */
-    public function validateAuthCode($authCode, $applicationSeed, $personSeed, $modulo = 10000019)
+    public function validateAuthCode($authCode, $applicationSeed, $personSeed)
     {
         $content = explode("_", $authCode);
         $expectedAuthCode = $content[0] * $applicationSeed * $personSeed;
-        $expectedAuthCode %= $modulo;
+        $expectedAuthCode %= $this->modulo;
         return $authCode == $expectedAuthCode;
     }
 

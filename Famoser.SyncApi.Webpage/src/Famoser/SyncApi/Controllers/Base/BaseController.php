@@ -167,4 +167,17 @@ class BaseController
         }
         return $missing;
     }
+
+    /**
+     * returns model as json
+     *
+     * @param  Response $response
+     * @param  $model
+     * @return Response
+     */
+    protected function returnJsonObject(Response $response, $model)
+    {
+        $response->getBody()->write(json_encode($model));
+        return $response->withHeader('Content-Type', 'application/json');
+    }
 }

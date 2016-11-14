@@ -28,6 +28,7 @@ $configuration = [
             'path' => "data.sqlite",
             'template_path' => "data_template.sqlite"
         ],
+        'api_modulo' => 10000019,
         'data_path' => realpath("../../app"),
         'asset_path' => realpath("../Assets"),
         'log_path' => realpath("../../app/logs"),
@@ -35,10 +36,6 @@ $configuration = [
         'template_path' => realpath("../../app/templates"),
         'cache_path' => realpath("../../app/cache"),
         'public_path' => realpath("../public")
-    ],
-    'api_settings' => [
-        'api_version' => 1,
-        'test_mode' => false
     ]
 ];
 
@@ -96,7 +93,7 @@ $c['logger'] = function (Container $c) {
     return new LoggerService($c->get("settings")["log_path"]);
 };
 $c['requestService'] = function (Container $c) {
-    return new RequestService($c->get("logger"));
+    return new RequestService($c->get("logger"), $c->get("settings")["api_modulo"]);
 };
 
 $controllerNamespace = 'Famoser\SyncApi\Controllers\\';
@@ -148,6 +145,7 @@ $apiRoutes = function () use ($controllerNamespace) {
 
 $webAppRoutes = function () use ($controllerNamespace) {
     $this->get('/', $controllerNamespace . 'PublicController:index')->setName("index");
+    $this->get('/info', $controllerNamespace . 'PublicController:index')->setName("api_info");
 
     $this->get('/login', $controllerNamespace . 'LoginController:login')->setName("login");
     $this->post('/login', $controllerNamespace . 'LoginController:loginPost');

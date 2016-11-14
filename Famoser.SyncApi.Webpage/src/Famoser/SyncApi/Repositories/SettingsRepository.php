@@ -38,7 +38,11 @@ class SettingsRepository
             return;
         }
 
-        $settings = $this->helper->getFromDatabase(new ApplicationSetting(), "application_id = :application_id", ["application_id" => $this->applicationId]);
+        $settings = $this->helper->getFromDatabase(
+            new ApplicationSetting(), 
+            "application_id = :application_id", 
+            ["application_id" => $this->applicationId]
+        );
         foreach ($settings as $setting) {
             $this->dic[$setting->key] = $setting->val;
         }

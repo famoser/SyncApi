@@ -17,7 +17,7 @@ use Slim\Http\Request;
 use Slim\Http\Response;
 
 /**
- * this controller is concerd so a user can register & login
+ * this controller is concerned so a user can register & login
  *
  * Class LoginController
  * @package Famoser\SyncApi\Controllers
@@ -113,7 +113,7 @@ class LoginController extends FrontendController
                 $args["message"] = "username or email already registered";
             }
         } else {
-            $args["message"] = "something went wrong :/ <br/>please double check you've filled out all fields correctly";
+            $args["message"] = "something went wrong :/ <br/>please check you've filled out all fields correctly";
         }
         unset($req["password"]);
         unset($req["password2"]);
@@ -172,7 +172,7 @@ class LoginController extends FrontendController
 
     /**
      * show the recover form
-     * 
+     *
      * @param Request $request
      * @param Response $response
      * @param $args
@@ -195,7 +195,11 @@ class LoginController extends FrontendController
     public function recoverPost(Request $request, Response $response, $args)
     {
         $req = $request->getParsedBody();
-        if (isset($req["username"]) && isset($req["authorization_code"]) && isset($req["password"]) && $req["password"] == $req["password2"]) {
+        if (
+            isset($req["username"]) &&
+            isset($req["authorization_code"]) &&
+            isset($req["password"]) && $req["password"] == $req["password2"]
+        ) {
             $user = $this->getDatabaseHelper()->getSingleFromDatabase(
                 new FrontendUser(),
                 "username = :username AND reset_key = :reset_key",

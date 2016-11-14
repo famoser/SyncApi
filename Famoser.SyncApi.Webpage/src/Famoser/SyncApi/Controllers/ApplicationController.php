@@ -264,7 +264,7 @@ class ApplicationController extends FrontendController
     }
 
     /**
-     * show a form to remove an applciation
+     * show a form to remove an application
      *
      * @param Request $request
      * @param Response $response
