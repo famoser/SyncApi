@@ -13,6 +13,9 @@ use Famoser\SyncApi\Helpers\DatabaseHelper;
 use Famoser\SyncApi\Helpers\LogHelper;
 use Famoser\SyncApi\Models\Communication\Request\Base\BaseRequest;
 use Famoser\SyncApi\Repositories\SettingsRepository;
+use Famoser\SyncApi\Services\Interfaces\LoggerInterface;
+use Famoser\SyncApi\Services\Interfaces\RequestServiceInterface;
+use Famoser\SyncApi\Services\RequestService;
 use Interop\Container\ContainerInterface;
 use Slim\Http\Request;
 use Slim\Http\Response;
@@ -70,6 +73,26 @@ class BaseController
     }
 
     /**
+     * get logger
+     *
+     * @return LoggerInterface
+     */
+    protected function getLogger()
+    {
+        return $this->container->get("logger");
+    }
+
+    /**
+     * get logger
+     *
+     * @return RequestServiceInterface
+     */
+    protected function getRequestService()
+    {
+        return $this->container->get("requestService");
+    }
+
+    /**
      * redirects to the route specified in $slug
      *
      * @param  Request $request
@@ -96,7 +119,11 @@ class BaseController
         if ($neededProps != null) {
             foreach ($neededProps as $neededProp) {
                 if ($request->$neededProp == null) {
-                    LogHelper::log("not a property: " . $neededProp . " in object " . json_encode($request, JSON_PRETTY_PRINT), "isWellDefined_" . uniqid() . ".txt");
+                    $this->getLogger()->log(
+                        "not a property: " . $neededProp . 
+                        " in object " . json_encode($request, JSON_PRETTY_PRINT), 
+                        "isWellDefined_" . uniqid() . ".txt"
+                    );
                     return false;
                 }
             }
@@ -104,7 +131,10 @@ class BaseController
         if ($neededArrays != null) {
             foreach ($neededArrays as $neededArray) {
                 if (!is_array($request->$neededArray)) {
-                    LogHelper::log("not an array: " . $neededArray . " in object " . json_encode($request, JSON_PRETTY_PRINT), "isWellDefined_" . uniqid() . ".txt");
+                    $this->getLogger()->log("not an array: " . $neededArray . 
+                        " in object " . json_encode($request, JSON_PRETTY_PRINT), 
+                        "isWellDefined_" . uniqid() . ".txt"
+                    );
                     return false;
                 }
             }

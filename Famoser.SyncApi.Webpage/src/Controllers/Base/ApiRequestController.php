@@ -60,7 +60,7 @@ class ApiRequestController extends BaseController
         $application = $this->getApplication($req->ApplicationId);
         $user = $this->getUser($req);
 
-        if (RequestHelper::validateAuthCode(
+        if ($this->getRequestService()->validateAuthCode(
             $req->AuthorizationCode,
             $application->application_seed,
             $user->personal_seed

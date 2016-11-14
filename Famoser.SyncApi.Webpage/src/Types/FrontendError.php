@@ -13,7 +13,7 @@ class FrontendError
 {
     const NOT_LOGGED_IN = 0;
 
-    public function toString($code)
+    public static function toString($code)
     {
         switch ($code) {
             case FrontendError::NOT_LOGGED_IN:

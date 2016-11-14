@@ -9,6 +9,7 @@
 namespace Famoser\SyncApi\Middleware;
 
 
+use Famoser\SyncApi\Services\Interfaces\LoggerInterface;
 use Interop\Container\ContainerInterface;
 
 class BaseMiddleware
@@ -18,5 +19,15 @@ class BaseMiddleware
     public function __construct(ContainerInterface $container)
     {
         $this->container = $container;
+    }
+
+    /**
+     * get logger
+     * 
+     * @return LoggerInterface
+     */
+    protected function getLogger()
+    {
+        return $this->container["logger"];
     }
 }

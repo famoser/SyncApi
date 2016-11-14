@@ -10,6 +10,8 @@ session_start();
 
 use Famoser\SyncApi\Middleware\LoggingMiddleware;
 use Famoser\SyncApi\Models\Communication\Response\Base\BaseResponse;
+use Famoser\SyncApi\Services\LoggerService;
+use Famoser\SyncApi\Services\RequestService;
 use Famoser\SyncApi\Types\FrontendError;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
@@ -89,6 +91,12 @@ $c['view'] = function (Container $c) {
     );
 
     return $view;
+};
+$c['logger'] = function (Container $c) {
+    return new LoggerService($c->get("settings")["log_path"]);
+};
+$c['requestService'] = function (Container $c) {
+    return new RequestService($c->get("logger"));
 };
 
 $controllerNamespace = 'Famoser\SyncApi\Controllers\\';

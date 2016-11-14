@@ -32,7 +32,7 @@ class UserController extends ApiRequestController
      */
     public function auth(Request $request, Response $response, $args)
     {
-        $req = RequestHelper::parseAuthorizationRequest($request);
+        $req = $this->getRequestService()->parseAuthorizationRequest($request);
         $this->authorizeRequest($req);
         $this->authenticateRequest($req);
 

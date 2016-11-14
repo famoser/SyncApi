@@ -85,7 +85,7 @@ class AuthorizationController extends ApiSyncController
      */
     public function useCode(Request $request, Response $response, $args)
     {
-        $req = RequestHelper::parseAuthorizationRequest($request);
+        $req = $this->getRequestService()->parseAuthorizationRequest($request);
         $this->authorizeRequest($req);
 
         //clean up expired auth codes
@@ -138,7 +138,7 @@ class AuthorizationController extends ApiSyncController
      */
     public function generate(Request $request, Response $response, $args)
     {
-        $req = RequestHelper::parseAuthorizationRequest($request);
+        $req = $this->getRequestService()->parseAuthorizationRequest($request);
         $this->authorizeRequest($req);
 
         //get device
@@ -176,7 +176,7 @@ class AuthorizationController extends ApiSyncController
      */
     public function sync(Request $request, Response $response, $args)
     {
-        $req = RequestHelper::parseAuthorizationRequest($request);
+        $req = $this->getRequestService()->parseAuthorizationRequest($request);
         $this->authorizeRequest($req);
         $this->authenticateRequest($req);
 

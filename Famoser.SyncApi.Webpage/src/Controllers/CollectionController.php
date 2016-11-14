@@ -35,7 +35,7 @@ class CollectionController extends ApiSyncController
      */
     public function sync(Request $request, Response $response, $args)
     {
-        $req = RequestHelper::parseCollectionEntityRequest($request);
+        $req = $this->getRequestService()->parseCollectionEntityRequest($request);
         $this->authorizeRequest($req);
         $this->authenticateRequest($req);
 

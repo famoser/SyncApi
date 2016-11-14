@@ -36,7 +36,7 @@ class DeviceController extends ApiSyncController
      */
     public function get(Request $request, Response $response, $args)
     {
-        $req = RequestHelper::parseCollectionEntityRequest($request);
+        $req = $this->getRequestService()->parseCollectionEntityRequest($request);
         $this->authorizeRequest($req);
         $this->authenticateRequest($req);
 
@@ -90,7 +90,7 @@ class DeviceController extends ApiSyncController
      */
     private function authInternal(Request $request, Response $response, $action)
     {
-        $req = RequestHelper::parseAuthorizationRequest($request);
+        $req = $this->getRequestService()->parseAuthorizationRequest($request);
         $this->authorizeRequest($req);
         $this->authenticateRequest($req);
 

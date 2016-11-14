@@ -32,7 +32,7 @@ abstract class BaseSyncEntity extends BaseEntity
 
     /**
      * create the communication entity for the implementing model
-     * 
+     *
      * @return BaseCommunicationEntity
      */
     abstract protected function createSpecificCommunicationEntity();
@@ -56,7 +56,7 @@ abstract class BaseSyncEntity extends BaseEntity
 
     /**
      * creates an entity which can be used by the api for communication
-     * 
+     *
      * @param ContentVersion $version
      * @param $onlineAction
      * @return BaseCommunicationEntity
@@ -67,9 +67,9 @@ abstract class BaseSyncEntity extends BaseEntity
         $entity = $this->createSpecificCommunicationEntity();
         $entity->Identifier = $this->identifier;
         $entity->Id = $this->guid;
-        
+
         $entity->Content = $version->content;
-        $entity->CreateDateTime = FormatHelper::toCSharpDateTime($version->create_date_time);
+        $entity->CreateDateTime = date("c", $version->create_date_time);
         $entity->VersionId = $version->version_guid;
         
         $entity->OnlineAction = $onlineAction;

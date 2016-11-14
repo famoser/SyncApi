@@ -41,7 +41,7 @@ class EntityController extends ApiSyncController
      */
     public function sync(Request $request, Response $response, $args)
     {
-        $req = RequestHelper::parseSyncEntityRequest($request);
+        $req = $this->getRequestService()->parseSyncEntityRequest($request);
         $this->authorizeRequest($req);
         $this->authenticateRequest($req);
 
@@ -66,7 +66,7 @@ class EntityController extends ApiSyncController
      */
     public function historySync(Request $request, Response $response, $args)
     {
-        $req = RequestHelper::parseHistoryEntityRequest($request);
+        $req = $this->getRequestService()->parseHistoryEntityRequest($request);
         $this->authorizeRequest($req);
         $this->authenticateRequest($req);
 

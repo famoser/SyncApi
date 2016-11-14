@@ -20,6 +20,7 @@ use Famoser\SyncApi\Models\Entities\Entity;
 use Famoser\SyncApi\Models\Entities\FrontendUser;
 use Famoser\SyncApi\Models\Entities\User;
 use Famoser\SyncApi\Models\Entities\UserCollection;
+use Famoser\SyncApi\Services\Interfaces\LoggerInterface;
 use Interop\Container\ContainerInterface;
 use PDO;
 
@@ -30,12 +31,22 @@ class DatabaseHelper
      */
     private $database;
 
+    /* @var ContainerInterface $container */
     private $container;
 
     public function __construct(ContainerInterface $container)
     {
         $this->container = $container;
+
         $this->initializeDatabase();
+    }
+
+    /**
+     * @return LoggerInterface
+     */
+    private function getLogger()
+    {
+        return $this->container["logger"];
     }
 
     /**
@@ -118,7 +129,7 @@ class DatabaseHelper
     private function executeAndFetch(BaseEntity $entity, $sql, $parameters)
     {
         try {
-            LogHelper::log(
+            $this->getLogger()->log(
                 $sql . "     " . json_encode($parameters),
                 "DatabaseHelper" . uniqid() . ".txt"
             );
@@ -128,7 +139,7 @@ class DatabaseHelper
             }
             return $request->fetchAll(PDO::FETCH_CLASS, get_class($entity));
         } catch (\Exception $ex) {
-            LogHelper::log(
+            $this->getLogger()->log(
                 $ex->getMessage() . "     " . $ex->getTraceAsString() . "     " . $sql . "     " . json_encode($parameters),
                 "DatabaseHelper.txt"
             );
@@ -145,7 +156,8 @@ class DatabaseHelper
      * @param string $selector
      * @return bool|\Famoser\SyncApi\Models\Entities\Application[]|\Famoser\SyncApi\Models\Entities\ApplicationSetting[]|\Famoser\SyncApi\Models\Entities\AuthorizationCode[]|\Famoser\SyncApi\Models\Entities\Collection[]|\Famoser\SyncApi\Models\Entities\ContentVersion[]|\Famoser\SyncApi\Models\Entities\Device[]|\Famoser\SyncApi\Models\Entities\Entity[]|\Famoser\SyncApi\Models\Entities\FrontendUser[]|\Famoser\SyncApi\Models\Entities\User[]|\Famoser\SyncApi\Models\Entities\UserCollection[]
      */
-    public function getFromDatabase(BaseEntity $entity, $where = null, $parameters = null, $orderBy = null, $limit = -1, $selector = "*")
+    public function getFromDatabase(BaseEntity $entity, $where = null, $parameters = null, 
+                                    $orderBy = null, $limit = -1, $selector = "*")
     {
         $sql = $this->createQuery($entity, $where, $orderBy, $limit, $selector);
         $res = $this->executeAndFetch($entity, $sql, $parameters);
@@ -177,7 +189,8 @@ class DatabaseHelper
      * @param int $limit
      * @return Application[]|ApplicationSetting[]|AuthorizationCode[]|Collection[]|ContentVersion[]|Device[]|Entity[]|FrontendUser[]|User[]|UserCollection[]|bool
      */
-    public function getWithInFromDatabase(BaseEntity $entity, $property, $values, $invertIn = false, $where = null, $parameters = null, $orderBy = null, $limit = -1)
+    public function getWithInFromDatabase(BaseEntity $entity, $property, $values, $invertIn = false, $where = null, $parameters = null, 
+                                          $orderBy = null, $limit = -1)
     {
         if ($parameters == null) {
             $parameters = [];
@@ -222,7 +235,7 @@ class DatabaseHelper
     public function saveToDatabase(BaseEntity $entity)
     {
         $properties = (array)$entity;
-        LogHelper::log(
+        $this->getLogger()->log(
             json_encode($properties, JSON_PRETTY_PRINT) . "\n\n\n" . json_encode($entity, JSON_PRETTY_PRINT),
             "DatabaseHelper_" . $entity->getTableName() . '_' . time() . "_" . uniqid() . ".txt"
         );
