@@ -145,7 +145,7 @@ $apiRoutes = function () use ($controllerNamespace) {
 
 $webAppRoutes = function () use ($controllerNamespace) {
     $this->get('/', $controllerNamespace . 'PublicController:index')->setName("index");
-    $this->get('/info', $controllerNamespace . 'PublicController:index')->setName("api_info");
+    $this->get('/info', $controllerNamespace . 'PublicController:info')->setName("api_info");
 
     $this->get('/login', $controllerNamespace . 'LoginController:login')->setName("login");
     $this->post('/login', $controllerNamespace . 'LoginController:loginPost');
@@ -171,7 +171,8 @@ $webAppRoutes = function () use ($controllerNamespace) {
             $this->get('/edit/{id}', $controllerNamespace . 'ApplicationController:edit')->setName("application_edit");
             $this->post('/edit/{id}', $controllerNamespace . 'ApplicationController:editPost');
 
-            $this->get('/delete/{id}', $controllerNamespace . 'ApplicationController:remove')->setName("application_delete");
+            $this->get('/delete/{id}', $controllerNamespace . 'ApplicationController:remove')
+                ->setName("application_delete");
             $this->post('/delete/{id}', $controllerNamespace . 'ApplicationController:removePost');
         }
     );

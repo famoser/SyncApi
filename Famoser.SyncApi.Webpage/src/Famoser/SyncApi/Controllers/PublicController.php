@@ -32,7 +32,7 @@ class PublicController extends FrontendController
     public function index(Request $request, Response $response, $args)
     {
         return $this->renderTemplate($response, "public/index", $args);
-    }
+    } // penis
 
     /**
      * show api info as json. Should be anough to configure C# library
