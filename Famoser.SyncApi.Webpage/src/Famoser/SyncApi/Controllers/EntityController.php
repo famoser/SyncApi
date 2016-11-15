@@ -27,6 +27,10 @@ use Famoser\SyncApi\Types\ServerError;
 use Slim\Http\Request;
 use Slim\Http\Response;
 
+/**
+ * api controllers which takes care of the entities
+ * @package Famoser\SyncApi\Controllers
+ */
 class EntityController extends ApiSyncController
 {
     /**

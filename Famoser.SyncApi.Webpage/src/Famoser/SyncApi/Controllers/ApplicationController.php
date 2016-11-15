@@ -18,6 +18,7 @@ use Famoser\SyncApi\Models\Entities\Device;
 use Famoser\SyncApi\Models\Entities\Entity;
 use Famoser\SyncApi\Models\Entities\User;
 use Famoser\SyncApi\Models\Entities\UserCollection;
+use Famoser\SyncApi\Repositories\SettingsRepository;
 use Famoser\SyncApi\Types\FrontendError;
 use Slim\Http\Request;
 use Slim\Http\Response;
@@ -93,6 +94,45 @@ class ApplicationController extends FrontendController
         $application = $this->getAuthorizedApplication($args["id"]);
         $args["application"] = $application;
         $args["stats"] = $this->getApplicationStats($application->application_id);
+        return $this->renderTemplate($response, "application/show", $args);
+    }
+
+    /**
+     * show the settings for an application
+     *
+     * @param Request $request
+     * @param Response $response
+     * @param $args
+     * @return mixed
+     * @throws AccessDeniedException
+     * @throws FrontendException
+     */
+    public function settings(Request $request, Response $response, $args)
+    {
+        $this->ensureHasAccess();
+        $application = $this->getAuthorizedApplication($args["id"]);
+        $settingsRepo = new SettingsRepository($this->getDatabaseHelper(), $application->application_id);
+        $args["settings"] = $settingsRepo->getAllSettings();
+        return $this->renderTemplate($response, "application/settings", $args);
+    }
+
+    /**
+     * process the post requst for an application
+     *
+     * @param Request $request
+     * @param Response $response
+     * @param $args
+     * @return mixed
+     * @throws AccessDeniedException
+     * @throws FrontendException
+     */
+    public function settingsPost(Request $request, Response $response, $args)
+    {
+        $this->ensureHasAccess();
+        $application = $this->getAuthorizedApplication($args["id"]);
+        $settingsRepo = new SettingsRepository($this->getDatabaseHelper(), $application->application_id);
+        $settingsRepo->setSettings($request->getParsedBody());
+        $args["settings"] = $settingsRepo->getAllSettings();
         return $this->renderTemplate($response, "application/show", $args);
     }
 

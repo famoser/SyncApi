@@ -171,6 +171,10 @@ $webAppRoutes = function () use ($controllerNamespace) {
             $this->get('/edit/{id}', $controllerNamespace . 'ApplicationController:edit')->setName("application_edit");
             $this->post('/edit/{id}', $controllerNamespace . 'ApplicationController:editPost');
 
+            $this->get('/settings/{id}', $controllerNamespace . 'ApplicationController:setting')
+                ->setName("application_settings");
+            $this->post('/settings/{id}', $controllerNamespace . 'ApplicationController:settingsPost');
+
             $this->get('/delete/{id}', $controllerNamespace . 'ApplicationController:remove')
                 ->setName("application_delete");
             $this->post('/delete/{id}', $controllerNamespace . 'ApplicationController:removePost');
