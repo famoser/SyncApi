@@ -35,7 +35,7 @@ class PublicController extends FrontendController
     } // penis
 
     /**
-     * show api info as json. Should be anough to configure C# library
+     * show api info as json. Should be enough to configure the C# library
      *
      * @param Request $request
      * @param Response $response

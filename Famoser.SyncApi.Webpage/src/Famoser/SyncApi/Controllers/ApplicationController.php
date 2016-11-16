@@ -117,7 +117,7 @@ class ApplicationController extends FrontendController
     }
 
     /**
-     * process the post requst for an application
+     * process the post request for an application
      *
      * @param Request $request
      * @param Response $response

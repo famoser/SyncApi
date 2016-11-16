@@ -21,7 +21,7 @@ class RequestService
 {
     /* @var LoggerInterface $logger */
     private $logger;
-    
+
     /* int $modulo */
     private $modulo;
 
@@ -80,7 +80,6 @@ class RequestService
      * @param $authCode
      * @param $applicationSeed
      * @param $personSeed
-     * @param int $modulo
      * @return bool
      */
     public function validateAuthCode($authCode, $applicationSeed, $personSeed)

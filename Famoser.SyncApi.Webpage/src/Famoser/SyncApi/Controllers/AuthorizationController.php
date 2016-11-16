@@ -153,7 +153,7 @@ class AuthorizationController extends ApiSyncController
         $authCode = new AuthorizationCode();
         $authCode->user_guid = $req->UserId;
         $authCode->code = $this->generateReadableRandomString($settingRepo->getAuthorizationCodeLength());
-        $authCode->valid_till_date_time = time() + $settingRepo->getAuthorizationCodeValidTime();
+        $authCode->valid_till_date_time = time() + (int)$settingRepo->getAuthorizationCodeValidTime();
         if (!$this->getDatabaseHelper()->saveToDatabase($authCode)) {
             throw new ServerException(ServerError::DATABASE_SAVE_FAILURE);
         }

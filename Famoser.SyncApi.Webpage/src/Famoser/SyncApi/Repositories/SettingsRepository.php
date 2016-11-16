@@ -96,7 +96,7 @@ class SettingsRepository
     }
 
     /**
-     * save a new setting to the database & settingsrepo cache
+     * save a new setting to the database & SettingsRepository cache
      *
      * @param $key
      * @param $val

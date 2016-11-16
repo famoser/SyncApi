@@ -122,6 +122,7 @@ class BaseController
     {
         if ($neededProps != null) {
             foreach ($neededProps as $neededProp) {
+                /** @noinspection PhpVariableVariableInspection */
                 if ($request->$neededProp == null) {
                     $this->getLogger()->log(
                         "not a property: " . $neededProp . 
@@ -134,6 +135,7 @@ class BaseController
         }
         if ($neededArrays != null) {
             foreach ($neededArrays as $neededArray) {
+                /** @noinspection PhpVariableVariableInspection */
                 if (!is_array($request->$neededArray)) {
                     $this->getLogger()->log("not an array: " . $neededArray . 
                         " in object " . json_encode($request, JSON_PRETTY_PRINT), 
@@ -160,6 +162,7 @@ class BaseController
         $keys = array_keys($source);
         foreach ($properties as $property) {
             if (in_array($property, $keys)) {
+                /** @noinspection PhpVariableVariableInspection */
                 $targetObject->$property = $source[$property];
             } else {
                 $missing[] = $property;
