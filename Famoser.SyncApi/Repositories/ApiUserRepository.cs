@@ -176,6 +176,7 @@ namespace Famoser.SyncApi.Repositories
         private AuthRequestEntity AuthorizeRequest(ApiInformation apiInformation,
             ApiRoamingEntity apiRoamingInfo, AuthRequestEntity request)
         {
+            request.ApplicationId = apiInformation.ApplicationId;
             request.AuthorizationCode = AuthorizationHelper.GenerateAuthorizationCode(apiInformation, apiRoamingInfo);
             request.UserId = _roaming.UserId;
             return request;

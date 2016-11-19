@@ -9,9 +9,15 @@
             <input placeholder="name" name="name" value="{{ application.name }}" class="form-control"/>
             <input placeholder="description" name="description" value="{{ application.description }}"
                    class="form-control"/>
+            <p>
+                <b>application id:</b> {{ application.application_id }} |
+                <b>application seed:</b> {{ application.application_seed }}
+            </p>
         </div>
         <button class="btn btn-primary" type="submit">send</button>
     </form>
-    <p>go <a href="{{ path_for("application_index") }}">back</a><br>
-        <a href="{{ path_for("application_delete", {'id' : application.id}) }}">delete</a> this application</p>
+    <p>go
+        <a href="{{ path_for("application_index") }}">back</a><br>
+        <a href="{{ path_for("application_delete", {'id' : application.id}) }}">delete</a> this application
+    </p>
 {% endblock content %}

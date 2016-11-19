@@ -19,7 +19,7 @@ namespace Famoser.SyncApi.Api.Base
 
         private Uri GetUri(string node)
         {
-            return new Uri(_baseUri.AbsolutePath + node);
+            return new Uri(_baseUri.AbsoluteUri + "1.0/" + node);
         }
 
         protected virtual async Task<T> DoApiRequestAsync<T>(object request, string node = "") where T : BaseResponse, new()
@@ -34,6 +34,7 @@ namespace Famoser.SyncApi.Api.Base
             }
             return new T()
             {
+                ServerMessage = "Server responded with an " + response.HttpResponseMessage.StatusCode,
                 RequestFailed = true
             };
         }

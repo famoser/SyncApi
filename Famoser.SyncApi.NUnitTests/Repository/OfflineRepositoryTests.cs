@@ -1,20 +1,19 @@
-﻿using System.Linq;
-using System.Threading.Tasks;
-using Famoser.SyncApi.Helpers;
+﻿using System.Threading.Tasks;
+using Famoser.SyncApi.NUnitTests.Helpers;
 using Famoser.SyncApi.NUnitTests.Implementations;
 using Famoser.SyncApi.NUnitTests.Models;
 using NUnit.Framework;
 
-namespace Famoser.SyncApi.NUnitTests
+namespace Famoser.SyncApi.NUnitTests.Repository
 {
     [TestFixture]
-    public class RepositoryTests
+    public class OfflineRepositoryTests
     {
         [Test]
         public async Task TestSave()
         {
             //arrange
-            var helper = new SyncApiHelper(new StorageService(), "test", "https://test.syncapi.famoser.ch");
+            var helper = TestHelper.GetOfflineApiHelper();
             var repo = helper.ResolveRepository<NoteModel>();
             var model = new NoteModel { Content = "Hallo Welt!" };
 
@@ -31,11 +30,11 @@ namespace Famoser.SyncApi.NUnitTests
         {
             //arrange
             var ss = new StorageService();
-            var helper = new SyncApiHelper(ss, "test", "https://test.syncapi.famoser.ch");
+            var helper = TestHelper.GetOfflineApiHelper(ss);
             var repo = helper.ResolveRepository<NoteModel>();
             var model = new NoteModel { Content = "Hallo Welt!" };
 
-            var helper2 = new SyncApiHelper(ss, "test", "https://test.syncapi.famoser.ch");
+            var helper2 = TestHelper.GetOfflineApiHelper(ss);
             var repo2 = helper2.ResolveRepository<NoteModel>();
 
             //act

@@ -42,8 +42,8 @@ class ApiRequestController extends BaseController
 
         $this->application = $this->getDatabaseHelper()->getSingleFromDatabase(
             new Application(),
-            "application_id = :application_id AND is_deleted =:is_deleted",
-            ["application_id" => $applicationId, "is_deleted" => false]
+            "application_id = :application_id",
+            ["application_id" => $applicationId]
         );
 
         if ($this->application == null) {

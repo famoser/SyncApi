@@ -65,10 +65,12 @@
     <Compile Include="CSharpTests\Models\BaseModel.cs" />
     <Compile Include="CSharpTests\Models\ChildModel.cs" />
     <Compile Include="CSharpTests\UriTests.cs" />
+    <Compile Include="Helpers\TestHelper.cs" />
     <Compile Include="Implementations\StorageService.cs" />
     <Compile Include="Models\NoteModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="RepositoryTests.cs" />
+    <Compile Include="Repository\SyncRepositoryTests.cs" />
+    <Compile Include="Repository\OfflineRepositoryTests.cs" />
     <Compile Include="Showcases.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -80,9 +82,7 @@
       <Name>Famoser.SyncApi</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Helpers\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
