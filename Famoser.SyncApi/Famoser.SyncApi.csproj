@@ -69,7 +69,6 @@
     <Compile Include="Repositories\ApiCollectionRepository.cs" />
     <Compile Include="Services\ApiConfigurationService.cs" />
     <Compile Include="Services\Interfaces\Authentication\IApiDeviceAuthenticationService.cs" />
-    <Compile Include="Services\Interfaces\Authentication\IApiCollectionAuthenticationService.cs" />
     <Compile Include="Services\Interfaces\Authentication\IApiUserAuthenticationRepository.cs" />
     <Compile Include="Storage\Cache\CacheEntity.cs" />
     <Compile Include="Storage\Cache\CollectionCacheEntity.cs" />
