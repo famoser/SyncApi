@@ -13,7 +13,7 @@ namespace Famoser.SyncApi.NUnitTests.Helpers
     public class TestHelper
     {
         private static string _applicationId = "test_appl";
-        private static string _testUri = "http://localhost";
+        private static string _testUri = "http://localhost:8080";
         public static SyncApiHelper GetOfflineApiHelper(IStorageService storageService = null)
         {
             if (storageService == null)
