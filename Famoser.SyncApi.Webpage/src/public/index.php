@@ -53,7 +53,7 @@ $c['notAllowedHandler'] = function (Container $c) {
 $c['errorHandler'] = function (Container $c) {
     return function (Request $request, Response $response, Exception $exception) use ($c) {
         if ($exception instanceof \Famoser\SyncApi\Exceptions\ServerException) {
-            return $response->withStatus(500); //->getBody()->write("exception occurred: " . $exception->getMessage());
+            return $response->withStatus(500)->getBody()->write("exception occurred: " . $exception->getMessage());
         } elseif ($exception instanceof \Famoser\SyncApi\Exceptions\ApiException) {
             $resp = new BaseResponse();
             $resp->RequestFailed = true;

@@ -9,11 +9,13 @@
 namespace Famoser\SyncApi\Services;
 
 
+use Famoser\SyncApi\Exceptions\ApiException;
 use Famoser\SyncApi\Models\Communication\Request\AuthorizationRequest;
 use Famoser\SyncApi\Models\Communication\Request\CollectionEntityRequest;
 use Famoser\SyncApi\Models\Communication\Request\HistoryEntityRequest;
 use Famoser\SyncApi\Models\Communication\Request\SyncEntityRequest;
 use Famoser\SyncApi\Services\Interfaces\LoggerInterface;
+use Famoser\SyncApi\Types\ApiError;
 use JsonMapper;
 use Slim\Http\Request;
 
@@ -27,6 +29,7 @@ class RequestService
 
     /**
      * RequestService constructor.
+     *
      * @param LoggerInterface $logger
      * @param int $modulo
      */
@@ -85,9 +88,23 @@ class RequestService
     public function validateAuthCode($authCode, $applicationSeed, $personSeed)
     {
         $content = explode("_", $authCode);
-        $expectedAuthCode = $content[0] * $applicationSeed * $personSeed;
-        $expectedAuthCode %= $this->modulo;
-        return $authCode == $expectedAuthCode;
+        //parse time from $content[0]
+        $chunks = chunk_split($content[0], 2);
+        if (count($chunks) != 4) {
+            return false;
+        }
+        //check if time is valid
+        $time = strtotime("today + " . $chunks[0] . " seconds " . $chunks[1] . " minutes " . $chunks[2] . " hours");
+        $older = new \DateTime("+ 1 minute");
+        $newer = new \DateTime("- 1 minute");
+        if ($time < $newer && $time > $older) {
+            //construct magic number (the same is done in c#)
+            $baseNr = $chunks[0] + $chunks[1] * 100 + $chunks[2] * 10000 + $chunks[3];
+            $expectedAuthCode = $baseNr * $applicationSeed * $personSeed;
+            $expectedAuthCode %= $this->modulo;
+            return $content[1] == $expectedAuthCode;
+        }
+        return false;
     }
 
     /**

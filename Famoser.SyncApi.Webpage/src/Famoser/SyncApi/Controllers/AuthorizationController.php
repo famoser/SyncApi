@@ -185,8 +185,6 @@ class AuthorizationController extends ApiSyncController
             } // else: create device, so no authorization required
         } //else: create user, so no authorization required
 
-
-
         $resp = new AuthorizationResponse();
 
         //sync user
