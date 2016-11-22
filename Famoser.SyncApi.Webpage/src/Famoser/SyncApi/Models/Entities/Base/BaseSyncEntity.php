@@ -11,6 +11,10 @@ namespace Famoser\SyncApi\Models\Entities\Base;
 use Famoser\SyncApi\Models\Communication\Entities\Base\BaseCommunicationEntity;
 use Famoser\SyncApi\Models\Entities\ContentVersion;
 
+/**
+ * the base properties which every synced entity has
+ * @package Famoser\SyncApi\Models\Entities\Base
+ */
 abstract class BaseSyncEntity extends BaseEntity
 {
     /* @var string $identifier */

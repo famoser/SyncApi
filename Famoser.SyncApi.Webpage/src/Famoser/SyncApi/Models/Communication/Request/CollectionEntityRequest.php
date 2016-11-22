@@ -12,6 +12,10 @@ namespace Famoser\SyncApi\Models\Communication\Request;
 use Famoser\SyncApi\Models\Communication\Entities\CollectionCommunicationEntity;
 use Famoser\SyncApi\Models\Communication\Request\Base\BaseRequest;
 
+/**
+ * an collection request; is handled by the collection controller and sent to /collections/*
+ * @package Famoser\SyncApi\Models\Communication\Request
+ */
 class CollectionEntityRequest extends BaseRequest
 {
     /* @var CollectionCommunicationEntity[] $CollectionEntities */

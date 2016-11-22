@@ -19,6 +19,10 @@ CREATE TABLE 'authorization_codes' (
 
 use Famoser\SyncApi\Models\Entities\Base\BaseEntity;
 
+/**
+ * this represents an authorization code for a specific user
+ * @package Famoser\SyncApi\Models\Entities
+ */
 class AuthorizationCode extends BaseEntity
 {
     /* @var string $user_guid type_of:guid */
@@ -30,6 +34,11 @@ class AuthorizationCode extends BaseEntity
     /* @var \DateTime $id */
     public $valid_till_date_time;
 
+    /**
+     * get the name of the table from the database
+     *
+     * @return string
+     */
     public function getTableName()
     {
         return "authorization_codes";

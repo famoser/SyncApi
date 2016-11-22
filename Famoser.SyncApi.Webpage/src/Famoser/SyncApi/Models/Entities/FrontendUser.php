@@ -20,6 +20,10 @@ CREATE TABLE 'frontend_users' (
 
 use Famoser\SyncApi\Models\Entities\Base\BaseEntity;
 
+/**
+ * a frontend user is used in the web application, it can manage and create applications
+ * @package Famoser\SyncApi\Models\Entities
+ */
 class FrontendUser extends BaseEntity
 {
     /* @var string $email type_of:email */
@@ -34,6 +38,11 @@ class FrontendUser extends BaseEntity
     /* @var string $reset_key type_of:random_hash */
     public $reset_key;
 
+    /**
+     * get the name of the table from the database
+     *
+     * @return string
+     */
     public function getTableName()
     {
         return "frontend_users";

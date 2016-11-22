@@ -12,6 +12,10 @@ namespace Famoser\SyncApi\Controllers\Base;
 use Famoser\SyncApi\Models\Entities\FrontendUser;
 use Slim\Http\Response;
 
+/**
+ * a frontend controller displays information in the web application.
+ * @package Famoser\SyncApi\Controllers\Base
+ */
 class FrontendController extends BaseController
 {
 

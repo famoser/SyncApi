@@ -9,6 +9,10 @@
 namespace Famoser\SyncApi\Models\Communication\Entities;
 
 
+/**
+ * a transferred collection.
+ * @package Famoser\SyncApi\Models\Communication\Entities
+ */
 class CollectionCommunicationEntity extends DeviceCommunicationEntity
 {
     /* @var string $DeviceId type_of:guid */

@@ -24,6 +24,10 @@ use Famoser\SyncApi\Models\Communication\Entities\SyncCommunicationEntity;
 use Famoser\SyncApi\Models\Entities\Base\BaseSyncEntity;
 use Famoser\SyncApi\Types\ContentType;
 
+/**
+ * an entity is the content a user wants to save. it is grouped in collections
+ * @package Famoser\SyncApi\Models\Entities
+ */
 class Entity extends BaseSyncEntity
 {
     /* @var string $user_guid type_of:guid */

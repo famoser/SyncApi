@@ -9,6 +9,10 @@
 namespace Famoser\SyncApi\Models\Entities\Base;
 
 
+/**
+ * the base database entry, has an id, and allows for the overriding class to specify a table name
+ * @package Famoser\SyncApi\Models\Entities\Base
+ */
 abstract class BaseEntity
 {
     /* @var int $id */

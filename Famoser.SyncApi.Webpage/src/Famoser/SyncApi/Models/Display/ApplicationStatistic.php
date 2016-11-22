@@ -9,6 +9,10 @@
 namespace Famoser\SyncApi\Models\Display;
 
 
+/**
+ * used in the view to display basic statistic for an application
+ * @package Famoser\SyncApi\Models\Display
+ */
 class ApplicationStatistic
 {
     public $usersCount = 0;

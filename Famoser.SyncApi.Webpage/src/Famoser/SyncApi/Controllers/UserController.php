@@ -17,6 +17,10 @@ use Famoser\SyncApi\Types\ServerError;
 use Slim\Http\Request;
 use Slim\Http\Response;
 
+/**
+ * the user controller authenticates users to new collections
+ * @package Famoser\SyncApi\Controllers
+ */
 class UserController extends ApiRequestController
 {
     /**

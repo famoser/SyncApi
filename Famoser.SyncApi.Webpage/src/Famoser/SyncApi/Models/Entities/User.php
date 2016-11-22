@@ -23,6 +23,10 @@ use Famoser\SyncApi\Models\Communication\Entities\UserCommunicationEntity;
 use Famoser\SyncApi\Models\Entities\Base\BaseSyncEntity;
 use Famoser\SyncApi\Types\ContentType;
 
+/**
+ * a user has access to specific collections, and owns devices
+ * @package Famoser\SyncApi\Models\Entities
+ */
 class User extends BaseSyncEntity
 {
     /* @var string $application_id */
