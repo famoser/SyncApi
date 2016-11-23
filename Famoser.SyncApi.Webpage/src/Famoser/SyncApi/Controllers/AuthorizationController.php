@@ -22,6 +22,7 @@ use Famoser\SyncApi\Models\Entities\Device;
 use Famoser\SyncApi\Models\Entities\User;
 use Famoser\SyncApi\Types\ApiError;
 use Famoser\SyncApi\Types\ContentType;
+use Famoser\SyncApi\Types\OnlineAction;
 use Famoser\SyncApi\Types\ServerError;
 use Slim\Http\Request;
 use Slim\Http\Response;
@@ -180,8 +181,13 @@ class AuthorizationController extends ApiSyncController
     public function sync(Request $request, Response $response, $args)
     {
         $req = $this->getRequestService()->parseAuthorizationRequest($request);
-        $this->authorizeRequest($req);
-        $this->authenticateRequest($req);
+
+        if ($req->UserEntity == null || $req->UserEntity->OnlineAction != OnlineAction::CREATE) {
+            $this->authorizeRequest($req);
+            if ($req->DeviceEntity->OnlineAction != OnlineAction::CREATE) {
+                $this->authenticateRequest($req);
+            } // else: create device, so no authorization required
+        } //else: create user, so no authorization required
 
         $resp = new AuthorizationResponse();
 

@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
+using Famoser.FrameworkEssentials.Logging;
+using Famoser.FrameworkEssentials.Logging.Interfaces;
 using Famoser.FrameworkEssentials.Services;
 using Famoser.SyncApi.Api.Communication.Response.Base;
 using Newtonsoft.Json;
@@ -10,16 +12,18 @@ namespace Famoser.SyncApi.Api.Base
     {
         private readonly Uri _baseUri;
         private readonly RestService _restService;
+        private readonly IExceptionLogger _logger;
 
         public BaseApiClient(Uri baseUri)
         {
             _baseUri = baseUri;
-            _restService = new RestService();
+            _logger = new LogHelper();
+            _restService = new RestService(null, true, _logger);
         }
 
         private Uri GetUri(string node)
         {
-            return new Uri(_baseUri.AbsolutePath + node);
+            return new Uri(_baseUri.AbsoluteUri + "1.0/" + node);
         }
 
         protected virtual async Task<T> DoApiRequestAsync<T>(object request, string node = "") where T : BaseResponse, new()
@@ -34,6 +38,7 @@ namespace Famoser.SyncApi.Api.Base
             }
             return new T()
             {
+                ServerMessage = "Server responded with an " + response.HttpResponseMessage.StatusCode,
                 RequestFailed = true
             };
         }

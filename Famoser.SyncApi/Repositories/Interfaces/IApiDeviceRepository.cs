@@ -9,6 +9,11 @@ namespace Famoser.SyncApi.Repositories.Interfaces
     public interface IApiDeviceRepository<TDevice> : IPersistentRespository<TDevice>, IApiDeviceAuthenticationService
         where TDevice : IDeviceModel
     {
+        /// <summary>
+        /// get all devices from an user
+        /// return the collection early, and fill it in the background with the data
+        /// </summary>
+        /// <returns></returns>
         ObservableCollection<TDevice> GetAllLazy();
         Task<ObservableCollection<TDevice>> GetAllAsync();
         Task<bool> SyncDevicesAsync();

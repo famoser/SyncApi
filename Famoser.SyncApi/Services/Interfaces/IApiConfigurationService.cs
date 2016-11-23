@@ -5,6 +5,9 @@ using Famoser.SyncApi.Managers.Interfaces;
 
 namespace Famoser.SyncApi.Services.Interfaces
 {
+    /// <summary>
+    /// This service configures the api
+    /// </summary>
     public interface IApiConfigurationService
     {
         /// <summary>

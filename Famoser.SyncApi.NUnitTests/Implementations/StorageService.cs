@@ -2,13 +2,19 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Famoser.FrameworkEssentials.Services.Interfaces;
+using NUnit.Framework.Interfaces;
 
 #pragma warning disable 1998
 namespace Famoser.SyncApi.NUnitTests.Implementations
 {
     public class StorageService : IStorageService
     {
-        private readonly Dictionary<string, string> _cachedFiles = new Dictionary<string, string>();
+        private Dictionary<string, string> _cachedFiles = new Dictionary<string, string>();
+        public void ClearCache()
+        {
+            _cachedFiles = new Dictionary<string, string>();
+        }
+
         public async Task<string> GetCachedTextFileAsync(string filePath)
         {
             return _cachedFiles[filePath];
@@ -35,7 +41,11 @@ namespace Famoser.SyncApi.NUnitTests.Implementations
             throw new NotImplementedException();
         }
 
-        private readonly Dictionary<string, string> _roamingFiles = new Dictionary<string, string>();
+        private Dictionary<string, string> _roamingFiles = new Dictionary<string, string>();
+        public void CLearRoaming()
+        {
+            _roamingFiles = new Dictionary<string, string>();
+        }
         public async Task<string> GetRoamingTextFileAsync(string filePath)
         {
             return _roamingFiles[filePath];

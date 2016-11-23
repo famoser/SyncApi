@@ -45,7 +45,7 @@ namespace Famoser.SyncApi.Services
                 {
                     _apiRoamingEntity = await _apiUserAuthenticationService.GetApiRoamingEntityAsync();
                     _deviceModel = await _apiDeviceAuthenticationService.GetDeviceAsync(_apiRoamingEntity);
-                }
+                } 
             }
         }
 

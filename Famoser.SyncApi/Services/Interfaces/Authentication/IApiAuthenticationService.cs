@@ -8,6 +8,10 @@ using Famoser.SyncApi.Repositories.Interfaces;
 
 namespace Famoser.SyncApi.Services.Interfaces.Authentication
 {
+    /// <summary>
+    /// this service is used to authenticate a user and its device against the api
+    /// it also creates authenticated requests
+    /// </summary>
     public interface IApiAuthenticationService
     {
         /// <summary>
