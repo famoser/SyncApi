@@ -128,14 +128,14 @@ $apiRoutes = function () use ($controllerNamespace) {
     );
 
     $this->group(
-        "/collection",
+        "/collections",
         function () use ($controllerNamespace) {
             $this->post('/sync', $controllerNamespace . 'CollectionController:sync');
         }
     );
 
     $this->group(
-        "/entity",
+        "/entities",
         function () use ($controllerNamespace) {
             $this->post('/sync', $controllerNamespace . 'EntityController:sync');
             $this->post('/history/sync', $controllerNamespace . 'EntityController:historySync');

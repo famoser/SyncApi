@@ -15,6 +15,10 @@ use Famoser\SyncApi\Models\Communication\Request\HistoryEntityRequest;
 use Famoser\SyncApi\Models\Communication\Request\SyncEntityRequest;
 use Slim\Http\Request;
 
+/**
+ * an interface to a request service; it parses & validates requests
+ * @package Famoser\SyncApi\Services\Interfaces
+ */
 interface RequestServiceInterface
 {
     /**

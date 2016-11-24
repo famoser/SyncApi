@@ -9,6 +9,10 @@
 namespace Famoser\SyncApi\Exceptions;
 
 
+/**
+ * raised if he access to a specific resource is denied
+ * @package Famoser\SyncApi\Exceptions
+ */
 class AccessDeniedException extends \Exception
 {
 

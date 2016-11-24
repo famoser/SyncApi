@@ -22,6 +22,10 @@ use Famoser\SyncApi\Types\ServerError;
 use Slim\Http\Request;
 use Slim\Http\Response;
 
+/**
+ * the device controller can authenticate devices and return all devices from a specific user
+ * @package Famoser\SyncApi\Controllers
+ */
 class DeviceController extends ApiSyncController
 {
     /**

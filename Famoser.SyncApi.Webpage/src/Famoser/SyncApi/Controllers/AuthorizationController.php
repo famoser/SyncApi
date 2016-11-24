@@ -27,6 +27,10 @@ use Famoser\SyncApi\Types\ServerError;
 use Slim\Http\Request;
 use Slim\Http\Response;
 
+/**
+ * this controller is concerned with syncing users & devices, and generating authorization codes
+ * @package Famoser\SyncApi\Controllers
+ */
 class AuthorizationController extends ApiSyncController
 {
     /**

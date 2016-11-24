@@ -9,6 +9,11 @@
 namespace Famoser\SyncApi\Models\Communication\Request\Base;
 
 
+/**
+ * a base request
+ * contains properties which every request may fill out with very few exceptions
+ * @package Famoser\SyncApi\Models\Communication\Request\Base
+ */
 class BaseRequest
 {
     /* @var string $UserId type_of:guid*/

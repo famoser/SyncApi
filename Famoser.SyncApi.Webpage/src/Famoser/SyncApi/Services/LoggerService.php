@@ -10,6 +10,10 @@ namespace Famoser\SyncApi\Services;
 
 use Famoser\SyncApi\Services\Interfaces\LoggerInterface;
 
+/**
+ * the logger service is concerned to save errors which occurred while the application is running
+ * @package Famoser\SyncApi\Services
+ */
 class LoggerService implements LoggerInterface
 {
     /* @var string $basePath */

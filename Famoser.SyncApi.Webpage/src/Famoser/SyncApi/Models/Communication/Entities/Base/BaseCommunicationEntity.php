@@ -9,6 +9,10 @@
 namespace Famoser\SyncApi\Models\Communication\Entities\Base;
 
 
+/**
+ * an base entity to be overridden and used to specify basic properties which every transferred entity contains
+ * @package Famoser\SyncApi\Models\Communication\Entities\Base
+ */
 class BaseCommunicationEntity
 {
     /* @var string $Id type_of:guid*/

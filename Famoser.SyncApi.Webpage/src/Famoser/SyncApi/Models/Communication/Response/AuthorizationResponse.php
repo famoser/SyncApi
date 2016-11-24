@@ -13,6 +13,10 @@ use Famoser\SyncApi\Models\Communication\Entities\DeviceCommunicationEntity;
 use Famoser\SyncApi\Models\Communication\Entities\UserCommunicationEntity;
 use Famoser\SyncApi\Models\Communication\Response\Base\BaseResponse;
 
+/**
+ * the response to an AuthorizationRequest
+ * @package Famoser\SyncApi\Models\Communication\Response
+ */
 class AuthorizationResponse extends BaseResponse
 {
     /* @var UserCommunicationEntity $UserEntity */

@@ -12,6 +12,10 @@ namespace Famoser\SyncApi\Models\Communication\Response;
 use Famoser\SyncApi\Models\Communication\Entities\SyncCommunicationEntity;
 use Famoser\SyncApi\Models\Communication\Response\Base\BaseResponse;
 
+/**
+ * the response to a SyncEntityRequest
+ * @package Famoser\SyncApi\Models\Communication\Response
+ */
 class SyncEntityResponse extends BaseResponse
 {
     /* @var SyncCommunicationEntity[] $SyncEntities */

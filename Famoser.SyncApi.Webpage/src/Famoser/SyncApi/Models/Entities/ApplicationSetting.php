@@ -19,6 +19,10 @@ CREATE TABLE 'application_settings' (
 
 use Famoser\SyncApi\Models\Entities\Base\BaseEntity;
 
+/**
+ * setting for an application in key/value format
+ * @package Famoser\SyncApi\Models\Entities
+ */
 class ApplicationSetting extends BaseEntity
 {
     /* @var int $application_id */
@@ -30,6 +34,11 @@ class ApplicationSetting extends BaseEntity
     /* @var string $val */
     public $val;
 
+    /**
+     * get the name of the table from the database
+     *
+     * @return string
+     */
     public function getTableName()
     {
         return "application_settings";

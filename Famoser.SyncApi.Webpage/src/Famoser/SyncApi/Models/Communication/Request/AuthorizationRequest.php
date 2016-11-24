@@ -14,6 +14,10 @@ use Famoser\SyncApi\Models\Communication\Entities\DeviceCommunicationEntity;
 use Famoser\SyncApi\Models\Communication\Entities\UserCommunicationEntity;
 use Famoser\SyncApi\Models\Communication\Request\Base\BaseRequest;
 
+/**
+ * an authorization request; is handled by the authorization controller and sent to /auth/*
+ * @package Famoser\SyncApi\Models\Communication\Request
+ */
 class AuthorizationRequest extends BaseRequest
 {
     /* @var UserCommunicationEntity $UserEntity */

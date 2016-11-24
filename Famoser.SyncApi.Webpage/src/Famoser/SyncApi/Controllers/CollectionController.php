@@ -21,6 +21,10 @@ use Famoser\SyncApi\Types\ServerError;
 use Slim\Http\Request;
 use Slim\Http\Response;
 
+/**
+ * the collection controller syncs collections
+ * @package Famoser\SyncApi\Controllers
+ */
 class CollectionController extends ApiSyncController
 {
     /**

@@ -23,6 +23,10 @@ use Famoser\SyncApi\Models\Communication\Entities\DeviceCommunicationEntity;
 use Famoser\SyncApi\Models\Entities\Base\BaseSyncEntity;
 use Famoser\SyncApi\Types\ContentType;
 
+/**
+ * a device identifies the device of an user
+ * @package Famoser\SyncApi\Models\Entities
+ */
 class Device extends BaseSyncEntity
 {
     /* @var string $user_guid type_of:guid */

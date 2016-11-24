@@ -23,6 +23,11 @@ use Famoser\SyncApi\Models\Communication\Entities\CollectionCommunicationEntity;
 use Famoser\SyncApi\Models\Entities\Base\BaseSyncEntity;
 use Famoser\SyncApi\Types\ContentType;
 
+/**
+ * a collection is similar to a folder. a collection can be shared between multiple users
+ * it is referenced by entities
+ * @package Famoser\SyncApi\Models\Entities
+ */
 class Collection extends BaseSyncEntity
 {
     /* @var string $user_guid type_of:guid */
@@ -30,12 +35,6 @@ class Collection extends BaseSyncEntity
 
     /* @var string $device_guid type_of:guid */
     public $device_guid;
-
-    public function writeFromEntity(CollectionCommunicationEntity $entity)
-    {
-        $this->identifier = $entity->Identifier;
-        $this->guid = $entity->Id;
-    }
 
     /**
      * get the name of the table from the database

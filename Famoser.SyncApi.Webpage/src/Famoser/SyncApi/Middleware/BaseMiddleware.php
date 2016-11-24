@@ -12,10 +12,18 @@ namespace Famoser\SyncApi\Middleware;
 use Famoser\SyncApi\Services\Interfaces\LoggerInterface;
 use Interop\Container\ContainerInterface;
 
+/**
+ * a middleware to be overridden which abstracts the fuzzy controller handling
+ * @package Famoser\SyncApi\Middleware
+ */
 class BaseMiddleware
 {
-    protected $container;
+    private $container;
 
+    /**
+     * BaseMiddleware constructor.
+     * @param ContainerInterface $container
+     */
     public function __construct(ContainerInterface $container)
     {
         $this->container = $container;

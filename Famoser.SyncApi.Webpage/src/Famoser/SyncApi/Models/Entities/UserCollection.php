@@ -19,6 +19,10 @@ CREATE TABLE 'user_collections' (
 
 use Famoser\SyncApi\Models\Entities\Base\BaseEntity;
 
+/**
+ * a user collection is the connection between an user and its collections
+ * @package Famoser\SyncApi\Models\Entities
+ */
 class UserCollection extends BaseEntity
 {
     /* @var string $user_guid type_of:guid */
@@ -29,7 +33,12 @@ class UserCollection extends BaseEntity
 
     /* @var \DateTime $create_date_time */
     public $create_date_time;
-    
+
+    /**
+     * get the name of the table from the database
+     *
+     * @return string
+     */
     public function getTableName()
     {
         return "user_collections";

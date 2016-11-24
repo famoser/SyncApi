@@ -22,6 +22,11 @@ CREATE TABLE 'applications' (
 
 use Famoser\SyncApi\Models\Entities\Base\BaseEntity;
 
+/**
+ * represents an application.
+ * An application can receive API requests
+ * @package Famoser\SyncApi\Models\Entities
+ */
 class Application extends BaseEntity
 {
     /* @var int $id */
@@ -42,6 +47,11 @@ class Application extends BaseEntity
     /* @var int $release_date type_of:DateTime */
     public $release_date_time;
 
+    /**
+     * get the name of the table from the database
+     *
+     * @return string
+     */
     public function getTableName()
     {
         return "applications";

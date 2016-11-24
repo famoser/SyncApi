@@ -19,6 +19,10 @@ use Famoser\SyncApi\Types\ApiError;
 use JsonMapper;
 use Slim\Http\Request;
 
+/**
+ * the request service parses & validates requests
+ * @package Famoser\SyncApi\Services
+ */
 class RequestService
 {
     /* @var LoggerInterface $logger */

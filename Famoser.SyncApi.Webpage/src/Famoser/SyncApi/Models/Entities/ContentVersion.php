@@ -22,6 +22,10 @@ CREATE TABLE 'content_versions' (
 
 use Famoser\SyncApi\Models\Entities\Base\BaseEntity;
 
+/**
+ * represents the content of an entity at a specific point in time
+ * @package Famoser\SyncApi\Models\Entities
+ */
 class ContentVersion extends BaseEntity
 {
     /* @var int $content_type const_of:ContentType */
@@ -42,6 +46,11 @@ class ContentVersion extends BaseEntity
     /* @var int $create_date_time type_of:DateTime */
     public $create_date_time;
 
+    /**
+     * get the name of the table from the database
+     *
+     * @return string
+     */
     public function getTableName()
     {
         return "content_versions";
