@@ -19,7 +19,7 @@ namespace Famoser.SyncApi.NUnitTests.Models
             Id = id;
         }
 
-        public string GetUniqeIdentifier()
+        public string GetClassIdentifier()
         {
             return "notes";
         }

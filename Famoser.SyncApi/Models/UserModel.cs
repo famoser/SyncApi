@@ -5,7 +5,7 @@ namespace Famoser.SyncApi.Models
 {
     public class UserModel : BaseModel, IUserModel
     {
-        public override string GetUniqeIdentifier()
+        public override string GetClassIdentifier()
         {
             return "user";
         }

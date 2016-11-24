@@ -9,7 +9,7 @@ namespace Famoser.SyncApi.NUnitTests.Repository
     [TestFixture]
     public class SyncRepositoryTests
     {
-        //[Test]: test not ready
+        //[Test]
         public async Task TestSaveAndRetrieve()
         {
             //arrange

@@ -6,7 +6,7 @@ namespace Famoser.SyncApi.Models
 {
     public class DeviceModel : BaseModel, IDeviceModel
     {
-        public override string GetUniqeIdentifier()
+        public override string GetClassIdentifier()
         {
             return "device";
         }

@@ -164,7 +164,7 @@ namespace Famoser.SyncApi.Repositories
                 return _deviceIdentifier;
 
             var model = (TDevice)Activator.CreateInstance(typeof(TDevice));
-            _deviceIdentifier = model.GetUniqeIdentifier();
+            _deviceIdentifier = model.GetClassIdentifier();
 
             return _deviceIdentifier;
         }

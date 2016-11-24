@@ -92,7 +92,7 @@ namespace Famoser.SyncApi.Repositories.Base
                 return _modelIdentifier;
 
             var model = (TModel)Activator.CreateInstance(typeof(TModel));
-            _modelIdentifier = model.GetUniqeIdentifier();
+            _modelIdentifier = model.GetClassIdentifier();
 
             return _modelIdentifier;
         }

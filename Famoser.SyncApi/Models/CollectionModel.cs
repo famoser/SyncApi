@@ -5,7 +5,7 @@ namespace Famoser.SyncApi.Models
 {
     public class CollectionModel : BaseModel, ICollectionModel
     {
-        public override string GetUniqeIdentifier()
+        public override string GetClassIdentifier()
         {
             return "collection";
         }

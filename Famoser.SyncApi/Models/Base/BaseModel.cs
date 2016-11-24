@@ -16,6 +16,6 @@ namespace Famoser.SyncApi.Models.Base
             _userId = id;
         }
 
-        public abstract string GetUniqeIdentifier();
+        public abstract string GetClassIdentifier();
     }
 }
