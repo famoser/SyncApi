@@ -73,13 +73,14 @@ abstract class ApiSyncController extends ApiRequestController
                 throw new ApiException(ApiError::ACTION_PROHIBITED);
             }
 
+
             //execute the OnlineAction
             switch ($communicationEntity->OnlineAction) {
                 case OnlineAction::NONE:
                     continue;
                 case OnlineAction::CREATE:
                     $entity = $this->getByIdInternal($req, $communicationEntity->Id, $contentType);
-                    $this->createSyncEntity($req, $entity, $communicationEntity, $contentType);
+                    $this->createSyncEntity($req, $communicationEntity, $contentType, $entity);
                     break;
                 case OnlineAction::READ:
                     $entity = $this->getByIdInternal($req, $communicationEntity->Id, $contentType);
@@ -211,9 +212,9 @@ abstract class ApiSyncController extends ApiRequestController
      */
     private function createSyncEntity(
         BaseRequest $req,
-        BaseSyncEntity $syncEntity,
         BaseCommunicationEntity $commEntity,
-        $contentType
+        $contentType,
+        BaseSyncEntity $syncEntity = null
     )
     {
         if ($syncEntity != null) {

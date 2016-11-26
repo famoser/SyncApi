@@ -22,7 +22,7 @@ require '../../vendor/autoload.php';
 
 $configuration = [
     'settings' => [
-        'displayErrorDetails' => false,
+        'displayErrorDetails' => true,
         'debug_mode' => true,
         'db' => [
             'path' => "data.sqlite",
@@ -53,22 +53,22 @@ $c['notAllowedHandler'] = function (Container $c) {
 $c['errorHandler'] = function (Container $c) {
     return function (Request $request, Response $response, Exception $exception) use ($c) {
         if ($exception instanceof \Famoser\SyncApi\Exceptions\ServerException) {
-            return $response->withStatus(500)->getBody()->write("exception occurred: " . $exception->getMessage());
+            return $c['response']->withStatus(500)->getBody()->write("exception occurred: " . $exception->getMessage());
         } elseif ($exception instanceof \Famoser\SyncApi\Exceptions\ApiException) {
             $resp = new BaseResponse();
             $resp->RequestFailed = true;
             $resp->ApiError = $exception->getCode();
             $resp->ServerMessage = $exception->getMessage();
-            return $response->withStatus(500)->withJson($resp);
+            return $c['response']->withStatus(500)->withJson($resp);
         } elseif ($exception instanceof \Famoser\SyncApi\Exceptions\FrontendException) {
             if ($exception->getCode() == FrontendError::NOT_LOGGED_IN) {
                 $reqUri = $request->getUri()->withPath($c->get("router")->pathFor("login"));
-                return $response->withRedirect($reqUri);
+                return $c['response']->withRedirect($reqUri);
             }
         }
         $args = [];
         $args["error"] = $exception->getMessage();
-        return $c->get("view")->render($response, "public/server_error.html.twig", $args);
+        return $c["view"]->render($response, "public/server_error.html.twig", $args);
     };
 };
 // Register component on container

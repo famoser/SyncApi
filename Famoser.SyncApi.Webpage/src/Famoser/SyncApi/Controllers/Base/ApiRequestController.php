@@ -213,7 +213,7 @@ class ApiRequestController extends BaseController
      */
     protected function returnJson(Response $response, BaseResponse $model)
     {
-        $response->getBody()->write(json_encode($model));
+        $response->write(json_encode($model));
         return $response->withHeader('Content-Type', 'application/json');
     }
 }

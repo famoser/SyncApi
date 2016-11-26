@@ -29,6 +29,7 @@ use Slim\Http\Response;
 
 /**
  * this controller is concerned with syncing users & devices, and generating authorization codes
+ *
  * @package Famoser\SyncApi\Controllers
  */
 class AuthorizationController extends ApiSyncController
@@ -182,6 +183,7 @@ class AuthorizationController extends ApiSyncController
     {
         $req = $this->getRequestService()->parseAuthorizationRequest($request);
 
+
         if ($req->UserEntity == null || $req->UserEntity->OnlineAction != OnlineAction::CREATE) {
             $this->authorizeRequest($req);
             if ($req->DeviceEntity->OnlineAction != OnlineAction::CREATE) {
@@ -215,6 +217,7 @@ class AuthorizationController extends ApiSyncController
                 $resp->DeviceEntity = $res;
             }
         }
+        $resp = new AuthorizationResponse();
 
         return $this->returnJson($response, $resp);
     }
