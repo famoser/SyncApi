@@ -9,6 +9,9 @@
 namespace Famoser\SyncApi\Models\Communication\Request;
 
 
+use Famoser\SyncApi\Framework\Json\Models\ArrayProperty;
+use Famoser\SyncApi\Framework\Json\Models\Base\JsonValueProperty;
+use Famoser\SyncApi\Framework\Json\Models\TextProperty;
 use Famoser\SyncApi\Models\Communication\Request\Base\BaseRequest;
 
 /**
@@ -23,4 +26,17 @@ class HistoryEntityRequest extends BaseRequest
 
     /* @var string[] $VersionIds type_of:guid[] */
     public $VersionIds;
+
+    /**
+     * gets the json properties needed to deserialize
+     *
+     * @return JsonValueProperty[]
+     */
+    public function getJsonProperties()
+    {
+        $arr = [];
+        $arr["Id"] = new TextProperty("Id");
+        $arr["VersionIds"] = new ArrayProperty("VersionIds", new TextProperty("VersionIds"));
+        return $arr;
+    }
 }

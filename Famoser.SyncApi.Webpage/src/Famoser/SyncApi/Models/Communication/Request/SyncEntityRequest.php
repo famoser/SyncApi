@@ -9,6 +9,9 @@
 namespace Famoser\SyncApi\Models\Communication\Request;
 
 
+use Famoser\SyncApi\Framework\Json\Models\ArrayProperty;
+use Famoser\SyncApi\Framework\Json\Models\Base\JsonValueProperty;
+use Famoser\SyncApi\Framework\Json\Models\ObjectProperty;
 use Famoser\SyncApi\Models\Communication\Entities\SyncCommunicationEntity;
 use Famoser\SyncApi\Models\Communication\Request\Base\BaseRequest;
 
@@ -20,4 +23,16 @@ class SyncEntityRequest extends BaseRequest
 {
     /* @var SyncCommunicationEntity[] $SyncEntities */
     public $SyncEntities;
+
+    /**
+     * gets the json properties needed to deserialize
+     *
+     * @return JsonValueProperty[]
+     */
+    public function getJsonProperties()
+    {
+        $arr = [];
+        $arr["SyncEntities"] = new ArrayProperty("SyncEntities", new ObjectProperty("SyncEntities", new SyncCommunicationEntity()));
+        return $arr;
+    }
 }

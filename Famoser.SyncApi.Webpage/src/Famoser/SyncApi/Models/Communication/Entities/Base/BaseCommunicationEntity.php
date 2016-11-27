@@ -8,20 +8,29 @@
 
 namespace Famoser\SyncApi\Models\Communication\Entities\Base;
 
+use Famoser\SyncApi\Framework\Json\Models\Base\JsonProperty;
+use Famoser\SyncApi\Framework\Json\Models\Base\JsonValueProperty;
+use Famoser\SyncApi\Framework\Json\Models\DateTimeProperty;
+use Famoser\SyncApi\Framework\Json\Models\DateTimeValueProperty;
+use Famoser\SyncApi\Framework\Json\Models\TextProperty;
+use Famoser\SyncApi\Framework\Json\Models\TextValueProperty;
+use Famoser\SyncApi\Interfaces\IJsonDeserializable;
+
 
 /**
  * an base entity to be overridden and used to specify basic properties which every transferred entity contains
+ *
  * @package Famoser\SyncApi\Models\Communication\Entities\Base
  */
-class BaseCommunicationEntity
+class BaseCommunicationEntity implements IJsonDeserializable
 {
-    /* @var string $Id type_of:guid*/
+    /* @var string $Id type_of:guid */
     public $Id;
-    
-    /* @var string $VersionId type_of:guid*/
+
+    /* @var string $VersionId type_of:guid */
     public $VersionId;
 
-    /* @var int $OnlineAction const_of:OnlineAction*/
+    /* @var int $OnlineAction const_of:OnlineAction */
     public $OnlineAction;
 
     /* @var string $Content */
@@ -29,7 +38,24 @@ class BaseCommunicationEntity
 
     /* @var \DateTime $CreateDateTime */
     public $CreateDateTime;
-    
+
     /* @var string $Identifier */
     public $Identifier;
+
+    /**
+     * gets the json properties needed to deserialize
+     *
+     * @return JsonProperty[]
+     */
+    public function getJsonProperties()
+    {
+        $props = [];
+        $props["Id"] = new TextProperty("Id");
+        $props["VersionId"] = new TextProperty("VersionId");
+        $props["OnlineAction"] = new TextProperty("OnlineAction");
+        $props["Content"] = new TextProperty("Content");
+        $props["CreateDateTime"] = new DateTimeProperty("CreateDateTime");
+        $props["Identifier"] = new TextProperty("Identifier");
+        return $props;
+    }
 }

@@ -10,6 +10,10 @@ namespace Famoser\SyncApi\Services;
 
 
 use Famoser\SyncApi\Exceptions\ApiException;
+use Famoser\SyncApi\Framework\Json\Models\Base\JsonValueProperty;
+use Famoser\SyncApi\Framework\Json\Models\ObjectProperty;
+use Famoser\SyncApi\Framework\Json\SimpleJsonMapper;
+use Famoser\SyncApi\Interfaces\IJsonDeserializable;
 use Famoser\SyncApi\Models\Communication\Request\AuthorizationRequest;
 use Famoser\SyncApi\Models\Communication\Request\CollectionEntityRequest;
 use Famoser\SyncApi\Models\Communication\Request\HistoryEntityRequest;
@@ -117,17 +121,16 @@ class RequestService
      * @return object
      * @throws \JsonMapper_Exception
      */
-    private function executeJsonMapper(Request $request, $model)
+    private function executeJsonMapper(Request $request, IJsonDeserializable $model)
     {
         if (isset($_POST["json"])) {
-            $jsonObj = json_decode($_POST["json"]);
+            $json = $_POST["json"];
         } else {
-            $jsonObj = json_decode($request->getBody()->getContents());
+            $json = $request->getBody()->getContents();
         }
 
-        $mapper = new JsonMapper();
-        $mapper->bExceptionOnUndefinedProperty = true;
-        $resObj = $mapper->map($jsonObj, $model);
+        $mapper = new SimpleJsonMapper();
+        $resObj = $mapper->mapObject($json, new ObjectProperty("root", $model));
         $this->logger->log(json_encode($resObj, JSON_PRETTY_PRINT), "RequestHelper.txt");
         return $resObj;
     }

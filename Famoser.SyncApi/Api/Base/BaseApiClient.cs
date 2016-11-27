@@ -29,12 +29,15 @@ namespace Famoser.SyncApi.Api.Base
         protected virtual async Task<T> DoApiRequestAsync<T>(object request, string node = "") where T : BaseResponse, new()
         {
             var response = await _restService.PostJsonAsync(GetUri(node), JsonConvert.SerializeObject(request));
-            var rawResponse = await response.GetResponseAsStringAsync();
-            var obj = JsonConvert.DeserializeObject<T>(rawResponse);
-            if (obj != null)
+            if (response != null)
             {
-                obj.RequestFailed = !response.IsRequestSuccessfull;
-                return obj;
+                var rawResponse = await response.GetResponseAsStringAsync();
+                var obj = JsonConvert.DeserializeObject<T>(rawResponse);
+                if (obj != null)
+                {
+                    obj.RequestFailed = !response.IsRequestSuccessfull;
+                    return obj;
+                }
             }
             return new T()
             {

@@ -9,6 +9,8 @@
 namespace Famoser\SyncApi\Models\Communication\Entities;
 
 
+use Famoser\SyncApi\Framework\Json\Models\Base\JsonProperty;
+use Famoser\SyncApi\Framework\Json\Models\TextProperty;
 use Famoser\SyncApi\Models\Communication\Entities\Base\BaseCommunicationEntity;
 
 /**
@@ -21,4 +23,16 @@ class UserCommunicationEntity extends BaseCommunicationEntity
 {
     /* @var string $PersonalSeed */
     public $PersonalSeed;
+
+    /**
+     * gets the json properties needed to deserialize
+     *
+     * @return JsonProperty[]
+     */
+    public function getJsonProperties()
+    {
+        $props = parent::getJsonProperties();
+        $props["PersonalSeed"] = new TextProperty("PersonalSeed");
+        return $props;
+    }
 }

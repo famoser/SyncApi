@@ -7,6 +7,8 @@
  */
 
 namespace Famoser\SyncApi\Models\Communication\Entities;
+use Famoser\SyncApi\Framework\Json\Models\Base\JsonProperty;
+use Famoser\SyncApi\Framework\Json\Models\TextProperty;
 
 
 /**
@@ -17,4 +19,16 @@ class CollectionCommunicationEntity extends DeviceCommunicationEntity
 {
     /* @var string $DeviceId type_of:guid */
     public $DeviceId;
+
+    /**
+     * gets the json properties needed to deserialize
+     *
+     * @return JsonProperty[]
+     */
+    public function getJsonProperties()
+    {
+        $props = parent::getJsonProperties();
+        $props["DeviceId"] = new TextProperty("DeviceId");
+        return $props;
+    }
 }
