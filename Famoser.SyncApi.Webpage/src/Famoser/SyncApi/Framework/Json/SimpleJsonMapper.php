@@ -57,7 +57,7 @@ class SimpleJsonMapper
                 }
             } else if ($property instanceof ArrayProperty) {
                 if (isset($content[$jsonPropertyName])) {
-                    $inst->$key = $this->mapArrayInternal($content, $property);
+                    $inst->$key = $this->mapArrayInternal($content[$jsonPropertyName], $property);
                 } else {
                     $inst->$key = [];
                 }

@@ -25,6 +25,7 @@ use Slim\Http\Request;
 
 /**
  * the request service parses & validates requests
+ *
  * @package Famoser\SyncApi\Services
  */
 class RequestService
@@ -130,7 +131,9 @@ class RequestService
         }
 
         $mapper = new SimpleJsonMapper();
-        $resObj = $mapper->mapObject($json, new ObjectProperty("root", $model));
+        $om = new ObjectProperty("root", $model);
+        $this->logger->log(serialize($om->getProperties()["UserEntity"]), "log.txt");
+        $resObj = $mapper->mapObject($json, $om);
         $this->logger->log(json_encode($resObj, JSON_PRETTY_PRINT), "RequestHelper.txt");
         return $resObj;
     }

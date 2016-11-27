@@ -18,6 +18,7 @@ use Famoser\SyncApi\Models\Entities\ContentVersion;
 use Famoser\SyncApi\Types\ApiError;
 use Famoser\SyncApi\Types\OnlineAction;
 use Famoser\SyncApi\Types\ServerError;
+use Symfony\Component\Config\Definition\Exception\Exception;
 
 /**
  * Base class for all api sync requests
@@ -70,6 +71,8 @@ abstract class ApiSyncController extends ApiRequestController
 
             //check that no action can be executed which is not explicitly allowed
             if (!in_array($communicationEntity->OnlineAction, $allowedOA)) {
+                $this->getLogger()->log(json_encode($allowedOA), "debug.txt");
+                $this->getLogger()->log(json_encode($communicationEntity), "excel.txt");
                 throw new ApiException(ApiError::ACTION_PROHIBITED);
             }
 

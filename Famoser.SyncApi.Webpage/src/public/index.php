@@ -52,6 +52,12 @@ $c['notAllowedHandler'] = function (Container $c) {
 };
 $c['errorHandler'] = function (Container $c) {
     return function (Request $request, Response $response, Exception $exception) use ($c) {
+        $c['logger']->log(
+            $exception->getFile()." (".$exception->getLine() .")\n".
+            $exception->getCode().": ".$exception->getMessage() ."\n".
+            $exception->getTraceAsString(),
+            "exception.txt"
+        );
         if ($exception instanceof \Famoser\SyncApi\Exceptions\ServerException) {
             return $c['response']->withStatus(500)->getBody()->write("exception occurred: " . $exception->getMessage());
         } elseif ($exception instanceof \Famoser\SyncApi\Exceptions\ApiException) {
