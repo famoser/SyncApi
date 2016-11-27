@@ -8,7 +8,7 @@
 
 namespace Famoser\SyncApi\Models\Communication\Request\Base;
 
-use Famoser\SyncApi\Framework\Json\Models\Base\JsonValueProperty;
+use Famoser\SyncApi\Framework\Json\Models\Base\JsonProperty;
 use Famoser\SyncApi\Framework\Json\Models\TextProperty;
 use Famoser\SyncApi\Interfaces\IJsonDeserializable;
 
@@ -36,7 +36,7 @@ class BaseRequest implements IJsonDeserializable
     /**
      * gets the json properties needed to deserialize
      *
-     * @return JsonValueProperty[]
+     * @return JsonProperty[]
      */
     public function getJsonProperties()
     {
