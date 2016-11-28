@@ -23,19 +23,16 @@ require '../../vendor/autoload.php';
 
 $app = new SyncApiApp(
     [
-        'settings' =>
-            [
-                'displayErrorDetails' => true,
-                'debug_mode' => true,
-                'api_modulo' => 10000019,
-                'db_path' => realpath("../../app/data.sqlite"),
-                'db_template_path' => realpath("../../app/data_template.sqlite"),
-                'file_path' => realpath("../../app/files"),
-                'cache_path' => realpath("../../app/cache"),
-                'log_path' => realpath("../../app/logs"),
-                'template_path' => realpath("../../app/templates"),
-                'public_path' => realpath("../public")
-            ]
+        'displayErrorDetails' => true,
+        'debug_mode' => true,
+        'api_modulo' => 10000019,
+        'db_path' => realpath("../../app/data.sqlite"),
+        'db_template_path' => realpath("../../app/data_template.sqlite"),
+        'file_path' => realpath("../../app/files"),
+        'cache_path' => realpath("../../app/cache"),
+        'log_path' => realpath("../../app/logs"),
+        'template_path' => realpath("../../app/templates"),
+        'public_path' => realpath("../public")
     ]
 );
 

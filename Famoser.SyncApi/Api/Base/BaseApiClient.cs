@@ -38,10 +38,15 @@ namespace Famoser.SyncApi.Api.Base
                     obj.RequestFailed = !response.IsRequestSuccessfull;
                     return obj;
                 }
+                return new T()
+                {
+                    ServerMessage = "Server responded with an " + response.HttpResponseMessage.StatusCode,
+                    RequestFailed = true
+                };
             }
             return new T()
             {
-                ServerMessage = "Server responded with an " + response.HttpResponseMessage.StatusCode,
+                ServerMessage = "Server could not be found",
                 RequestFailed = true
             };
         }

@@ -29,7 +29,8 @@
   },
   "autoload": {
     "psr-4": {
-      "Famoser\\SyncApi\\": "src/Famoser/SyncApi/"
+      "Famoser\\SyncApi\\": "src/Famoser/SyncApi/",
+      "Famoser\\SyncApi\\Tests\\": "tests/Famoser/SyncApi/Tests"
     }
   }
 }

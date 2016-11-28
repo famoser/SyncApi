@@ -19,7 +19,7 @@ namespace Famoser.SyncApi.Api
         /// <returns></returns>
         public Task<CollectionEntityResponse> DoSyncRequestAsync(CollectionEntityRequest entity)
         {
-            return DoApiRequestAsync<CollectionEntityResponse>(entity, "collection/sync");
+            return DoApiRequestAsync<CollectionEntityResponse>(entity, "collections/sync");
         }
 
         /// <summary>
@@ -29,7 +29,7 @@ namespace Famoser.SyncApi.Api
         /// <returns></returns>
         public Task<HistoryEntityResponse> DoEntityHistoryRequestAsync(HistoryEntityRequest entity)
         {
-            return DoApiRequestAsync<HistoryEntityResponse>(entity, "entity/history/sync");
+            return DoApiRequestAsync<HistoryEntityResponse>(entity, "entities/history/sync");
         }
 
         /// <summary>
@@ -39,7 +39,7 @@ namespace Famoser.SyncApi.Api
         /// <returns></returns>
         public Task<SyncEntityResponse> DoSyncRequestAsync(SyncEntityRequest entity)
         {
-            return DoApiRequestAsync<SyncEntityResponse>(entity, "entity/sync");
+            return DoApiRequestAsync<SyncEntityResponse>(entity, "entities/sync");
         }
 
         /// <summary>

@@ -21,11 +21,17 @@ use Interop\Container\ContainerInterface;
 use InvalidArgumentException;
 use Slim\App;
 use Slim\Container;
+use Slim\Http\Environment;
 use Slim\Http\Request;
 use Slim\Http\Response;
 use Slim\Views\Twig;
 use Slim\Views\TwigExtension;
 
+/**
+ * the sync api application, in one neat class :)
+ *
+ * @package Famoser\SyncApi
+ */
 class SyncApiApp extends App
 {
     private $controllerNamespace = 'Famoser\SyncApi\Controllers\\';
@@ -41,17 +47,20 @@ class SyncApiApp extends App
         //$configuration
         $configuration = array_merge(
             [
-                'settings' =>
-                    [
-                        'displayErrorDetails' => false,
-                        'debug_mode' => false
-                    ]
+                'displayErrorDetails' => false,
+                'debug_mode' => false
             ],
             $configuration
         );
 
         //construct parent with container
-        parent::__construct($this->constructContainer($configuration));
+        parent::__construct(
+            $this->constructContainer(
+                [
+                    'settings' => $configuration
+                ]
+            )
+        );
 
         //get middleware
         $this->add(new LoggingMiddleware($this->getContainer()));
@@ -70,6 +79,16 @@ class SyncApiApp extends App
     private function overrideContainer($key, \Closure $val)
     {
         $this->getContainer()[$key] = $val;
+    }
+
+    /**
+     * override the environment (to mock requests for example)
+     *
+     * @param Environment $ev
+     */
+    public function overrideEnvironment(Environment $ev)
+    {
+        $this->getContainer()["environment"] =  $ev;
     }
 
     /**

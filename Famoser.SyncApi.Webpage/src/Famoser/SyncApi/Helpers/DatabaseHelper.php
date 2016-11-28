@@ -23,6 +23,7 @@ use PDO;
 
 /**
  * the DatabaseHelper allows access to the database. It abstracts sql from logic, and is type safe
+ *
  * @package Famoser\SyncApi\Helpers
  */
 class DatabaseHelper
@@ -89,19 +90,14 @@ class DatabaseHelper
      */
     private function initializeDatabase()
     {
-        $dataPath = $this->container["settings"]["data_path"];
-        $dbPath = $this->container['settings']['db']["path"];
-        $activePath = $dataPath . "/" . $dbPath;
+        $dataPath = $this->container["settings"]["db_path"];
 
-        if (!file_exists($activePath)) {
-            $templatePath = $this->container['settings']['db']["template_path"];
-            copy(
-                $activePath = $dataPath . "/" . $templatePath,
-                $activePath = $dataPath . "/" . $dbPath
-            );
+        if (!file_exists($dataPath)) {
+            $templatePath = $this->container['settings']["template_path"];
+            copy($templatePath, $dataPath);
         }
 
-        $this->database = $this->constructPdo($activePath);
+        $this->database = $this->constructPdo($dataPath);
     }
 
     /**

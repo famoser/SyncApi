@@ -17,8 +17,7 @@ use Famoser\SyncApi\Types\ApiError;
  */
 class BaseResponse
 {
-    /* @var ApiError $ApiError: contains the Error which might have occurred, see the errors in the ApiError class
-     */
+    /* @var ApiError $ApiError: contains the Error which might have occurred, see the errors in the ApiError class */
     public $ApiError;
 
     /* @var string $ServerMessage: a message from the server, content type depends on request */

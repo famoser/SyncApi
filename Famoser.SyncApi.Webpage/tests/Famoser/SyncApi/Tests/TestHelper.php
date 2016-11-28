@@ -30,19 +30,16 @@ class TestHelper
         $indentation = "../../../../";
         $config =
             [
-                'settings' =>
-                    [
-                        'displayErrorDetails' => true,
-                        'debug_mode' => true,
-                        'api_modulo' => 10000019,
-                        'db_path' => realpath($indentation . "app/data_test.sqlite"),
-                        'db_template_path' => realpath($indentation . "app/data_template.sqlite"),
-                        'file_path' => realpath($indentation . "app/files"),
-                        'cache_path' => realpath($indentation . "app/cache"),
-                        'log_path' => realpath($indentation . "app/logs"),
-                        'template_path' => realpath($indentation . "app/templates"),
-                        'public_path' => realpath($indentation . "src/public")
-                    ]
+                'displayErrorDetails' => true,
+                'debug_mode' => true,
+                'api_modulo' => 10000019,
+                'db_path' => realpath($indentation . "app/data_test.sqlite"),
+                'db_template_path' => realpath($indentation . "app/data_template.sqlite"),
+                'file_path' => realpath($indentation . "app/files"),
+                'cache_path' => realpath($indentation . "app/cache"),
+                'log_path' => realpath($indentation . "app/logs"),
+                'template_path' => realpath($indentation . "app/templates"),
+                'public_path' => realpath($indentation . "src/public")
             ];
 
         if ($cleanDatabase && is_file($config["db_path"])) {
@@ -57,17 +54,21 @@ class TestHelper
      * call app->run afterwards
      *
      * @param $json
-     * @param $link
+     * @param $relativeLink
+     * @param SyncApiApp $app
      */
-    public function mockApiRequest($json, $link)
+    public function mockApiRequest($json, $relativeLink, SyncApiApp $app)
     {
-        Environment::mock([
-            'REQUEST_METHOD' => 'POST',
-            'REQUEST_URI' => '/1.0/' . $link,
-            'QUERY_STRING' => $json,
-            'SERVER_NAME' => 'localhost',
-            'CONTENT_TYPE' => 'application/json;charset=utf8',
-            'CONTENT_LENGTH' => 15
-        ]);
+        $app->overrideEnvironment(
+            Environment::mock(
+                [
+                    'REQUEST_METHOD' => 'POST',
+                    'REQUEST_URI' => '/1.0/' . $relativeLink,
+                    'QUERY_STRING' => $json,
+                    'SERVER_NAME' => 'localhost',
+                    'CONTENT_TYPE' => 'application/json;charset=utf8'
+                ]
+            )
+        );
     }
 }
