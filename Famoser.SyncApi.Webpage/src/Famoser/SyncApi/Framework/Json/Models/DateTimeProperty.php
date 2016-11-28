@@ -11,13 +11,29 @@ namespace Famoser\SyncApi\Framework\Json\Models;
 
 use Famoser\SyncApi\Framework\Json\Models\Base\JsonValueProperty;
 
+/**
+ * a date time json property
+ *
+ * @package Famoser\SyncApi\Framework\Json\Models
+ */
 class DateTimeProperty extends JsonValueProperty
 {
+    /**
+     * converts an integer or string to time
+     *
+     * @param $value
+     * @return \DateTime
+     */
     public function parseValue($value)
     {
-        return new \DateTime(strtotime($value));
+        return new \DateTime($value);
     }
 
+    /**
+     * returns a null object
+     *
+     * @return null
+     */
     public function getNullValue()
     {
         return null;

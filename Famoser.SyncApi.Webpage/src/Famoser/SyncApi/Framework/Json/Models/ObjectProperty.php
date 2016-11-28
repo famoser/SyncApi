@@ -13,6 +13,11 @@ use Famoser\SyncApi\Framework\Json\Models\Base\JsonProperty;
 use Famoser\SyncApi\Framework\Json\Models\Base\JsonValueProperty;
 use Famoser\SyncApi\Interfaces\IJsonDeserializable;
 
+/**
+ * object json property. hold json info about the object that should be created there
+ *
+ * @package Famoser\SyncApi\Framework\Json\Models
+ */
 class ObjectProperty extends JsonProperty
 {
     /* @var string $className */
@@ -34,6 +39,8 @@ class ObjectProperty extends JsonProperty
     }
 
     /**
+     * returns properties of the object
+     * 
      * @return Base\JsonProperty[]
      */
     public function getProperties()
@@ -42,6 +49,8 @@ class ObjectProperty extends JsonProperty
     }
 
     /**
+     * constructs an instance of the object
+     *
      * @return object
      */
     public function getInstance()

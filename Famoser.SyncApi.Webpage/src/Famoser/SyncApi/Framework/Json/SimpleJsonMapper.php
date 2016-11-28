@@ -13,6 +13,11 @@ use Famoser\SyncApi\Framework\Json\Models\ArrayProperty;
 use Famoser\SyncApi\Framework\Json\Models\Base\JsonValueProperty;
 use Famoser\SyncApi\Framework\Json\Models\ObjectProperty;
 
+/**
+ * you can map a json strong to your classes
+ *
+ * @package Famoser\SyncApi\Framework\Json
+ */
 class SimpleJsonMapper
 {
     /**
@@ -63,7 +68,7 @@ class SimpleJsonMapper
                 }
             } else if ($property instanceof ObjectProperty) {
                 if (isset($content[$jsonPropertyName])) {
-                    $inst->$key = $this->mapObject($content[$jsonPropertyName], $property);
+                    $inst->$key = $this->mapObjectInternal($content[$jsonPropertyName], $property);
                 } else {
                     $inst->$key = null;
                 }
@@ -83,7 +88,7 @@ class SimpleJsonMapper
         foreach ($content as $arrayContent) {
             $prop = $property->getProperty();
             if ($prop instanceof ObjectProperty) {
-                $res[] = $this->mapObject($arrayContent, $prop);
+                $res[] = $this->mapObjectInternal($arrayContent, $prop);
             } else if ($prop instanceof JsonValueProperty) {
                 $res[] = $prop->parseValue($arrayContent);
             }

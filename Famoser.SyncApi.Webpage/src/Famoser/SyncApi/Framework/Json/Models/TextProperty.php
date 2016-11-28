@@ -11,6 +11,10 @@ namespace Famoser\SyncApi\Framework\Json\Models;
 
 use Famoser\SyncApi\Framework\Json\Models\Base\JsonValueProperty;
 
+/**
+ * Class TextProperty
+ * @package Famoser\SyncApi\Framework\Json\Models
+ */
 class TextProperty extends JsonValueProperty
 {
     public function parseValue($value)

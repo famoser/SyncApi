@@ -20,7 +20,5 @@ class ApplicationController extends \PHPUnit_Framework_TestCase
     public function testIndex()
     {
         $mockEv = Environment::mock();
-        
     }
-
 }
