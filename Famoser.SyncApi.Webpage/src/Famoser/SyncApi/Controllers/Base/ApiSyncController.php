@@ -18,7 +18,6 @@ use Famoser\SyncApi\Models\Entities\ContentVersion;
 use Famoser\SyncApi\Types\ApiError;
 use Famoser\SyncApi\Types\OnlineAction;
 use Famoser\SyncApi\Types\ServerError;
-use Symfony\Component\Config\Definition\Exception\Exception;
 
 /**
  * Base class for all api sync requests

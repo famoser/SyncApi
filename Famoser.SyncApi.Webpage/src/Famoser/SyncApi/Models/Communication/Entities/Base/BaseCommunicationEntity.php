@@ -9,11 +9,8 @@
 namespace Famoser\SyncApi\Models\Communication\Entities\Base;
 
 use Famoser\SyncApi\Framework\Json\Models\Base\JsonProperty;
-use Famoser\SyncApi\Framework\Json\Models\Base\JsonValueProperty;
 use Famoser\SyncApi\Framework\Json\Models\DateTimeProperty;
-use Famoser\SyncApi\Framework\Json\Models\DateTimeValueProperty;
 use Famoser\SyncApi\Framework\Json\Models\TextProperty;
-use Famoser\SyncApi\Framework\Json\Models\TextValueProperty;
 use Famoser\SyncApi\Interfaces\IJsonDeserializable;
 
 

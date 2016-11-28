@@ -17,6 +17,6 @@ class PhpUnitTest extends \PHPUnit_Framework_TestCase
 {
     public function testTesting()
     {
-        $this->assertTrue(true);
+        static::assertTrue(true);
     }
 }

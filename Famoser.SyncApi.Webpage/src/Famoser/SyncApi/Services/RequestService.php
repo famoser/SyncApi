@@ -9,8 +9,6 @@
 namespace Famoser\SyncApi\Services;
 
 
-use Famoser\SyncApi\Exceptions\ApiException;
-use Famoser\SyncApi\Framework\Json\Models\Base\JsonValueProperty;
 use Famoser\SyncApi\Framework\Json\Models\ObjectProperty;
 use Famoser\SyncApi\Framework\Json\SimpleJsonMapper;
 use Famoser\SyncApi\Interfaces\IJsonDeserializable;
@@ -19,8 +17,6 @@ use Famoser\SyncApi\Models\Communication\Request\CollectionEntityRequest;
 use Famoser\SyncApi\Models\Communication\Request\HistoryEntityRequest;
 use Famoser\SyncApi\Models\Communication\Request\SyncEntityRequest;
 use Famoser\SyncApi\Services\Interfaces\LoggerInterface;
-use Famoser\SyncApi\Types\ApiError;
-use JsonMapper;
 use Slim\Http\Request;
 
 /**

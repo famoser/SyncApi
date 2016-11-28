@@ -8,7 +8,6 @@
 
 namespace Famoser\SyncApi\Models\Communication\Entities;
 use Famoser\SyncApi\Framework\Json\Models\Base\JsonProperty;
-use Famoser\SyncApi\Framework\Json\Models\Base\JsonValueProperty;
 use Famoser\SyncApi\Framework\Json\Models\TextProperty;
 
 

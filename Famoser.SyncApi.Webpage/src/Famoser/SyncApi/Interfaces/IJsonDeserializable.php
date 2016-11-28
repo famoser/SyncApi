@@ -11,6 +11,12 @@ namespace Famoser\SyncApi\Interfaces;
 
 use Famoser\SyncApi\Framework\Json\Models\Base\JsonProperty;
 
+/**
+ * Interface IJsonDeserializable
+ * if you plan to use this object with the SimpleJsonMapper, implement this interface
+ *
+ * @package Famoser\SyncApi\Interfaces
+ */
 interface IJsonDeserializable
 {
     /**
