@@ -16,6 +16,7 @@ use Famoser\SyncApi\Middleware\LoggingMiddleware;
 use Famoser\SyncApi\Models\Communication\Response\Base\BaseResponse;
 use Famoser\SyncApi\Services\LoggerService;
 use Famoser\SyncApi\Services\RequestService;
+use Famoser\SyncApi\Types\ApiError;
 use Famoser\SyncApi\Types\FrontendError;
 use Interop\Container\ContainerInterface;
 use InvalidArgumentException;
@@ -222,25 +223,31 @@ class SyncApiApp extends App
                     $exception->getTraceAsString(),
                     "exception.txt"
                 );
-                if ($exception instanceof ServerException) {
-                    return $c['response']->withStatus(500)->getBody()->write(
-                        "exception occurred: " . $exception->getMessage()
-                    );
-                } elseif ($exception instanceof ApiException) {
+                //return json if api request
+                if (strpos($request->getUri()->getPath(),"/1.0/") === 0 && $request->getMethod() == "POST") {
                     $resp = new BaseResponse();
                     $resp->RequestFailed = true;
-                    $resp->ApiError = $exception->getCode();
+                    if ($exception instanceof ApiException) {
+                        $resp->ApiError = $exception->getCode();
+                    } else {
+                        $resp->ApiError = ApiError::SERVER_ERROR;
+                    }
                     $resp->ServerMessage = $exception->getMessage();
                     return $c['response']->withStatus(500)->withJson($resp);
-                } elseif ($exception instanceof FrontendException) {
-                    if ($exception->getCode() == FrontendError::NOT_LOGGED_IN) {
-                        $reqUri = $request->getUri()->withPath($c->get("router")->pathFor("login"));
-                        return $c['response']->withRedirect($reqUri);
-                    }
                 }
-                $args = [];
-                $args["error"] = $exception->getMessage();
-                return $c["view"]->render($response, "public/server_error.html.twig", $args);
+                else {
+                    //specific behaviour for login failures
+                    if ($exception instanceof FrontendException) {
+                        if ($exception->getCode() == FrontendError::NOT_LOGGED_IN) {
+                            $reqUri = $request->getUri()->withPath($c->get("router")->pathFor("login"));
+                            return $c['response']->withRedirect($reqUri);
+                        }
+                    }
+
+                    $args = [];
+                    $args["error"] = $exception->getMessage();
+                    return $c["view"]->render($response, "public/server_error.html.twig", $args);
+                }
             };
         };
 

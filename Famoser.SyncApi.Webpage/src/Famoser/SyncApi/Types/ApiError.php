@@ -38,6 +38,8 @@ class ApiError
     const ACTION_NOT_SUPPORTED = 6000;
     const ACTION_PROHIBITED = 6001;
 
+    const SERVER_ERROR = 7000;
+
     /**
      * convert the api to a string
      * 
@@ -85,6 +87,10 @@ class ApiError
                 return "action not supported";
             case ApiError::ACTION_PROHIBITED:
                 return "action prohibited";
+
+
+            case ApiError::SERVER_ERROR:
+                return "unknown server error occurred";
             
             default:
                 return "unknown api error occurred with code " . $apiError;

@@ -57,7 +57,7 @@ class TestHelper
         $config = $this->constructConfig();
 
         if ($cleanDatabase) {
-            $this->tryCleanDatbase($config);
+            $this->tryCleanDatabase($config);
         }
 
         return new SyncApiApp($config);
@@ -73,12 +73,18 @@ class TestHelper
      */
     public function mockApiRequest($json, $relativeLink, SyncApiApp $app)
     {
+        // does not work as expected
+        $tmp_handle = fopen('php://temp', 'w+');
+        fwrite($tmp_handle, $json);
+        rewind($tmp_handle);
+        fclose($tmp_handle);
+
         $app->overrideEnvironment(
             Environment::mock(
                 [
                     'REQUEST_METHOD' => 'POST',
                     'REQUEST_URI' => '/1.0/' . $relativeLink,
-                    'QUERY_STRING' => $json,
+                    'slim.input' => $json,
                     'SERVER_NAME' => 'localhost',
                     'CONTENT_TYPE' => 'application/json;charset=utf8'
                 ]
@@ -92,7 +98,7 @@ class TestHelper
     public function cleanEnvironment()
     {
         $config = $this->constructConfig();
-        $this->tryCleanDatbase($config);
+        $this->tryCleanDatabase($config);
     }
 
     /**
@@ -100,7 +106,7 @@ class TestHelper
      *
      * @param $config
      */
-    private function tryCleanDatbase($config)
+    private function tryCleanDatabase($config)
     {
         if (is_file($config["db_path"])) {
             unlink($config["db_path"]);
