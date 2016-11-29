@@ -70,6 +70,7 @@ class AuthorizationControllerTest extends \PHPUnit_Framework_TestCase
 
         $response = $this->app->run();
 
-        static::assertEquals('["ApiError":0,"RequestFailed":false,"ServerMessage":null]', $response->getBody());
+        $resp = $response->getBody()->getContents();
+        static::assertEquals('["ApiError":0,"RequestFailed":false,"ServerMessage":null]', $resp);
     }
 }
