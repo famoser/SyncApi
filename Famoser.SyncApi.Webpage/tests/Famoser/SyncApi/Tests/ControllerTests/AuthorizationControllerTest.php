@@ -29,7 +29,7 @@ class AuthorizationControllerTest extends \PHPUnit_Framework_TestCase
         $this->app = $this->testHelper->getTestApp();
     }
 
-    public function testSync()
+    public function testCreateUser()
     {
         $this->testHelper->mockApiRequest('
             {
