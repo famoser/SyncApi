@@ -20,30 +20,44 @@ use Slim\Http\Environment;
 class TestHelper
 {
     /**
-     * create a test application app
+     * construct the configuration
      *
-     * @param bool $cleanDatabase
-     * @return SyncApiApp
+     * @return array
      */
-    public function getTestApp($cleanDatabase = true)
+    private function constructConfig()
     {
-        $indentation = "../../../../";
+        $ds = DIRECTORY_SEPARATOR;
+        $oneUp = ".." . $ds;
+        $basePath = realpath($oneUp . $oneUp . $oneUp . $oneUp . $oneUp) . $ds;
         $config =
             [
                 'displayErrorDetails' => true,
                 'debug_mode' => true,
                 'api_modulo' => 10000019,
-                'db_path' => realpath($indentation . "app/data_test.sqlite"),
-                'db_template_path' => realpath($indentation . "app/data_template.sqlite"),
-                'file_path' => realpath($indentation . "app/files"),
-                'cache_path' => realpath($indentation . "app/cache"),
-                'log_path' => realpath($indentation . "app/logs"),
-                'template_path' => realpath($indentation . "app/templates"),
-                'public_path' => realpath($indentation . "src/public")
+                'db_path' => $basePath . "app" . $ds . "data_test.sqlite",
+                'db_template_path' => $basePath . "app" . $ds . "data_template.sqlite",
+                'file_path' => $basePath . "app" . $ds . "files",
+                'cache_path' => $basePath . "app" . $ds . "cache",
+                'log_path' => $basePath . "app" . $ds . "logs",
+                'template_path' => $basePath . "app" . $ds . "templates",
+                'public_path' => $basePath . "src" . $ds . "public"
             ];
 
-        if ($cleanDatabase && is_file($config["db_path"])) {
-            unlink($config["db_path"]);
+        return $config;
+    }
+
+    /**
+     * create a test application app
+     *
+     * @param bool $cleanDatabase
+     * @return SyncApiApp
+     */
+    public function getTestApp($cleanDatabase = true, $prefilData = true)
+    {
+        $config = $this->constructConfig();
+
+        if ($cleanDatabase) {
+            $this->tryCleanDatbase($config);
         }
 
         return new SyncApiApp($config);
@@ -70,5 +84,26 @@ class TestHelper
                 ]
             )
         );
+    }
+
+    /**
+     * cleans the environment, including database
+     */
+    public function cleanEnvironment()
+    {
+        $config = $this->constructConfig();
+        $this->tryCleanDatbase($config);
+    }
+
+    /**
+     * tries to delete the database
+     *
+     * @param $config
+     */
+    private function tryCleanDatbase($config)
+    {
+        if (is_file($config["db_path"])) {
+            unlink($config["db_path"]);
+        }
     }
 }

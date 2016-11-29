@@ -23,12 +23,26 @@ class AuthorizationControllerTest extends \PHPUnit_Framework_TestCase
     /* @var TestHelper $testHelper */
     private $testHelper;
 
+    /**
+     * create the $app and $testHelper
+     */
     public function setUp()
     {
         $this->testHelper = new TestHelper();
         $this->app = $this->testHelper->getTestApp();
     }
 
+    /**
+     * cleans the test environment
+     */
+    public function tearDown()
+    {
+        $this->testHelper->cleanEnvironment();
+    }
+
+    /**
+     * tries to create a user for a test application
+     */
     public function testCreateUser()
     {
         $this->testHelper->mockApiRequest('
