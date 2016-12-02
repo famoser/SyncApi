@@ -93,7 +93,7 @@ class DatabaseHelper
         $dataPath = $this->container["settings"]["db_path"];
 
         if (!file_exists($dataPath)) {
-            $templatePath = $this->container['settings']["template_path"];
+            $templatePath = $this->container['settings']["db_template_path"];
             copy($templatePath, $dataPath);
         }
 

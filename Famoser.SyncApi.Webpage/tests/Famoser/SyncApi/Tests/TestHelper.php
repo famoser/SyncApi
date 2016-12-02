@@ -63,6 +63,7 @@ class TestHelper
         return new SyncApiApp($config);
     }
 
+    private $tmpHandle;
     /**
      * mock a json POST request
      * call app->run afterwards
@@ -73,18 +74,12 @@ class TestHelper
      */
     public function mockApiRequest($json, $relativeLink, SyncApiApp $app)
     {
-        // does not work as expected
-        $tmp_handle = fopen('php://temp', 'w+');
-        fwrite($tmp_handle, $json);
-        rewind($tmp_handle);
-        fclose($tmp_handle);
-
         $app->overrideEnvironment(
             Environment::mock(
                 [
                     'REQUEST_METHOD' => 'POST',
                     'REQUEST_URI' => '/1.0/' . $relativeLink,
-                    'slim.input' => $json,
+                    'MOCK_POST_DATA' => $json,
                     'SERVER_NAME' => 'localhost',
                     'CONTENT_TYPE' => 'application/json;charset=utf8'
                 ]
@@ -99,6 +94,7 @@ class TestHelper
     {
         $config = $this->constructConfig();
         $this->tryCleanDatabase($config);
+        fclose($this->tmpHandle);
     }
 
     /**
