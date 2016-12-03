@@ -111,11 +111,28 @@ abstract class ApiSyncController extends ApiRequestController
 
         //add new ones
         $existingEntities = $this->getAllInternal($req, $contentType);
-        $newOnes = array_diff($askedForGuids, array_keys($existingEntities));
-        foreach ($newOnes as $newOne) {
-            if (!$existingEntities[$newOne]->is_deleted) {
-                $ver = $this->getActiveVersion($existingEntities[$newOne], $contentType);
-                $resultArray[] = $existingEntities[$newOne]->createCommunicationEntity($ver, OnlineAction::CREATE);
+        $existingEntityIds = $this->getArrayOfObjectProperty($existingEntities, "id");
+
+        //get new Ids
+        $newOnes = array_diff($askedForGuids, $existingEntityIds);
+
+        if (count($newOnes) > 0) {
+            //add new Objects to response
+
+            //traverse list only once as array_diff returns sorted array (not sure about this one)
+            $i = 0;
+            foreach ($newOnes as $newOne) {
+                for (; $i < count($existingEntityIds); $i++) {
+                    if ($existingEntityIds[$i] != $newOne) {
+                        //not the Id we are looking for; skip
+                        continue;
+                    }
+                    if (!$existingEntities[$i]->is_deleted) {
+                        $ver = $this->getActiveVersion($existingEntities[$i], $contentType);
+                        $resultArray[] = $existingEntities[$i]->createCommunicationEntity($ver, OnlineAction::CREATE);
+                    }
+                    break;
+                }
             }
         }
 
@@ -138,6 +155,23 @@ abstract class ApiSyncController extends ApiRequestController
         }
 
         return $this->tempEntities;
+    }
+
+    /**
+     * returns an array which value are the specified property of the object.
+     *
+     * @param array $objects
+     * @param $property
+     * @return array
+     */
+    private function getArrayOfObjectProperty(array $objects, $property)
+    {
+        $newArr = [];
+        foreach ($objects as $object) {
+            /** @noinspection PhpVariableVariableInspection */
+            $newArr[] = $object->$property;
+        }
+        return $newArr;
     }
 
     /**

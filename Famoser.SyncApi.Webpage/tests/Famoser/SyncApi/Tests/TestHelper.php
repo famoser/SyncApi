@@ -9,8 +9,9 @@
 namespace Famoser\SyncApi\Tests;
 
 
-use Famoser\SyncApi\Helpers\DatabaseService;
+use Famoser\SyncApi\Framework\ContainerBase;
 use Famoser\SyncApi\Models\Communication\Request\Base\BaseRequest;
+use Famoser\SyncApi\Models\Entities\Application;
 use Famoser\SyncApi\SyncApiApp;
 use Slim\Http\Environment;
 
@@ -19,25 +20,34 @@ use Slim\Http\Environment;
  *
  * @package Famoser\SyncApi\Tests
  */
-class TestHelper
+class TestHelper extends ContainerBase
 {
     const TEST_APPLICATION_ID = "test_app";
+    const TEST_APPLICATION_SEED = 0;
 
+    /* @var SyncApiApp $testApp */
     private $testApp;
+    /* @var array $config */
+    private $config;
 
     /**
      * TestHelper constructor.
      */
     public function __construct()
     {
-        $config = $this->constructConfig();
-        $this->tryCleanDatabase($config);
+        //create config array
+        $this->config = $this->constructConfig();
+        //clean environment
+        $this->cleanEnvironment();
 
-        $this->testApp = new SyncApiApp($config);
+        //create test app
+        $this->testApp = new SyncApiApp($this->config);
 
-        $this->prepareDatabase($this->testApp);
+        //use container to initialize parent
+        parent::__construct($this->testApp->getContainer());
 
-        return $this->testApp;
+        //prepare environment
+        $this->prepareEnvironment();
     }
 
     /**
@@ -49,7 +59,7 @@ class TestHelper
     {
         $ds = DIRECTORY_SEPARATOR;
         $oneUp = ".." . $ds;
-        $basePath = realpath($oneUp . $oneUp . $oneUp . $oneUp . $oneUp) . $ds;
+        $basePath = realpath(__DIR__ . "/" . $oneUp . $oneUp . $oneUp . $oneUp) . $ds;
         $config =
             [
                 'displayErrorDetails' => true,
@@ -77,18 +87,18 @@ class TestHelper
         return $this->testApp;
     }
 
-    private $tmpHandle;
-
     /**
      * mock a json POST request
      * call app->run afterwards
      *
-     * @param $json
+     * @param BaseRequest $request
      * @param $relativeLink
      * @param SyncApiApp $app
+     * @internal param $json
      */
-    public function mockApiRequest($json, $relativeLink, SyncApiApp $app)
+    public function mockApiRequest(BaseRequest $request, $relativeLink, SyncApiApp $app)
     {
+        $json = json_encode($request, JSON_PRETTY_PRINT);
         $app->overrideEnvironment(
             Environment::mock(
                 [
@@ -100,8 +110,6 @@ class TestHelper
                 ]
             )
         );
-
-        //$ds = $this->getTestApp()
     }
 
     /**
@@ -109,21 +117,25 @@ class TestHelper
      */
     public function cleanEnvironment()
     {
-        $config = $this->constructConfig();
-        $this->tryCleanDatabase($config);
-        fclose($this->tmpHandle);
+        //delete db if exists
+        if (is_file($this->config ["db_path"])) {
+            unlink($this->config ["db_path"]);
+        }
     }
 
     /**
-     * tries to delete the database
-     *
-     * @param $config
+     * prepares the environment
      */
-    private function tryCleanDatabase($config)
+    public function prepareEnvironment()
     {
-        if (is_file($config["db_path"])) {
-            unlink($config["db_path"]);
-        }
+        //create test application
+        $application = new Application();
+        $application->application_id = static::TEST_APPLICATION_ID;
+        $application->application_seed = static::TEST_APPLICATION_SEED;
+        $application->description = "a test application created while running tests";
+        $application->name = "Test Application";
+        $application->release_date_time = time() - 1;
+        $this->getDatabaseService()->saveToDatabase($application);
     }
 
     /**

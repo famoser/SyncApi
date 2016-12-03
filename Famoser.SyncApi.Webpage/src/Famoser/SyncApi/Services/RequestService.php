@@ -74,6 +74,11 @@ class RequestService extends BaseService
      */
     public function validateAuthCode($authCode, $applicationSeed, $personSeed)
     {
+        //return true if $applicationSeed is 0 (= not configured)
+        if ($applicationSeed == 0) {
+            return true;
+        }
+
         $content = explode("_", $authCode);
         //parse time from $content[0]
         $chunks = chunk_split($content[0], 2);

@@ -8,10 +8,12 @@
 
 namespace Famoser\SyncApi\Tests\ControllerTests;
 
+use Famoser\SyncApi\Models\Communication\Entities\UserCommunicationEntity;
 use Famoser\SyncApi\Models\Communication\Request\AuthorizationRequest;
 use Famoser\SyncApi\Models\Communication\Request\SyncEntityRequest;
 use Famoser\SyncApi\SyncApiApp;
 use Famoser\SyncApi\Tests\TestHelper;
+use Famoser\SyncApi\Types\OnlineAction;
 
 /**
  * Class AuthorizationControllerTests
@@ -50,31 +52,26 @@ class AuthorizationControllerTest extends \PHPUnit_Framework_TestCase
         $syncRequest = new AuthorizationRequest();
         $this->testHelper->authorizeRequest($syncRequest);
 
-        $this->testHelper->mockApiRequest('
-            {
-                "UserEntity": {
-                    "PersonalSeed": 621842297,
-                    "Id": "da66416e-767d-4687-a2af-353b47a0e5c1",
-                    "VersionId": "6b73667e-0229-4350-9c0e-831845bbda8f",
-                    "OnlineAction": 1,
-                    "Content": "{}",
-                    "CreateDateTime": "2016-11-28T12:43:13+01:00",
-                    "Identifier": "user"
-                },
-                "DeviceEntity": null,
-                "CollectionEntity": null,
-                "ClientMessage": null,
-                "UserId": "da66416e-767d-4687-a2af-353b47a0e5c1",
-                "DeviceId": "00000000-0000-0000-0000-000000000000",
-                "AuthorizationCode": "13431239_-8215860",
-                "ApplicationId": "test_appl"
-            }',
-            "auth/sync",
-            $this->app
-        );
+        $user = new UserCommunicationEntity();
+        $user->PersonalSeed = 621842297;
+        $user->Id = "da66416e-767d-4687-a2af-353b47a0e5c1";
+        $user->VersionId = "da66416e-767d-4687-a2af-831845bbda8f";
+        $user->OnlineAction = OnlineAction::CREATE;
+        $user->Content = "{}";
+        $user->CreateDateTime = date("c");
+        $user->Identifier = "user";
+        $syncRequest->UserEntity = $user;
+        $syncRequest->UserId = $user->Id;
+        $syncRequest->DeviceId = "00000000-0000-0000-0000-000000000000";
+
+        $this->testHelper->mockApiRequest($syncRequest, "auth/sync", $this->app);
 
         $response = $this->app->run();
 
-        static::assertEquals('["ApiError":0,"RequestFailed":false,"ServerMessage":null]', $response->getBody());
+        static::assertTrue($response->getStatusCode() == 200);
+        static::assertEquals(
+            '["ApiError":0,"RequestFailed":false,"ServerMessage":null]',
+            $response->getBody()
+        );
     }
 }

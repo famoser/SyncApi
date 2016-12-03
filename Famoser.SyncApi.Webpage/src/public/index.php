@@ -12,7 +12,7 @@ use Famoser\SyncApi\SyncApiApp;
 
 $ds = DIRECTORY_SEPARATOR;
 $oneUp = ".." . $ds;
-$basePath = realpath($oneUp . $oneUp) . $ds;
+$basePath = realpath(__DIR__ . "/" . $oneUp . $oneUp) . $ds;
 
 require '../../vendor/autoload.php';
 
