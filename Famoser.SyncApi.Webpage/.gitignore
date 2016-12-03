@@ -3,6 +3,7 @@ vendor/*
 app/cache/*
 app/logs/*
 app/data.sqlite
+app/data_test.sqlite
 node_modules
 bower_components
 src/public/assets/vendor/*

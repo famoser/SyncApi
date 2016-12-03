@@ -74,7 +74,7 @@ class AuthorizationController extends ApiSyncController
         if (!is_numeric($personalSeed)) {
             throw new ApiException(ApiError::PERSONAL_SEED_NOT_NUMERIC);
         }
-        if ($personalSeed > 1000) {
+        if ($personalSeed < 1000) {
             throw new ApiException(ApiError::PERSONAL_SEED_TOO_SMALL);
         }
     }
@@ -265,11 +265,11 @@ class AuthorizationController extends ApiSyncController
             throw new ServerException(ServerError::FORBIDDEN);
         }
         if ($contentType == ContentType::USER) {
-            $this->ensureValidPersonalSeed($req->ClientMessage);
+            $this->ensureValidPersonalSeed($req->UserEntity->PersonalSeed);
 
             $user = new User();
             $user->application_id = $req->ApplicationId;
-            $user->personal_seed = $req->ClientMessage;
+            $user->personal_seed = $req->UserEntity->PersonalSeed;
 
             return $user;
         } elseif ($contentType == ContentType::DEVICE) {
