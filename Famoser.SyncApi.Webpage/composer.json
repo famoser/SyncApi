@@ -1,10 +1,10 @@
 {
-  "name": "famoser/masspass",
+  "name": "famoser/syncapi",
   "type": "application",
   "license": "MIT",
-  "description": "The api for a password mananger",
+  "description": "The web backend for a generic api",
   "keywords": [
-    "masspass",
+    "syncapi",
     "api"
   ],
   "authors": [
@@ -15,8 +15,14 @@
       "role": "Developer"
     }
   ],
+  "repositories": [
+        {
+            "type": "vcs",
+            "url": "https://github.com/famoser/Slim"
+        }
+   ],
   "require": {
-    "slim/slim": "^3.0",
+    "slim/slim": "dev-famoser-mock-post",
     "slim/twig-view": "^2.1",
     "famoser/jsonmapper": "*",
     "codeguy/upload": "*",
