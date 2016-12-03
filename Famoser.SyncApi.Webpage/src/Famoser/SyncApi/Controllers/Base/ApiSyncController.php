@@ -120,16 +120,16 @@ abstract class ApiSyncController extends ApiRequestController
             //add new Objects to response
 
             //traverse list only once as array_diff returns sorted array (not sure about this one)
-            $i = 0;
+            $index = 0;
             foreach ($newOnes as $newOne) {
-                for (; $i < count($existingEntityIds); $i++) {
-                    if ($existingEntityIds[$i] != $newOne) {
+                for (; $index < count($existingEntityIds); $index++) {
+                    if ($existingEntityIds[$index] != $newOne) {
                         //not the Id we are looking for; skip
                         continue;
                     }
-                    if (!$existingEntities[$i]->is_deleted) {
-                        $ver = $this->getActiveVersion($existingEntities[$i], $contentType);
-                        $resultArray[] = $existingEntities[$i]->createCommunicationEntity($ver, OnlineAction::CREATE);
+                    if (!$existingEntities[$index]->is_deleted) {
+                        $ver = $this->getActiveVersion($existingEntities[$index], $contentType);
+                        $resultArray[] = $existingEntities[$index]->createCommunicationEntity($ver, OnlineAction::CREATE);
                     }
                     break;
                 }
