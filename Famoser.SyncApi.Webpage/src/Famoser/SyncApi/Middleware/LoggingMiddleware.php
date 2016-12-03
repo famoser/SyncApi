@@ -9,6 +9,7 @@
 namespace Famoser\SyncApi\Middleware;
 
 
+use Famoser\SyncApi\Middleware\Base\BaseMiddleware;
 use Slim\Http\Request;
 use Slim\Http\Response;
 
@@ -28,19 +29,27 @@ class LoggingMiddleware extends BaseMiddleware
      */
     public function __invoke(Request $request, Response $response, $next)
     {
-        $files = glob($this->getLogger()->getLogPath() . '/*'); // get all file names
-        foreach ($files as $file) { // iterate files
+        //delete existing logging files
+        $files = glob($this->getLoggingService()->getLogPath() . '/*'); // get all file names
+        foreach ($files as $file) {
             if (is_file($file)) {
-                unlink($file); // delete file
+                unlink($file);
             }
         }
 
+        //log current request
         $str = $request->getMethod() . ": " . $request->getUri()->getPath() . "\n";
         $jsonObj = $request->getParsedBody();
         if ($jsonObj == null) {
-            $this->getLogger()->log($str . $request->getBody(), "Request.txt");
+            $this->getLoggingService()->log(
+                $str . $request->getBody(),
+                "Request.txt"
+            );
         } else {
-            $this->getLogger()->log($str . json_encode($request->getParsedBody(), JSON_PRETTY_PRINT), "Request.txt");
+            $this->getLoggingService()->log(
+                $str . json_encode($request->getParsedBody(), JSON_PRETTY_PRINT),
+                "Request.txt"
+            );
         }
 
         $response = $next($request, $response);

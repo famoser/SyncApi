@@ -34,9 +34,6 @@ class DatabaseService extends BaseService implements DatabaseServiceInterface
      */
     private $database;
 
-    /* @var ContainerInterface $container */
-    private $container;
-
     /**
      * DatabaseHelper constructor.
      *
@@ -83,10 +80,10 @@ class DatabaseService extends BaseService implements DatabaseServiceInterface
      */
     private function initializeDatabase()
     {
-        $dataPath = $this->container["settings"]["db_path"];
+        $dataPath = $this->getSettingsArray()["db_path"];
 
         if (!file_exists($dataPath)) {
-            $templatePath = $this->container['settings']["db_template_path"];
+            $templatePath = $this->getSettingsArray()["db_template_path"];
             copy($templatePath, $dataPath);
         }
 
@@ -143,7 +140,7 @@ class DatabaseService extends BaseService implements DatabaseServiceInterface
     private function executeAndFetch(BaseEntity $entity, $sql, $parameters)
     {
         try {
-            $this->getLogger()->log(
+            $this->getLoggingService()->log(
                 $sql . "     " . json_encode($parameters),
                 "DatabaseHelper" . uniqid() . ".txt"
             );
@@ -153,7 +150,7 @@ class DatabaseService extends BaseService implements DatabaseServiceInterface
             }
             return $request->fetchAll(PDO::FETCH_CLASS, get_class($entity));
         } catch (\Exception $ex) {
-            $this->getLogger()->log(
+            $this->getLoggingService()->log(
                 $ex->getMessage() . "     " .
                 $ex->getTraceAsString() . "     " .
                 $sql . "     " . json_encode($parameters),
@@ -285,7 +282,7 @@ class DatabaseService extends BaseService implements DatabaseServiceInterface
     public function saveToDatabase(BaseEntity $entity)
     {
         $properties = (array)$entity;
-        $this->getLogger()->log(
+        $this->getLoggingService()->log(
             json_encode($properties, JSON_PRETTY_PRINT) . "\n\n\n" . json_encode($entity, JSON_PRETTY_PRINT),
             "DatabaseHelper_" . $entity->getTableName() . '_' . time() . "_" . uniqid() . ".txt"
         );

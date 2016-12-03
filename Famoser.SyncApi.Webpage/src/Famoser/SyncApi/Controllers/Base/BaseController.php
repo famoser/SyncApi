@@ -9,6 +9,7 @@
 namespace Famoser\SyncApi\Controllers\Base;
 
 
+use Famoser\SyncApi\Framework\ContainerBase;
 use Famoser\SyncApi\Models\Communication\Request\Base\BaseRequest;
 use Famoser\SyncApi\Repositories\SettingsRepository;
 use Famoser\SyncApi\Services\Interfaces\DatabaseServiceInterface;
@@ -26,52 +27,8 @@ use Slim\Interfaces\RouterInterface;
  * Class BaseController
  * @package Famoser\SyncApi\Controllers\Base
  */
-class BaseController
+class BaseController extends ContainerBase
 {
-    /* @var ContainerInterface $container */
-    protected $container;
-
-    /**
-     * BaseController constructor.
-     *
-     * @param ContainerInterface $ci
-     */
-    public function __construct(ContainerInterface $ci)
-    {
-        $this->container = $ci;
-    }
-
-
-    /**
-     * get database helper, used for database access
-     *
-     * @return DatabaseServiceInterface
-     */
-    protected function getDatabaseService()
-    {
-        return $this->container->get(SyncApiApp::DATABASE_SERVICE_KEY);
-    }
-
-    /**
-     * get logger
-     *
-     * @return LoggingServiceInterface
-     */
-    protected function getLoggingService()
-    {
-        return $this->container->get(SyncApiApp::LOGGING_SERVICE_KEY);
-    }
-
-    /**
-     * get logger
-     *
-     * @return RequestServiceInterface
-     */
-    protected function getRequestService()
-    {
-        return $this->container->get(SyncApiApp::REQUEST_SERVICE_KEY);
-    }
-
     /**
      * get SettingsRepository for the specified application
      *
@@ -81,16 +38,6 @@ class BaseController
     protected function getSettingRepository($applicationId)
     {
         return new SettingsRepository($this->getDatabaseService(), $applicationId);
-    }
-
-    /**
-     * get router
-     *
-     * @return RouterInterface
-     */
-    protected function getRouter()
-    {
-        return $this->container->get("router");
     }
 
     /**

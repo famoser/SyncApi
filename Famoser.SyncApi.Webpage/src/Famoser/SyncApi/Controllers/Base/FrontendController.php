@@ -64,6 +64,6 @@ class FrontendController extends BaseController
      */
     protected function renderTemplate(Response $response, $path, $args)
     {
-        return $this->container->get("view")->render($response, $path . ".html.twig", $args);
+        return $this->getView()->render($response, $path . ".html.twig", $args);
     }
 }

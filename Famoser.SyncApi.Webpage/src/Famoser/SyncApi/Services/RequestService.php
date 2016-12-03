@@ -110,9 +110,9 @@ class RequestService extends BaseService
 
         $mapper = new SimpleJsonMapper();
         $om = new ObjectProperty("root", $model);
-        $this->getLogger()->log(serialize($om->getProperties()["UserEntity"]), "log.txt");
+        $this->getLoggingService()->log(serialize($om->getProperties()["UserEntity"]), "log.txt");
         $resObj = $mapper->mapObject($json, $om);
-        $this->getLogger()->log(json_encode($resObj, JSON_PRETTY_PRINT), "RequestHelper.txt");
+        $this->getLoggingService()->log(json_encode($resObj, JSON_PRETTY_PRINT), "RequestHelper.txt");
         return $resObj;
     }
 }

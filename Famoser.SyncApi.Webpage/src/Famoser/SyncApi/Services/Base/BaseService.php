@@ -9,6 +9,7 @@
 namespace Famoser\SyncApi\Services\Base;
 
 
+use Famoser\SyncApi\Framework\ContainerBase;
 use Famoser\SyncApi\Services\Interfaces\LoggingServiceInterface;
 use Famoser\SyncApi\SyncApiApp;
 use Interop\Container\ContainerInterface;
@@ -19,31 +20,8 @@ use Slim\Container;
  *
  * @package Famoser\SyncApi\Services\Base
  */
-class BaseService
+class BaseService extends ContainerBase
 {
-    /* @var Container $container */
-    private $container;
-
-    /**
-     * RequestService constructor.
-     *
-     * @param ContainerInterface $container
-     */
-    public function __construct(ContainerInterface $container)
-    {
-        $this->container = $container;
-    }
-
-    /**
-     * return the logger
-     *
-     * @return LoggingServiceInterface
-     */
-    protected function getLogger()
-    {
-        return $this->container->get(SyncApiApp::LOGGING_SERVICE_KEY);
-    }
-
     /**
      * return the modulo used in the application
      *
@@ -51,7 +29,7 @@ class BaseService
      */
     protected function getModulo()
     {
-        return $this->container->get(SyncApiApp::SETTINGS_KEY)["api_modulo"];
+        return $this->getSettingsArray()["api_modulo"];
     }
 
     /**
@@ -61,6 +39,6 @@ class BaseService
      */
     protected function getLoggingBasePath()
     {
-        return $this->container->get(SyncApiApp::SETTINGS_KEY)["log_path"];
+        return $this->getSettingsArray()["log_path"];
     }
 }
