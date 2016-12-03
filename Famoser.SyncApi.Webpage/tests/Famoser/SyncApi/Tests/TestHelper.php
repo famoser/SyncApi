@@ -13,6 +13,7 @@ use Famoser\SyncApi\Framework\ContainerBase;
 use Famoser\SyncApi\Models\Communication\Request\Base\BaseRequest;
 use Famoser\SyncApi\Models\Entities\Application;
 use Famoser\SyncApi\SyncApiApp;
+use Psr\Http\Message\ResponseInterface;
 use Slim\Http\Environment;
 
 /**
@@ -37,8 +38,9 @@ class TestHelper extends ContainerBase
     {
         //create config array
         $this->config = $this->constructConfig();
+
         //clean environment
-        $this->cleanEnvironment();
+        $this->cleanOldEnvironments();
 
         //create test app
         $this->testApp = new SyncApiApp($this->config);
@@ -117,6 +119,15 @@ class TestHelper extends ContainerBase
      */
     public function cleanEnvironment()
     {
+        $this->getDatabaseService()->dispose();
+        $this->cleanOldEnvironments();
+    }
+
+    /**
+     * cleans up garbage left there by test runners which failed
+     */
+    private function cleanOldEnvironments()
+    {
         //delete db if exists
         if (is_file($this->config ["db_path"])) {
             unlink($this->config ["db_path"]);
@@ -126,7 +137,7 @@ class TestHelper extends ContainerBase
     /**
      * prepares the environment
      */
-    public function prepareEnvironment()
+    private function prepareEnvironment()
     {
         //create test application
         $application = new Application();
@@ -147,5 +158,23 @@ class TestHelper extends ContainerBase
     {
         $syncRequest->ApplicationId = static::TEST_APPLICATION_ID;
         $syncRequest->AuthorizationCode = 0;
+    }
+
+    /**
+     * check if request was successful
+     *
+     * @param \PHPUnit_Framework_TestCase $testingUnit
+     * @param ResponseInterface $response
+     */
+    public function checkForSuccessfulApiResponse(\PHPUnit_Framework_TestCase $testingUnit, ResponseInterface $response)
+    {
+        //valid status code
+        $testingUnit->assertTrue($response->getStatusCode() == 200);
+
+        //no error in json response
+        $response->getBody()->rewind();
+        $responseString = $response->getBody()->getContents();
+        $testingUnit->assertContains("\"ApiError\":0", $responseString);
+        $testingUnit->assertContains("\"RequestFailed\":false", $responseString);
     }
 }

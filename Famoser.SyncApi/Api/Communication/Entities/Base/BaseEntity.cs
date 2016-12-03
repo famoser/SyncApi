@@ -11,5 +11,6 @@ namespace Famoser.SyncApi.Api.Communication.Entities.Base
         public string Content { get; set; }
         public DateTime CreateDateTime { get; set; }
         public string Identifier { get; set; }
+        public bool IsDeleted { get; set; }
     }
 }

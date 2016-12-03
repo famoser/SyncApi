@@ -49,6 +49,7 @@ class AuthorizationControllerTest extends \PHPUnit_Framework_TestCase
      */
     public function testCreateUser()
     {
+        //arrange
         $syncRequest = new AuthorizationRequest();
         $this->testHelper->authorizeRequest($syncRequest);
 
@@ -66,12 +67,10 @@ class AuthorizationControllerTest extends \PHPUnit_Framework_TestCase
 
         $this->testHelper->mockApiRequest($syncRequest, "auth/sync", $this->app);
 
+        //act
         $response = $this->app->run();
 
-        static::assertTrue($response->getStatusCode() == 200);
-        static::assertEquals(
-            '["ApiError":0,"RequestFailed":false,"ServerMessage":null]',
-            $response->getBody()
-        );
+        //assert
+        $this->testHelper->checkForSuccessfulApiResponse($this, $response);
     }
 }

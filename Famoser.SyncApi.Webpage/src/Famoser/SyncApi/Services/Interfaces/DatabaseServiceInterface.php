@@ -136,4 +136,10 @@ interface DatabaseServiceInterface
      * @return bool
      */
     public function deleteFromDatabase(BaseEntity $entity);
+
+    /**
+     * frees up any resources / files locks
+     * behaviour of service calls after disposing it is undefined
+     */
+    public function dispose();
 }

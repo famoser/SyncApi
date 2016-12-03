@@ -29,9 +29,7 @@ use PDO;
  */
 class DatabaseService extends BaseService implements DatabaseServiceInterface
 {
-    /*
-     * @var \PDO
-     */
+    /* @var \PDO $database */
     private $database;
 
     /**
@@ -363,5 +361,14 @@ class DatabaseService extends BaseService implements DatabaseServiceInterface
         $params = ["id" => $entity->id];
         $prep = $this->getConnection()->prepare($sql);
         return $prep->execute($params);
+    }
+
+    /**
+     * frees up any resources / files locks
+     * behaviour of service calls after disposing it is undefined
+     */
+    public function dispose()
+    {
+        $this->database = null;
     }
 }
