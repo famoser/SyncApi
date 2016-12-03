@@ -13,5 +13,6 @@ namespace Famoser.SyncApi.Models.Information.Base
         public Guid CollectionId { get; set; }
         public Guid VersionId { get; set; }
         public DateTime CreateDateTime { get; set; }
+        public bool IsDeleted { get; set; }
     }
 }

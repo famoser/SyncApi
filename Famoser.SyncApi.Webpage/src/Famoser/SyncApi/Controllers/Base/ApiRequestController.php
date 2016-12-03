@@ -152,7 +152,7 @@ class ApiRequestController extends BaseController
         return $this->getDatabaseHelper()->getSingleFromDatabase(
             new Device(),
             "guid = :guid AND user_guid = :user_guid AND is_deleted = :is_deleted",
-            ["guid" => $req->DeviceId, "user_guid" => $this->getUser($req)->guid]
+            ["guid" => $req->DeviceId, "user_guid" => $this->getUser($req)->guid, "is_deleted" => false]
         );
     }
 
