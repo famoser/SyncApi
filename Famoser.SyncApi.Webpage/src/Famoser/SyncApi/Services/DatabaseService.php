@@ -6,7 +6,7 @@
  * Time: 15:25
  */
 
-namespace Famoser\SyncApi\Helpers;
+namespace Famoser\SyncApi\Services;
 
 use Famoser\SyncApi\Models\Entities\Application;
 use Famoser\SyncApi\Models\Entities\ApplicationSetting;
@@ -17,16 +17,17 @@ use Famoser\SyncApi\Models\Entities\ContentVersion;
 use Famoser\SyncApi\Models\Entities\Device;
 use Famoser\SyncApi\Models\Entities\Entity;
 use Famoser\SyncApi\Models\Entities\FrontendUser;
-use Famoser\SyncApi\Services\Interfaces\LoggerInterface;
+use Famoser\SyncApi\Services\Base\BaseService;
+use Famoser\SyncApi\Services\Interfaces\DatabaseServiceInterface;
 use Interop\Container\ContainerInterface;
 use PDO;
 
 /**
- * the DatabaseHelper allows access to the database. It abstracts sql from logic, and is type safe
+ * the DatabaseService allows access to the database. It abstracts sql from logic, and is type safe
  *
  * @package Famoser\SyncApi\Helpers
  */
-class DatabaseHelper
+class DatabaseService extends BaseService implements DatabaseServiceInterface
 {
     /*
      * @var \PDO
@@ -43,17 +44,9 @@ class DatabaseHelper
      */
     public function __construct(ContainerInterface $container)
     {
-        $this->container = $container;
+        parent::__construct($container);
 
         $this->initializeDatabase();
-    }
-
-    /**
-     * @return LoggerInterface
-     */
-    private function getLogger()
-    {
-        return $this->container["logger"];
     }
 
     /**
@@ -171,6 +164,8 @@ class DatabaseHelper
     }
 
     /**
+     * gets all entities which match the specified conditions from the database
+     *
      * @param BaseEntity $entity
      * @param null $where
      * @param null $parameters
@@ -195,6 +190,8 @@ class DatabaseHelper
     }
 
     /**
+     * counts the entities which match the conditions
+     *
      * @param BaseEntity $entity
      * @param null $where
      * @param null $parameters
@@ -207,13 +204,16 @@ class DatabaseHelper
         $where = null,
         $parameters = null,
         $orderBy = null,
-        $limit = -1)
+        $limit = -1
+    )
     {
         $sql = $this->createQuery($entity, $where, $orderBy, $limit, "COUNT(*)");
         return $this->executeAndCount($sql, $parameters);
     }
 
     /**
+     * gets all entities whose property is one of the values provided and which match the specified conditions
+     *
      * @param BaseEntity $entity
      * @param string $property
      * @param int[] $values
@@ -256,6 +256,8 @@ class DatabaseHelper
     }
 
     /**
+     * get the first entry from the database which matches the conditions
+     *
      * @param BaseEntity $entity
      * @param null $where
      * @param null $parameters
@@ -274,6 +276,9 @@ class DatabaseHelper
     }
 
     /**
+     * save the entity to the database
+     * if the entity was retrieved from the database before, it will replace the old data
+     *
      * @param BaseEntity $entity
      * @return bool
      */
@@ -321,6 +326,8 @@ class DatabaseHelper
     }
 
     /**
+     * execute the specified sql query, return if the query was successful
+     *
      * @param $sql
      * @param null $arr
      * @return bool
@@ -332,11 +339,13 @@ class DatabaseHelper
     }
 
     /**
+     * execute the specified sql query, return the FETCH_NUM result
+     *
      * @param $sql
      * @param null $arr
      * @return bool
      */
-    private function executeAndCount($sql, $arr = null)
+    public function executeAndCount($sql, $arr = null)
     {
         $prep = $this->getConnection()->prepare($sql);
         if (!$prep->execute($arr)) {
@@ -346,6 +355,8 @@ class DatabaseHelper
     }
 
     /**
+     * deletes the entity from the database
+     *
      * @param BaseEntity $entity
      * @return bool
      */

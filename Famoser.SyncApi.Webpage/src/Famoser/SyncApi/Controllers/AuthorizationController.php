@@ -94,12 +94,12 @@ class AuthorizationController extends ApiSyncController
         $this->authorizeRequest($req);
 
         //clean up expired auth codes
-        $this->getDatabaseHelper()->execute(
+        $this->getDatabaseService()->execute(
             "DELETE FROM authorization_codes WHERE valid_till_date_time < :valid_till_date_time",
             ["valid_till_date_time" => time()]);
 
         //try to get auth code
-        $authCode = $this->getDatabaseHelper()->getSingleFromDatabase(
+        $authCode = $this->getDatabaseService()->getSingleFromDatabase(
             new AuthorizationCode(),
             "code = :code AND user_guid = :user_guid",
             ["code" => $req->ClientMessage, "user_guid" => $req->UserId]
@@ -116,13 +116,13 @@ class AuthorizationController extends ApiSyncController
         }
 
         //delete auth code
-        if (!$this->getDatabaseHelper()->deleteFromDatabase($authCode)) {
+        if (!$this->getDatabaseService()->deleteFromDatabase($authCode)) {
             throw new ServerException(ServerError::DATABASE_SAVE_FAILURE);
         }
 
         //authenticate device
         $device->is_authenticated = true;
-        if (!$this->getDatabaseHelper()->saveToDatabase($device)) {
+        if (!$this->getDatabaseService()->saveToDatabase($device)) {
             throw new ServerException(ServerError::DATABASE_SAVE_FAILURE);
         }
 
@@ -160,7 +160,7 @@ class AuthorizationController extends ApiSyncController
         $authCode->user_guid = $req->UserId;
         $authCode->code = $this->generateReadableRandomString($settingRepo->getAuthorizationCodeLength());
         $authCode->valid_till_date_time = time() + (int)$settingRepo->getAuthorizationCodeValidTime();
-        if (!$this->getDatabaseHelper()->saveToDatabase($authCode)) {
+        if (!$this->getDatabaseService()->saveToDatabase($authCode)) {
             throw new ServerException(ServerError::DATABASE_SAVE_FAILURE);
         }
 
@@ -273,7 +273,7 @@ class AuthorizationController extends ApiSyncController
 
             return $user;
         } elseif ($contentType == ContentType::DEVICE) {
-            $devices = $this->getDatabaseHelper()->countFromDatabase(
+            $devices = $this->getDatabaseService()->countFromDatabase(
                 new Device(),
                 "user_guid = :user_guid AND is_deleted = :is_deleted",
                 ["user_guid" => $this->getUser($req)->guid, "is_deleted" => false]

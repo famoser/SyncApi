@@ -13,7 +13,7 @@ namespace Famoser\SyncApi\Services\Interfaces;
  * the interface to a logger, which logs errors
  * @package Famoser\SyncApi\Services\Interfaces
  */
-interface LoggerInterface
+interface LoggingServiceInterface
 {
     /**
      * log your message

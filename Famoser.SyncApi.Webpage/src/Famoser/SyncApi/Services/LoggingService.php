@@ -8,26 +8,16 @@
 
 namespace Famoser\SyncApi\Services;
 
-use Famoser\SyncApi\Services\Interfaces\LoggerInterface;
+use Famoser\SyncApi\Services\Base\BaseService;
+use Famoser\SyncApi\Services\Interfaces\LoggingServiceInterface;
 
 /**
  * the logger service is concerned to save errors which occurred while the application is running
+ *
  * @package Famoser\SyncApi\Services
  */
-class LoggerService implements LoggerInterface
+class LoggingService extends BaseService implements LoggingServiceInterface
 {
-    /* @var string $basePath */
-    private $basePath;
-
-    /**
-     * LoggerService constructor.
-     * @param string $basePath the base path to use for all log files
-     */
-    public function __construct($basePath)
-    {
-        $this->basePath = $basePath;
-    }
-
     /**
      * log your message
      *
@@ -37,7 +27,7 @@ class LoggerService implements LoggerInterface
      */
     public function log($message, $filename, $clearOld = true)
     {
-        $path = $this->basePath . "/" . $filename;
+        $path = $this->getLoggingBasePath() . "/" . $filename;
         if ($clearOld && file_exists($path)) {
             unlink($path);
         }
@@ -51,6 +41,6 @@ class LoggerService implements LoggerInterface
      */
     public function getLogPath()
     {
-        return $this->basePath;
+        return $this->getLoggingBasePath();
     }
 }

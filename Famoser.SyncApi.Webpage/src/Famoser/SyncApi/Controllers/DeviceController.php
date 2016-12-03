@@ -97,13 +97,13 @@ class DeviceController extends ApiSyncController
         $this->authorizeRequest($req);
         $this->authenticateRequest($req);
 
-        $dev = $this->getDatabaseHelper()->getSingleFromDatabase(
+        $dev = $this->getDatabaseService()->getSingleFromDatabase(
             new Device(),
             "user_guid = :user_guid AND guid = :guid",
             ["user_guid" => $this->getUser($req)->guid, "guid" => $req->ClientMessage]
         );
         $dev->is_authenticated = $action;
-        if (!$this->getDatabaseHelper()->saveToDatabase($dev)) {
+        if (!$this->getDatabaseService()->saveToDatabase($dev)) {
             throw new ServerException(ServerError::DATABASE_SAVE_FAILURE);
         }
 
@@ -124,7 +124,7 @@ class DeviceController extends ApiSyncController
             throw new ServerException(ServerError::FORBIDDEN);
         }
 
-        return $this->getDatabaseHelper()->getFromDatabase(
+        return $this->getDatabaseService()->getFromDatabase(
             new Device(),
             "user_guid = :user_guid",
             ["user_guid" => $this->getUser($req)->guid]

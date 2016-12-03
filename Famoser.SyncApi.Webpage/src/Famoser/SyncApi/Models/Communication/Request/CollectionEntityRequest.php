@@ -11,7 +11,6 @@ namespace Famoser\SyncApi\Models\Communication\Request;
 
 use Famoser\SyncApi\Framework\Json\Models\ArrayProperty;
 use Famoser\SyncApi\Framework\Json\Models\Base\JsonProperty;
-use Famoser\SyncApi\Framework\Json\Models\Base\JsonValueProperty;
 use Famoser\SyncApi\Framework\Json\Models\ObjectProperty;
 use Famoser\SyncApi\Models\Communication\Entities\CollectionCommunicationEntity;
 use Famoser\SyncApi\Models\Communication\Request\Base\BaseRequest;

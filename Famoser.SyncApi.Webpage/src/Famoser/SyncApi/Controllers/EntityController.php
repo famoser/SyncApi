@@ -76,7 +76,7 @@ class EntityController extends ApiSyncController
         //get entity (checks if user has access)
         $collectionIds = $this->getCollectionIds($req);
         $collectionIds["guid"] = $req->Id;
-        $entity = $this->getDatabaseHelper()->getSingleFromDatabase(
+        $entity = $this->getDatabaseService()->getSingleFromDatabase(
             new Entity(),
             "guid = :guid AND collection_guid IN (:" . implode(',:', array_keys($collectionIds)) . ")",
             $collectionIds);
@@ -89,7 +89,7 @@ class EntityController extends ApiSyncController
         $versionIds = $req->VersionIds;
         $versionIds["entity_guid"] = $entity->guid;
         /* @var ContentVersion[] $newOnes */
-        $newOnes = $this->getDatabaseHelper()->getFromDatabase(
+        $newOnes = $this->getDatabaseService()->getFromDatabase(
             new ContentVersion(),
             "entity_guid = :entity_guid AND version_guid NOT IN (:" . implode(',:', array_keys($req->VersionIds)) . ")",
             $versionIds, "create_date_time");
@@ -121,7 +121,7 @@ class EntityController extends ApiSyncController
         $collectionIds = $this->getCollectionIds($req);
 
         //get all collections
-        return $this->getDatabaseHelper()->getFromDatabase(
+        return $this->getDatabaseService()->getFromDatabase(
             new Entity(),
             "collection_guid IN (:" . implode(',:', array_keys($collectionIds)) . ")",
             $collectionIds);

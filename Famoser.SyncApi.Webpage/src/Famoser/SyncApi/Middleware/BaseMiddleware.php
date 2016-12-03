@@ -9,7 +9,7 @@
 namespace Famoser\SyncApi\Middleware;
 
 
-use Famoser\SyncApi\Services\Interfaces\LoggerInterface;
+use Famoser\SyncApi\Services\Interfaces\LoggingServiceInterface;
 use Interop\Container\ContainerInterface;
 
 /**
@@ -32,7 +32,7 @@ class BaseMiddleware
     /**
      * get logger
      * 
-     * @return LoggerInterface
+     * @return LoggingServiceInterface
      */
     protected function getLogger()
     {

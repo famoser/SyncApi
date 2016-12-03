@@ -11,14 +11,13 @@ namespace Famoser\SyncApi;
 
 use Famoser\SyncApi\Exceptions\ApiException;
 use Famoser\SyncApi\Exceptions\FrontendException;
-use Famoser\SyncApi\Exceptions\ServerException;
 use Famoser\SyncApi\Middleware\LoggingMiddleware;
 use Famoser\SyncApi\Models\Communication\Response\Base\BaseResponse;
-use Famoser\SyncApi\Services\LoggerService;
+use Famoser\SyncApi\Services\DatabaseService;
+use Famoser\SyncApi\Services\LoggingService;
 use Famoser\SyncApi\Services\RequestService;
 use Famoser\SyncApi\Types\ApiError;
 use Famoser\SyncApi\Types\FrontendError;
-use Interop\Container\ContainerInterface;
 use InvalidArgumentException;
 use Slim\App;
 use Slim\Container;
@@ -36,6 +35,12 @@ use Slim\Views\TwigExtension;
 class SyncApiApp extends App
 {
     private $controllerNamespace = 'Famoser\SyncApi\Controllers\\';
+
+    const DATABASE_SERVICE_KEY = "databaseService";
+    const LOGGING_SERVICE_KEY = "loggingService";
+    const REQUEST_SERVICE_KEY = "requestService";
+
+    const SETTINGS_KEY = "settings";
 
     /**
      * Create new application
@@ -58,28 +63,17 @@ class SyncApiApp extends App
         parent::__construct(
             $this->constructContainer(
                 [
-                    'settings' => $configuration
+                    SyncApiApp::SETTINGS_KEY => $configuration
                 ]
             )
         );
 
-        //get middleware
+        //add middleware
         $this->add(new LoggingMiddleware($this->getContainer()));
 
-        //get routes
+        //add routes
         $this->group("", $this->getWebAppRoutes());
         $this->group("/1.0", $this->getApiRoutes());
-    }
-
-    /**
-     * override a service from the container
-     *
-     * @param $key
-     * @param \Closure $val
-     */
-    private function overrideContainer($key, \Closure $val)
-    {
-        $this->getContainer()[$key] = $val;
     }
 
     /**
@@ -89,7 +83,7 @@ class SyncApiApp extends App
      */
     public function overrideEnvironment(Environment $ev)
     {
-        $this->getContainer()["environment"] =  $ev;
+        $this->getContainer()["environment"] = $ev;
     }
 
     /**
@@ -205,6 +199,39 @@ class SyncApiApp extends App
     {
         $c = new Container($configuration);
 
+        //add handlers & services
+        $this->addHandlers($c);
+        $this->addServices($c);
+
+        //add view
+        $c["view"] = function (Container $c) {
+            $view = new Twig(
+                $c->get(SyncApiApp::SETTINGS_KEY)["template_path"],
+                [
+                    'cache' => $c->get(SyncApiApp::SETTINGS_KEY)["cache_path"],
+                    'debug' => $c->get(SyncApiApp::SETTINGS_KEY)["debug_mode"]
+                ]
+            );
+            $view->addExtension(
+                new TwigExtension(
+                    $c['router'],
+                    $c['request']->getUri()
+                )
+            );
+
+            return $view;
+        };
+
+        return $c;
+    }
+
+    /**
+     * add the error handlers to the container
+     *
+     * @param Container $c
+     */
+    private function addHandlers(Container $c)
+    {
         $c["notFoundHandler"] = function (Container $c) {
             return function (Request $req, Response $resp) use ($c) {
                 return $resp->withStatus(404);
@@ -217,14 +244,14 @@ class SyncApiApp extends App
         };
         $c["errorHandler"] = function (Container $c) {
             return function (Request $request, Response $response, \Exception $exception) use ($c) {
-                $c['logger']->log(
+                $c[SyncApiApp::LOGGING_SERVICE_KEY]->log(
                     $exception->getFile() . " (" . $exception->getLine() . ")\n" .
                     $exception->getCode() . ": " . $exception->getMessage() . "\n" .
                     $exception->getTraceAsString(),
                     "exception.txt"
                 );
                 //return json if api request
-                if (strpos($request->getUri()->getPath(),"/1.0/") === 0 && $request->getMethod() == "POST") {
+                if (strpos($request->getUri()->getPath(), "/1.0/") === 0 && $request->getMethod() == "POST") {
                     $resp = new BaseResponse();
                     $resp->RequestFailed = true;
                     if ($exception instanceof ApiException) {
@@ -234,47 +261,40 @@ class SyncApiApp extends App
                     }
                     $resp->ServerMessage = $exception->getMessage();
                     return $c['response']->withStatus(500)->withJson($resp);
-                }
-                else {
-                    //specific behaviour for login failures
+                } else {
+                    //behaviour for FrontendExceptions
                     if ($exception instanceof FrontendException) {
+                        //tried to access page where you need to be logged in
                         if ($exception->getCode() == FrontendError::NOT_LOGGED_IN) {
                             $reqUri = $request->getUri()->withPath($c->get("router")->pathFor("login"));
                             return $c['response']->withRedirect($reqUri);
                         }
                     }
 
+                    //general error page
                     $args = [];
                     $args["error"] = $exception->getMessage();
                     return $c["view"]->render($response, "public/server_error.html.twig", $args);
                 }
             };
         };
+    }
 
-        $c["view"] = function (Container $c) {
-            $view = new Twig(
-                $c->get("settings")["template_path"],
-                [
-                    'cache' => $c->get("settings")["cache_path"],
-                    'debug' => $c->get("settings")["debug_mode"]
-                ]
-            );
-            $view->addExtension(
-                new TwigExtension(
-                    $c['router'],
-                    $c['request']->getUri()
-                )
-            );
-
-            return $view;
+    /**
+     * add all services to the container
+     *
+     * @param Container $c
+     */
+    private function addServices(Container $c)
+    {
+        $c[SyncApiApp::LOGGING_SERVICE_KEY] = function (Container $c) {
+            return new LoggingService($c);
         };
-        $c["logger"] = function (Container $c) {
-            return new LoggerService($c->get("settings")["log_path"]);
+        $c[SyncApiApp::REQUEST_SERVICE_KEY] = function (Container $c) {
+            return new RequestService($c);
         };
-        $c["requestService"] = function (Container $c) {
-            return new RequestService($c->get("logger"), $c->get("settings")["api_modulo"]);
+        $c[SyncApiApp::DATABASE_SERVICE_KEY] = function (Container $c) {
+            return new DatabaseService($c);
         };
-
-        return $c;
     }
 }

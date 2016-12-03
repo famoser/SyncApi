@@ -9,11 +9,12 @@
 namespace Famoser\SyncApi\Controllers\Base;
 
 
-use Famoser\SyncApi\Helpers\DatabaseHelper;
 use Famoser\SyncApi\Models\Communication\Request\Base\BaseRequest;
 use Famoser\SyncApi\Repositories\SettingsRepository;
-use Famoser\SyncApi\Services\Interfaces\LoggerInterface;
+use Famoser\SyncApi\Services\Interfaces\DatabaseServiceInterface;
+use Famoser\SyncApi\Services\Interfaces\LoggingServiceInterface;
 use Famoser\SyncApi\Services\Interfaces\RequestServiceInterface;
+use Famoser\SyncApi\SyncApiApp;
 use Interop\Container\ContainerInterface;
 use Slim\Http\Request;
 use Slim\Http\Response;
@@ -40,19 +41,35 @@ class BaseController
         $this->container = $ci;
     }
 
-    private $databaseHelper;
 
     /**
      * get database helper, used for database access
      *
-     * @return DatabaseHelper
+     * @return DatabaseServiceInterface
      */
-    protected function getDatabaseHelper()
+    protected function getDatabaseService()
     {
-        if ($this->databaseHelper == null) {
-            $this->databaseHelper = new DatabaseHelper($this->container);
-        }
-        return $this->databaseHelper;
+        return $this->container->get(SyncApiApp::DATABASE_SERVICE_KEY);
+    }
+
+    /**
+     * get logger
+     *
+     * @return LoggingServiceInterface
+     */
+    protected function getLoggingService()
+    {
+        return $this->container->get(SyncApiApp::LOGGING_SERVICE_KEY);
+    }
+
+    /**
+     * get logger
+     *
+     * @return RequestServiceInterface
+     */
+    protected function getRequestService()
+    {
+        return $this->container->get(SyncApiApp::REQUEST_SERVICE_KEY);
     }
 
     /**
@@ -63,7 +80,7 @@ class BaseController
      */
     protected function getSettingRepository($applicationId)
     {
-        return new SettingsRepository($this->getDatabaseHelper(), $applicationId);
+        return new SettingsRepository($this->getDatabaseService(), $applicationId);
     }
 
     /**
@@ -74,26 +91,6 @@ class BaseController
     protected function getRouter()
     {
         return $this->container->get("router");
-    }
-
-    /**
-     * get logger
-     *
-     * @return LoggerInterface
-     */
-    protected function getLogger()
-    {
-        return $this->container->get("logger");
-    }
-
-    /**
-     * get logger
-     *
-     * @return RequestServiceInterface
-     */
-    protected function getRequestService()
-    {
-        return $this->container->get("requestService");
     }
 
     /**
@@ -124,7 +121,7 @@ class BaseController
             foreach ($neededProps as $neededProp) {
                 /** @noinspection PhpVariableVariableInspection */
                 if ($request->$neededProp == null) {
-                    $this->getLogger()->log(
+                    $this->getLoggingService()->log(
                         "not a property: " . $neededProp . 
                         " in object " . json_encode($request, JSON_PRETTY_PRINT), 
                         "isWellDefined_" . uniqid() . ".txt"
@@ -137,7 +134,7 @@ class BaseController
             foreach ($neededArrays as $neededArray) {
                 /** @noinspection PhpVariableVariableInspection */
                 if (!is_array($request->$neededArray)) {
-                    $this->getLogger()->log("not an array: " . $neededArray . 
+                    $this->getLoggingService()->log("not an array: " . $neededArray .
                         " in object " . json_encode($request, JSON_PRETTY_PRINT), 
                         "isWellDefined_" . uniqid() . ".txt"
                     );

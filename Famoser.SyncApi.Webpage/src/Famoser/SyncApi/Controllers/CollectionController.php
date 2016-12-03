@@ -71,7 +71,7 @@ class CollectionController extends ApiSyncController
         $collectionIds = $this->getCollectionIds($req);
 
         //get all collections
-        return $this->getDatabaseHelper()->getFromDatabase(
+        return $this->getDatabaseService()->getFromDatabase(
             new Collection(),
             "guid IN (:" . implode(',:', array_keys($collectionIds)) . ")",
             $collectionIds);

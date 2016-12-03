@@ -52,7 +52,7 @@ class UserController extends ApiRequestController
             //check if user has already access to one or more of the collections
             $sqlArr = $guidsToSetFree;
             $sqlArr["user_guid"] = $item->Id;
-            $userCollections = $this->getDatabaseHelper()->getFromDatabase(
+            $userCollections = $this->getDatabaseService()->getFromDatabase(
                 new UserCollection(),
                 "user_guid =:user_guid AND collection_guid IN (:" . implode(",:", array_keys($guidsToSetFree)),
                 $sqlArr,
@@ -73,7 +73,7 @@ class UserController extends ApiRequestController
                 $userCollection->user_guid = $item->Id;
                 $userCollection->create_date_time = time();
                 $userCollection->collection_guid = $collectionGuid;
-                if (!$this->getDatabaseHelper()->saveToDatabase($userCollection)) {
+                if (!$this->getDatabaseService()->saveToDatabase($userCollection)) {
                     throw new ServerException(ServerError::DATABASE_SAVE_FAILURE);
                 }
             }

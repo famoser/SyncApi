@@ -13,7 +13,8 @@ CREATE TABLE 'users' (
   'application_id' INTEGER DEFAULT NULL REFERENCES 'applications' ('id'),
   'identifier'     TEXT    DEFAULT NULL,
   'guid'           TEXT    DEFAULT NULL,
-  'personal_seed'  TEXT    DEFAULT NULL
+  'personal_seed'  TEXT    DEFAULT NULL,
+  'is_deleted'     INTEGER DEFAULT NULL
 );
 
 CREATE TABLE 'devices' (
@@ -21,7 +22,8 @@ CREATE TABLE 'devices' (
   'user_guid'        TEXT    DEFAULT NULL,
   'identifier'       TEXT    DEFAULT NULL,
   'guid'             TEXT    DEFAULT NULL,
-  'is_authenticated' BOOLEAN DEFAULT NULL
+  'is_authenticated' BOOLEAN DEFAULT NULL,
+  'is_deleted'       INTEGER DEFAULT NULL
 );
 
 CREATE TABLE 'collections' (
@@ -29,7 +31,8 @@ CREATE TABLE 'collections' (
   'user_guid'   TEXT    DEFAULT NULL,
   'device_guid' TEXT    DEFAULT NULL,
   'identifier'  TEXT    DEFAULT NULL,
-  'guid'        TEXT    DEFAULT NULL
+  'guid'        TEXT    DEFAULT NULL,
+  'is_deleted'  INTEGER DEFAULT NULL
 );
 
 CREATE TABLE 'user_collections' (
@@ -45,7 +48,8 @@ CREATE TABLE 'entities' (
   'device_guid'     TEXT    DEFAULT NULL,
   'collection_guid' TEXT    DEFAULT NULL,
   'identifier'      TEXT    DEFAULT NULL,
-  'guid'            TEXT    DEFAULT NULL
+  'guid'            TEXT    DEFAULT NULL,
+  'is_deleted'      INTEGER DEFAULT NULL
 );
 
 CREATE TABLE 'content_versions' (
@@ -59,10 +63,10 @@ CREATE TABLE 'content_versions' (
 );
 
 CREATE TABLE 'frontend_users' (
-  'id'       INTEGER DEFAULT NULL PRIMARY KEY AUTOINCREMENT,
-  'email'    TEXT    DEFAULT NULL,
-  'username' TEXT    DEFAULT NULL,
-  'password' TEXT    DEFAULT NULL,
+  'id'        INTEGER DEFAULT NULL PRIMARY KEY AUTOINCREMENT,
+  'email'     TEXT    DEFAULT NULL,
+  'username'  TEXT    DEFAULT NULL,
+  'password'  TEXT    DEFAULT NULL,
   'reset_key' TEXT    DEFAULT NULL
 );
 

@@ -14,13 +14,14 @@ namespace Famoser\SyncApi\Repositories;
     const AuthorizationCodeLength = 2;
 */
 
-use Famoser\SyncApi\Helpers\DatabaseHelper;
 use Famoser\SyncApi\Models\Display\SettingModel;
 use Famoser\SyncApi\Models\Entities\ApplicationSetting;
+use Famoser\SyncApi\Services\Interfaces\DatabaseServiceInterface;
 use Famoser\SyncApi\Types\SettingKeys;
 
 /**
  * manages the settings of an application
+ *
  * @package Famoser\SyncApi\Repositories
  */
 class SettingsRepository
@@ -30,10 +31,11 @@ class SettingsRepository
 
     /**
      * SettingsRepository constructor.
-     * @param DatabaseHelper $helper
+     *
+     * @param DatabaseServiceInterface $helper
      * @param $applicationId
      */
-    public function __construct(DatabaseHelper $helper, $applicationId)
+    public function __construct(DatabaseServiceInterface $helper, $applicationId)
     {
         $this->helper = $helper;
         $this->applicationId = $applicationId;
@@ -117,6 +119,7 @@ class SettingsRepository
 
     /**
      * gte the authentication code valid time in seconds
+     *
      * @return string
      */
     public function getAuthorizationCodeValidTime()
@@ -126,6 +129,7 @@ class SettingsRepository
 
     /**
      * get a boolean if the device needs to be authenticated before accessing a resource from the user
+     *
      * @return string
      */
     public function getDeviceAuthenticationRequired()
@@ -135,6 +139,7 @@ class SettingsRepository
 
     /**
      * get the authorization code length
+     *
      * @return string
      */
     public function getAuthorizationCodeLength()

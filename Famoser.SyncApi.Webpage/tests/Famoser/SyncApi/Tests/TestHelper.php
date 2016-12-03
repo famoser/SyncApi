@@ -9,6 +9,8 @@
 namespace Famoser\SyncApi\Tests;
 
 
+use Famoser\SyncApi\Helpers\DatabaseService;
+use Famoser\SyncApi\Models\Communication\Request\Base\BaseRequest;
 use Famoser\SyncApi\SyncApiApp;
 use Slim\Http\Environment;
 
@@ -19,6 +21,25 @@ use Slim\Http\Environment;
  */
 class TestHelper
 {
+    const TEST_APPLICATION_ID = "test_app";
+
+    private $testApp;
+
+    /**
+     * TestHelper constructor.
+     */
+    public function __construct()
+    {
+        $config = $this->constructConfig();
+        $this->tryCleanDatabase($config);
+
+        $this->testApp = new SyncApiApp($config);
+
+        $this->prepareDatabase($this->testApp);
+
+        return $this->testApp;
+    }
+
     /**
      * construct the configuration
      *
@@ -47,23 +68,17 @@ class TestHelper
     }
 
     /**
-     * create a test application app
+     * returns the test application app
      *
-     * @param bool $cleanDatabase
      * @return SyncApiApp
      */
-    public function getTestApp($cleanDatabase = true, $prefilData = true)
+    public function getTestApp()
     {
-        $config = $this->constructConfig();
-
-        if ($cleanDatabase) {
-            $this->tryCleanDatabase($config);
-        }
-
-        return new SyncApiApp($config);
+        return $this->testApp;
     }
 
     private $tmpHandle;
+
     /**
      * mock a json POST request
      * call app->run afterwards
@@ -85,6 +100,8 @@ class TestHelper
                 ]
             )
         );
+
+        //$ds = $this->getTestApp()
     }
 
     /**
@@ -107,5 +124,16 @@ class TestHelper
         if (is_file($config["db_path"])) {
             unlink($config["db_path"]);
         }
+    }
+
+    /**
+     * fills out the application id & authorization code for the request
+     *
+     * @param BaseRequest $syncRequest
+     */
+    public function authorizeRequest(BaseRequest $syncRequest)
+    {
+        $syncRequest->ApplicationId = static::TEST_APPLICATION_ID;
+        $syncRequest->AuthorizationCode = 0;
     }
 }

@@ -8,16 +8,7 @@
 
 session_start();
 
-use Famoser\SyncApi\Middleware\LoggingMiddleware;
-use Famoser\SyncApi\Models\Communication\Response\Base\BaseResponse;
-use Famoser\SyncApi\Services\LoggerService;
-use Famoser\SyncApi\Services\RequestService;
 use Famoser\SyncApi\SyncApiApp;
-use Famoser\SyncApi\Types\FrontendError;
-use Psr\Http\Message\ResponseInterface as Response;
-use Psr\Http\Message\ServerRequestInterface as Request;
-use Slim\App;
-use Slim\Container;
 
 $ds = DIRECTORY_SEPARATOR;
 $oneUp = ".." . $ds;

@@ -70,8 +70,8 @@ abstract class ApiSyncController extends ApiRequestController
 
             //check that no action can be executed which is not explicitly allowed
             if (!in_array($communicationEntity->OnlineAction, $allowedOA)) {
-                $this->getLogger()->log(json_encode($allowedOA), "debug.txt");
-                $this->getLogger()->log(json_encode($communicationEntity), "excel.txt");
+                $this->getLoggingService()->log(json_encode($allowedOA), "debug.txt");
+                $this->getLoggingService()->log(json_encode($communicationEntity), "excel.txt");
                 throw new ApiException(ApiError::ACTION_PROHIBITED);
             }
 
@@ -165,7 +165,7 @@ abstract class ApiSyncController extends ApiRequestController
      */
     private function getActiveVersion(BaseSyncEntity $syncEntity, $contentType)
     {
-        return $this->getDatabaseHelper()->getSingleFromDatabase(
+        return $this->getDatabaseService()->getSingleFromDatabase(
             new ContentVersion(),
             "content_type = :content_type AND entity_guid = :entity_guid",
             ["content_type" => $contentType, "entity_guid" => $syncEntity->guid],
@@ -229,12 +229,12 @@ abstract class ApiSyncController extends ApiRequestController
         $syncEntity->identifier = $commEntity->Identifier;
         $syncEntity->is_deleted = false;
 
-        if (!$this->getDatabaseHelper()->saveToDatabase($syncEntity)) {
+        if (!$this->getDatabaseService()->saveToDatabase($syncEntity)) {
             throw new ServerException(ServerError::DATABASE_SAVE_FAILURE);
         }
 
         $content = $syncEntity->createContentVersion($commEntity);
-        if (!$this->getDatabaseHelper()->saveToDatabase($content)) {
+        if (!$this->getDatabaseService()->saveToDatabase($content)) {
             throw new ServerException(ServerError::DATABASE_SAVE_FAILURE);
         }
     }
@@ -282,13 +282,13 @@ abstract class ApiSyncController extends ApiRequestController
         //un-delete if already deleted
         if ($entity->is_deleted) {
             $entity->is_deleted = false;
-            if (!$this->getDatabaseHelper()->saveToDatabase($entity)) {
+            if (!$this->getDatabaseService()->saveToDatabase($entity)) {
                 throw new ServerException(ServerError::DATABASE_SAVE_FAILURE);
             }
         }
 
         $content = $entity->createContentVersion($syncEntity);
-        if (!$this->getDatabaseHelper()->saveToDatabase($content)) {
+        if (!$this->getDatabaseService()->saveToDatabase($content)) {
             throw new ServerException(ServerError::DATABASE_SAVE_FAILURE);
         }
     }
@@ -307,7 +307,7 @@ abstract class ApiSyncController extends ApiRequestController
         }
 
         $entity->is_deleted = true;
-        if (!$this->getDatabaseHelper()->saveToDatabase($entity)) {
+        if (!$this->getDatabaseService()->saveToDatabase($entity)) {
             throw new ServerException(ServerError::DATABASE_SAVE_FAILURE);
         }
     }

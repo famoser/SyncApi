@@ -36,7 +36,7 @@ class FrontendController extends BaseController
             return null;
         }
 
-        $helper = $this->getDatabaseHelper();
+        $helper = $this->getDatabaseService();
         $this->frontendUser = $helper->getSingleFromDatabase(
             new FrontendUser(), 
             "id = :id", 

@@ -8,6 +8,8 @@
 
 namespace Famoser\SyncApi\Tests\ControllerTests;
 
+use Famoser\SyncApi\Models\Communication\Request\AuthorizationRequest;
+use Famoser\SyncApi\Models\Communication\Request\SyncEntityRequest;
 use Famoser\SyncApi\SyncApiApp;
 use Famoser\SyncApi\Tests\TestHelper;
 
@@ -45,6 +47,9 @@ class AuthorizationControllerTest extends \PHPUnit_Framework_TestCase
      */
     public function testCreateUser()
     {
+        $syncRequest = new AuthorizationRequest();
+        $this->testHelper->authorizeRequest($syncRequest);
+
         $this->testHelper->mockApiRequest('
             {
                 "UserEntity": {

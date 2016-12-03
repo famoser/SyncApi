@@ -16,7 +16,7 @@ use Famoser\SyncApi\Models\Communication\Request\AuthorizationRequest;
 use Famoser\SyncApi\Models\Communication\Request\CollectionEntityRequest;
 use Famoser\SyncApi\Models\Communication\Request\HistoryEntityRequest;
 use Famoser\SyncApi\Models\Communication\Request\SyncEntityRequest;
-use Famoser\SyncApi\Services\Interfaces\LoggerInterface;
+use Famoser\SyncApi\Services\Base\BaseService;
 use Slim\Http\Request;
 
 /**
@@ -24,26 +24,8 @@ use Slim\Http\Request;
  *
  * @package Famoser\SyncApi\Services
  */
-class RequestService
+class RequestService extends BaseService
 {
-    /* @var LoggerInterface $logger */
-    private $logger;
-
-    /* int $modulo */
-    private $modulo;
-
-    /**
-     * RequestService constructor.
-     *
-     * @param LoggerInterface $logger
-     * @param int $modulo
-     */
-    public function __construct(LoggerInterface $logger, $modulo)
-    {
-        $this->logger = $logger;
-        $this->modulo = $modulo;
-    }
-
     /**
      * @param Request $request
      * @return AuthorizationRequest
@@ -106,7 +88,7 @@ class RequestService
             //construct magic number (the same is done in c#)
             $baseNr = $chunks[0] + $chunks[1] * 100 + $chunks[2] * 10000 + $chunks[3];
             $expectedAuthCode = $baseNr * $applicationSeed * $personSeed;
-            $expectedAuthCode %= $this->modulo;
+            $expectedAuthCode %= $this->getModulo();
             return $content[1] == $expectedAuthCode;
         }
         return false;
@@ -128,9 +110,9 @@ class RequestService
 
         $mapper = new SimpleJsonMapper();
         $om = new ObjectProperty("root", $model);
-        $this->logger->log(serialize($om->getProperties()["UserEntity"]), "log.txt");
+        $this->getLogger()->log(serialize($om->getProperties()["UserEntity"]), "log.txt");
         $resObj = $mapper->mapObject($json, $om);
-        $this->logger->log(json_encode($resObj, JSON_PRETTY_PRINT), "RequestHelper.txt");
+        $this->getLogger()->log(json_encode($resObj, JSON_PRETTY_PRINT), "RequestHelper.txt");
         return $resObj;
     }
 }

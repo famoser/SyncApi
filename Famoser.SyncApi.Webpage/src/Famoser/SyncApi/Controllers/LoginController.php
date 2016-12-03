@@ -48,7 +48,7 @@ class LoginController extends FrontendController
     {
         $req = $request->getParsedBody();
         if (isset($req["username"]) && isset($req["password"])) {
-            $user = $this->getDatabaseHelper()->getSingleFromDatabase(
+            $user = $this->getDatabaseService()->getSingleFromDatabase(
                 new FrontendUser(),
                 "username = :username",
                 ["username" => $req["username"]]
@@ -94,7 +94,7 @@ class LoginController extends FrontendController
             isset($req["password"]) &&
             $req["password"] == $req["password2"]
         ) {
-            $usr = $this->getDatabaseHelper()->getSingleFromDatabase(
+            $usr = $this->getDatabaseService()->getSingleFromDatabase(
                 new FrontendUser(),
                 "username = :username OR email = :email",
                 ["username" => $req["username"], "email" => $req["email"]]
@@ -105,7 +105,7 @@ class LoginController extends FrontendController
                 $frontendUser->password = password_hash($req["password"], PASSWORD_BCRYPT);
                 $frontendUser->username = $req["username"];
                 $frontendUser->reset_key = md5(rand(0, 100000));
-                if (!$this->getDatabaseHelper()->saveToDatabase($frontendUser)) {
+                if (!$this->getDatabaseService()->saveToDatabase($frontendUser)) {
                     throw new ServerException(ServerError::DATABASE_SAVE_FAILURE);
                 }
                 return $this->redirect($request, $response, "login");
@@ -147,7 +147,7 @@ class LoginController extends FrontendController
     {
         $req = $request->getParsedBody();
         if (isset($req["username"]) && isset($req["email"])) {
-            $user = $this->getDatabaseHelper()->getSingleFromDatabase(
+            $user = $this->getDatabaseService()->getSingleFromDatabase(
                 new FrontendUser(),
                 "username = :username AND email = :email",
                 ["username" => $req["username"], "email" => $req["email"]]
@@ -155,7 +155,7 @@ class LoginController extends FrontendController
             if ($user != null) {
                 //generate new reset key
                 $user->reset_key = substr(md5(rand(0, 100000)), 0, 10);
-                if (!$this->getDatabaseHelper()->saveToDatabase($user)) {
+                if (!$this->getDatabaseService()->saveToDatabase($user)) {
                     throw new ServerException(ServerError::DATABASE_SAVE_FAILURE);
                 }
                 //send mail
@@ -200,7 +200,7 @@ class LoginController extends FrontendController
             isset($req["authorization_code"]) &&
             isset($req["password"]) && $req["password"] == $req["password2"]
         ) {
-            $user = $this->getDatabaseHelper()->getSingleFromDatabase(
+            $user = $this->getDatabaseService()->getSingleFromDatabase(
                 new FrontendUser(),
                 "username = :username AND reset_key = :reset_key",
                 ["username" => $req["username"], "reset_key" => $req["authorization_code"]]
@@ -209,7 +209,7 @@ class LoginController extends FrontendController
                 $user->password = password_hash($req["password"], PASSWORD_BCRYPT);
                 //generate new reset key
                 $user->reset_key = substr(md5(rand(0, 100000)), 0, 10);
-                if (!$this->getDatabaseHelper()->saveToDatabase($user)) {
+                if (!$this->getDatabaseService()->saveToDatabase($user)) {
                     throw new ServerException(ServerError::DATABASE_SAVE_FAILURE);
                 }
                 return $this->redirect($request, $response, "login");

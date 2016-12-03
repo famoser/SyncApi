@@ -40,7 +40,7 @@ class ApiRequestController extends BaseController
             return $this->application;
         }
 
-        $this->application = $this->getDatabaseHelper()->getSingleFromDatabase(
+        $this->application = $this->getDatabaseService()->getSingleFromDatabase(
             new Application(),
             "application_id = :application_id",
             ["application_id" => $applicationId]
@@ -111,7 +111,7 @@ class ApiRequestController extends BaseController
      */
     protected function tryGetUser(BaseRequest $req)
     {
-        return $this->getDatabaseHelper()->getSingleFromDatabase(
+        return $this->getDatabaseService()->getSingleFromDatabase(
             new User(),
             "guid = :guid AND application_id = :application_id",
             ["guid" => $req->UserId, "application_id" => $req->ApplicationId]
@@ -149,7 +149,7 @@ class ApiRequestController extends BaseController
      */
     protected function tryGetDevice(BaseRequest $req)
     {
-        return $this->getDatabaseHelper()->getSingleFromDatabase(
+        return $this->getDatabaseService()->getSingleFromDatabase(
             new Device(),
             "guid = :guid AND user_guid = :user_guid AND is_deleted = :is_deleted",
             ["guid" => $req->DeviceId, "user_guid" => $this->getUser($req)->guid, "is_deleted" => false]
@@ -170,7 +170,7 @@ class ApiRequestController extends BaseController
             return $this->collectionIds;
         }
 
-        $userCollectionIds = $this->getDatabaseHelper()->getFromDatabase(
+        $userCollectionIds = $this->getDatabaseService()->getFromDatabase(
             new UserCollection(),
             "user_guid =:user_guid",
             ["user_guid" => $this->getUser($req)->guid],

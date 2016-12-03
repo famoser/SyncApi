@@ -45,7 +45,7 @@ class ApplicationController extends FrontendController
      */
     private function getAuthorizedApplication($entityId)
     {
-        $application = $this->getDatabaseHelper()->getSingleFromDatabase(
+        $application = $this->getDatabaseService()->getSingleFromDatabase(
             new Application(),
             "id = :id",
             ["id" => $entityId]
@@ -69,7 +69,7 @@ class ApplicationController extends FrontendController
     public function index(Request $request, Response $response, $args)
     {
         $this->ensureHasAccess();
-        $applications = $this->getDatabaseHelper()->getFromDatabase(
+        $applications = $this->getDatabaseService()->getFromDatabase(
             new Application(),
             "admin_id = :admin_id",
             ["admin_id" => $this->getFrontendUser()->id]
@@ -111,7 +111,7 @@ class ApplicationController extends FrontendController
     {
         $this->ensureHasAccess();
         $application = $this->getAuthorizedApplication($args["id"]);
-        $settingsRepo = new SettingsRepository($this->getDatabaseHelper(), $application->application_id);
+        $settingsRepo = new SettingsRepository($this->getDatabaseService(), $application->application_id);
         $args["settings"] = $settingsRepo->getAllSettings();
         return $this->renderTemplate($response, "application/settings", $args);
     }
@@ -130,7 +130,7 @@ class ApplicationController extends FrontendController
     {
         $this->ensureHasAccess();
         $application = $this->getAuthorizedApplication($args["id"]);
-        $settingsRepo = new SettingsRepository($this->getDatabaseHelper(), $application->application_id);
+        $settingsRepo = new SettingsRepository($this->getDatabaseService(), $application->application_id);
         $settingsRepo->setSettings($request->getParsedBody());
         $args["settings"] = $settingsRepo->getAllSettings();
         return $this->renderTemplate($response, "application/show", $args);
@@ -145,7 +145,7 @@ class ApplicationController extends FrontendController
     private function getApplicationStats($applicationId)
     {
         $appStats = new ApplicationStatistic();
-        $users = $this->getDatabaseHelper()->getFromDatabase(
+        $users = $this->getDatabaseService()->getFromDatabase(
             new User(),
             "application_id = :application_id",
             ["application_id" => $applicationId],
@@ -163,7 +163,7 @@ class ApplicationController extends FrontendController
             $userGuids[] = $user->guid;
         }
 
-        $devices = $this->getDatabaseHelper()->getFromDatabase(
+        $devices = $this->getDatabaseService()->getFromDatabase(
             new Device(),
             "user_guid IN (:" . array_keys($userGuids) . ")",
             $userGuids,
@@ -176,7 +176,7 @@ class ApplicationController extends FrontendController
             return $appStats;
         }
 
-        $userCollections = $this->getDatabaseHelper()->getFromDatabase(
+        $userCollections = $this->getDatabaseService()->getFromDatabase(
             new UserCollection(),
             "user_guid IN (:" . array_keys($userGuids) . ")",
             $userGuids,
@@ -194,7 +194,7 @@ class ApplicationController extends FrontendController
             return $appStats;
         }
 
-        $appStats->itemsCount = $this->getDatabaseHelper()->countFromDatabase(
+        $appStats->itemsCount = $this->getDatabaseService()->countFromDatabase(
             new Entity(),
             "collection_guid IN (:" . array_keys($collectionGuids) . ")",
             $collectionGuids
@@ -231,7 +231,6 @@ class ApplicationController extends FrontendController
         $this->ensureHasAccess();
         $application = new Application();
         $message = "";
-        var_dump($request->getParsedBody());
         if ($this->writeFromPost(
             $application,
             $request->getParsedBody(),
@@ -242,14 +241,14 @@ class ApplicationController extends FrontendController
             $application->admin_id = $this->getFrontendUser()->id;
             $application->release_date_time = time();
 
-            $existing = $this->getDatabaseHelper()->getSingleFromDatabase(
+            $existing = $this->getDatabaseService()->getSingleFromDatabase(
                 new Application(),
                 "application_id = :application_id",
                 ["application_id" => $application->application_id]
             );
             if ($existing != null) {
                 $args["message"] = "application with this id already exists";
-            } elseif ($this->getDatabaseHelper()->saveToDatabase($application)) {
+            } elseif ($this->getDatabaseService()->saveToDatabase($application)) {
                 return $this->redirect($request, $response, "application_index");
             } else {
                 $args["message"] = "application could not be saved (database error)";
@@ -293,7 +292,7 @@ class ApplicationController extends FrontendController
         $this->ensureHasAccess();
         $application = $this->getAuthorizedApplication($args["id"]);
         if ($this->writeFromPost($application, $request->getParsedBody(), $message, ["name", "description"])) {
-            if (!$this->getDatabaseHelper()->saveToDatabase($application)) {
+            if (!$this->getDatabaseService()->saveToDatabase($application)) {
                 $args["message"] = "application could not be saved (database error)";
             }
         } else {
@@ -335,7 +334,7 @@ class ApplicationController extends FrontendController
     {
         $this->ensureHasAccess();
         $application = $this->getAuthorizedApplication($args["id"]);
-        if (!$this->getDatabaseHelper()->deleteFromDatabase($application)) {
+        if (!$this->getDatabaseService()->deleteFromDatabase($application)) {
             $args["message"] = "application could not be saved (database error)";
             $args["application"] = $application;
             return $this->renderTemplate($response, "application/delete", $args);
