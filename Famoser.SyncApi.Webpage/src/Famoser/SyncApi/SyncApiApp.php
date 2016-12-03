@@ -79,11 +79,11 @@ class SyncApiApp extends App
     /**
      * override the environment (to mock requests for example)
      *
-     * @param Environment $ev
+     * @param Environment $environment
      */
-    public function overrideEnvironment(Environment $ev)
+    public function overrideEnvironment(Environment $environment)
     {
-        $this->getContainer()["environment"] = $ev;
+        $this->getContainer()["environment"] = $environment;
     }
 
     /**
@@ -204,18 +204,18 @@ class SyncApiApp extends App
         $this->addServices($c);
 
         //add view
-        $c["view"] = function (Container $c) {
+        $c["view"] = function (Container $container) {
             $view = new Twig(
-                $c->get(SyncApiApp::SETTINGS_KEY)["template_path"],
+                $container->get(SyncApiApp::SETTINGS_KEY)["template_path"],
                 [
-                    'cache' => $c->get(SyncApiApp::SETTINGS_KEY)["cache_path"],
-                    'debug' => $c->get(SyncApiApp::SETTINGS_KEY)["debug_mode"]
+                    'cache' => $container->get(SyncApiApp::SETTINGS_KEY)["cache_path"],
+                    'debug' => $container->get(SyncApiApp::SETTINGS_KEY)["debug_mode"]
                 ]
             );
             $view->addExtension(
                 new TwigExtension(
-                    $c['router'],
-                    $c['request']->getUri()
+                    $container['router'],
+                    $container['request']->getUri()
                 )
             );
 
@@ -228,23 +228,23 @@ class SyncApiApp extends App
     /**
      * add the error handlers to the container
      *
-     * @param Container $c
+     * @param Container $container
      */
-    private function addHandlers(Container $c)
+    private function addHandlers(Container $container)
     {
-        $c["notFoundHandler"] = function (Container $c) {
-            return function (Request $req, Response $resp) use ($c) {
+        $container["notFoundHandler"] = function (Container $container) {
+            return function (Request $req, Response $resp) use ($container) {
                 return $resp->withStatus(404);
             };
         };
-        $c["notAllowedHandler"] = function (Container $c) {
-            return function (Request $req, Response $resp) use ($c) {
+        $container["notAllowedHandler"] = function (Container $container) {
+            return function (Request $req, Response $resp) use ($container) {
                 return $resp->withStatus(405);
             };
         };
-        $c["errorHandler"] = function (Container $c) {
-            return function (Request $request, Response $response, \Exception $exception) use ($c) {
-                $c[SyncApiApp::LOGGING_SERVICE_KEY]->log(
+        $container["errorHandler"] = function (Container $container) {
+            return function (Request $request, Response $response, \Exception $exception) use ($container) {
+                $container[SyncApiApp::LOGGING_SERVICE_KEY]->log(
                     $exception->getFile() . " (" . $exception->getLine() . ")\n" .
                     $exception->getCode() . ": " . $exception->getMessage() . "\n" .
                     $exception->getTraceAsString(),
@@ -260,21 +260,21 @@ class SyncApiApp extends App
                         $resp->ApiError = ApiError::SERVER_ERROR;
                     }
                     $resp->ServerMessage = $exception->getMessage();
-                    return $c['response']->withStatus(500)->withJson($resp);
+                    return $container['response']->withStatus(500)->withJson($resp);
                 } else {
                     //behaviour for FrontendExceptions
                     if ($exception instanceof FrontendException) {
                         //tried to access page where you need to be logged in
                         if ($exception->getCode() == FrontendError::NOT_LOGGED_IN) {
-                            $reqUri = $request->getUri()->withPath($c->get("router")->pathFor("login"));
-                            return $c['response']->withRedirect($reqUri);
+                            $reqUri = $request->getUri()->withPath($container->get("router")->pathFor("login"));
+                            return $container['response']->withRedirect($reqUri);
                         }
                     }
 
                     //general error page
                     $args = [];
                     $args["error"] = $exception->getMessage();
-                    return $c["view"]->render($response, "public/server_error.html.twig", $args);
+                    return $container["view"]->render($response, "public/server_error.html.twig", $args);
                 }
             };
         };
@@ -283,17 +283,17 @@ class SyncApiApp extends App
     /**
      * add all services to the container
      *
-     * @param Container $c
+     * @param Container $container
      */
-    private function addServices(Container $c)
+    private function addServices(Container $container)
     {
-        $c[SyncApiApp::LOGGING_SERVICE_KEY] = function (Container $c) {
+        $container[SyncApiApp::LOGGING_SERVICE_KEY] = function (Container $c) {
             return new LoggingService($c);
         };
-        $c[SyncApiApp::REQUEST_SERVICE_KEY] = function (Container $c) {
+        $container[SyncApiApp::REQUEST_SERVICE_KEY] = function (Container $c) {
             return new RequestService($c);
         };
-        $c[SyncApiApp::DATABASE_SERVICE_KEY] = function (Container $c) {
+        $container[SyncApiApp::DATABASE_SERVICE_KEY] = function (Container $c) {
             return new DatabaseService($c);
         };
     }
