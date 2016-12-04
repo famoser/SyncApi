@@ -12,6 +12,7 @@ namespace Famoser\SyncApi\Tests;
 use Famoser\SyncApi\Framework\ContainerBase;
 use Famoser\SyncApi\Models\Communication\Request\Base\BaseRequest;
 use Famoser\SyncApi\Models\Entities\Application;
+use Famoser\SyncApi\Models\Entities\Device;
 use Famoser\SyncApi\Models\Entities\User;
 use Famoser\SyncApi\SyncApiApp;
 use Psr\Http\Message\ResponseInterface;
@@ -151,24 +152,6 @@ class TestHelper extends ContainerBase
     }
 
     /**
-     * check if request was successful
-     *
-     * @param \PHPUnit_Framework_TestCase $testingUnit
-     * @param ResponseInterface $response
-     */
-    public function checkForSuccessfulApiResponse(\PHPUnit_Framework_TestCase $testingUnit, ResponseInterface $response)
-    {
-        //valid status code
-        $testingUnit->assertTrue($response->getStatusCode() == 200);
-
-        //no error in json response
-        $response->getBody()->rewind();
-        $responseString = $response->getBody()->getContents();
-        $testingUnit->assertContains("\"ApiError\":0", $responseString);
-        $testingUnit->assertContains("\"RequestFailed\":false", $responseString);
-    }
-
-    /**
      * returns an authenticated user id
      *
      * @return string
@@ -184,5 +167,24 @@ class TestHelper extends ContainerBase
         $this->getDatabaseService()->saveToDatabase($user);
 
         return $user->guid;
+    }
+
+    /**
+     * returns an authenticated device id
+     *
+     * @param $userId
+     * @return string
+     */
+    public function getDeviceId($userId)
+    {
+        $device = new Device();
+        $device->guid = SampleGenerator::createGuid();
+        $device->identifier = "json";
+        $device->is_deleted = false;
+        $device->is_authenticated = true;
+        $device->user_guid = $userId;
+        $this->getDatabaseService()->saveToDatabase($device);
+
+        return $device->guid;
     }
 }

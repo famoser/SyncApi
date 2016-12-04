@@ -59,6 +59,7 @@ class SettingsRepository
             "application_id = :application_id",
             ["application_id" => $this->applicationId]
         );
+        $this->dic = [];
         foreach ($settings as $setting) {
             $this->dic[$setting->key] = $setting;
         }
@@ -74,7 +75,7 @@ class SettingsRepository
     private function getOrCreateValue($key)
     {
         $this->ensureInitialized();
-        if (in_array($key, $this->dic)) {
+        if (isset($this->dic[$key])) {
             return $this->dic[$key]->key;
         }
         $this->persistNewSetting($key);
@@ -109,7 +110,7 @@ class SettingsRepository
         $setting->application_id = $this->applicationId;
         $setting->key = $key;
         if ($val == null) {
-            $setting->val = SettingKeys::getDefaultValue($val);
+            $setting->val = SettingKeys::getDefaultValue($key);
         } else {
             $setting->val = $val;
         }

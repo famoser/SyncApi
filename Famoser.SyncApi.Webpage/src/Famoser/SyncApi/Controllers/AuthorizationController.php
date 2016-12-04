@@ -50,9 +50,9 @@ class AuthorizationController extends ApiSyncController
         $random = "";
         srand((double)microtime() * 1000000);
         $max = $length / 2;
-        for ($i = 1; $i <= $max; $i++) {
-            $random .= $consonants[rand(0, 19)];
-            $random .= $vocals[rand(0, 4)];
+        for ($i = 0; $i < $max; $i++) {
+            $random .= $consonants[rand(0, count($consonants) - 1)];
+            $random .= $vocals[rand(0, count($vocals) - 1)];
         }
         return $random;
     }
