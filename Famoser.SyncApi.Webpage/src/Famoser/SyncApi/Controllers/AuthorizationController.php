@@ -183,7 +183,7 @@ class AuthorizationController extends ApiSyncController
     {
         $req = $this->getRequestService()->parseAuthorizationRequest($request);
 
-        if ($req->UserEntity == null && $req->UserEntity->OnlineAction != OnlineAction::CREATE) {
+        if ($req->UserEntity == null || $req->UserEntity->OnlineAction != OnlineAction::CREATE) {
             $this->authorizeRequest($req);
             if ($req->DeviceEntity->OnlineAction != OnlineAction::CREATE) {
                 $this->authenticateRequest($req);

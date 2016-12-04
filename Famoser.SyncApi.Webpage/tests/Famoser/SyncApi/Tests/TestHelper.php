@@ -12,6 +12,7 @@ namespace Famoser\SyncApi\Tests;
 use Famoser\SyncApi\Framework\ContainerBase;
 use Famoser\SyncApi\Models\Communication\Request\Base\BaseRequest;
 use Famoser\SyncApi\Models\Entities\Application;
+use Famoser\SyncApi\Models\Entities\User;
 use Famoser\SyncApi\SyncApiApp;
 use Psr\Http\Message\ResponseInterface;
 use Slim\Http\Environment;
@@ -39,9 +40,6 @@ class TestHelper extends ContainerBase
         //create config array
         $this->config = $this->constructConfig();
 
-        //clean environment
-        $this->cleanOldEnvironments();
-
         //create test app
         $this->testApp = new SyncApiApp($this->config);
 
@@ -67,7 +65,7 @@ class TestHelper extends ContainerBase
                 'displayErrorDetails' => true,
                 'debug_mode' => true,
                 'api_modulo' => 10000019,
-                'db_path' => $basePath . "app" . $ds . "data_test.sqlite",
+                'db_path' => $basePath . "app" . $ds . "data_test_" . uniqid() . ".sqlite",
                 'db_template_path' => $basePath . "app" . $ds . "data_test_template.sqlite",
                 'file_path' => $basePath . "app" . $ds . "files",
                 'cache_path' => $basePath . "app" . $ds . "cache",
@@ -120,14 +118,6 @@ class TestHelper extends ContainerBase
     public function cleanEnvironment()
     {
         $this->getDatabaseService()->dispose();
-        $this->cleanOldEnvironments();
-    }
-
-    /**
-     * cleans up garbage left there by test runners which failed
-     */
-    private function cleanOldEnvironments()
-    {
         //delete db if exists
         if (is_file($this->config ["db_path"])) {
             unlink($this->config ["db_path"]);
@@ -176,5 +166,23 @@ class TestHelper extends ContainerBase
         $responseString = $response->getBody()->getContents();
         $testingUnit->assertContains("\"ApiError\":0", $responseString);
         $testingUnit->assertContains("\"RequestFailed\":false", $responseString);
+    }
+
+    /**
+     * returns an authenticated user id
+     *
+     * @return string
+     */
+    public function getUserId()
+    {
+        $user = new User();
+        $user->personal_seed = 0;
+        $user->application_id = static::TEST_APPLICATION_ID;
+        $user->guid = SampleGenerator::createGuid();
+        $user->identifier = "json";
+        $user->is_deleted = false;
+        $this->getDatabaseService()->saveToDatabase($user);
+
+        return $user->guid;
     }
 }
