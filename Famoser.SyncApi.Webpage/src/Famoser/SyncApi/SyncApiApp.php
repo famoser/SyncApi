@@ -153,6 +153,7 @@ class SyncApiApp extends App
                     $this->post('/use', $controllerNamespace . 'AuthorizationController:useCode');
                     $this->post('/generate', $controllerNamespace . 'AuthorizationController:generate');
                     $this->post('/sync', $controllerNamespace . 'AuthorizationController:sync');
+                    $this->post('/status', $controllerNamespace . 'AuthorizationController:status');
                 }
             );
 

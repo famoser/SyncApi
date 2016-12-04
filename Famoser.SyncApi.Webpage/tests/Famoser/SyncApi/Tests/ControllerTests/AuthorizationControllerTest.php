@@ -139,11 +139,18 @@ class AuthorizationControllerTest extends \PHPUnit_Framework_TestCase
         $this->testHelper->getDeviceId($syncRequest->UserId);
 
         $this->testHelper->mockApiRequest($syncRequest, "auth/sync", $this->app);
-
         //act
         $response = $this->app->run();
 
-        //assert
+        //arrange
         AssertHelper::checkForSuccessfulApiResponse($this, $response);
+
+        $authRequest = new AuthorizationRequest();
+        $authRequest->UserId = $syncRequest->UserId;
+        $authRequest->DeviceId = $syncRequest->DeviceId;
+        $this->testHelper->mockApiRequest($authRequest, "auth/status", $this->app);
+
+        $response = $this->app->run();
+        AssertHelper::checkForFailedApiResponse($this, $response);
     }
 }

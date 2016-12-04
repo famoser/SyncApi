@@ -171,6 +171,25 @@ class AuthorizationController extends ApiSyncController
     }
 
     /**
+     * returns a failure if not authenticated, ApiError::None if authenticated
+     *
+     * @param  Request $request
+     * @param  Response $response
+     * @param  $args
+     * @return \Psr\Http\Message\ResponseInterface
+     * @throws Exception
+     */
+    public function status(Request $request, Response $response, $args)
+    {
+        $req = $this->getRequestService()->parseAuthorizationRequest($request);
+        $this->authorizeRequest($req);
+        $this->authenticateRequest($req);
+
+        $resp = new AuthorizationResponse();
+        return $this->returnJson($response, $resp);
+    }
+
+    /**
      * syncs user & device objects.
      *
      * @param  Request $request
@@ -185,7 +204,7 @@ class AuthorizationController extends ApiSyncController
 
         if ($req->UserEntity == null || $req->UserEntity->OnlineAction != OnlineAction::CREATE) {
             $this->authorizeRequest($req);
-            if ($req->DeviceEntity->OnlineAction != OnlineAction::CREATE) {
+            if ($req->DeviceEntity == null || $req->DeviceEntity->OnlineAction != OnlineAction::CREATE) {
                 $this->authenticateRequest($req);
             } // else: create device, so no authorization required
         } //else: create user, so no authorization required
