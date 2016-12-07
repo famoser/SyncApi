@@ -58,6 +58,8 @@ class TestHelper extends ContainerBase
     {
         //clean output buffer
         ob_end_clean();
+        //start again so phpunit does not throw risky exceptions (that motherf***er)
+        ob_start();
 
         //dispose database service (free up database connection)
         $this->getDatabaseService()->dispose();

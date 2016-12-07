@@ -97,7 +97,7 @@ class AuthorizationControllerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * create a authentication code
+     * create an authentication code
      */
     public function testGenerateCode()
     {
@@ -119,9 +119,9 @@ class AuthorizationControllerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * create a authentication code
+     * test the status of authenticated
      */
-    public function testStatus()
+    public function testAuthenticatedStatus()
     {
         //arrange
         $syncRequest = new AuthorizationRequest();
@@ -143,11 +143,57 @@ class AuthorizationControllerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * create a authentication code
+     * test the status of authenticated
+     */
+    public function testUserNotFound()
+    {
+        //arrange
+        $syncRequest = new AuthorizationRequest();
+        $this->testHelper->authorizeRequest($syncRequest);
+
+        $device = new DeviceCommunicationEntity();
+        SampleGenerator::createEntity($device);
+
+        $syncRequest->UserId = SampleGenerator::createGuid();
+        $syncRequest->DeviceId = SampleGenerator::createGuid();
+
+        $this->testHelper->mockApiRequest($syncRequest, "auth/status");
+        //act
+        $response = $this->testHelper->getTestApp()->run();
+
+        //arrange
+        AssertHelper::checkForFailedApiResponse($this, $response, ApiError::USER_NOT_FOUND);
+    }
+
+    /**
+     * test the status of authenticated
+     */
+    public function testDeviceNotFound()
+    {
+        //arrange
+        $syncRequest = new AuthorizationRequest();
+        $this->testHelper->authorizeRequest($syncRequest);
+
+        $device = new DeviceCommunicationEntity();
+        SampleGenerator::createEntity($device);
+
+        $syncRequest->UserId = $this->testHelper->getUserId();
+        $syncRequest->DeviceId = SampleGenerator::createGuid();
+
+        $this->testHelper->mockApiRequest($syncRequest, "auth/status");
+        //act
+        $response = $this->testHelper->getTestApp()->run();
+
+        //arrange
+        AssertHelper::checkForFailedApiResponse($this, $response, ApiError::DEVICE_NOT_FOUND);
+    }
+
+    /**
+     * add seconds device without authentication code
      */
     public function testAddSecondDevice()
     {
-        //arrange
+        //add unauthorized device
         $syncRequest = new AuthorizationRequest();
         $this->testHelper->authorizeRequest($syncRequest);
 
@@ -161,10 +207,9 @@ class AuthorizationControllerTest extends \PHPUnit_Framework_TestCase
         $this->testHelper->getDeviceId($syncRequest->UserId);
 
         $this->testHelper->mockApiRequest($syncRequest, "auth/sync");
-        //act
         $response = $this->testHelper->getTestApp()->run();
 
-        //arrange
+        //check for unauthorized device
         AssertHelper::checkForSuccessfulApiResponse($this, $response);
 
         $authRequest = new AuthorizationRequest();
@@ -175,5 +220,65 @@ class AuthorizationControllerTest extends \PHPUnit_Framework_TestCase
 
         $response = $this->testHelper->getTestApp()->run();
         AssertHelper::checkForFailedApiResponse($this, $response, ApiError::DEVICE_NOT_AUTHORIZED);
+    }
+
+    /**
+     * add second device and authorize it
+     */
+    public function testUseAuthenticationCode()
+    {
+        //adds unauthenticated device
+        $syncRequest = new AuthorizationRequest();
+        $this->testHelper->authorizeRequest($syncRequest);
+
+        $device = new DeviceCommunicationEntity();
+        SampleGenerator::createEntity($device);
+
+        $syncRequest->DeviceEntity = $device;
+        $syncRequest->UserId = $this->testHelper->getUserId();
+        $syncRequest->DeviceId = $device->Id;
+        //add primary device to user (which will be authenticated)
+        $authenticatedDeviceId = $this->testHelper->getDeviceId($syncRequest->UserId);
+
+        $this->testHelper->mockApiRequest($syncRequest, "auth/sync");
+        $response = $this->testHelper->getTestApp()->run();
+
+        //get auth code
+        $authCodeRequest = new AuthorizationRequest();
+        $this->testHelper->authorizeRequest($authCodeRequest);
+
+        $authCodeRequest->UserId = $syncRequest->UserId;
+        $authCodeRequest->DeviceId = $authenticatedDeviceId;
+
+        $this->testHelper->mockApiRequest($authCodeRequest, "auth/generate");
+        $response = $this->testHelper->getTestApp()->run();
+        $responseString = AssertHelper::checkForSuccessfulApiResponse($this, $response);
+        static::assertRegExp("#\"ServerMessage\":\"([a-z])+\"#", $responseString);
+        $responseObj = json_decode($responseString);
+        $authCode = $responseObj->ServerMessage;
+
+        //auth device with auth code
+        $useAuthCodeRequest = new AuthorizationRequest();
+        $this->testHelper->authorizeRequest($useAuthCodeRequest);
+
+        $authCodeRequest->UserId = $syncRequest->UserId;
+        $authCodeRequest->DeviceId = $syncRequest->DeviceId;
+        $authCodeRequest->ClientMessage = $authCode;
+
+        $this->testHelper->mockApiRequest($authCodeRequest, "auth/use");
+        $response = $this->testHelper->getTestApp()->run();
+        AssertHelper::checkForSuccessfulApiResponse($this, $response);
+
+        //check if device authenticated now
+        AssertHelper::checkForSuccessfulApiResponse($this, $response);
+
+        $authRequest = new AuthorizationRequest();
+        $this->testHelper->authorizeRequest($authRequest);
+        $authRequest->UserId = $syncRequest->UserId;
+        $authRequest->DeviceId = $syncRequest->DeviceId;
+        $this->testHelper->mockApiRequest($authRequest, "auth/status");
+
+        $response = $this->testHelper->getTestApp()->run();
+        AssertHelper::checkForSuccessfulApiResponse($this, $response);
     }
 }
