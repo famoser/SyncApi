@@ -107,24 +107,23 @@ class TestHelper extends ContainerBase
     }
 
     private $mockAlreadyCalled;
+
     /**
      * mock a json POST request
      * call app->run afterwards
      *
      * @param BaseRequest $request
      * @param $relativeLink
-     * @param SyncApiApp $app
      * @param bool $autoReset
-     * @internal param $json
      */
-    public function mockApiRequest(BaseRequest $request, $relativeLink, SyncApiApp $app, $autoReset = true)
+    public function mockApiRequest(BaseRequest $request, $relativeLink, $autoReset = true)
     {
         if ($this->mockAlreadyCalled && $autoReset) {
             $this->resetApplication();
         }
         $this->mockAlreadyCalled = true;
         $json = json_encode($request, JSON_PRETTY_PRINT);
-        $app->overrideEnvironment(
+        $this->getTestApp()->overrideEnvironment(
             Environment::mock(
                 [
                     'REQUEST_METHOD' => 'POST',

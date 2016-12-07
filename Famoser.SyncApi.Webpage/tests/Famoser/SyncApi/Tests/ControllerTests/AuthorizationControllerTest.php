@@ -16,6 +16,7 @@ use Famoser\SyncApi\SyncApiApp;
 use Famoser\SyncApi\Tests\AssertHelper;
 use Famoser\SyncApi\Tests\SampleGenerator;
 use Famoser\SyncApi\Tests\TestHelper;
+use Famoser\SyncApi\Types\ApiError;
 use Famoser\SyncApi\Types\OnlineAction;
 
 /**
@@ -61,7 +62,7 @@ class AuthorizationControllerTest extends \PHPUnit_Framework_TestCase
         $syncRequest->UserEntity = $user;
         $syncRequest->UserId = $user->Id;
 
-        $this->testHelper->mockApiRequest($syncRequest, "auth/sync", $this->testHelper->getTestApp());
+        $this->testHelper->mockApiRequest($syncRequest, "auth/sync");
 
         //act
         $response = $this->testHelper->getTestApp()->run();
@@ -86,7 +87,7 @@ class AuthorizationControllerTest extends \PHPUnit_Framework_TestCase
         $syncRequest->UserId = $this->testHelper->getUserId();
         $syncRequest->DeviceId = $device->Id;
 
-        $this->testHelper->mockApiRequest($syncRequest, "auth/sync", $this->testHelper->getTestApp());
+        $this->testHelper->mockApiRequest($syncRequest, "auth/sync");
 
         //act
         $response = $this->testHelper->getTestApp()->run();
@@ -107,7 +108,7 @@ class AuthorizationControllerTest extends \PHPUnit_Framework_TestCase
         $syncRequest->UserId = $this->testHelper->getUserId();
         $syncRequest->DeviceId = $this->testHelper->getDeviceId($syncRequest->UserId);
 
-        $this->testHelper->mockApiRequest($syncRequest, "auth/generate", $this->testHelper->getTestApp());
+        $this->testHelper->mockApiRequest($syncRequest, "auth/generate");
 
         //act
         $response = $this->testHelper->getTestApp()->run();
@@ -133,7 +134,7 @@ class AuthorizationControllerTest extends \PHPUnit_Framework_TestCase
         $syncRequest->UserId = $this->testHelper->getUserId();
         $syncRequest->DeviceId = $this->testHelper->getDeviceId($syncRequest->UserId);
 
-        $this->testHelper->mockApiRequest($syncRequest, "auth/status", $this->testHelper->getTestApp());
+        $this->testHelper->mockApiRequest($syncRequest, "auth/status");
         //act
         $response = $this->testHelper->getTestApp()->run();
 
@@ -159,7 +160,7 @@ class AuthorizationControllerTest extends \PHPUnit_Framework_TestCase
         //add primary device to user (which will be authenticated)
         $this->testHelper->getDeviceId($syncRequest->UserId);
 
-        $this->testHelper->mockApiRequest($syncRequest, "auth/sync", $this->testHelper->getTestApp());
+        $this->testHelper->mockApiRequest($syncRequest, "auth/sync");
         //act
         $response = $this->testHelper->getTestApp()->run();
 
@@ -167,11 +168,12 @@ class AuthorizationControllerTest extends \PHPUnit_Framework_TestCase
         AssertHelper::checkForSuccessfulApiResponse($this, $response);
 
         $authRequest = new AuthorizationRequest();
+        $this->testHelper->authorizeRequest($authRequest);
         $authRequest->UserId = $syncRequest->UserId;
         $authRequest->DeviceId = $syncRequest->DeviceId;
-        $this->testHelper->mockApiRequest($authRequest, "auth/status", $this->testHelper->getTestApp());
+        $this->testHelper->mockApiRequest($authRequest, "auth/status");
 
         $response = $this->testHelper->getTestApp()->run();
-        AssertHelper::checkForFailedApiResponse($this, $response);
+        AssertHelper::checkForFailedApiResponse($this, $response, ApiError::DEVICE_NOT_AUTHORIZED);
     }
 }

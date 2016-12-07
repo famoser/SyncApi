@@ -60,22 +60,24 @@ class AssertHelper
      *
      * @param \PHPUnit_Framework_TestCase $testingUnit
      * @param ResponseInterface $response
+     * @param int $expectedApiError
      * @param int $expectedCode
      * @return string
      */
     public static function checkForFailedApiResponse(
         \PHPUnit_Framework_TestCase $testingUnit,
         ResponseInterface $response,
-        $expectedCode = 500
+        $expectedApiError, $expectedCode = 500
     )
     {
+        $responseString = static::getResponseString($response);
+
         //valid status code
         $testingUnit->assertTrue($response->getStatusCode() == $expectedCode);
 
-
         //no error in json response
-        $responseString = static::getResponseString($response);
         $testingUnit->assertNotContains("\"ApiError\":0", $responseString);
+        $testingUnit->assertContains("\"ApiError\":" . $expectedApiError, $responseString);
         $testingUnit->assertContains("\"RequestFailed\":true", $responseString);
 
         return $responseString;
