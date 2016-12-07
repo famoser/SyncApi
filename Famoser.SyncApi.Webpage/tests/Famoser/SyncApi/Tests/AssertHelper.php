@@ -28,7 +28,9 @@ class AssertHelper
     {
         $response->getBody()->rewind();
         return $response->getBody()->getContents();
-    }    /**
+    }
+
+    /**
      * check if request was successful
      * returns the tested response string
      *
@@ -58,15 +60,18 @@ class AssertHelper
      *
      * @param \PHPUnit_Framework_TestCase $testingUnit
      * @param ResponseInterface $response
+     * @param int $expectedCode
      * @return string
      */
     public static function checkForFailedApiResponse(
         \PHPUnit_Framework_TestCase $testingUnit,
-        ResponseInterface $response
+        ResponseInterface $response,
+        $expectedCode = 500
     )
     {
         //valid status code
-        $testingUnit->assertTrue($response->getStatusCode() != 200);
+        $testingUnit->assertTrue($response->getStatusCode() == $expectedCode);
+
 
         //no error in json response
         $responseString = static::getResponseString($response);

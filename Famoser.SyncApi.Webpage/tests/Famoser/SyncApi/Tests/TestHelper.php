@@ -48,7 +48,25 @@ class TestHelper extends ContainerBase
         parent::__construct($this->testApp->getContainer());
 
         //prepare environment
-        $this->prepareEnvironment();
+        $this->prepareDatabase();
+    }
+
+    /**
+     * resets application to prepare for new request, but does not reset the database
+     */
+    public function resetApplication()
+    {
+        //clean output buffer
+        ob_end_clean();
+
+        //dispose database service (free up database connection)
+        $this->getDatabaseService()->dispose();
+
+        //create test app
+        $this->testApp = new SyncApiApp($this->config);
+
+        //use container to initialize parent
+        parent::__construct($this->testApp->getContainer());
     }
 
     /**
@@ -88,6 +106,7 @@ class TestHelper extends ContainerBase
         return $this->testApp;
     }
 
+    private $mockAlreadyCalled;
     /**
      * mock a json POST request
      * call app->run afterwards
@@ -95,10 +114,15 @@ class TestHelper extends ContainerBase
      * @param BaseRequest $request
      * @param $relativeLink
      * @param SyncApiApp $app
+     * @param bool $autoReset
      * @internal param $json
      */
-    public function mockApiRequest(BaseRequest $request, $relativeLink, SyncApiApp $app)
+    public function mockApiRequest(BaseRequest $request, $relativeLink, SyncApiApp $app, $autoReset = true)
     {
+        if ($this->mockAlreadyCalled && $autoReset) {
+            $this->resetApplication();
+        }
+        $this->mockAlreadyCalled = true;
         $json = json_encode($request, JSON_PRETTY_PRINT);
         $app->overrideEnvironment(
             Environment::mock(
@@ -128,7 +152,7 @@ class TestHelper extends ContainerBase
     /**
      * prepares the environment
      */
-    private function prepareEnvironment()
+    private function prepareDatabase()
     {
         //create test application
         $application = new Application();
