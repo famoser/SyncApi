@@ -120,6 +120,11 @@ class EntityController extends ApiSyncController
         //get all accessible collection guids
         $collectionIds = $this->getCollectionIds($req);
 
+        //return empty array if no ids yet
+        if (count($collectionIds) == 0) {
+            return [];
+        }
+
         //get all collections
         return $this->getDatabaseService()->getFromDatabase(
             new Entity(),

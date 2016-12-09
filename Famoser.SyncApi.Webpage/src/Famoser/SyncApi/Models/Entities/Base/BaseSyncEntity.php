@@ -53,7 +53,8 @@ abstract class BaseSyncEntity extends BaseEntity
         $content->entity_guid = $entity->Id;
         $content->version_guid = $entity->VersionId;
         $content->content = $entity->Content;
-        $content->create_date_time = time();
+        $content->create_date_time = $entity->CreateDateTime->getTimestamp();
+        $content->device_guid = $entity->DeviceId;
         return $content;
     }
 
@@ -66,7 +67,6 @@ abstract class BaseSyncEntity extends BaseEntity
      */
     public function createCommunicationEntity(ContentVersion $version, $onlineAction)
     {
-
         $entity = $this->createSpecificCommunicationEntity();
         $entity->Identifier = $this->identifier;
         $entity->Id = $this->guid;
@@ -74,8 +74,10 @@ abstract class BaseSyncEntity extends BaseEntity
         $entity->Content = $version->content;
         $entity->CreateDateTime = date("c", $version->create_date_time);
         $entity->VersionId = $version->version_guid;
-        
+
         $entity->OnlineAction = $onlineAction;
+
+        $entity->DeviceId = $version->device_guid;
 
         return $entity;
     }

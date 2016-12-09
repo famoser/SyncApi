@@ -25,6 +25,9 @@ class BaseCommunicationEntity implements IJsonDeserializable
     /* @var string $Id type_of:guid */
     public $Id;
 
+    /* @var string $DeviceId type_of:guid */
+    public $DeviceId;
+
     /* @var string $VersionId type_of:guid */
     public $VersionId;
 

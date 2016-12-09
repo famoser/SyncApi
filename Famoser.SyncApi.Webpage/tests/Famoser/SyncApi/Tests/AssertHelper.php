@@ -125,12 +125,12 @@ class AssertHelper
         /* @var ContentVersion $entityVersion */
         $entityVersion = $databaseService->getSingleFromDatabase(
             new ContentVersion(),
-            ["entity_guid = :guid"],
+            "entity_guid = :guid",
             ["guid" => $collEntity->Id]
         );
         $testController::assertNotNull($entityVersion);
         $testController::assertEquals($entityVersion->content, $collEntity->Content);
-        $testController::assertEquals($entityVersion->create_date_time, $collEntity->CreateDateTime->getTimestamp());
+        $testController::assertEquals($entityVersion->create_date_time, (new \DateTime($collEntity->CreateDateTime))->getTimestamp());
         $testController::assertEquals($entityVersion->entity_guid, $collEntity->Id);
         $testController::assertEquals($entityVersion->version_guid, $collEntity->VersionId);
 
