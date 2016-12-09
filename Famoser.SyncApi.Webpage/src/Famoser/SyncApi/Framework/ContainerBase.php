@@ -41,7 +41,7 @@ class ContainerBase
      *
      * @return LoggingServiceInterface
      */
-    protected function getLoggingService()
+    public function getLoggingService()
     {
         return $this->container->get(SyncApiApp::LOGGING_SERVICE_KEY);
     }
@@ -51,7 +51,7 @@ class ContainerBase
      *
      * @return LoggingServiceInterface
      */
-    protected function getSettingsArray()
+    public function getSettingsArray()
     {
         return $this->container->get(SyncApiApp::SETTINGS_KEY);
     }
@@ -61,7 +61,7 @@ class ContainerBase
      *
      * @return DatabaseServiceInterface
      */
-    protected function getDatabaseService()
+    public function getDatabaseService()
     {
         return $this->container->get(SyncApiApp::DATABASE_SERVICE_KEY);
     }
@@ -71,7 +71,7 @@ class ContainerBase
      *
      * @return RequestServiceInterface
      */
-    protected function getRequestService()
+    public function getRequestService()
     {
         return $this->container->get(SyncApiApp::REQUEST_SERVICE_KEY);
     }
@@ -81,7 +81,7 @@ class ContainerBase
      *
      * @return RouterInterface
      */
-    protected function getRouter()
+    public function getRouter()
     {
         return $this->container->get("router");
     }
@@ -91,7 +91,7 @@ class ContainerBase
      *
      * @return mixed
      */
-    protected function getView()
+    public function getView()
     {
         return $this->container->get("view");
     }

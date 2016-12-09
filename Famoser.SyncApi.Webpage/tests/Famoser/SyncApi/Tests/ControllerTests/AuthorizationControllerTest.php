@@ -14,6 +14,7 @@ use Famoser\SyncApi\Models\Communication\Request\AuthorizationRequest;
 use Famoser\SyncApi\Models\Communication\Request\SyncEntityRequest;
 use Famoser\SyncApi\SyncApiApp;
 use Famoser\SyncApi\Tests\AssertHelper;
+use Famoser\SyncApi\Tests\ControllerTests\Base\ApiTestController;
 use Famoser\SyncApi\Tests\SampleGenerator;
 use Famoser\SyncApi\Tests\TestHelper;
 use Famoser\SyncApi\Types\ApiError;
@@ -24,26 +25,8 @@ use Famoser\SyncApi\Types\OnlineAction;
  *
  * @package Famoser\SyncApi\Tests\ControllerTests
  */
-class AuthorizationControllerTest extends \PHPUnit_Framework_TestCase
+class AuthorizationControllerTest extends ApiTestController
 {
-    /* @var TestHelper $testHelper */
-    private $testHelper;
-
-    /**
-     * create the $app and $testHelper
-     */
-    public function setUp()
-    {
-        $this->testHelper = new TestHelper();
-    }
-
-    /**
-     * cleans the test environment
-     */
-    public function tearDown()
-    {
-        $this->testHelper->cleanEnvironment();
-    }
 
     /**
      * create a user
