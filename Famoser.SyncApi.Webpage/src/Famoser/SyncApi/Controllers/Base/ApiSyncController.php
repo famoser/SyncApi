@@ -114,7 +114,7 @@ abstract class ApiSyncController extends ApiRequestController
         $existingEntityIds = $this->getArrayOfObjectProperty($existingEntities, "guid");
 
         //get new Ids
-        $newOnes = array_diff($askedForGuids, $existingEntityIds);
+        $newOnes = array_diff($existingEntityIds, $askedForGuids);
 
         if (count($newOnes) > 0) {
             //add new Objects to response
@@ -127,9 +127,9 @@ abstract class ApiSyncController extends ApiRequestController
                         //not the Id we are looking for; skip
                         continue;
                     }
-                    if (!$existingEntities[$ind]->is_deleted) {
-                        $ver = $this->getActiveVersion($existingEntities[$ind], $contentType);
-                        $resultArray[] = $existingEntities[$ind]->createCommunicationEntity($ver, OnlineAction::CREATE);
+                    if (!$existingEntities[$newOne]->is_deleted) {
+                        $ver = $this->getActiveVersion($existingEntities[$newOne], $contentType);
+                        $resultArray[] = $existingEntities[$newOne]->createCommunicationEntity($ver, OnlineAction::CREATE);
                     }
                     break;
                 }
@@ -140,6 +140,7 @@ abstract class ApiSyncController extends ApiRequestController
     }
 
     private $allEntities;
+
     /**
      * get all collections accessible by the current user
      *

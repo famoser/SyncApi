@@ -16,6 +16,7 @@ use Famoser\SyncApi\Models\Communication\Response\CollectionEntityResponse;
 use Famoser\SyncApi\Tests\AssertHelper;
 use Famoser\SyncApi\Tests\ControllerTests\Base\ApiTestController;
 use Famoser\SyncApi\Tests\SampleGenerator;
+use Famoser\SyncApi\Tests\TestHelper;
 use Famoser\SyncApi\Types\OnlineAction;
 
 /**
@@ -50,9 +51,9 @@ class CollectionControllerTest extends ApiTestController
     }
 
     /**
-     * tests single read
+     * tests single read if the id of the entity is provided
      */
-    public function testReadSync()
+    public function testExplicitReadSync()
     {
         //test create
         $syncRequest = new CollectionEntityRequest();
@@ -108,6 +109,50 @@ class CollectionControllerTest extends ApiTestController
     }
 
     /**
+     * tests read if no id of the missing collection is provided
+     */
+    public function testImplicitReadSync()
+    {
+        //test create
+        $syncRequest = new CollectionEntityRequest();
+        $this->testHelper->authorizeRequest($syncRequest);
+
+        $syncRequest->UserId = $this->testHelper->getUserId();
+        $syncRequest->DeviceId = $this->testHelper->getDeviceId($syncRequest->UserId);
+
+        $collEntity = new CollectionCommunicationEntity();
+        SampleGenerator::createEntity($collEntity);
+        $collEntity->DeviceId = $syncRequest->DeviceId;
+
+        $syncRequest->CollectionEntities[] = $collEntity;
+
+        $this->testHelper->mockApiRequest($syncRequest, "collections/sync");
+        $response = $this->testHelper->getTestApp()->run();
+        AssertHelper::checkForSuccessfulApiResponse($this, $response);
+        AssertHelper::checkForSavedCollection($this, $collEntity, $this->testHelper->getTestApp());
+
+        //test read
+        $syncRequest2 = new CollectionEntityRequest();
+        $this->testHelper->authorizeRequest($syncRequest2);
+
+        $syncRequest2->UserId = $syncRequest->UserId;
+        $syncRequest2->DeviceId = $syncRequest->DeviceId;
+
+        $syncRequest2->CollectionEntities = [];
+
+        $this->testHelper->mockApiRequest($syncRequest2, "collections/sync");
+        $response2 = $this->testHelper->getTestApp()->run();
+        $responseString = AssertHelper::checkForSuccessfulApiResponse($this, $response2);
+
+        /* @var CollectionEntityResponse $responseObj */
+        $responseObj = json_decode($responseString);
+        static::assertTrue(count($responseObj->CollectionEntities) == 1);
+        static::assertEquals(OnlineAction::CREATE, $responseObj->CollectionEntities[0]->OnlineAction);
+        AssertHelper::checkResponseCollection($this, $collEntity, $syncRequest, $responseObj->CollectionEntities[0]);
+        AssertHelper::checkForSavedCollection($this, $collEntity, $this->testHelper->getTestApp());
+    }
+
+    /**
      * tests single update
      */
     public function testUpdateSync()
@@ -146,6 +191,117 @@ class CollectionControllerTest extends ApiTestController
         $this->testHelper->mockApiRequest($syncRequest2, "collections/sync");
         $response2 = $this->testHelper->getTestApp()->run();
         AssertHelper::checkForSuccessfulApiResponse($this, $response2);
+        AssertHelper::checkForSavedCollection($this, $collEntity, $this->testHelper->getTestApp());
+    }
+
+    /**
+     * tests single delete
+     */
+    public function testDeleteSync()
+    {
+        //test create
+        $syncRequest = new CollectionEntityRequest();
+        $this->testHelper->authorizeRequest($syncRequest);
+
+        $syncRequest->UserId = $this->testHelper->getUserId();
+        $syncRequest->DeviceId = $this->testHelper->getDeviceId($syncRequest->UserId);
+
+        $collEntity = new CollectionCommunicationEntity();
+        SampleGenerator::createEntity($collEntity);
+        $collEntity->DeviceId = $syncRequest->DeviceId;
+
+        $syncRequest->CollectionEntities[] = $collEntity;
+
+        $this->testHelper->mockApiRequest($syncRequest, "collections/sync");
+        $response = $this->testHelper->getTestApp()->run();
+        AssertHelper::checkForSuccessfulApiResponse($this, $response);
+        AssertHelper::checkForSavedCollection($this, $collEntity, $this->testHelper->getTestApp());
+
+        //test delete
+        $syncRequest2 = new CollectionEntityRequest();
+        $this->testHelper->authorizeRequest($syncRequest2);
+
+        $syncRequest2->UserId = $syncRequest->UserId;
+        $syncRequest2->DeviceId = $syncRequest->DeviceId;
+
+        $collEntity2 = new CollectionCommunicationEntity();
+        $collEntity2->Id = $collEntity->Id;
+        $collEntity2->OnlineAction = OnlineAction::DELETE;
+
+        $syncRequest2->CollectionEntities[] = $collEntity2;
+
+        $this->testHelper->mockApiRequest($syncRequest2, "collections/sync");
+        $response2 = $this->testHelper->getTestApp()->run();
+        AssertHelper::checkForSuccessfulApiResponse($this, $response2);
+        AssertHelper::checkForSavedCollection($this, $collEntity, $this->testHelper->getTestApp(), true);
+    }
+
+    /**
+     * tests confirm access request method
+     */
+    public function testConfirmAccessSync()
+    {
+        //test create
+        $syncRequest = new CollectionEntityRequest();
+        $this->testHelper->authorizeRequest($syncRequest);
+
+        $syncRequest->UserId = $this->testHelper->getUserId();
+        $syncRequest->DeviceId = $this->testHelper->getDeviceId($syncRequest->UserId);
+
+        $collEntity = new CollectionCommunicationEntity();
+        SampleGenerator::createEntity($collEntity);
+        $collEntity->DeviceId = $syncRequest->DeviceId;
+
+        $syncRequest->CollectionEntities[] = $collEntity;
+
+        $this->testHelper->mockApiRequest($syncRequest, "collections/sync");
+        $response = $this->testHelper->getTestApp()->run();
+        AssertHelper::checkForSuccessfulApiResponse($this, $response);
+        AssertHelper::checkForSavedCollection($this, $collEntity, $this->testHelper->getTestApp());
+
+        //test confirm version (no response)
+        $syncRequest2 = new CollectionEntityRequest();
+        $this->testHelper->authorizeRequest($syncRequest2);
+
+        $syncRequest2->UserId = $syncRequest->UserId;
+        $syncRequest2->DeviceId = $syncRequest->DeviceId;
+
+        $collEntity2 = new CollectionCommunicationEntity();
+        $collEntity2->Id = $collEntity->Id;
+        $collEntity2->VersionId = $collEntity->VersionId;
+        $collEntity2->OnlineAction = OnlineAction::CONFIRM_VERSION;
+
+        $syncRequest2->CollectionEntities[] = $collEntity2;
+
+        $this->testHelper->mockApiRequest($syncRequest2, "collections/sync");
+        $response2 = $this->testHelper->getTestApp()->run();
+        AssertHelper::checkForSuccessfulApiResponse($this, $response2);
+        AssertHelper::checkForSavedCollection($this, $collEntity, $this->testHelper->getTestApp());
+
+        //test confirm version (active version response)
+        $syncRequest2 = new CollectionEntityRequest();
+        $this->testHelper->authorizeRequest($syncRequest2);
+
+        $syncRequest2->UserId = $syncRequest->UserId;
+        $syncRequest2->DeviceId = $syncRequest->DeviceId;
+
+        $collEntity2 = new CollectionCommunicationEntity();
+        $collEntity2->Id = $collEntity->Id;
+        $collEntity2->VersionId = SampleGenerator::createGuid();
+        $collEntity2->OnlineAction = OnlineAction::CONFIRM_VERSION;
+
+        $syncRequest2->CollectionEntities[] = $collEntity2;
+
+        $this->testHelper->mockApiRequest($syncRequest2, "collections/sync");
+        $response2 = $this->testHelper->getTestApp()->run();
+        $responseString = AssertHelper::checkForSuccessfulApiResponse($this, $response2);
+        AssertHelper::checkForSavedCollection($this, $collEntity, $this->testHelper->getTestApp());
+
+        /* @var CollectionEntityResponse $responseObj */
+        $responseObj = json_decode($responseString);
+        static::assertTrue(count($responseObj->CollectionEntities) == 1);
+        static::assertEquals(OnlineAction::UPDATE, $responseObj->CollectionEntities[0]->OnlineAction);
+        AssertHelper::checkResponseCollection($this, $collEntity, $syncRequest, $responseObj->CollectionEntities[0]);
         AssertHelper::checkForSavedCollection($this, $collEntity, $this->testHelper->getTestApp());
     }
 }

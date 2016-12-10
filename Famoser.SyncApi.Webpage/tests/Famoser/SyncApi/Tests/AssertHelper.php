@@ -12,6 +12,7 @@ namespace Famoser\SyncApi\Tests;
 use Famoser\SyncApi\Framework\ContainerBase;
 use Famoser\SyncApi\Models\Communication\Entities\Base\BaseCommunicationEntity;
 use Famoser\SyncApi\Models\Communication\Entities\CollectionCommunicationEntity;
+use Famoser\SyncApi\Models\Communication\Request\CollectionEntityRequest;
 use Famoser\SyncApi\Models\Entities\Base\BaseSyncEntity;
 use Famoser\SyncApi\Models\Entities\Collection;
 use Famoser\SyncApi\Models\Entities\ContentVersion;
@@ -172,5 +173,24 @@ class AssertHelper
         $testController::assertEquals($collectionCommunicationEntity->DeviceId, $entityVersion->device_guid);
         $testController::assertEquals(ContentType::COLLECTION, $entityVersion->content_type);
 
+    }
+
+    public static function checkResponseCollection(
+        ApiTestController $testController,
+        CollectionCommunicationEntity $collEntity,
+        CollectionEntityRequest $syncRequest,
+        $receivedCollection)
+    {
+        /* @var CollectionCommunicationEntity $receivedCollection */
+        $testController::assertEquals($collEntity->VersionId, $receivedCollection->VersionId);
+        $testController::assertEquals($collEntity->Content, $receivedCollection->Content);
+        $testController::assertEquals(
+            (new \DateTime($collEntity->CreateDateTime))->getTimestamp(),
+            (new \DateTime($receivedCollection->CreateDateTime))->getTimestamp()
+        );
+        $testController::assertEquals($syncRequest->DeviceId, $receivedCollection->DeviceId);
+        $testController::assertEquals($collEntity->Id, $receivedCollection->Id);
+        $testController::assertEquals($collEntity->Identifier, $receivedCollection->Identifier);
+        $testController::assertEquals($syncRequest->UserId, $receivedCollection->UserId);
     }
 }
