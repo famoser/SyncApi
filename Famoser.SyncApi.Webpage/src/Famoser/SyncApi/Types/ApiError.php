@@ -78,7 +78,7 @@ class ApiError
             case ApiError::RESOURCE_ALREADY_EXISTS:
                 return "resource already exists";
             case ApiError::RESOURCE_NOT_FOUND:
-                return "resource already exists";
+                return "resource not found";
             
             case ApiError::AUTHORIZATION_CODE_INVALID:
                 return "authorization code invalid";

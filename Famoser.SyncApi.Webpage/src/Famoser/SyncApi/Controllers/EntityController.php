@@ -75,24 +75,46 @@ class EntityController extends ApiSyncController
 
         //get entity (checks if user has access)
         $collectionIds = $this->getCollectionIds($req);
-        $collectionIds["guid"] = $req->Id;
+        if (count($collectionIds) == 0) {
+            throw new ApiException(ApiError::RESOURCE_NOT_FOUND);
+        }
+
+        $arr = $this->convertToStringArrayKeys($collectionIds);
+        $inner = implode(',:', array_keys($arr));
+        $arr["guid"] = $req->Id;
         $entity = $this->getDatabaseService()->getSingleFromDatabase(
             new Entity(),
-            "guid = :guid AND collection_guid IN (:" . implode(',:', array_keys($collectionIds)) . ")",
-            $collectionIds);
+            "guid = :guid AND collection_guid IN (:" . $inner . ")",
+            $arr
+        );
 
         if ($entity == null) {
             throw new ApiException(ApiError::RESOURCE_NOT_FOUND);
         }
 
         //get missing versions from database
-        $versionIds = $req->VersionIds;
-        $versionIds["entity_guid"] = $entity->guid;
         /* @var ContentVersion[] $newOnes */
-        $newOnes = $this->getDatabaseService()->getFromDatabase(
-            new ContentVersion(),
-            "entity_guid = :entity_guid AND version_guid NOT IN (:" . implode(',:', array_keys($req->VersionIds)) . ")",
-            $versionIds, "create_date_time");
+        if ($req->VersionIds == null || count($req->VersionIds) == 0) {
+            $arr = [];
+            $arr["entity_guid"] = $entity->guid;
+            /* @var ContentVersion[] $newOnes */
+            $newOnes = $this->getDatabaseService()->getFromDatabase(
+                new ContentVersion(),
+                "entity_guid = :entity_guid",
+                $arr,
+                "create_date_time"
+            );
+        } else {
+            $arr = $this->convertToStringArrayKeys($req->VersionIds);
+            $inner = implode(',:', array_keys($arr));
+            $arr["entity_guid"] = $entity->guid;
+            $newOnes = $this->getDatabaseService()->getFromDatabase(
+                new ContentVersion(),
+                "entity_guid = :entity_guid AND version_guid NOT IN (:" . $inner . ")",
+                $arr,
+                "create_date_time"
+            );
+        }
 
         //convert to entities
         $resp = new HistoryEntityResponse();
@@ -101,6 +123,17 @@ class EntityController extends ApiSyncController
         }
 
         return $this->returnJson($response, $resp);
+    }
+
+    private function convertToStringArrayKeys($arr)
+    {
+        $str = "rawrrr";
+        $counter = 1;
+        $result = [];
+        foreach ($arr as $item) {
+            $result[$str . $counter++] = $item;
+        }
+        return $result;
     }
 
     /**
@@ -148,7 +181,7 @@ class EntityController extends ApiSyncController
             throw new ServerException(ServerError::FORBIDDEN);
         }
 
-        if ($contentType != ContentType::ENTITY){
+        if ($contentType != ContentType::ENTITY) {
             throw new ServerException(ServerError::FORBIDDEN);
         }
 
