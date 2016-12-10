@@ -115,7 +115,7 @@ class ApiTestHelper extends ContainerBase
         $filePath = str_replace("\\", DIRECTORY_SEPARATOR, $nameSpace);
         $res = [];
         foreach (glob($srcPath . DIRECTORY_SEPARATOR . $filePath . DIRECTORY_SEPARATOR . "*.php") as $filename) {
-            $className = substr(str_replace($srcPath . DIRECTORY_SEPARATOR, "", $filename), 0, -4);
+            $className = $nameSpace . "\\" . substr($filename, strrpos($filename, DIRECTORY_SEPARATOR) + 1, -4);
             $res[] = new $className();
         }
         $testCase::assertTrue(count($res) > 0);
