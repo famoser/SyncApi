@@ -9,7 +9,7 @@
 namespace Famoser\SyncApi\Tests\ControllerTests\Base;
 
 
-use Famoser\SyncApi\Tests\TestHelper;
+use Famoser\SyncApi\Tests\ApiTestHelper;
 
 /**
  * a base class for all api tests
@@ -18,7 +18,7 @@ use Famoser\SyncApi\Tests\TestHelper;
  */
 class ApiTestController extends \PHPUnit_Framework_TestCase
 {
-    /* @var TestHelper $testHelper */
+    /* @var ApiTestHelper $testHelper */
     protected $testHelper;
 
     /**
@@ -26,7 +26,7 @@ class ApiTestController extends \PHPUnit_Framework_TestCase
      */
     public function setUp()
     {
-        $this->testHelper = new TestHelper();
+        $this->testHelper = new ApiTestHelper();
     }
 
     /**

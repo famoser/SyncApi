@@ -16,7 +16,7 @@ use Famoser\SyncApi\Models\Communication\Response\CollectionEntityResponse;
 use Famoser\SyncApi\Tests\AssertHelper;
 use Famoser\SyncApi\Tests\ControllerTests\Base\ApiTestController;
 use Famoser\SyncApi\Tests\SampleGenerator;
-use Famoser\SyncApi\Tests\TestHelper;
+use Famoser\SyncApi\Tests\ApiTestHelper;
 use Famoser\SyncApi\Types\OnlineAction;
 
 /**

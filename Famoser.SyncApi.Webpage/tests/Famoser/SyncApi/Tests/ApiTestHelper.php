@@ -25,7 +25,7 @@ use Slim\Http\Environment;
  *
  * @package Famoser\SyncApi\Tests
  */
-class TestHelper extends ContainerBase
+class ApiTestHelper extends ContainerBase
 {
     const TEST_APPLICATION_ID = "test_app";
     const TEST_APPLICATION_SEED = 0;
@@ -94,10 +94,35 @@ class TestHelper extends ContainerBase
                 'cache_path' => $basePath . "app" . $ds . "cache",
                 'log_path' => $basePath . "app" . $ds . "logs",
                 'template_path' => $basePath . "app" . $ds . "templates",
-                'public_path' => $basePath . "src" . $ds . "public"
+                'public_path' => $basePath . "src" . $ds . "public",
+                'src_path' => $basePath . "src",
             ];
 
         return $config;
+    }
+
+    /**
+     * get an array of instances of all the classes in this exact namespace
+     *
+     * @param \PHPUnit_Framework_TestCase $testCase
+     * @param $nameSpace
+     * @return array
+     */
+    public function getClassInstancesInNamespace(\PHPUnit_Framework_TestCase $testCase, $nameSpace)
+    {
+        $containerBase = new ContainerBase($this->getTestApp()->getContainer());
+        $srcPath = $containerBase->getSettingsArray()["src_path"];
+        $filePath = str_replace("\\", DIRECTORY_SEPARATOR, $nameSpace);
+        $res = [];
+        foreach (glob($srcPath . DIRECTORY_SEPARATOR . $filePath . DIRECTORY_SEPARATOR . "*.php") as $filename) {
+            $className = substr(str_replace($srcPath . DIRECTORY_SEPARATOR, "", $filename), 0, -4);
+            $res[] = new $className();
+        }
+        $testCase::assertTrue(count($res) > 0);
+        foreach ($res as $obj) {
+            $testCase::assertTrue(is_object($obj));
+        }
+        return $res;
     }
 
     /**
