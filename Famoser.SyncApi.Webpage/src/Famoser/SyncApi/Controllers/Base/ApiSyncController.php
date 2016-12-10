@@ -33,7 +33,7 @@ abstract class ApiSyncController extends ApiRequestController
      * @param $contentType
      * @return BaseSyncEntity[]
      */
-    abstract protected function getAll(BaseRequest $req, $contentType);
+    abstract protected function getAllFromDatabase(BaseRequest $req, $contentType);
 
     /**
      * create a new entity ready to insert into database
@@ -86,11 +86,11 @@ abstract class ApiSyncController extends ApiRequestController
                     break;
                 case OnlineAction::READ:
                     $entity = $this->getByIdInternal($req, $communicationEntity->Id, $contentType);
-                    $resultArray[] = $this->readSyncEntity($entity, $contentType);
+                    $resultArray[] = $this->readSyncEntity($contentType, $entity);
                     break;
                 case OnlineAction::UPDATE:
                     $entity = $this->getByIdInternal($req, $communicationEntity->Id, $contentType);
-                    $this->updateSyncEntity($entity, $communicationEntity);
+                    $this->updateSyncEntity($communicationEntity, $entity);
                     break;
                 case OnlineAction::DELETE:
                     $entity = $this->getByIdInternal($req, $communicationEntity->Id, $contentType);
@@ -98,7 +98,7 @@ abstract class ApiSyncController extends ApiRequestController
                     break;
                 case OnlineAction::CONFIRM_VERSION:
                     $entity = $this->getByIdInternal($req, $communicationEntity->Id, $contentType);
-                    $res = $this->confirmVersion($entity, $communicationEntity, $contentType);
+                    $res = $this->confirmVersion($communicationEntity, $contentType, $entity);
                     if ($res != null) {
                         $resultArray[] = $res;
                     }
@@ -111,7 +111,7 @@ abstract class ApiSyncController extends ApiRequestController
 
         //add new ones
         $existingEntities = $this->getAllInternal($req, $contentType);
-        $existingEntityIds = $this->getArrayOfObjectProperty($existingEntities, "id");
+        $existingEntityIds = $this->getArrayOfObjectProperty($existingEntities, "guid");
 
         //get new Ids
         $newOnes = array_diff($askedForGuids, $existingEntityIds);
@@ -120,16 +120,16 @@ abstract class ApiSyncController extends ApiRequestController
             //add new Objects to response
 
             //traverse list only once as array_diff returns sorted array (not sure about this one)
-            $index = 0;
+            $ind = 0;
             foreach ($newOnes as $newOne) {
-                for (; $index < count($existingEntityIds); $index++) {
-                    if ($existingEntityIds[$index] != $newOne) {
+                for (; $ind < count($existingEntityIds); $ind++) {
+                    if ($existingEntityIds[$ind] != $newOne) {
                         //not the Id we are looking for; skip
                         continue;
                     }
-                    if (!$existingEntities[$index]->is_deleted) {
-                        $ver = $this->getActiveVersion($existingEntities[$index], $contentType);
-                        $resultArray[] = $existingEntities[$index]->createCommunicationEntity($ver, OnlineAction::CREATE);
+                    if (!$existingEntities[$ind]->is_deleted) {
+                        $ver = $this->getActiveVersion($existingEntities[$ind], $contentType);
+                        $resultArray[] = $existingEntities[$ind]->createCommunicationEntity($ver, OnlineAction::CREATE);
                     }
                     break;
                 }
@@ -139,8 +139,7 @@ abstract class ApiSyncController extends ApiRequestController
         return $resultArray;
     }
 
-    private $tempEntities;
-
+    private $allEntities;
     /**
      * get all collections accessible by the current user
      *
@@ -150,11 +149,14 @@ abstract class ApiSyncController extends ApiRequestController
      */
     private function getAllInternal(BaseRequest $req, $contentType)
     {
-        if ($this->tempEntities == null) {
-            $this->tempEntities = $this->getAll($req, $contentType);
+        if ($this->allEntities == null) {
+            $dbData = $this->getAllFromDatabase($req, $contentType);
+            $this->allEntities = [];
+            foreach ($dbData as $item) {
+                $this->allEntities[$item->guid] = $item;
+            }
         }
-
-        return $this->tempEntities;
+        return $this->allEntities;
     }
 
     /**
@@ -184,13 +186,9 @@ abstract class ApiSyncController extends ApiRequestController
      */
     private function getByIdInternal(BaseRequest $req, $guid, $contentType)
     {
-        if ($this->tempEntities == null) {
-            $this->tempEntities = $this->getAll($req, $contentType);
-        }
-
-        return in_array($guid, $this->tempEntities) ? $this->tempEntities[$guid] : null;
+        $tempEntities = $this->getAllInternal($req, $contentType);
+        return in_array($guid, array_keys($tempEntities)) ? $tempEntities[$guid] : null;
     }
-
 
     /**
      * @param BaseSyncEntity $syncEntity
@@ -203,20 +201,20 @@ abstract class ApiSyncController extends ApiRequestController
             new ContentVersion(),
             "content_type = :content_type AND entity_guid = :entity_guid",
             ["content_type" => $contentType, "entity_guid" => $syncEntity->guid],
-            "create_date_time DESC"
+            "create_date_time DESC, id DESC"
         );
     }
 
     /**
      * confirms if the entity is already the newest version. If not, returns the newer version
      *
-     * @param BaseSyncEntity $entity
      * @param BaseCommunicationEntity $communicationEntity
      * @param $contentType
+     * @param BaseSyncEntity $entity
      * @return BaseCommunicationEntity|null
      * @throws ApiException
      */
-    private function confirmVersion(BaseSyncEntity $entity, BaseCommunicationEntity $communicationEntity, $contentType)
+    private function confirmVersion(BaseCommunicationEntity $communicationEntity, $contentType, BaseSyncEntity $entity)
     {
         if ($entity == null) {
             throw new ApiException(ApiError::RESOURCE_NOT_FOUND);
@@ -281,7 +279,7 @@ abstract class ApiSyncController extends ApiRequestController
      * @return BaseCommunicationEntity
      * @throws ApiException
      */
-    private function readSyncEntity(BaseSyncEntity $entity, $contentType)
+    private function readSyncEntity($contentType, BaseSyncEntity $entity = null)
     {
         if ($entity == null) {
             throw new ApiException(ApiError::RESOURCE_NOT_FOUND);
@@ -302,12 +300,12 @@ abstract class ApiSyncController extends ApiRequestController
     /**
      * updates sync entity, by creating a new content version
      *
-     * @param BaseSyncEntity $entity
      * @param BaseCommunicationEntity $syncEntity
+     * @param BaseSyncEntity $entity
      * @throws ApiException
      * @throws ServerException
      */
-    protected function updateSyncEntity(BaseSyncEntity $entity, BaseCommunicationEntity $syncEntity)
+    protected function updateSyncEntity(BaseCommunicationEntity $syncEntity, BaseSyncEntity $entity = null)
     {
         if ($entity == null) {
             throw new ApiException(ApiError::RESOURCE_NOT_FOUND);
@@ -334,7 +332,7 @@ abstract class ApiSyncController extends ApiRequestController
      * @throws ApiException
      * @throws ServerException
      */
-    protected function deleteSyncEntity(BaseSyncEntity $entity)
+    protected function deleteSyncEntity(BaseSyncEntity $entity = null)
     {
         if ($entity == null) {
             throw new ApiException(ApiError::RESOURCE_NOT_FOUND);

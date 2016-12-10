@@ -248,7 +248,7 @@ class AuthorizationController extends ApiSyncController
      * @return \Famoser\SyncApi\Models\Entities\Base\BaseSyncEntity[]
      * @throws ServerException
      */
-    protected function getAll(BaseRequest $req, $contentType)
+    protected function getAllFromDatabase(BaseRequest $req, $contentType)
     {
         if ($contentType == ContentType::USER) {
             //get all accessible users (which is obv. only one)

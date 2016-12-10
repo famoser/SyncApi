@@ -118,7 +118,7 @@ class DeviceController extends ApiSyncController
      * @return \Famoser\SyncApi\Models\Entities\Base\BaseSyncEntity[]
      * @throws ServerException
      */
-    protected function getAll(BaseRequest $req, $contentType)
+    protected function getAllFromDatabase(BaseRequest $req, $contentType)
     {
         if ($contentType != ContentType::DEVICE) {
             throw new ServerException(ServerError::FORBIDDEN);

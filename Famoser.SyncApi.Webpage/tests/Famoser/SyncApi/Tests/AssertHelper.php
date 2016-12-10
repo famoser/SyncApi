@@ -53,7 +53,7 @@ class AssertHelper
     )
     {
         //valid status code
-        $testingUnit->assertTrue($response->getStatusCode() == 200);
+        $testingUnit->assertEquals(200, $response->getStatusCode());
 
         //no error in json response
         $responseString = static::getResponseString($response);
@@ -82,7 +82,7 @@ class AssertHelper
         $responseString = static::getResponseString($response);
 
         //valid status code
-        $testingUnit->assertTrue($response->getStatusCode() == $expectedCode);
+        $testingUnit->assertEquals($expectedCode, $response->getStatusCode());
 
         //no error in json response
         $testingUnit->assertNotContains("\"ApiError\":0", $responseString);
@@ -121,18 +121,22 @@ class AssertHelper
             ["guid" => $collEntity->Id]
         );
         $testController::assertNotNull($entity);
-        $testController::assertEquals($entity->identifier, $collEntity->Identifier);
+        $testController::assertEquals($collEntity->Identifier, $entity->identifier);
         /* @var ContentVersion $entityVersion */
         $entityVersion = $databaseService->getSingleFromDatabase(
             new ContentVersion(),
             "entity_guid = :guid",
-            ["guid" => $collEntity->Id]
+            ["guid" => $collEntity->Id],
+            "create_date_time DESC, id DESC"
         );
         $testController::assertNotNull($entityVersion);
-        $testController::assertEquals($entityVersion->content, $collEntity->Content);
-        $testController::assertEquals($entityVersion->create_date_time, (new \DateTime($collEntity->CreateDateTime))->getTimestamp());
-        $testController::assertEquals($entityVersion->entity_guid, $collEntity->Id);
-        $testController::assertEquals($entityVersion->version_guid, $collEntity->VersionId);
+        $testController::assertEquals($collEntity->Content, $entityVersion->content);
+        $testController::assertEquals(
+            (new \DateTime($collEntity->CreateDateTime))->getTimestamp(),
+            $entityVersion->create_date_time
+        );
+        $testController::assertEquals($collEntity->Id, $entityVersion->entity_guid);
+        $testController::assertEquals($collEntity->VersionId, $entityVersion->version_guid);
 
     }
 
@@ -164,9 +168,9 @@ class AssertHelper
             $entityVersion
         );
 
-        $testController::assertEquals($entity->is_deleted, $deleted);
-        $testController::assertEquals($entityVersion->device_guid, $collectionCommunicationEntity->DeviceId);
-        $testController::assertEquals($entityVersion->content_type, ContentType::COLLECTION);
+        $testController::assertEquals($deleted, $entity->is_deleted);
+        $testController::assertEquals($collectionCommunicationEntity->DeviceId, $entityVersion->device_guid);
+        $testController::assertEquals(ContentType::COLLECTION, $entityVersion->content_type);
 
     }
 }

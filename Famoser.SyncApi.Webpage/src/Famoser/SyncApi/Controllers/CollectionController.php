@@ -16,6 +16,7 @@ use Famoser\SyncApi\Models\Communication\Request\Base\BaseRequest;
 use Famoser\SyncApi\Models\Communication\Response\CollectionEntityResponse;
 use Famoser\SyncApi\Models\Entities\Base\BaseSyncEntity;
 use Famoser\SyncApi\Models\Entities\Collection;
+use Famoser\SyncApi\Models\Entities\UserCollection;
 use Famoser\SyncApi\Types\ContentType;
 use Famoser\SyncApi\Types\ServerError;
 use Slim\Http\Request;
@@ -61,7 +62,7 @@ class CollectionController extends ApiSyncController
      * @throws ApiException
      * @throws ServerException
      */
-    protected function getAll(BaseRequest $req, $contentType)
+    protected function getAllFromDatabase(BaseRequest $req, $contentType)
     {
         if ($contentType != ContentType::COLLECTION) {
             throw new ServerException(ServerError::FORBIDDEN);
@@ -96,6 +97,15 @@ class CollectionController extends ApiSyncController
     {
         if ($contentType != ContentType::COLLECTION) {
             throw new ServerException(ServerError::FORBIDDEN);
+        }
+
+        //create userCollection
+        $entity = new UserCollection();
+        $entity->collection_guid = $commEntity->Id;
+        $entity->user_guid = $this->getUser($req)->guid;
+        $entity->create_date_time = time();
+        if (!$this->getDatabaseService()->saveToDatabase($entity)) {
+            throw new ServerException(ServerError::DATABASE_SAVE_FAILURE);
         }
 
         $coll = new Collection();
