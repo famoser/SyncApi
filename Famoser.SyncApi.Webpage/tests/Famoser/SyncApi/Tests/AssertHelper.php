@@ -12,6 +12,7 @@ namespace Famoser\SyncApi\Tests;
 use Famoser\SyncApi\Framework\ContainerBase;
 use Famoser\SyncApi\Models\Communication\Entities\Base\BaseCommunicationEntity;
 use Famoser\SyncApi\Models\Communication\Entities\CollectionCommunicationEntity;
+use Famoser\SyncApi\Models\Communication\Request\Base\BaseRequest;
 use Famoser\SyncApi\Models\Communication\Request\CollectionEntityRequest;
 use Famoser\SyncApi\Models\Entities\Base\BaseSyncEntity;
 use Famoser\SyncApi\Models\Entities\Collection;
@@ -175,22 +176,49 @@ class AssertHelper
 
     }
 
+    /**
+     * check the response for the expected properties
+     *
+     * @param ApiTestController $testController
+     * @param BaseCommunicationEntity $collEntity
+     * @param BaseRequest $syncRequest
+     * @param $communicationEntity
+     */
+    private static function checkResponseEntity(
+        ApiTestController $testController,
+        BaseCommunicationEntity $collEntity,
+        BaseRequest $syncRequest,
+        $communicationEntity
+    )
+    {
+        /* @var BaseCommunicationEntity $communicationEntity */
+        $testController::assertEquals($collEntity->VersionId, $communicationEntity->VersionId);
+        $testController::assertEquals($collEntity->Content, $communicationEntity->Content);
+        $testController::assertEquals(
+            (new \DateTime($collEntity->CreateDateTime))->getTimestamp(),
+            (new \DateTime($communicationEntity->CreateDateTime))->getTimestamp()
+        );
+        $testController::assertEquals($syncRequest->DeviceId, $communicationEntity->DeviceId);
+        $testController::assertEquals($collEntity->Id, $communicationEntity->Id);
+        $testController::assertEquals($collEntity->Identifier, $communicationEntity->Identifier);
+    }
+
+    /**
+     * checks the response collection for the expected properties
+     *
+     * @param ApiTestController $testController
+     * @param CollectionCommunicationEntity $collEntity
+     * @param CollectionEntityRequest $syncRequest
+     * @param $receivedCollection
+     */
     public static function checkResponseCollection(
         ApiTestController $testController,
         CollectionCommunicationEntity $collEntity,
         CollectionEntityRequest $syncRequest,
-        $receivedCollection)
+        $receivedCollection
+    )
     {
-        /* @var CollectionCommunicationEntity $receivedCollection */
-        $testController::assertEquals($collEntity->VersionId, $receivedCollection->VersionId);
-        $testController::assertEquals($collEntity->Content, $receivedCollection->Content);
-        $testController::assertEquals(
-            (new \DateTime($collEntity->CreateDateTime))->getTimestamp(),
-            (new \DateTime($receivedCollection->CreateDateTime))->getTimestamp()
-        );
-        $testController::assertEquals($syncRequest->DeviceId, $receivedCollection->DeviceId);
-        $testController::assertEquals($collEntity->Id, $receivedCollection->Id);
-        $testController::assertEquals($collEntity->Identifier, $receivedCollection->Identifier);
+        static::checkResponseEntity($testController, $collEntity, $syncRequest, $receivedCollection);
         $testController::assertEquals($syncRequest->UserId, $receivedCollection->UserId);
     }
 }

@@ -107,8 +107,8 @@ class SyncApiApp extends App
             $this->get('/forgot', $controllerNamespace . 'LoginController:forgot')->setName("forgot");
             $this->post('/forgot', $controllerNamespace . 'LoginController:forgotPost');
 
-            $this->get('/recover/{id}', $controllerNamespace . 'LoginController:recover')->setName("recover");
-            $this->post('/recover/{id}', $controllerNamespace . 'LoginController:recoverPost');
+            $this->get('/recover', $controllerNamespace . 'LoginController:recover')->setName("recover");
+            $this->post('/recover', $controllerNamespace . 'LoginController:recoverPost');
 
             $this->group(
                 "/dashboard",

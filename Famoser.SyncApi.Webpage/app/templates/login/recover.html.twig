@@ -11,11 +11,11 @@
             <input placeholder="activation code" name="activation_code" class="form-control"/>
         </div>
         <div class="form-group">
-            <input placeholder="password" name="password" type="password" class="form-control"/>
-            <input placeholder="confirm password" name="password2" type="password" class="form-control"/>
+            <input placeholder="new password" name="password" type="password" class="form-control"/>
+            <input placeholder="confirm new password" name="password2" type="password" class="form-control"/>
         </div>
         <button class="btn btn-primary" type="submit">send</button>
     </form>
     <p>create an authorization code <a href="{{ path_for("forgot") }}">here</a><br/>
-        have your got your memory back and want to <a href="{{ path_for("login") }}">login</a>?</p>
+        have got your memory back and want to <a href="{{ path_for("login") }}">login</a>?</p>
 {% endblock %}

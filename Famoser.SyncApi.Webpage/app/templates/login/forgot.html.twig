@@ -5,7 +5,7 @@
 {% block content %}
     <h3>forgot the password, hm?</h3>
     <p>fill out all information you remember! <br/>
-        if we're happy with it, we'll send you an email with an activation code
+        if username and email match, we'll send you an email with an activation code
         you can use <a href="{{ path_for("recover") }}">here</a> to choose a new password</p>
     <form action="{{ path_for("forgot") }}" method="post">
         <div class="form-group">
@@ -14,5 +14,5 @@
         </div>
         <button class="btn btn-primary" type="submit">send</button>
     </form>
-    <p>have your got your memory back and want to <a href="{{ path_for("login") }}">login</a>?</p>
+    <p>have got your memory back and want to <a href="{{ path_for("login") }}">login</a>?</p>
 {% endblock %}

@@ -304,4 +304,34 @@ class CollectionControllerTest extends ApiTestController
         AssertHelper::checkResponseCollection($this, $collEntity, $syncRequest, $responseObj->CollectionEntities[0]);
         AssertHelper::checkForSavedCollection($this, $collEntity, $this->testHelper->getTestApp());
     }
+
+    /**
+     * tests multiple actions
+     */
+    public function testMultipleActionSync()
+    {
+        //test create
+        $syncRequest = new CollectionEntityRequest();
+        $this->testHelper->authorizeRequest($syncRequest);
+
+        $syncRequest->UserId = $this->testHelper->getUserId();
+        $syncRequest->DeviceId = $this->testHelper->getDeviceId($syncRequest->UserId);
+
+        $collEntity = new CollectionCommunicationEntity();
+        SampleGenerator::createEntity($collEntity);
+        $collEntity->DeviceId = $syncRequest->DeviceId;
+
+        $syncRequest->CollectionEntities[] = $collEntity;
+
+        $collEntity2 = clone $collEntity;
+        $collEntity2->Id = SampleGenerator::createGuid();
+
+        $syncRequest->CollectionEntities[] = $collEntity2;
+
+        $this->testHelper->mockApiRequest($syncRequest, "collections/sync");
+        $response = $this->testHelper->getTestApp()->run();
+        AssertHelper::checkForSuccessfulApiResponse($this, $response);
+        AssertHelper::checkForSavedCollection($this, $collEntity, $this->testHelper->getTestApp());
+        AssertHelper::checkForSavedCollection($this, $collEntity2, $this->testHelper->getTestApp());
+    }
 }
