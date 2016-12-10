@@ -12,8 +12,10 @@ namespace Famoser\SyncApi\Tests;
 use Famoser\SyncApi\Framework\ContainerBase;
 use Famoser\SyncApi\Models\Communication\Request\Base\BaseRequest;
 use Famoser\SyncApi\Models\Entities\Application;
+use Famoser\SyncApi\Models\Entities\Collection;
 use Famoser\SyncApi\Models\Entities\Device;
 use Famoser\SyncApi\Models\Entities\User;
+use Famoser\SyncApi\Models\Entities\UserCollection;
 use Famoser\SyncApi\SyncApiApp;
 use Psr\Http\Message\ResponseInterface;
 use Slim\Http\Environment;
@@ -211,5 +213,31 @@ class TestHelper extends ContainerBase
         $this->getDatabaseService()->saveToDatabase($device);
 
         return $device->guid;
+    }
+
+    /**
+     * returns an authenticated device id
+     *
+     * @param $userId
+     * @param $deviceId
+     * @return string
+     */
+    public function getCollectionId($userId, $deviceId)
+    {
+        $collection = new Collection();
+        $collection->guid = SampleGenerator::createGuid();
+        $collection->identifier = "json";
+        $collection->is_deleted = false;
+        $collection->user_guid = $userId;
+        $collection->device_guid = $deviceId;
+        $this->getDatabaseService()->saveToDatabase($collection);
+
+        $userCollection = new UserCollection();
+        $userCollection->collection_guid = $collection->guid;
+        $userCollection->create_date_time = time();
+        $userCollection->user_guid = $userId;
+        $this->getDatabaseService()->saveToDatabase($userCollection);
+
+        return $collection->guid;
     }
 }

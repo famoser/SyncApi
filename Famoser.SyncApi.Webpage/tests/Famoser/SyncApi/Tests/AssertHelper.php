@@ -12,11 +12,14 @@ namespace Famoser\SyncApi\Tests;
 use Famoser\SyncApi\Framework\ContainerBase;
 use Famoser\SyncApi\Models\Communication\Entities\Base\BaseCommunicationEntity;
 use Famoser\SyncApi\Models\Communication\Entities\CollectionCommunicationEntity;
+use Famoser\SyncApi\Models\Communication\Entities\SyncCommunicationEntity;
 use Famoser\SyncApi\Models\Communication\Request\Base\BaseRequest;
 use Famoser\SyncApi\Models\Communication\Request\CollectionEntityRequest;
+use Famoser\SyncApi\Models\Communication\Request\SyncEntityRequest;
 use Famoser\SyncApi\Models\Entities\Base\BaseSyncEntity;
 use Famoser\SyncApi\Models\Entities\Collection;
 use Famoser\SyncApi\Models\Entities\ContentVersion;
+use Famoser\SyncApi\Models\Entities\Entity;
 use Famoser\SyncApi\SyncApiApp;
 use Famoser\SyncApi\Tests\ControllerTests\Base\ApiTestController;
 use Famoser\SyncApi\Types\ContentType;
@@ -157,7 +160,7 @@ class AssertHelper
         $deleted = false
     )
     {
-        /* @var BaseSyncEntity $entity */
+        /* @var Collection $entity */
         $entity = null;
         /* @var ContentVersion $entityVersion */
         $entityVersion = null;
@@ -171,8 +174,47 @@ class AssertHelper
         );
 
         $testController::assertEquals($deleted, $entity->is_deleted);
+        $testController::assertEquals($collectionCommunicationEntity->UserId, $entity->user_guid);
+        $testController::assertEquals($collectionCommunicationEntity->DeviceId, $entity->device_guid);
         $testController::assertEquals($collectionCommunicationEntity->DeviceId, $entityVersion->device_guid);
         $testController::assertEquals(ContentType::COLLECTION, $entityVersion->content_type);
+
+    }
+
+    /**
+     * check if collection is saved correctly to the database
+     *
+     * @param ApiTestController $testController
+     * @param SyncCommunicationEntity $syncCommunicationEntity
+     * @param SyncApiApp $syncApiApp
+     * @param bool $deleted
+     */
+    public static function checkForSavedEntity(
+        ApiTestController $testController,
+        SyncCommunicationEntity $syncCommunicationEntity,
+        SyncApiApp $syncApiApp,
+        $deleted = false
+    )
+    {
+        /* @var Entity $entity */
+        $entity = null;
+        /* @var ContentVersion $entityVersion */
+        $entityVersion = null;
+        static::checkForSavedSyncEntity(
+            $testController,
+            $syncCommunicationEntity,
+            new Entity(),
+            $syncApiApp,
+            $entity,
+            $entityVersion
+        );
+
+        $testController::assertEquals($deleted, $entity->is_deleted);
+        $testController::assertEquals($syncCommunicationEntity->CollectionId, $entity->collection_guid);
+        $testController::assertEquals($syncCommunicationEntity->UserId, $entity->user_guid);
+        $testController::assertEquals($syncCommunicationEntity->DeviceId, $entity->device_guid);
+        $testController::assertEquals($syncCommunicationEntity->DeviceId, $entityVersion->device_guid);
+        $testController::assertEquals(ContentType::ENTITY, $entityVersion->content_type);
 
     }
 
@@ -184,7 +226,7 @@ class AssertHelper
      * @param BaseRequest $syncRequest
      * @param $communicationEntity
      */
-    private static function checkResponseEntity(
+    private static function checkResponseBaseEntity(
         ApiTestController $testController,
         BaseCommunicationEntity $collEntity,
         BaseRequest $syncRequest,
@@ -218,7 +260,29 @@ class AssertHelper
         $receivedCollection
     )
     {
-        static::checkResponseEntity($testController, $collEntity, $syncRequest, $receivedCollection);
+        static::checkResponseBaseEntity($testController, $collEntity, $syncRequest, $receivedCollection);
         $testController::assertEquals($syncRequest->UserId, $receivedCollection->UserId);
+    }
+
+    /**
+     * checks the response collection for the expected properties
+     *
+     * @param ApiTestController $testController
+     * @param SyncCommunicationEntity $collEntity
+     * @param SyncEntityRequest $syncRequest
+     * @param $receivedEntity
+     * @param $collectionId
+     */
+    public static function checkResponseEntity(
+        ApiTestController $testController,
+        SyncCommunicationEntity $collEntity,
+        SyncEntityRequest $syncRequest,
+        $receivedEntity,
+        $collectionId
+    )
+    {
+        static::checkResponseBaseEntity($testController, $collEntity, $syncRequest, $receivedEntity);
+        $testController::assertEquals($syncRequest->UserId, $receivedEntity->UserId);
+        $testController::assertEquals($collectionId, $receivedEntity->CollectionId);
     }
 }
