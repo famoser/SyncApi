@@ -104,6 +104,10 @@ abstract class ApiSyncController extends ApiRequestController
                     }
                     break;
                 case OnlineAction::CONFIRM_ACCESS:
+                    $entity = $this->getByIdInternal($req, $communicationEntity->Id, $contentType);
+                    $res = $this->confirmAccess($communicationEntity, $entity);
+                    $resultArray[] = $res;
+                    break;
                 default:
                     throw new ApiException(ApiError::ACTION_NOT_SUPPORTED);
             }
@@ -129,7 +133,10 @@ abstract class ApiSyncController extends ApiRequestController
                     }
                     if (!$existingEntities[$newOne]->is_deleted) {
                         $ver = $this->getActiveVersion($existingEntities[$newOne], $contentType);
-                        $resultArray[] = $existingEntities[$newOne]->createCommunicationEntity($ver, OnlineAction::CREATE);
+                        $resultArray[] = $existingEntities[$newOne]->createCommunicationEntity(
+                            $ver,
+                            OnlineAction::CREATE
+                        );
                     }
                     break;
                 }
@@ -223,7 +230,7 @@ abstract class ApiSyncController extends ApiRequestController
 
         $ver = $this->getActiveVersion($entity, $contentType);
 
-        if ($entity == null) {
+        if ($ver == null) {
             throw new ApiException(ApiError::RESOURCE_NOT_FOUND);
         }
 
@@ -233,6 +240,22 @@ abstract class ApiSyncController extends ApiRequestController
             return $entity->createCommunicationEntity($ver, OnlineAction::UPDATE);
         }
         return null;
+    }
+
+    /**
+     * confirms if the entity is already the newest version. If not, returns the newer version
+     *
+     * @param BaseCommunicationEntity $communicationEntity
+     * @param BaseSyncEntity $entity
+     * @return BaseCommunicationEntity|null
+     * @throws ApiException
+     */
+    private function confirmAccess(BaseCommunicationEntity $communicationEntity, BaseSyncEntity $entity)
+    {
+        $resp = new BaseCommunicationEntity();
+        $resp->Id = $communicationEntity->Id;
+        $resp->OnlineAction = $entity != null ? OnlineAction::ACCESS_GRANTED : OnlineAction::ACCESS_DENIED;
+        return $resp;
     }
 
     /**

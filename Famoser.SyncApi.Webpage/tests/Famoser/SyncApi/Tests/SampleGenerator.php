@@ -44,6 +44,26 @@ class SampleGenerator
     }
 
     /**
+     * create a guid
+     *
+     * @return string
+     */
+    public static function emptyGuid()
+    {
+        return sprintf(
+            '%04X%04X-%04X-%04X-%04X-%04X%04X%04X',
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+        );
+    }
+
+    /**
      * create an entity
      *
      * @param BaseCommunicationEntity $entity

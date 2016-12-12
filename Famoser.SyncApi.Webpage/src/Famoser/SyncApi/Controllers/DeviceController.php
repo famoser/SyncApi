@@ -18,6 +18,7 @@ use Famoser\SyncApi\Models\Communication\Response\CollectionEntityResponse;
 use Famoser\SyncApi\Models\Entities\Base\BaseSyncEntity;
 use Famoser\SyncApi\Models\Entities\Device;
 use Famoser\SyncApi\Types\ContentType;
+use Famoser\SyncApi\Types\OnlineAction;
 use Famoser\SyncApi\Types\ServerError;
 use Slim\Http\Request;
 use Slim\Http\Response;
@@ -47,7 +48,8 @@ class DeviceController extends ApiSyncController
         $resp->CollectionEntities = $this->syncInternal(
             $req,
             $req->CollectionEntities,
-            ContentType::DEVICE
+            ContentType::DEVICE,
+            [OnlineAction::READ, OnlineAction::CONFIRM_VERSION]
         );
 
         return $this->returnJson($response, $resp);
@@ -143,6 +145,9 @@ class DeviceController extends ApiSyncController
      */
     protected function createEntity(BaseRequest $req, $contentType, BaseCommunicationEntity $commEntity)
     {
+        //the access here is not allowed as no OnlineAction is equal to create
+        throw new ServerException(ServerError::FORBIDDEN);
+        /*
         if ($contentType != ContentType::DEVICE) {
             throw new ServerException(ServerError::FORBIDDEN);
         }
@@ -151,5 +156,6 @@ class DeviceController extends ApiSyncController
         $entity->is_authenticated = false;
         $entity->user_guid = $this->getUser($req)->guid;
         return $entity;
+        */
     }
 }

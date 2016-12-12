@@ -13,10 +13,12 @@ use Famoser\SyncApi\Framework\ContainerBase;
 use Famoser\SyncApi\Models\Communication\Request\Base\BaseRequest;
 use Famoser\SyncApi\Models\Entities\Application;
 use Famoser\SyncApi\Models\Entities\Collection;
+use Famoser\SyncApi\Models\Entities\ContentVersion;
 use Famoser\SyncApi\Models\Entities\Device;
 use Famoser\SyncApi\Models\Entities\User;
 use Famoser\SyncApi\Models\Entities\UserCollection;
 use Famoser\SyncApi\SyncApiApp;
+use Famoser\SyncApi\Types\ContentType;
 use Psr\Http\Message\ResponseInterface;
 use Slim\Http\Environment;
 
@@ -218,6 +220,9 @@ class ApiTestHelper extends ContainerBase
         $user->is_deleted = false;
         $this->getDatabaseService()->saveToDatabase($user);
 
+        $this->addVersion($user->guid, SampleGenerator::emptyGuid(), ContentType::USER);
+
+
         return $user->guid;
     }
 
@@ -236,6 +241,8 @@ class ApiTestHelper extends ContainerBase
         $device->is_authenticated = true;
         $device->user_guid = $userId;
         $this->getDatabaseService()->saveToDatabase($device);
+
+        $this->addVersion($device->guid, $device->guid, ContentType::DEVICE);
 
         return $device->guid;
     }
@@ -257,6 +264,8 @@ class ApiTestHelper extends ContainerBase
         $collection->device_guid = $deviceId;
         $this->getDatabaseService()->saveToDatabase($collection);
 
+        $this->addVersion($collection->guid, $deviceId, ContentType::COLLECTION);
+
         $userCollection = new UserCollection();
         $userCollection->collection_guid = $collection->guid;
         $userCollection->create_date_time = time();
@@ -264,5 +273,24 @@ class ApiTestHelper extends ContainerBase
         $this->getDatabaseService()->saveToDatabase($userCollection);
 
         return $collection->guid;
+    }
+
+    /**
+     * add a content version for an entity
+     *
+     * @param $entityGuid
+     * @param $deviceGuid
+     * @param $contentType
+     */
+    private function addVersion($entityGuid, $deviceGuid, $contentType)
+    {
+        $contentVersion = new ContentVersion();
+        $contentVersion->content = "{}";
+        $contentVersion->content_type = $contentType;
+        $contentVersion->create_date_time = time();
+        $contentVersion->device_guid = $deviceGuid;
+        $contentVersion->entity_guid = $entityGuid;
+        $contentVersion->version_guid = SampleGenerator::createGuid();
+        $this->getDatabaseService()->saveToDatabase($contentVersion);
     }
 }

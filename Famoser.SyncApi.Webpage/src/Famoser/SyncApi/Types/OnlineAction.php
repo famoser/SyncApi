@@ -24,6 +24,9 @@ class OnlineAction
     const CONFIRM_VERSION = 5;
     const CONFIRM_ACCESS = 6;
 
+    const ACCESS_GRANTED = 10;
+    const ACCESS_DENIED = 11;
+
     const ALL_SYNC_ACTIONS = [
         OnlineAction::CONFIRM_VERSION,
         OnlineAction::CREATE,
