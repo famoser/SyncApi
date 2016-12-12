@@ -17,6 +17,7 @@ use Famoser\SyncApi\Models\Communication\Request\CollectionEntityRequest;
 use Famoser\SyncApi\Models\Communication\Request\HistoryEntityRequest;
 use Famoser\SyncApi\Models\Communication\Request\SyncEntityRequest;
 use Famoser\SyncApi\Services\Base\BaseService;
+use Famoser\SyncApi\Services\Interfaces\RequestServiceInterface;
 use Slim\Http\Request;
 
 /**
@@ -24,7 +25,7 @@ use Slim\Http\Request;
  *
  * @package Famoser\SyncApi\Services
  */
-class RequestService extends BaseService
+class RequestService extends BaseService implements RequestServiceInterface
 {
     /**
      * @param Request $request
@@ -67,12 +68,34 @@ class RequestService extends BaseService
     }
 
     /**
+     * @param Request $request
+     * @param $model
+     * @return mixed
+     * @throws \JsonMapper_Exception
+     */
+    private function executeJsonMapper(Request $request, IJsonDeserializable $model)
+    {
+        if (isset($_POST["json"])) {
+            $json = $_POST["json"];
+        } else {
+            $json = $request->getBody()->getContents();
+        }
+
+        $mapper = new SimpleJsonMapper();
+        $om = new ObjectProperty("root", $model);
+        $resObj = $mapper->mapObject($json, $om);
+        $this->getLoggingService()->log(json_encode($resObj, JSON_PRETTY_PRINT), "RequestHelper.txt");
+        return $resObj;
+    }
+
+    /**
      * @param $authCode
      * @param $applicationSeed
      * @param $personSeed
+     * @param int $modulo
      * @return bool
      */
-    public function validateAuthCode($authCode, $applicationSeed, $personSeed)
+    public function validateAuthCode($authCode, $applicationSeed, $personSeed, $modulo = 10000019)
     {
         //return true if $applicationSeed is 0 (= not configured)
         if ($applicationSeed == 0) {
@@ -97,26 +120,5 @@ class RequestService extends BaseService
             return $content[1] == $expectedAuthCode;
         }
         return false;
-    }
-
-    /**
-     * @param Request $request
-     * @param $model
-     * @return object
-     * @throws \JsonMapper_Exception
-     */
-    private function executeJsonMapper(Request $request, IJsonDeserializable $model)
-    {
-        if (isset($_POST["json"])) {
-            $json = $_POST["json"];
-        } else {
-            $json = $request->getBody()->getContents();
-        }
-
-        $mapper = new SimpleJsonMapper();
-        $om = new ObjectProperty("root", $model);
-        $resObj = $mapper->mapObject($json, $om);
-        $this->getLoggingService()->log(json_encode($resObj, JSON_PRETTY_PRINT), "RequestHelper.txt");
-        return $resObj;
     }
 }

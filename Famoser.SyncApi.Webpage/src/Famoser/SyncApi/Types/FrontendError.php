@@ -17,6 +17,7 @@ namespace Famoser\SyncApi\Types;
 class FrontendError
 {
     const NOT_LOGGED_IN = 0;
+    const ACCESS_DENIED = 1;
 
     /**
      * convert to string
@@ -29,6 +30,8 @@ class FrontendError
         switch ($code) {
             case FrontendError::NOT_LOGGED_IN:
                 return "not logged in";
+            case FrontendError::ACCESS_DENIED:
+                return "you are not allowed to view this resource";
             default:
                 return "unknown error occurred with code " . $code;
         }

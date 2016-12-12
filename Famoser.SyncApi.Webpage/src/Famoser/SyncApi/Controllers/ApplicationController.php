@@ -10,7 +10,6 @@ namespace Famoser\SyncApi\Controllers;
 
 
 use Famoser\SyncApi\Controllers\Base\FrontendController;
-use Famoser\SyncApi\Exceptions\AccessDeniedException;
 use Famoser\SyncApi\Exceptions\FrontendException;
 use Famoser\SyncApi\Models\Display\ApplicationStatistic;
 use Famoser\SyncApi\Models\Entities\Application;
@@ -41,7 +40,7 @@ class ApplicationController extends FrontendController
     /**
      * @param $entityId
      * @return Application
-     * @throws AccessDeniedException
+     * @throws FrontendException
      */
     private function getAuthorizedApplication($entityId)
     {
@@ -54,7 +53,7 @@ class ApplicationController extends FrontendController
             return $application;
         }
 
-        throw new AccessDeniedException();
+        throw new FrontendException(FrontendError::NOT_LOGGED_IN);
     }
 
     /**
@@ -85,7 +84,6 @@ class ApplicationController extends FrontendController
      * @param Response $response
      * @param $args
      * @return mixed
-     * @throws AccessDeniedException
      * @throws FrontendException
      */
     public function show(Request $request, Response $response, $args)
@@ -104,7 +102,6 @@ class ApplicationController extends FrontendController
      * @param Response $response
      * @param $args
      * @return mixed
-     * @throws AccessDeniedException
      * @throws FrontendException
      */
     public function settings(Request $request, Response $response, $args)
@@ -123,7 +120,6 @@ class ApplicationController extends FrontendController
      * @param Response $response
      * @param $args
      * @return mixed
-     * @throws AccessDeniedException
      * @throws FrontendException
      */
     public function settingsPost(Request $request, Response $response, $args)
@@ -266,7 +262,6 @@ class ApplicationController extends FrontendController
      * @param Response $response
      * @param $args
      * @return mixed
-     * @throws AccessDeniedException
      * @throws FrontendException
      */
     public function edit(Request $request, Response $response, $args)
@@ -284,7 +279,6 @@ class ApplicationController extends FrontendController
      * @param Response $response
      * @param $args
      * @return mixed
-     * @throws AccessDeniedException
      * @throws FrontendException
      */
     public function editPost(Request $request, Response $response, $args)
@@ -309,7 +303,6 @@ class ApplicationController extends FrontendController
      * @param Response $response
      * @param $args
      * @return mixed
-     * @throws AccessDeniedException
      * @throws FrontendException
      */
     public function remove(Request $request, Response $response, $args)
@@ -327,7 +320,6 @@ class ApplicationController extends FrontendController
      * @param Response $response
      * @param $args
      * @return mixed|static
-     * @throws AccessDeniedException
      * @throws FrontendException
      */
     public function removePost(Request $request, Response $response, $args)

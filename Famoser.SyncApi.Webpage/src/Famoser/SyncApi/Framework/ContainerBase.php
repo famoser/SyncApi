@@ -49,7 +49,7 @@ class ContainerBase
     /**
      * return the logger
      *
-     * @return LoggingServiceInterface
+     * @return string[]
      */
     public function getSettingsArray()
     {
