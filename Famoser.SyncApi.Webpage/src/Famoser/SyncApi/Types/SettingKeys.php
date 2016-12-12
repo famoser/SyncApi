@@ -52,7 +52,7 @@ class SettingKeys
             case SettingKeys::AUTHORIZATION_CODE_VALID_TIME:
                 return "300";
             case SettingKeys::DEVICE_AUTHENTICATION_REQUIRED:
-                return "false";
+                return "true";
             case SettingKeys::AUTHORIZATION_CODE_LENGTH:
                 return "6";
             default:

@@ -23,6 +23,9 @@ use Famoser\SyncApi\Types\ServerError;
  */
 class ExceptionTest extends \PHPUnit_Framework_TestCase
 {
+    /**
+     * tests that exception error messages & codes are correct
+     */
     public function testTextConversionsCorrect()
     {
         $apiException = new ApiException(ApiError::APPLICATION_NOT_FOUND);

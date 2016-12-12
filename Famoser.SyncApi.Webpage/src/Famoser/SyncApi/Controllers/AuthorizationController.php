@@ -292,15 +292,17 @@ class AuthorizationController extends ApiSyncController
 
             return $user;
         } elseif ($contentType == ContentType::DEVICE) {
-            $devices = $this->getDatabaseService()->countFromDatabase(
+            $deviceCount = $this->getDatabaseService()->countFromDatabase(
                 new Device(),
                 "user_guid = :user_guid AND is_deleted = :is_deleted",
                 ["user_guid" => $this->getUser($req)->guid, "is_deleted" => false]
             );
 
+            $settingsRepo = $this->getSettingRepository($req->ApplicationId);
+
             $device = new Device();
             $device->user_guid = $this->getUser($req)->guid;
-            $device->is_authenticated = $devices == 0;
+            $device->is_authenticated = !$settingsRepo->getDeviceAuthenticationRequired() || ($deviceCount == 0);
 
             return $device;
         }

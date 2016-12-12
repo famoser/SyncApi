@@ -134,11 +134,11 @@ class SettingsRepository
     /**
      * get a boolean if the device needs to be authenticated before accessing a resource from the user
      *
-     * @return string
+     * @return bool
      */
     public function getDeviceAuthenticationRequired()
     {
-        return $this->getOrCreateValue(SettingKeys::DEVICE_AUTHENTICATION_REQUIRED);
+        return $this->getOrCreateValue(SettingKeys::DEVICE_AUTHENTICATION_REQUIRED) == "true";
     }
 
     /**

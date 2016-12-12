@@ -32,7 +32,7 @@ class BaseController extends ContainerBase
     /**
      * get SettingsRepository for the specified application
      *
-     * @param  $applicationId
+     * @param  int $applicationId
      * @return SettingsRepository
      */
     protected function getSettingRepository($applicationId)
