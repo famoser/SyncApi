@@ -88,7 +88,6 @@ class ApiError
             case ApiError::ACTION_PROHIBITED:
                 return "action prohibited";
 
-
             case ApiError::SERVER_ERROR:
                 return "unknown server error occurred";
             

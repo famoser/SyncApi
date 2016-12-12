@@ -90,11 +90,14 @@ class SettingsRepository
      */
     private function setOrCreateValue($key, $val)
     {
-        if (in_array($key, $this->dic)) {
-            $this->dic[$key]->val = $val;
-            $this->helper->saveToDatabase($this->dic[$key]);
-        } else {
-            $this->persistNewSetting($key, $val);
+        //check if valid value, else simply ignore
+        if (SettingKeys::isValidValue($key, $val)) {
+            if (in_array($key, $this->dic)) {
+                $this->dic[$key]->val = $val;
+                $this->helper->saveToDatabase($this->dic[$key]);
+            } else {
+                $this->persistNewSetting($key, $val);
+            }
         }
     }
 

@@ -11,7 +11,7 @@ namespace Famoser\SyncApi\Types;
 
 /**
  * used to distinguish setting keys
- * 
+ *
  * @package Famoser\SyncApi\Types
  */
 class SettingKeys
@@ -22,13 +22,13 @@ class SettingKeys
 
     /**
      * get a description of a setting to be displayed to a user
-     * 
-     * @param $val
+     *
+     * @param $key
      * @return string
      */
-    public static function getSettingDescription($val)
+    public static function getSettingDescription($key)
     {
-        switch ($val) {
+        switch ($key) {
             case SettingKeys::AUTHORIZATION_CODE_VALID_TIME:
                 return "authorization code valid time";
             case SettingKeys::DEVICE_AUTHENTICATION_REQUIRED:
@@ -36,19 +36,19 @@ class SettingKeys
             case SettingKeys::AUTHORIZATION_CODE_LENGTH:
                 return "length of the authorization code";
             default:
-                return "unknown setting";
+                return "unknown setting with key " . $key;
         }
     }
 
     /**
      * get a default value of a setting
-     * 
-     * @param $val
+     *
+     * @param $key
      * @return string
      */
-    public static function getDefaultValue($val)
+    public static function getDefaultValue($key)
     {
-        switch ($val) {
+        switch ($key) {
             case SettingKeys::AUTHORIZATION_CODE_VALID_TIME:
                 return "300";
             case SettingKeys::DEVICE_AUTHENTICATION_REQUIRED:
@@ -56,19 +56,20 @@ class SettingKeys
             case SettingKeys::AUTHORIZATION_CODE_LENGTH:
                 return "6";
             default:
-                return "unknown";
+                return "unknown default value for key " . $key;
         }
     }
 
     /**
      * checks if the value to be assigned to a setting is valid
-     * 
+     *
+     * @param $key
      * @param $val
      * @return bool
      */
-    public static function isValidValue($val)
+    public static function isValidValue($key, $val)
     {
-        switch ($val) {
+        switch ($key) {
             case SettingKeys::AUTHORIZATION_CODE_VALID_TIME:
                 return is_numeric($val);
             case SettingKeys::DEVICE_AUTHENTICATION_REQUIRED:

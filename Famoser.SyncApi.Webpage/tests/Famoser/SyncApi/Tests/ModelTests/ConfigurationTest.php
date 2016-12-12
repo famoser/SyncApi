@@ -13,6 +13,11 @@ use Famoser\SyncApi\Framework\ContainerBase;
 use Famoser\SyncApi\Models\Entities\Base\BaseEntity;
 use Famoser\SyncApi\Tests\ApiTestHelper;
 
+/**
+ * tests the configuration of the models
+ *
+ * @package Famoser\SyncApi\Tests\ModelTests
+ */
 class ConfigurationTest extends \PHPUnit_Framework_TestCase
 {
     public function testTableNamesUnique()

@@ -20,7 +20,7 @@ class FrontendError
 
     /**
      * convert to string
-     * 
+     *
      * @param $code
      * @return string
      */
@@ -30,7 +30,7 @@ class FrontendError
             case FrontendError::NOT_LOGGED_IN:
                 return "not logged in";
             default:
-                return "unknown error occurred";
+                return "unknown error occurred with code " . $code;
         }
     }
 }
