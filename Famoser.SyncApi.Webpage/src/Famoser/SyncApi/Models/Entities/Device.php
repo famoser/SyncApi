@@ -65,6 +65,7 @@ class Device extends BaseSyncEntity
         $entity = new DeviceCommunicationEntity();
 
         $entity->UserId = $this->user_guid;
+        $entity->IsAuthenticated = $this->is_authenticated == 1;
 
         return $entity;
     }

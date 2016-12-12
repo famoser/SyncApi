@@ -230,15 +230,16 @@ class ApiTestHelper extends ContainerBase
      * returns an authenticated device id
      *
      * @param $userId
+     * @param bool $isAuthenticated
      * @return string
      */
-    public function getDeviceId($userId)
+    public function getDeviceId($userId, $isAuthenticated = true)
     {
         $device = new Device();
         $device->guid = SampleGenerator::createGuid();
         $device->identifier = "json";
         $device->is_deleted = false;
-        $device->is_authenticated = true;
+        $device->is_authenticated = $isAuthenticated;
         $device->user_guid = $userId;
         $this->getDatabaseService()->saveToDatabase($device);
 

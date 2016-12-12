@@ -10,6 +10,7 @@ namespace Famoser\SyncApi\Models\Communication\Entities;
 
 
 use Famoser\SyncApi\Framework\Json\Models\Base\JsonProperty;
+use Famoser\SyncApi\Framework\Json\Models\BooleanProperty;
 use Famoser\SyncApi\Framework\Json\Models\TextProperty;
 use Famoser\SyncApi\Models\Communication\Entities\Base\BaseCommunicationEntity;
 
@@ -23,6 +24,9 @@ class DeviceCommunicationEntity extends BaseCommunicationEntity
     /* @var string $UserId type_of:guid */
     public $UserId;
 
+    /* @var bool $IsAuthenticated */
+    public $IsAuthenticated;
+
     /**
      * gets the json properties needed to deserialize
      *
@@ -32,6 +36,7 @@ class DeviceCommunicationEntity extends BaseCommunicationEntity
     {
         $props = parent::getJsonProperties();
         $props["UserId"] = new TextProperty("UserId");
+        $props["IsAuthenticated"] = new BooleanProperty("IsAuthenticated");
         return $props;
     }
 }

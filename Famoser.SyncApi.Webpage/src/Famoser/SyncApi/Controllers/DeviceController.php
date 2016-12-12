@@ -10,6 +10,7 @@ namespace Famoser\SyncApi\Controllers;
 
 
 use Famoser\SyncApi\Controllers\Base\ApiSyncController;
+use Famoser\SyncApi\Exceptions\ApiException;
 use Famoser\SyncApi\Exceptions\ServerException;
 use Famoser\SyncApi\Models\Communication\Entities\Base\BaseCommunicationEntity;
 use Famoser\SyncApi\Models\Communication\Request\Base\BaseRequest;
@@ -17,6 +18,7 @@ use Famoser\SyncApi\Models\Communication\Response\AuthorizationResponse;
 use Famoser\SyncApi\Models\Communication\Response\CollectionEntityResponse;
 use Famoser\SyncApi\Models\Entities\Base\BaseSyncEntity;
 use Famoser\SyncApi\Models\Entities\Device;
+use Famoser\SyncApi\Types\ApiError;
 use Famoser\SyncApi\Types\ContentType;
 use Famoser\SyncApi\Types\OnlineAction;
 use Famoser\SyncApi\Types\ServerError;
@@ -66,12 +68,12 @@ class DeviceController extends ApiSyncController
      */
     public function auth(Request $request, Response $response, $args)
     {
-        return $this->authInternal($request, $response, false);
+        return $this->authInternal($request, $response, true);
     }
 
     /**
      * unauthenticates a device
-     * 
+     *
      * @param Request $request
      * @param Response $response
      * @param $args
@@ -104,6 +106,10 @@ class DeviceController extends ApiSyncController
             "user_guid = :user_guid AND guid = :guid",
             ["user_guid" => $this->getUser($req)->guid, "guid" => $req->ClientMessage]
         );
+        if ($dev == null) {
+            throw new ApiException(ApiError::RESOURCE_NOT_FOUND);
+        }
+
         $dev->is_authenticated = $action;
         if (!$this->getDatabaseService()->saveToDatabase($dev)) {
             throw new ServerException(ServerError::DATABASE_SAVE_FAILURE);
