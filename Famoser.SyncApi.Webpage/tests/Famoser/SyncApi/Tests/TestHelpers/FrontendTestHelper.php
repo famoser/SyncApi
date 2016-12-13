@@ -59,7 +59,7 @@ class FrontendTestHelper extends BaseTestHelper
         //create test application
         $application = new Application();
         $application->application_id = "test_id";
-        $application->application_seed = "test_seed";
+        $application->application_seed = 0;
         $application->description = "a test application created while running tests";
         $application->name = "Test Application";
         $application->release_date_time = time() - 1;
@@ -84,7 +84,9 @@ class FrontendTestHelper extends BaseTestHelper
      * call app->run afterwards
      *
      * @param $relativeLink
-     * @param null $postData : if null, a GET request will be sent
+     * @param string|array $postData
+     * if null, a GET request will be sent.
+     * if array will be converted automatically to valid post data
      * @param bool $autoReset
      */
     public function mockRequest($relativeLink, $postData = null, $autoReset = true)
@@ -94,13 +96,23 @@ class FrontendTestHelper extends BaseTestHelper
         }
         $this->mockAlreadyCalled = true;
 
-        if ($postData != null) {
+        if (is_array($postData)) {
+            $posting = "";
+            foreach ($postData as $key => $value) {
+                $posting .= $key . "=" . urlencode($value) . "&";
+            }
+            $posting = substr($posting, 0, -1);
+        } else {
+            $posting = $postData;
+        }
+
+        if ($posting != null) {
             $this->getTestApp()->overrideEnvironment(
                 Environment::mock(
                     [
                         'REQUEST_METHOD' => 'POST',
                         'REQUEST_URI' => '/' . $relativeLink,
-                        'MOCK_POST_DATA' => $postData,
+                        'MOCK_POST_DATA' => $posting,
                         'SERVER_NAME' => 'localhost',
                         'CONTENT_TYPE' => 'application/x-www-form-urlencoded'
                     ]

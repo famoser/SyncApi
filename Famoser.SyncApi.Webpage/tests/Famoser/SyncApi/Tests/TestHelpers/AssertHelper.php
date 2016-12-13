@@ -92,6 +92,35 @@ class AssertHelper
     }
 
     /**
+     * check if request was successful
+     * returns the tested response string
+     *
+     * @param \PHPUnit_Framework_TestCase $testingUnit
+     * @param ResponseInterface $response
+     * @param $redirectCode
+     * @param $expectedLink
+     * @return string
+     */
+    public static function checkForRedirectResponse(
+        \PHPUnit_Framework_TestCase $testingUnit,
+        ResponseInterface $response,
+        $redirectCode,
+        $expectedLink
+    )
+    {
+        //valid status code
+        $testingUnit->assertEquals($redirectCode, $response->getStatusCode());
+
+        //no error in json response
+        $responseString = static::getResponseString($response);
+        $testingUnit->assertNotContains("Exception", $responseString);
+        $testingUnit::assertEmpty($responseString);
+        $testingUnit::assertContains($expectedLink, $response->getHeaderLine("location"));
+
+        return $responseString;
+    }
+
+    /**
      * check if request failed (code != 200)
      * returns the tested response string
      *

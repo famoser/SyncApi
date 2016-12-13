@@ -9,6 +9,9 @@
 namespace Famoser\SyncApi\Tests\ControllerTests;
 
 
+use Famoser\SyncApi\Framework\ContainerBase;
+use Famoser\SyncApi\Models\Entities\Application;
+use Famoser\SyncApi\Services\DatabaseService;
 use Famoser\SyncApi\Tests\ControllerTests\Base\FrontendTestController;
 use Famoser\SyncApi\Tests\TestHelpers\AssertHelper;
 
@@ -64,9 +67,7 @@ class ApplicationControllerTest extends FrontendTestController
             static::fail("invalid method specified");
         }
         $response = $this->getTestHelper()->getTestApp()->run();
-        $responseStr = AssertHelper::checkForFailedResponse($this, $response, 403);
-        static::assertContains("login", $response->getHeaderLine("location"));
-        static::assertEmpty($responseStr);
+        AssertHelper::checkForRedirectResponse($this, $response, 403, "login");
     }
 
     /**
@@ -107,5 +108,40 @@ class ApplicationControllerTest extends FrontendTestController
         $response = $this->getTestHelper()->getTestApp()->run();
         $responseStr = AssertHelper::checkForSuccessfulResponse($this, $response);
         static::assertNotEmpty($responseStr);
+    }
+
+    public function testCreatePost()
+    {
+        $this->getTestHelper()->loginUser();
+        $application = $this->getTestHelper()->getTestApplication();
+        $this->getTestHelper()->mockRequest(
+            "dashboard/new",
+            [
+                "name" => $application->name . "new",
+                "description" => $application->description,
+                "application_id" => $application->application_id . "new",
+                "application_seed" => $application->application_seed
+            ]
+        );
+        $response = $this->getTestHelper()->getTestApp()->run();
+        AssertHelper::checkForRedirectResponse($this, $response, 302, "dashboard/");
+
+        $containerBase = new ContainerBase($this->getTestHelper()->getTestApp()->getContainer());
+        $databaseService = $containerBase->getDatabaseService();
+        $newApplication = $databaseService->getSingleFromDatabase(new Application(), null, null, "id DESC");
+
+        static::assertEquals($application->name . "new", $newApplication->name);
+        static::assertEquals($application->description, $newApplication->description);
+        static::assertEquals($application->application_id . "new", $newApplication->application_id);
+        static::assertEquals($application->application_seed, $newApplication->application_seed);
+        static::assertEquals($application->admin_id, $this->getTestHelper()->getTestUser()->id);
+        $threshold = 100;
+        static::assertTrue(
+            (time() - $threshold) < $application->release_date_time &&
+            $application->release_date_time < (time() + $threshold),
+            "release date time not in thresholds. expected difference: +-" .
+            $threshold . " got: " .
+            (time() - $application->release_date_time)
+        );
     }
 }
