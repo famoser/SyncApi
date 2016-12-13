@@ -6,7 +6,7 @@
  * Time: 11:29
  */
 
-namespace Famoser\SyncApi\Tests;
+namespace Famoser\SyncApi\Tests\TestHelpers;
 
 
 use Famoser\SyncApi\Models\Communication\Entities\Base\BaseCommunicationEntity;

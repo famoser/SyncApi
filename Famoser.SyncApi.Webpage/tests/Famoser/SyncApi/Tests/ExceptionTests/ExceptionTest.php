@@ -12,7 +12,6 @@ namespace Famoser\SyncApi\Tests\ExceptionTests;
 use Famoser\SyncApi\Exceptions\ApiException;
 use Famoser\SyncApi\Exceptions\FrontendException;
 use Famoser\SyncApi\Exceptions\ServerException;
-use Famoser\SyncApi\Tests\ApiTestHelper;
 use Famoser\SyncApi\Types\ApiError;
 use Famoser\SyncApi\Types\FrontendError;
 use Famoser\SyncApi\Types\ServerError;

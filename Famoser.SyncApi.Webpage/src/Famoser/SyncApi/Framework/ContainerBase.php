@@ -12,6 +12,7 @@ namespace Famoser\SyncApi\Framework;
 use Famoser\SyncApi\Services\Interfaces\DatabaseServiceInterface;
 use Famoser\SyncApi\Services\Interfaces\LoggingServiceInterface;
 use Famoser\SyncApi\Services\Interfaces\RequestServiceInterface;
+use Famoser\SyncApi\Services\Interfaces\SessionServiceInterface;
 use Famoser\SyncApi\SyncApiApp;
 use Interop\Container\ContainerInterface;
 use Slim\Interfaces\RouterInterface;
@@ -64,6 +65,16 @@ class ContainerBase
     public function getDatabaseService()
     {
         return $this->container->get(SyncApiApp::DATABASE_SERVICE_KEY);
+    }
+
+    /**
+     * get database helper, used for database access
+     *
+     * @return SessionServiceInterface
+     */
+    public function getSessionService()
+    {
+        return $this->container->get(SyncApiApp::SESSION_SERVICE_KEY);
     }
 
     /**

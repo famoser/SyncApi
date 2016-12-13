@@ -9,8 +9,6 @@
 namespace Famoser\SyncApi\Tests\ControllerTests\Base;
 
 
-use Famoser\SyncApi\Models\Communication\Request\Base\BaseRequest;
-
 /**
  * controller for sync testing
  * @package Famoser\SyncApi\Tests\ControllerTests\Base

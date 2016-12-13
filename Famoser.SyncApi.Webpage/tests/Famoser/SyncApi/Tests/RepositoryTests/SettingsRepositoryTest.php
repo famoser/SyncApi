@@ -9,10 +9,9 @@
 namespace Famoser\SyncApi\Tests\RepositoryTests;
 
 
-use Famoser\SyncApi\Controllers\Base\BaseController;
 use Famoser\SyncApi\Framework\ContainerBase;
 use Famoser\SyncApi\Repositories\SettingsRepository;
-use Famoser\SyncApi\Tests\ApiTestHelper;
+use Famoser\SyncApi\Tests\TestHelpers\ApiTestHelper;
 use Famoser\SyncApi\Tests\TypeTests\SettingKeysTest;
 use ReflectionClass;
 

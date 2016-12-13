@@ -6,7 +6,7 @@
  * Time: 12:55
  */
 
-namespace Famoser\SyncApi\Tests;
+namespace Famoser\SyncApi\Tests\TestHelpers;
 
 
 use Famoser\SyncApi\Framework\ContainerBase;
@@ -66,6 +66,50 @@ class AssertHelper
         $testingUnit->assertContains("\"RequestFailed\":false", $responseString);
 
         return $responseString;
+    }
+
+    /**
+     * check if request was successful
+     * returns the tested response string
+     *
+     * @param \PHPUnit_Framework_TestCase $testingUnit
+     * @param ResponseInterface $response
+     * @return string
+     */
+    public static function checkForSuccessfulResponse(
+        \PHPUnit_Framework_TestCase $testingUnit,
+        ResponseInterface $response
+    )
+    {
+        //valid status code
+        $testingUnit->assertEquals(200, $response->getStatusCode());
+
+        //no error in json response
+        $responseString = static::getResponseString($response);
+        $testingUnit->assertNotContains("Exception", $responseString);
+
+        return $responseString;
+    }
+
+    /**
+     * check if request failed (code != 200)
+     * returns the tested response string
+     *
+     * @param \PHPUnit_Framework_TestCase $testingUnit
+     * @param ResponseInterface $response
+     * @param int $expectedCode
+     * @return string
+     */
+    public static function checkForFailedResponse(
+        \PHPUnit_Framework_TestCase $testingUnit,
+        ResponseInterface $response,
+        $expectedCode
+    )
+    {
+        //valid status code
+        $testingUnit->assertEquals($expectedCode, $response->getStatusCode());
+
+        return static::getResponseString($response);
     }
 
     /**

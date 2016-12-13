@@ -9,7 +9,7 @@
 namespace Famoser\SyncApi\Tests\ControllerTests\Base;
 
 
-use Famoser\SyncApi\Tests\ApiTestHelper;
+use Famoser\SyncApi\Tests\TestHelpers\ApiTestHelper;
 
 /**
  * a base class for all api tests

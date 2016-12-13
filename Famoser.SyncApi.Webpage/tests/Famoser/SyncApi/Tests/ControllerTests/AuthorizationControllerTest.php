@@ -11,14 +11,10 @@ namespace Famoser\SyncApi\Tests\ControllerTests;
 use Famoser\SyncApi\Models\Communication\Entities\DeviceCommunicationEntity;
 use Famoser\SyncApi\Models\Communication\Entities\UserCommunicationEntity;
 use Famoser\SyncApi\Models\Communication\Request\AuthorizationRequest;
-use Famoser\SyncApi\Models\Communication\Request\SyncEntityRequest;
-use Famoser\SyncApi\SyncApiApp;
-use Famoser\SyncApi\Tests\AssertHelper;
 use Famoser\SyncApi\Tests\ControllerTests\Base\ApiTestController;
-use Famoser\SyncApi\Tests\SampleGenerator;
-use Famoser\SyncApi\Tests\ApiTestHelper;
+use Famoser\SyncApi\Tests\TestHelpers\AssertHelper;
+use Famoser\SyncApi\Tests\TestHelpers\SampleGenerator;
 use Famoser\SyncApi\Types\ApiError;
-use Famoser\SyncApi\Types\OnlineAction;
 
 /**
  * Class AuthorizationControllerTests

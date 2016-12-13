@@ -9,9 +9,8 @@
 namespace Famoser\SyncApi\Tests\ModelTests;
 
 
-use Famoser\SyncApi\Framework\ContainerBase;
 use Famoser\SyncApi\Models\Entities\Base\BaseEntity;
-use Famoser\SyncApi\Tests\ApiTestHelper;
+use Famoser\SyncApi\Tests\TestHelpers\ApiTestHelper;
 
 /**
  * tests the configuration of the models

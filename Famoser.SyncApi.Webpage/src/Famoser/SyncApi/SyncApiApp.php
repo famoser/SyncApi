@@ -16,9 +16,11 @@ use Famoser\SyncApi\Models\Communication\Response\Base\BaseResponse;
 use Famoser\SyncApi\Services\DatabaseService;
 use Famoser\SyncApi\Services\LoggingService;
 use Famoser\SyncApi\Services\RequestService;
+use Famoser\SyncApi\Services\SessionService;
 use Famoser\SyncApi\Types\ApiError;
 use Famoser\SyncApi\Types\FrontendError;
 use InvalidArgumentException;
+use Psr\Http\Message\ResponseInterface;
 use Slim\App;
 use Slim\Container;
 use Slim\Http\Environment;
@@ -39,6 +41,7 @@ class SyncApiApp extends App
     const DATABASE_SERVICE_KEY = "databaseService";
     const LOGGING_SERVICE_KEY = "loggingService";
     const REQUEST_SERVICE_KEY = "requestService";
+    const SESSION_SERVICE_KEY = "sessionService";
 
     const SETTINGS_KEY = "settings";
 
@@ -126,7 +129,7 @@ class SyncApiApp extends App
                         ->setName("application_edit");
                     $this->post('/edit/{id}', $controllerNamespace . 'ApplicationController:editPost');
 
-                    $this->get('/settings/{id}', $controllerNamespace . 'ApplicationController:setting')
+                    $this->get('/settings/{id}', $controllerNamespace . 'ApplicationController:settings')
                         ->setName("application_settings");
                     $this->post('/settings/{id}', $controllerNamespace . 'ApplicationController:settingsPost');
 
@@ -268,7 +271,7 @@ class SyncApiApp extends App
                         //tried to access page where you need to be logged in
                         if ($exception->getCode() == FrontendError::NOT_LOGGED_IN) {
                             $reqUri = $request->getUri()->withPath($container->get("router")->pathFor("login"));
-                            return $container['response']->withRedirect($reqUri);
+                            return $container['response']->withStatus(403)->withRedirect($reqUri);
                         }
                     }
 
@@ -296,6 +299,9 @@ class SyncApiApp extends App
         };
         $container[SyncApiApp::DATABASE_SERVICE_KEY] = function (Container $c) {
             return new DatabaseService($c);
+        };
+        $container[SyncApiApp::SESSION_SERVICE_KEY] = function (Container $c) {
+            return new SessionService($c);
         };
     }
 }

@@ -13,8 +13,8 @@ use Famoser\SyncApi\Models\Communication\Entities\DeviceCommunicationEntity;
 use Famoser\SyncApi\Models\Communication\Request\AuthorizationRequest;
 use Famoser\SyncApi\Models\Communication\Request\CollectionEntityRequest;
 use Famoser\SyncApi\Models\Communication\Response\CollectionEntityResponse;
-use Famoser\SyncApi\Tests\AssertHelper;
 use Famoser\SyncApi\Tests\ControllerTests\Base\ApiSyncTestController;
+use Famoser\SyncApi\Tests\TestHelpers\AssertHelper;
 
 /**
  * tests the methods from the device controller

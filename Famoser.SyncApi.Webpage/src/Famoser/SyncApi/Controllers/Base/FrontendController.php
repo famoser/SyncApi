@@ -10,6 +10,7 @@ namespace Famoser\SyncApi\Controllers\Base;
 
 
 use Famoser\SyncApi\Models\Entities\FrontendUser;
+use Famoser\SyncApi\Services\SessionService;
 use Slim\Http\Response;
 
 /**
@@ -32,15 +33,16 @@ class FrontendController extends BaseController
             return $this->frontendUser;
         }
 
-        if (!isset($_SESSION["frontend_user_id"])) {
+        $userId = $this->getSessionService()->getValue(SessionService::FRONTEND_USER_ID, null);
+        if ($userId === null) {
             return null;
         }
 
         $helper = $this->getDatabaseService();
         $this->frontendUser = $helper->getSingleFromDatabase(
-            new FrontendUser(), 
-            "id = :id", 
-            ["id" => $_SESSION["frontend_user_id"]]
+            new FrontendUser(),
+            "id = :id",
+            ["id" => $userId]
         );
         return $this->frontendUser;
     }
@@ -52,7 +54,7 @@ class FrontendController extends BaseController
      */
     protected function setFrontendUser(FrontendUser $user)
     {
-        $_SESSION["frontend_user_id"] = $user->id;
+        $this->getSessionService()->setValue(SessionService::FRONTEND_USER_ID, $user->id);
     }
 
 
