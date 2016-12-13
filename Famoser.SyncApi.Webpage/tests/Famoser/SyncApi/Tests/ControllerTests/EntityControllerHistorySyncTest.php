@@ -118,6 +118,6 @@ class EntityControllerHistorySyncTest extends ApiTestController
         /* @var HistoryEntityResponse $responseObj */
         $responseObj = json_decode($responseString);
 
-        static::assertTrue(count($responseObj->CollectionEntities) == 0);
+        static::assertTrue(!(is_array($responseObj->CollectionEntities) && count($responseObj->CollectionEntities)));
     }
 }
