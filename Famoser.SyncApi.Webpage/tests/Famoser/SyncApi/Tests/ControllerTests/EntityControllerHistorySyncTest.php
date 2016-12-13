@@ -45,6 +45,7 @@ class EntityControllerHistorySyncTest extends ApiTestController
             $this->cache["DeviceId"] = $this->testHelper->getDeviceId($this->cache["UserId"]);
             $this->cache["CollectionId"] = $this->testHelper->getCollectionId($this->cache["UserId"], $this->cache["DeviceId"]);
             $this->cache["EntityId"] = SampleGenerator::createGuid();
+            $this->cache["VersionIds"] = [];
             $action = OnlineAction::CREATE;
         }
         //test create
@@ -62,6 +63,7 @@ class EntityControllerHistorySyncTest extends ApiTestController
         $collEntity->CollectionId = $this->cache["CollectionId"];
         $collEntity->Content = uniqid();
         $collEntity->VersionId = SampleGenerator::createGuid();
+        $this->cache["VersionIds"][] = $collEntity->VersionId;
         $collEntity->OnlineAction = $action;
 
         $syncRequest->SyncEntities[] = $collEntity;
@@ -94,5 +96,28 @@ class EntityControllerHistorySyncTest extends ApiTestController
         $responseObj = json_decode($responseString);
 
         static::assertTrue(count($responseObj->CollectionEntities) == 2);
+    }
+
+    /**
+     * tests single create
+     */
+    public function testReadHistory2()
+    {
+        $this->addEntityVersion(3);
+
+        $request = new HistoryEntityRequest();
+        $this->testHelper->authorizeRequest($request);
+        $request->UserId = $this->cache["UserId"];
+        $request->DeviceId = $this->cache["DeviceId"];
+        $request->VersionIds = $this->cache["VersionIds"];
+        $request->Id = $this->cache["EntityId"];
+
+        $this->testHelper->mockApiRequest($request, "entities/history/sync");
+        $response = $this->testHelper->getTestApp()->run();
+        $responseString = AssertHelper::checkForSuccessfulApiResponse($this, $response);
+        /* @var HistoryEntityResponse $responseObj */
+        $responseObj = json_decode($responseString);
+
+        static::assertTrue(count($responseObj->CollectionEntities) == 0);
     }
 }

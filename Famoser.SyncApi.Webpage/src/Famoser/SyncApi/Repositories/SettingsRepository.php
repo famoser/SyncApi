@@ -76,7 +76,7 @@ class SettingsRepository
     {
         $this->ensureInitialized();
         if (isset($this->dic[$key])) {
-            return $this->dic[$key]->key;
+            return $this->dic[$key]->val;
         }
         $this->persistNewSetting($key);
         return $this->dic[$key]->val;
@@ -92,7 +92,7 @@ class SettingsRepository
     {
         //check if valid value, else simply ignore
         if (SettingKeys::isValidValue($key, $val)) {
-            if (in_array($key, $this->dic)) {
+            if (key_exists($key, $this->dic)) {
                 $this->dic[$key]->val = $val;
                 $this->helper->saveToDatabase($this->dic[$key]);
             } else {
@@ -176,7 +176,7 @@ class SettingsRepository
     {
         foreach ($keyValPairs as $key => $val) {
             if (strrpos($key, "setting_") === 0) {
-                $intKey = substr($key, count("setting_"));
+                $intKey = substr($key, strlen("setting_"));
                 $this->setOrCreateValue($intKey, $val);
             }
         }
@@ -185,15 +185,15 @@ class SettingsRepository
     /**
      * create a model ready for display to the user
      *
-     * @param $code
+     * @param $key
      * @return SettingModel
      */
-    private function createSettingModel($code)
+    private function createSettingModel($key)
     {
         $sm = new SettingModel();
-        $sm->value = $this->getOrCreateValue($code);
-        $sm->key = "setting_" . $code;
-        $sm->description = SettingKeys::getSettingDescription($code);
+        $sm->value = $this->getOrCreateValue($key);
+        $sm->key = "setting_" . $key;
+        $sm->description = SettingKeys::getSettingDescription($key);
         return $sm;
     }
 }
