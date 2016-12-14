@@ -110,6 +110,9 @@ class ApplicationControllerTest extends FrontendTestController
         static::assertNotEmpty($responseStr);
     }
 
+    /**
+     * test the create post action
+     */
     public function testCreatePost()
     {
         $this->getTestHelper()->loginUser();
