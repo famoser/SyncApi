@@ -230,5 +230,77 @@ class LoginControllerTest extends FrontendTestController
         static::assertContains($usr->username, $mailService->getCache()["receiver"][$usr->email]);
     }
 
-    
+    /**
+     * tests the recover function; check if passwords are checked
+     */
+    public function testRecoverPost()
+    {
+        $usr = $this->getTestHelper()->getTestUser();
+        $this->getTestHelper()->mockRequest("recover",
+            [
+                "username" => $usr->username,
+                "authorization_code" => $usr->reset_key,
+                "password" => "hallo welt 2",
+                "password2" => "hallo welt 2",
+            ]);
+
+        $response = $this->getTestHelper()->getTestApp()->run();
+        AssertHelper::checkForRedirectResponse($this, $response, 302, "login");
+
+        $containerBase = new ContainerBase($this->getTestHelper()->getTestApp()->getContainer());
+        $result = $containerBase->getDatabaseService()->getSingleFromDatabase(
+            new FrontendUser(),
+            "id = :id",
+            ["id" => $usr->id]
+        );
+
+        static::assertNotNull($result);
+        static::assertNotEquals($usr->reset_key, $result->reset_key);
+        static::assertNotEquals($usr->password, $result->password);
+        static::assertTrue(password_verify("hallo welt 2", $result->password));
+    }
+
+    /**
+     * tests the recover function; check if passwords are checked
+     */
+    public function testRecoverWrongPost()
+    {
+        $usr = $this->getTestHelper()->getTestUser();
+        $this->getTestHelper()->mockRequest("recover",
+            [
+                "username" => $usr->username,
+                "authorization_code" => $usr->reset_key."0",
+                "password" => "hallo welt 2",
+                "password2" => "hallo welt 2",
+            ]);
+
+        $response = $this->getTestHelper()->getTestApp()->run();
+        $resonseString = AssertHelper::checkForSuccessfulResponse($this, $response);
+        static::assertContains("wrong", $resonseString);
+
+
+        $this->getTestHelper()->mockRequest("recover",
+            [
+                "username" => $usr->username,
+                "authorization_code" => $usr->reset_key,
+                "password" => "hallo welt 2a",
+                "password2" => "hallo welt 2",
+            ]);
+
+        $response = $this->getTestHelper()->getTestApp()->run();
+        $resonseString = AssertHelper::checkForSuccessfulResponse($this, $response);
+        static::assertContains("wrong", $resonseString);
+
+        $this->getTestHelper()->mockRequest("recover",
+            [
+                "username" => $usr->username."2",
+                "authorization_code" => $usr->reset_key,
+                "password" => "hallo welt 2",
+                "password2" => "hallo welt 2",
+            ]);
+
+        $response = $this->getTestHelper()->getTestApp()->run();
+        $resonseString = AssertHelper::checkForSuccessfulResponse($this, $response);
+        static::assertContains("wrong", $resonseString);
+    }
 }
