@@ -160,8 +160,8 @@ class LoginController extends FrontendController
                 }
                 //send mail
                 $this->getMailService()->sendMail(
-                    ["webmaster" => "server@famoser.ch"],
-                    [$user->username => $user->email],
+                    ["server@famoser.ch" => "webmaster"],
+                    [$user->email => $user->username],
                     "password reset on sync api",
                     "hi " . $user->username . ", here's your code to recover your password: " . $user->reset_key
                 );

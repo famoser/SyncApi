@@ -50,7 +50,7 @@ class FrontendTestHelper extends BaseTestHelper
         //create test user
         $user = new FrontendUser();
         $user->email = "me@who.ch";
-        $user->password = '$2y$10$xE1OAthSN.ecZlb4Zkf4i.oa041ZsusEVsuBNlr0ePGXN1T2DKoVm';
+        $user->password = '$2y$10$JCOftRPxCBzPhcF8aJQu8OIBhNuoCgW9sVH7oPxKQ8MZS67CQl.uW'; //hallo welt
         $user->reset_key = "reset_key";
         $user->username = "me";
         $this->getDatabaseService()->saveToDatabase($user);
