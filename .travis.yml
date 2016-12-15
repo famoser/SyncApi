@@ -11,4 +11,4 @@ install:
 
 after_script:
   - ./vendor/bin/test-reporter
-  - php ./vendor/bin/codacycoverage clover ./build/logs/clover.xml
+  - ./vendor/bin/codacycoverage clover
