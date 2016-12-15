@@ -15,6 +15,7 @@ use Famoser\SyncApi\Middleware\LoggingMiddleware;
 use Famoser\SyncApi\Models\Communication\Response\Base\BaseResponse;
 use Famoser\SyncApi\Services\DatabaseService;
 use Famoser\SyncApi\Services\LoggingService;
+use Famoser\SyncApi\Services\MailService;
 use Famoser\SyncApi\Services\RequestService;
 use Famoser\SyncApi\Services\SessionService;
 use Famoser\SyncApi\Types\ApiError;
@@ -46,6 +47,7 @@ class SyncApiApp extends App
     const LOGGING_SERVICE_KEY = "loggingService";
     const REQUEST_SERVICE_KEY = "requestService";
     const SESSION_SERVICE_KEY = "sessionService";
+    const MAIL_SERVICE_KEY = "mailService";
 
     const SETTINGS_KEY = "settings";
 
@@ -330,6 +332,9 @@ class SyncApiApp extends App
         };
         $container[SyncApiApp::SESSION_SERVICE_KEY] = function (Container $c) {
             return new SessionService($c);
+        };
+        $container[SyncApiApp::MAIL_SERVICE_KEY] = function (Container $c) {
+            return new MailService($c);
         };
     }
 }

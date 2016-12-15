@@ -61,6 +61,33 @@ class ApiTestHelper extends BaseTestHelper
     }
 
     /**
+     * mock a json POST request
+     * call app->run afterwards
+     *
+     * @param $relativeLink
+     * @param bool $autoReset
+     * @internal param BaseRequest $request
+     */
+    public function mockGetRequest($relativeLink, $autoReset = true)
+    {
+        if ($this->mockAlreadyCalled && $autoReset) {
+            $this->resetApplication();
+        }
+        $this->mockAlreadyCalled = true;
+        $this->getTestApp()->overrideEnvironment(
+            Environment::mock(
+                [
+                    'REQUEST_URI' => '/' . $relativeLink,
+                    'SERVER_NAME' => 'localhost'
+                ]
+            )
+        );
+    }
+
+    /* @var Application $application */
+    private $application;
+
+    /**
      * prepares the environment
      */
     protected function prepareDatabase()
@@ -73,6 +100,16 @@ class ApiTestHelper extends BaseTestHelper
         $application->name = "Test Application";
         $application->release_date_time = time() - 1;
         $this->getDatabaseService()->saveToDatabase($application);
+
+        $this->application = $application;
+    }
+
+    /**
+     * @return Application
+     */
+    public function getApiApplication()
+    {
+        return $this->application;
     }
 
     /**

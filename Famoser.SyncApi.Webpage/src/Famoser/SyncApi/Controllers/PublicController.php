@@ -16,7 +16,7 @@ use Slim\Http\Response;
 
 /**
  * the public controller displays the index page & other pages accessible to everyone
- * 
+ *
  * @package Famoser\SyncApi\Controllers
  */
 class PublicController extends FrontendController

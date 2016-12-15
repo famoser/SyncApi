@@ -126,7 +126,7 @@ class ApplicationController extends FrontendController
     {
         $this->ensureHasAccess();
         $application = $this->getAuthorizedApplication($args["id"]);
-        $settingsRepo = new SettingsRepository($this->getDatabaseService(), $application->application_id);
+        $settingsRepo = new SettingsRepository($this->getDatabaseService(), $application->id);
         $settingsRepo->setSettings($request->getParsedBody());
         $args["settings"] = $settingsRepo->getAllSettings();
         return $this->renderTemplate($response, "application/show", $args);
@@ -161,7 +161,7 @@ class ApplicationController extends FrontendController
 
         $devices = $this->getDatabaseService()->getFromDatabase(
             new Device(),
-            "user_guid IN (:" . array_keys($userGuids) . ")",
+            "user_guid IN (:" . implode(",:", array_keys($userGuids)) . ")",
             $userGuids,
             null,
             -1,
@@ -174,7 +174,7 @@ class ApplicationController extends FrontendController
 
         $userCollections = $this->getDatabaseService()->getFromDatabase(
             new UserCollection(),
-            "user_guid IN (:" . array_keys($userGuids) . ")",
+            "user_guid IN (:" . implode(",:", array_keys($userGuids)) . ")",
             $userGuids,
             null,
             -1,
@@ -192,7 +192,7 @@ class ApplicationController extends FrontendController
 
         $appStats->itemsCount = $this->getDatabaseService()->countFromDatabase(
             new Entity(),
-            "collection_guid IN (:" . array_keys($collectionGuids) . ")",
+            "collection_guid IN (:" . implode(",:", array_keys($collectionGuids)) . ")",
             $collectionGuids
         );
         return $appStats;

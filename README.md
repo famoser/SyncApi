@@ -3,6 +3,7 @@ C#: [![Build status](https://ci.appveyor.com/api/projects/status/un5aq493586670k
 php: [![Build Status](https://travis-ci.org/famoser/SyncApi.svg?branch=master)](https://travis-ci.org/famoser/SyncApi)
 [![Code Climate](https://codeclimate.com/github/famoser/SyncApi/badges/gpa.svg)](https://codeclimate.com/github/famoser/SyncApi)
 [![Test Coverage](https://codeclimate.com/github/famoser/SyncApi/badges/coverage.svg)](https://codeclimate.com/github/famoser/SyncApi/coverage)
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/9ba78fbd408b40aabfa3ee220a2f5ea0)](https://www.codacy.com/app/products/SyncApi?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=famoser/SyncApi&amp;utm_campaign=Badge_Grade)
 
 a nuget portable library to sync entities in a very convenient way.
 
