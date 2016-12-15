@@ -27,7 +27,7 @@
     "famoser/jsonmapper": "*",
     "codeguy/upload": "*",
     "phpunit/phpunit": "^5.6",
-    "phpmailer/phpmailer": "^5"
+    "swiftmailer/swiftmailer": "@stable"
   },
   "require-dev": {
     "codeclimate/php-test-reporter": "dev-master",

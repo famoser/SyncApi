@@ -11,6 +11,7 @@ namespace Famoser\SyncApi\Framework;
 
 use Famoser\SyncApi\Services\Interfaces\DatabaseServiceInterface;
 use Famoser\SyncApi\Services\Interfaces\LoggingServiceInterface;
+use Famoser\SyncApi\Services\Interfaces\MailServiceInterface;
 use Famoser\SyncApi\Services\Interfaces\RequestServiceInterface;
 use Famoser\SyncApi\Services\Interfaces\SessionServiceInterface;
 use Famoser\SyncApi\SyncApiApp;
@@ -85,6 +86,16 @@ class ContainerBase
     public function getRequestService()
     {
         return $this->container->get(SyncApiApp::REQUEST_SERVICE_KEY);
+    }
+
+    /**
+     * get mailer
+     *
+     * @return MailServiceInterface
+     */
+    public function getMailService()
+    {
+        return $this->container->get(SyncApiApp::MAIL_SERVICE_KEY);
     }
 
     /**

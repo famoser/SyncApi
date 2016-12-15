@@ -12,6 +12,7 @@ namespace Famoser\SyncApi\Tests\FrameworkTests;
 use Famoser\SyncApi\Framework\ContainerBase;
 use Famoser\SyncApi\Services\Interfaces\DatabaseServiceInterface;
 use Famoser\SyncApi\Services\Interfaces\LoggingServiceInterface;
+use Famoser\SyncApi\Services\Interfaces\MailServiceInterface;
 use Famoser\SyncApi\Services\Interfaces\RequestServiceInterface;
 use Famoser\SyncApi\Services\Interfaces\SessionServiceInterface;
 use Famoser\SyncApi\Tests\TestHelpers\ApiTestHelper;
@@ -35,11 +36,12 @@ class ContainerBaseTest extends \PHPUnit_Framework_TestCase
         static::assertInstanceOf(LoggingServiceInterface::class, $container->getLoggingService());
         static::assertInstanceOf(RequestServiceInterface::class, $container->getRequestService());
         static::assertInstanceOf(SessionServiceInterface::class, $container->getSessionService());
+        static::assertInstanceOf(MailServiceInterface::class, $container->getMailService());
         static::assertTrue(count($container->getSettingsArray()) > 0);
         static::assertInstanceOf(Twig::class, $container->getView());
 
         //6 methods tested + __construct
-        $expectedMethodCount = 8;
+        $expectedMethodCount = 9;
         $actualMethodCount = count(get_class_methods(ContainerBase::class));
         static::assertTrue(
             $actualMethodCount == $expectedMethodCount,

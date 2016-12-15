@@ -159,8 +159,9 @@ class LoginController extends FrontendController
                     throw new ServerException(ServerError::DATABASE_SAVE_FAILURE);
                 }
                 //send mail
-                mail(
-                    $user->email,
+                $this->getMailService()->sendMail(
+                    ["webmaster" => "server@famoser.ch"],
+                    [$user->username => $user->email],
                     "password reset on sync api",
                     "hi " . $user->username . ", here's your code to recover your password: " . $user->reset_key
                 );
