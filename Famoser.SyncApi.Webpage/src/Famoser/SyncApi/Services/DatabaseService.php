@@ -338,7 +338,7 @@ class DatabaseService extends BaseService implements DatabaseServiceInterface
      *
      * @param $sql
      * @param null $arr
-     * @return bool
+     * @return bool|int
      */
     public function executeAndCount($sql, $arr = null)
     {
@@ -346,7 +346,11 @@ class DatabaseService extends BaseService implements DatabaseServiceInterface
         if (!$prep->execute($arr)) {
             return false;
         }
-        return $prep->fetchAll(PDO::FETCH_NUM);
+        $fetched = $prep->fetchAll(PDO::FETCH_NUM);
+        if (!isset($fetched[0][0])) {
+            return false;
+        }
+        return $fetched[0][0];
     }
 
     /**

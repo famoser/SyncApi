@@ -11,9 +11,12 @@ namespace Famoser\SyncApi\Tests\ControllerTests;
 
 use Famoser\SyncApi\Framework\ContainerBase;
 use Famoser\SyncApi\Models\Entities\Application;
+use Famoser\SyncApi\Models\Entities\FrontendUser;
 use Famoser\SyncApi\Repositories\SettingsRepository;
 use Famoser\SyncApi\Services\DatabaseService;
+use Famoser\SyncApi\Services\SessionService;
 use Famoser\SyncApi\Tests\ControllerTests\Base\FrontendTestController;
+use Famoser\SyncApi\Tests\TestHelpers\ApiTestHelper;
 use Famoser\SyncApi\Tests\TestHelpers\AssertHelper;
 
 /**
@@ -152,6 +155,56 @@ class ApplicationControllerTest extends FrontendTestController
     /**
      * test the create post action
      */
+    public function testFailedCreatePost()
+    {
+        $this->getTestHelper()->loginUser();
+        $application = $this->getTestHelper()->getTestApplication();
+        $this->getTestHelper()->mockRequest(
+            "dashboard/new",
+            [
+                "name" => $application->name . "new",
+                "description" => $application->description,
+            ]
+        );
+        $response = $this->getTestHelper()->getTestApp()->run();
+        $responseStr = AssertHelper::checkForSuccessfulResponse($this, $response);
+
+        static::assertContains("not", $responseStr);
+
+        $application = $this->getTestHelper()->getTestApplication();
+        $this->getTestHelper()->mockRequest(
+            "dashboard/new",
+            [
+                "name" => $application->name . "new",
+                "description" => $application->description,
+                "application_seed" => "asdf",
+                "application_id" => $application->application_id . "_new",
+            ]
+        );
+        $response = $this->getTestHelper()->getTestApp()->run();
+        $responseStr = AssertHelper::checkForSuccessfulResponse($this, $response);
+
+        static::assertContains("numeric", $responseStr);
+
+        $application = $this->getTestHelper()->getTestApplication();
+        $this->getTestHelper()->mockRequest(
+            "dashboard/new",
+            [
+                "name" => $application->name . "new",
+                "description" => $application->description,
+                "application_seed" => 21,
+                "application_id" => $application->application_id,
+            ]
+        );
+        $response = $this->getTestHelper()->getTestApp()->run();
+        $responseStr = AssertHelper::checkForSuccessfulResponse($this, $response);
+
+        static::assertContains("exist", $responseStr);
+    }
+
+    /**
+     * test the create post action
+     */
     public function testSettingsPost()
     {
         $this->getTestHelper()->loginUser();
@@ -272,5 +325,54 @@ class ApplicationControllerTest extends FrontendTestController
         );
 
         static::assertNull($newApplication);
+    }
+
+    /**
+     * test the create post action
+     */
+    public function testStats()
+    {
+        //add api data
+        $objCount = 5;
+        $apiTestHelper = new ApiTestHelper();
+        $admin = new FrontendUser();
+        $containerBase = new ContainerBase($apiTestHelper->getTestApp()->getContainer());
+        $containerBase->getDatabaseService()->saveToDatabase($admin);
+        $apiTestHelper->getApiApplication()->admin_id = $admin->id;
+        $containerBase->getDatabaseService()->saveToDatabase($apiTestHelper->getApiApplication());
+        $containerBase->getSessionService()->setValue(SessionService::FRONTEND_USER_ID, $admin->id);
+
+        for ($i = 0; $i < $objCount; $i++) {
+            $apiTestHelper->getUserId();
+        }
+        $userId = $apiTestHelper->getUserId();
+        for ($i = 0; $i < $objCount + 2; $i++) {
+            $apiTestHelper->getDeviceId($userId);
+        }
+        $deviceId = $apiTestHelper->getDeviceId($userId);
+        for ($i = 0; $i < $objCount + 5; $i++) {
+            $apiTestHelper->getCollectionId($userId, $deviceId);
+        }
+
+        $apiTestHelper->mockGetRequest(
+            "dashboard/show/" . $apiTestHelper->getApiApplication()->id
+        );
+        $response = $apiTestHelper->getTestApp()->run();
+        $responseStr = AssertHelper::checkForSuccessfulResponse($this, $response);
+
+        $apiTestHelper->cleanEnvironment();
+
+        //user count
+        static::assertContains((string)($objCount + 1), $responseStr);
+
+        //device count
+        static::assertContains((string)($objCount + 3), $responseStr);
+
+        //collections count
+        static::assertContains((string)($objCount + 5), $responseStr);
+
+        //entities count
+        static::assertContains("0", $responseStr);
+
     }
 }

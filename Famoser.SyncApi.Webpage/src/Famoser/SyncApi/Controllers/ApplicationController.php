@@ -161,7 +161,7 @@ class ApplicationController extends FrontendController
 
         $devices = $this->getDatabaseService()->getFromDatabase(
             new Device(),
-            "user_guid IN (:" . array_keys($userGuids) . ")",
+            "user_guid IN (:" . implode(",:", array_keys($userGuids)) . ")",
             $userGuids,
             null,
             -1,
@@ -174,7 +174,7 @@ class ApplicationController extends FrontendController
 
         $userCollections = $this->getDatabaseService()->getFromDatabase(
             new UserCollection(),
-            "user_guid IN (:" . array_keys($userGuids) . ")",
+            "user_guid IN (:" . implode(",:", array_keys($userGuids)) . ")",
             $userGuids,
             null,
             -1,
@@ -192,7 +192,7 @@ class ApplicationController extends FrontendController
 
         $appStats->itemsCount = $this->getDatabaseService()->countFromDatabase(
             new Entity(),
-            "collection_guid IN (:" . array_keys($collectionGuids) . ")",
+            "collection_guid IN (:" . implode(",:", array_keys($collectionGuids)) . ")",
             $collectionGuids
         );
         return $appStats;
