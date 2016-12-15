@@ -199,4 +199,78 @@ class ApplicationControllerTest extends FrontendTestController
             }
         }
     }
+
+    /**
+     * test the create post action
+     */
+    public function testEditPost()
+    {
+        $this->getTestHelper()->loginUser();
+        $application = $this->getTestHelper()->getTestApplication();
+        $this->getTestHelper()->mockRequest(
+            "dashboard/edit/" . $application->id,
+            [
+                "name" => $application->name . "new",
+                "description" => $application->description . "new",
+                "application_id" => $application->application_id . "new",
+                "application_seed" => $application->application_seed + 20
+            ]
+        );
+        $response = $this->getTestHelper()->getTestApp()->run();
+        AssertHelper::checkForSuccessfulResponse($this, $response);
+
+        $containerBase = new ContainerBase($this->getTestHelper()->getTestApp()->getContainer());
+        $databaseService = $containerBase->getDatabaseService();
+        $newApplication = $databaseService->getSingleFromDatabase(
+            new Application(),
+            "id = :id",
+            ["id" => $application->id]
+        );
+
+        static::assertEquals($application->name . "new", $newApplication->name);
+        static::assertEquals($application->description . "new", $newApplication->description);
+        static::assertEquals($application->application_id, $newApplication->application_id);
+        static::assertEquals($application->application_seed, $newApplication->application_seed);
+        static::assertEquals($application->admin_id, $this->getTestHelper()->getTestUser()->id);
+
+        $this->getTestHelper()->mockRequest(
+            "dashboard/edit/" . $application->id,
+            [
+                "name" => $application->name . "new",
+                "description" => $application->description . "new"
+            ]
+        );
+        $response = $this->getTestHelper()->getTestApp()->run();
+        AssertHelper::checkForSuccessfulResponse($this, $response);
+
+        static::assertEquals($application->name . "new", $newApplication->name);
+        static::assertEquals($application->description . "new", $newApplication->description);
+    }
+
+    /**
+     * test the create post action
+     */
+    public function testDeletePost()
+    {
+        $this->getTestHelper()->loginUser();
+        $application = $this->getTestHelper()->getTestApplication();
+        $this->getTestHelper()->mockRequest(
+            "dashboard/delete/" . $application->id,
+            [
+                "nothing" => true
+            ]
+        );
+        $response = $this->getTestHelper()->getTestApp()->run();
+        AssertHelper::checkForRedirectResponse($this, $response, 302, "dashboard/");
+
+        $containerBase = new ContainerBase($this->getTestHelper()->getTestApp()->getContainer());
+        $databaseService = $containerBase->getDatabaseService();
+        $newApplication = $databaseService->getSingleFromDatabase(
+            new Application(),
+            "id = :id",
+            ["id" => $application->id]
+        );
+
+        static::assertNull($newApplication);
+    }
 }
