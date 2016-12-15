@@ -110,6 +110,7 @@ class ApplicationController extends FrontendController
         $application = $this->getAuthorizedApplication($args["id"]);
         $settingsRepo = new SettingsRepository($this->getDatabaseService(), $application->application_id);
         $args["settings"] = $settingsRepo->getAllSettings();
+        $args["application"] = $application;
         return $this->renderTemplate($response, "application/settings", $args);
     }
 
@@ -129,7 +130,7 @@ class ApplicationController extends FrontendController
         $settingsRepo = new SettingsRepository($this->getDatabaseService(), $application->id);
         $settingsRepo->setSettings($request->getParsedBody());
         $args["settings"] = $settingsRepo->getAllSettings();
-        return $this->renderTemplate($response, "application/show", $args);
+        return $this->renderTemplate($response, "application/settings", $args);
     }
 
     /**

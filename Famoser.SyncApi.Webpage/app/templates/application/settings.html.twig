@@ -1,0 +1,21 @@
+{% extends "layout.html.twig" %}
+
+{% block title %}edit settings{% endblock title %}
+
+{% block content %}
+    <h3>edit settings for {{ application.name }}</h3>
+    <form action="{{ path_for("application_settings", {'id' : application.id}) }}" method="post">
+        <div class="form-group">
+            {% for setting in settings %}
+                <p class="input-info">{{ setting.description }}</p>
+                <input placeholder="{{ setting.value }}" name="{{ setting.key }}" value="{{ setting.value }}"
+                       class="form-control"/>
+            {% endfor %}
+        </div>
+        <button class="btn btn-primary" type="submit">save</button>
+    </form>
+    <p>go
+        <a href="{{ path_for("application_index") }}">back</a><br>
+        <a href="{{ path_for("application_delete", {'id' : application.id}) }}">delete</a> this application
+    </p>
+{% endblock content %}

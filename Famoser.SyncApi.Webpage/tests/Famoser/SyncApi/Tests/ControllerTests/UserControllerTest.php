@@ -17,5 +17,5 @@ use Famoser\SyncApi\Tests\ControllerTests\Base\ApiTestController;
  */
 class UserControllerTest extends ApiTestController
 {
-    
+
 }

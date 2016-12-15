@@ -16,8 +16,9 @@
         </div>
         <button class="btn btn-primary" type="submit">send</button>
     </form>
-    <p>go
-        <a href="{{ path_for("application_index") }}">back</a><br>
+    <p>
+        <a href="{{ path_for("application_settings", {'id' : application.id}) }}">configure</a> this application<br>
+        go <a href="{{ path_for("application_index") }}">back</a><br>
         <a href="{{ path_for("application_delete", {'id' : application.id}) }}">delete</a> this application
     </p>
 {% endblock content %}
