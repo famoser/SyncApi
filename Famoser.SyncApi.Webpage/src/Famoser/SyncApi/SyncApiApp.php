@@ -19,10 +19,14 @@ use Famoser\SyncApi\Services\RequestService;
 use Famoser\SyncApi\Services\SessionService;
 use Famoser\SyncApi\Types\ApiError;
 use Famoser\SyncApi\Types\FrontendError;
+use Guzzle\Http\Message\RequestInterface;
 use InvalidArgumentException;
 use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ServerRequestInterface;
 use Slim\App;
 use Slim\Container;
+use Slim\Exception\MethodNotAllowedException;
+use Slim\Exception\NotFoundException;
 use Slim\Http\Environment;
 use Slim\Http\Request;
 use Slim\Http\Response;
@@ -236,40 +240,45 @@ class SyncApiApp extends App
      */
     private function addHandlers(Container $container)
     {
-        $container["notFoundHandler"] = function (Container $container) {
-            return function (Request $req, Response $resp) use ($container) {
-                return $resp->withStatus(404);
-            };
-        };
-        $container["notAllowedHandler"] = function (Container $container) {
-            return function (Request $req, Response $resp) use ($container) {
-                return $resp->withStatus(405);
-            };
-        };
-        $container["errorHandler"] = function (Container $container) {
-            return function (Request $request, Response $response, \Exception $exception) use ($container) {
+        $errorHandler = function (Container $container) {
+            return function (ServerRequestInterface $request, ResponseInterface $response, $error = null)
+            use ($container) {
+                if ($error instanceof \Exception || $error instanceof \Throwable) {
+                    $errorString = $error->getFile() . " (" . $error->getLine() . ")\n" .
+                        $error->getCode() . ": " . $error->getMessage() . "\n" .
+                        $error->getTraceAsString();
+                } else {
+                    $errorString = "unknown error type occurred :/. Details: " . print_r($error);
+                }
+
                 $container[SyncApiApp::LOGGING_SERVICE_KEY]->log(
-                    $exception->getFile() . " (" . $exception->getLine() . ")\n" .
-                    $exception->getCode() . ": " . $exception->getMessage() . "\n" .
-                    $exception->getTraceAsString(),
+                    $errorString,
                     "exception.txt"
                 );
+
                 //return json if api request
                 if (strpos($request->getUri()->getPath(), "/1.0/") === 0 && $request->getMethod() == "POST") {
                     $resp = new BaseResponse();
                     $resp->RequestFailed = true;
-                    if ($exception instanceof ApiException) {
-                        $resp->ApiError = $exception->getCode();
+                    if ($error instanceof ApiException) {
+                        $resp->ApiError = $error->getCode();
+                    } elseif ($error instanceof NotFoundException) {
+                        $resp->ApiError = ApiError::NODE_NOT_FOUND;
+                        $errorString = ApiError::toString(ApiError::NODE_NOT_FOUND);
+                    } elseif ($error instanceof MethodNotAllowedException) {
+                        $resp->ApiError = ApiError::METHOD_NOT_ALLOWED;
+                        $errorString = ApiError::toString(ApiError::METHOD_NOT_ALLOWED);
                     } else {
                         $resp->ApiError = ApiError::SERVER_ERROR;
                     }
-                    $resp->ServerMessage = $exception->getMessage();
+                    $resp->ServerMessage = $errorString;
                     return $container['response']->withStatus(500)->withJson($resp);
                 } else {
+                    $type = "server_error";
                     //behaviour for FrontendExceptions
-                    if ($exception instanceof FrontendException) {
+                    if ($error instanceof FrontendException) {
                         //tried to access page where you need to be logged in
-                        if ($exception->getCode() == FrontendError::NOT_LOGGED_IN) {
+                        if ($error->getCode() == FrontendError::NOT_LOGGED_IN) {
                             $reqUri = $request->getUri()->withPath($container->get("router")->pathFor("login"));
                             return $container['response']->withStatus(403)->withRedirect($reqUri);
                         }
@@ -277,9 +286,27 @@ class SyncApiApp extends App
 
                     //general error page
                     $args = [];
-                    $args["error"] = $exception->getMessage();
+                    $args["error"] = $errorString;
                     return $container["view"]->render($response, "public/server_error.html.twig", $args);
                 }
+            };
+        };
+
+        //third argument: \Throwable
+        $container["phpErrorHandler"] = $errorHandler;
+        //third argument: \Exception
+        $container["errorHandler"] = $errorHandler;
+
+        $container["notAllowedHandler"] = function (Container $container) {
+            return function (ServerRequestInterface $request, ResponseInterface $response, $allowedMethods)
+            use ($container) {
+                return $container["view"]->render($response, "public/not_found.html.twig", []);
+            };
+        };
+        $container["notFoundHandler"] = function (Container $container) {
+            return function (ServerRequestInterface $request, ResponseInterface $response)
+            use ($container) {
+                return $container["view"]->render($response, "public/not_found.html.twig", []);
             };
         };
     }
@@ -289,7 +316,8 @@ class SyncApiApp extends App
      *
      * @param Container $container
      */
-    private function addServices(Container $container)
+    private
+    function addServices(Container $container)
     {
         $container[SyncApiApp::LOGGING_SERVICE_KEY] = function (Container $c) {
             return new LoggingService($c);

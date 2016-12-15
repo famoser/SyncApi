@@ -216,13 +216,13 @@ abstract class ApiSyncController extends ApiRequestController
     /**
      * confirms if the entity is already the newest version. If not, returns the newer version
      *
-     * @param BaseCommunicationEntity $communicationEntity
+     * @param BaseCommunicationEntity $commEntity
      * @param $contentType
      * @param BaseSyncEntity $entity
      * @return BaseCommunicationEntity|null
      * @throws ApiException
      */
-    private function confirmVersion(BaseCommunicationEntity $communicationEntity, $contentType, BaseSyncEntity $entity)
+    private function confirmVersion(BaseCommunicationEntity $commEntity, $contentType, BaseSyncEntity $entity = null)
     {
         if ($entity == null) {
             throw new ApiException(ApiError::RESOURCE_NOT_FOUND);
@@ -236,7 +236,7 @@ abstract class ApiSyncController extends ApiRequestController
 
         if ($entity->is_deleted) {
             return $entity->createCommunicationEntity($ver, OnlineAction::DELETE);
-        } elseif ($communicationEntity->VersionId != $ver->version_guid) {
+        } elseif ($commEntity->VersionId != $ver->version_guid) {
             return $entity->createCommunicationEntity($ver, OnlineAction::UPDATE);
         }
         return null;
@@ -246,11 +246,11 @@ abstract class ApiSyncController extends ApiRequestController
      * confirms if the entity is already the newest version. If not, returns the newer version
      *
      * @param BaseCommunicationEntity $communicationEntity
-     * @param BaseSyncEntity $entity
+     * @param BaseSyncEntity|null $entity
      * @return BaseCommunicationEntity|null
      * @throws ApiException
      */
-    private function confirmAccess(BaseCommunicationEntity $communicationEntity, BaseSyncEntity $entity)
+    private function confirmAccess(BaseCommunicationEntity $communicationEntity, BaseSyncEntity $entity = null)
     {
         $resp = new BaseCommunicationEntity();
         $resp->Id = $communicationEntity->Id;

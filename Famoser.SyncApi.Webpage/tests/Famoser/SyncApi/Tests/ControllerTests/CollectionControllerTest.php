@@ -240,9 +240,9 @@ class CollectionControllerTest extends ApiTestController
     }
 
     /**
-     * tests confirm access request method
+     * tests confirm version request method
      */
-    public function testConfirmAccessSync()
+    public function testConfirmVersionSync()
     {
         //test create
         $syncRequest = new CollectionEntityRequest();
@@ -307,6 +307,79 @@ class CollectionControllerTest extends ApiTestController
         static::assertEquals(OnlineAction::UPDATE, $responseObj->CollectionEntities[0]->OnlineAction);
         AssertHelper::checkResponseCollection($this, $collEntity, $syncRequest, $responseObj->CollectionEntities[0]);
         AssertHelper::checkForSavedCollection($this, $collEntity, $this->testHelper->getTestApp());
+    }
+
+
+    /**
+     * tests confirm version request method
+     */
+    public function testConfirmAccessSync()
+    {
+        //test create
+        $syncRequest = new CollectionEntityRequest();
+        $this->testHelper->authorizeRequest($syncRequest);
+
+        $syncRequest->UserId = $this->testHelper->getUserId();
+        $syncRequest->DeviceId = $this->testHelper->getDeviceId($syncRequest->UserId);
+
+        $collEntity = new CollectionCommunicationEntity();
+        SampleGenerator::createEntity($collEntity);
+        $collEntity->DeviceId = $syncRequest->DeviceId;
+        $collEntity->UserId = $syncRequest->UserId;
+
+        $syncRequest->CollectionEntities[] = $collEntity;
+
+        $this->testHelper->mockApiRequest($syncRequest, "collections/sync");
+        $response = $this->testHelper->getTestApp()->run();
+        AssertHelper::checkForSuccessfulApiResponse($this, $response);
+        AssertHelper::checkForSavedCollection($this, $collEntity, $this->testHelper->getTestApp());
+
+        //test confirm access (granted)
+        $syncRequest1 = new CollectionEntityRequest();
+        $this->testHelper->authorizeRequest($syncRequest1);
+
+        $syncRequest1->UserId = $syncRequest->UserId;
+        $syncRequest1->DeviceId = $syncRequest->DeviceId;
+
+        $collEntity2 = new CollectionCommunicationEntity();
+        $collEntity2->Id = $collEntity->Id;
+        $collEntity2->OnlineAction = OnlineAction::CONFIRM_ACCESS;
+
+        $syncRequest1->CollectionEntities[] = $collEntity2;
+
+        $this->testHelper->mockApiRequest($syncRequest1, "collections/sync");
+        $response2 = $this->testHelper->getTestApp()->run();
+        $responseString = AssertHelper::checkForSuccessfulApiResponse($this, $response2);
+        AssertHelper::checkForSavedCollection($this, $collEntity, $this->testHelper->getTestApp());
+
+        /* @var CollectionEntityResponse $responseObj */
+        $responseObj = json_decode($responseString);
+        static::assertTrue(count($responseObj->CollectionEntities) == 1);
+        static::assertEquals(OnlineAction::ACCESS_GRANTED, $responseObj->CollectionEntities[0]->OnlineAction);
+
+        //test confirm access (denied)
+        $syncRequest2 = new CollectionEntityRequest();
+        $this->testHelper->authorizeRequest($syncRequest2);
+
+        $syncRequest2->UserId = $syncRequest->UserId;
+        $syncRequest2->DeviceId = $syncRequest->DeviceId;
+
+        $collEntity2 = new CollectionCommunicationEntity();
+        $collEntity2->Id = SampleGenerator::createGuid();
+        $collEntity2->OnlineAction = OnlineAction::CONFIRM_ACCESS;
+
+        $syncRequest2->CollectionEntities[] = $collEntity2;
+
+        $this->testHelper->mockApiRequest($syncRequest2, "collections/sync");
+
+        $response2 = $this->testHelper->getTestApp()->run();
+        $responseString = AssertHelper::checkForSuccessfulApiResponse($this, $response2);
+        AssertHelper::checkForSavedCollection($this, $collEntity, $this->testHelper->getTestApp());
+
+        /* @var CollectionEntityResponse $responseObj */
+        $responseObj = json_decode($responseString);
+        static::assertTrue(count($responseObj->CollectionEntities) == 2);
+        static::assertEquals(OnlineAction::ACCESS_DENIED, $responseObj->CollectionEntities[0]->OnlineAction);
     }
 
     /**

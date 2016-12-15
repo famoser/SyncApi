@@ -39,6 +39,8 @@ class ApiError
     const ACTION_PROHIBITED = 6001;
 
     const SERVER_ERROR = 7000;
+    const NODE_NOT_FOUND = 7001;
+    const METHOD_NOT_ALLOWED = 7002;
 
     /**
      * convert the api to a string
