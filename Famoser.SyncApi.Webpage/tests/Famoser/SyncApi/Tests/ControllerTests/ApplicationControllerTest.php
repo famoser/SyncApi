@@ -11,6 +11,7 @@ namespace Famoser\SyncApi\Tests\ControllerTests;
 
 use Famoser\SyncApi\Framework\ContainerBase;
 use Famoser\SyncApi\Models\Entities\Application;
+use Famoser\SyncApi\Repositories\SettingsRepository;
 use Famoser\SyncApi\Services\DatabaseService;
 use Famoser\SyncApi\Tests\ControllerTests\Base\FrontendTestController;
 use Famoser\SyncApi\Tests\TestHelpers\AssertHelper;
@@ -146,5 +147,56 @@ class ApplicationControllerTest extends FrontendTestController
             $threshold . " got: " .
             (time() - $application->release_date_time)
         );
+    }
+
+    /**
+     * test the create post action
+     */
+    public function testSettingsPost()
+    {
+        $this->getTestHelper()->loginUser();
+        $application = $this->getTestHelper()->getTestApplication();
+        $containerBase = new ContainerBase($this->getTestHelper()->getTestApp()->getContainer());
+
+        $settingsRepo = new SettingsRepository(
+            $containerBase->getDatabaseService(),
+            $this->getTestHelper()->getTestApplication()->id
+        );
+
+        $originSetting = $settingsRepo->getAllSettings();
+        $newSettings = [];
+        foreach ($originSetting as $item) {
+            if (is_numeric($item->value)) {
+                $newSettings[$item->key] = $item->value + 1;
+            } else if (is_string($item->value)) {
+                if ($item->value == "true") {
+                    $newSettings[$item->key] = "false";
+                } else if ($item->value == "false") {
+                    $newSettings[$item->key] = "true";
+                } else {
+                    $newSettings[$item->key] = $item->value . "-new";
+                }
+            }
+        }
+
+        $this->getTestHelper()->mockRequest(
+            "dashboard/settings/" . $application->id,
+            $newSettings
+        );
+        $response = $this->getTestHelper()->getTestApp()->run();
+        AssertHelper::checkForSuccessfulResponse($this, $response);
+
+
+        //reconstruct settings repo & try again
+        $settingsRepo = new SettingsRepository(
+            $containerBase->getDatabaseService(),
+            $this->getTestHelper()->getTestApplication()->id
+        );
+        $savedSettings = $settingsRepo->getAllSettings();
+        foreach ($savedSettings as $item) {
+            if (key_exists($item->key, $newSettings)) {
+                static::assertEquals($newSettings[$item->key], $item->value);
+            }
+        }
     }
 }

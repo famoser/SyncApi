@@ -90,6 +90,7 @@ class SettingsRepository
      */
     private function setOrCreateValue($key, $val)
     {
+        $this->ensureInitialized();
         //check if valid value, else simply ignore
         if (SettingKeys::isValidValue($key, $val)) {
             if (key_exists($key, $this->dic)) {
