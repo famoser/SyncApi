@@ -16,7 +16,7 @@ use Slim\Http\Response;
 
 /**
  * the public controller displays the index page & other pages accessible to everyone
- * 
+ *
  * @package Famoser\SyncApi\Controllers
  */
 class PublicController extends FrontendController
@@ -45,7 +45,7 @@ class PublicController extends FrontendController
     public function info(Request $request, Response $response, $args)
     {
         $apiInfo = new ApiInformation();
-        $apiInfo->Modulo = $this->container->get("settings")["api_modulo"];
+        $apiInfo->Modulo = $this->getSettingsArray()["api_modulo"];
         return $this->returnJsonObject($response, $apiInfo);
     }
 }
