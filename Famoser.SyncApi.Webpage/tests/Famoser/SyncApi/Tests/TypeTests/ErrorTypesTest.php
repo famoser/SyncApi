@@ -31,12 +31,13 @@ class ErrorTypesTest extends \PHPUnit_Framework_TestCase
         $reflection = new ReflectionClass(static::ERROR_NAMESPACE . "ApiError");
         $messages = [];
         //add default error description
-        $messages[ApiError::toString(-1)] = true;
+        $messages[str_replace((string)(-1), "", ApiError::toString(-1))] = true;
         //code must be in default error description
         static::assertContains("-1", ApiError::toString(-1));
         foreach ($reflection->getConstants() as $constant) {
             $message = ApiError::toString($constant);
-            static::assertArrayNotHasKey($message, $messages);
+            $message = str_replace((string)$constant, "", $message);
+            static::assertFalse(key_exists($message, $messages), "not specified for " . $constant);
             $tableNames[$message] = true;
         }
     }
@@ -49,12 +50,13 @@ class ErrorTypesTest extends \PHPUnit_Framework_TestCase
         $reflection = new ReflectionClass(static::ERROR_NAMESPACE . "FrontendError");
         $messages = [];
         //add default error description
-        $messages[FrontendError::toString(-1)] = true;
+        $messages[str_replace((string)(-1), "", FrontendError::toString(-1))] = true;
         //code must be in default error description
         static::assertContains("-1", FrontendError::toString(-1));
         foreach ($reflection->getConstants() as $constant) {
             $message = FrontendError::toString($constant);
-            static::assertArrayNotHasKey($message, $messages);
+            $message = str_replace((string)$constant, "", $message);
+            static::assertFalse(key_exists($message, $messages), "not specified for " . $constant);
             $tableNames[$message] = true;
         }
     }
@@ -72,7 +74,8 @@ class ErrorTypesTest extends \PHPUnit_Framework_TestCase
         static::assertContains("-1", ServerError::toString(-1));
         foreach ($reflection->getConstants() as $constant) {
             $message = ServerError::toString($constant);
-            static::assertArrayNotHasKey($message, $messages);
+            $message = str_replace((string)$constant, "", $message);
+            static::assertFalse(key_exists($message, $messages), "not specified for " . $constant);
             $tableNames[$message] = true;
         }
     }

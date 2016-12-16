@@ -10,9 +10,11 @@ namespace Famoser\SyncApi\Controllers;
 
 
 use Famoser\SyncApi\Controllers\Base\ApiRequestController;
+use Famoser\SyncApi\Exceptions\ApiException;
 use Famoser\SyncApi\Exceptions\ServerException;
 use Famoser\SyncApi\Models\Communication\Response\AuthorizationResponse;
 use Famoser\SyncApi\Models\Entities\UserCollection;
+use Famoser\SyncApi\Types\ApiError;
 use Famoser\SyncApi\Types\ServerError;
 use Slim\Http\Request;
 use Slim\Http\Response;
@@ -25,7 +27,7 @@ class UserController extends ApiRequestController
 {
     /**
      * authenticate other users against collection
-     * 
+     *
      * @param Request $request
      * @param Response $response
      * @param $args
@@ -42,40 +44,25 @@ class UserController extends ApiRequestController
         //check if requesting user has access to collection, if yes, add to $guidsToSetFree
         $allowedGuids = $this->getCollectionIds($req);
         $guidsToSetFree = [];
-        foreach ($req->CollectionEntity as $item) {
-            if (in_array($item->Id, $allowedGuids)) {
-                $guidsToSetFree[] = $item->Id;
-            }
+        if (!in_array($req->CollectionEntity->Id, $allowedGuids)) {
+            throw new ApiException(ApiError::USER_NOT_AUTHORIZED);
         }
 
-        foreach ($req->UserEntity as $item) {
-            //check if user has already access to one or more of the collections
-            $sqlArr = $guidsToSetFree;
-            $sqlArr["user_guid"] = $item->Id;
-            $userCollections = $this->getDatabaseService()->getFromDatabase(
-                new UserCollection(),
-                "user_guid =:user_guid AND collection_guid IN (:" . implode(",:", array_keys($guidsToSetFree)),
-                $sqlArr,
-                null,
-                1000,
-                "collection_guid");
+        //check if user already in collection
+        $userCollection = $this->getDatabaseService()->getSingleFromDatabase(
+            new UserCollection(),
+            "user_guid =:user_guid AND collection_guid = :collection_guid",
+            ["user_guid" => $req->UserEntity->Id, "collection_guid" => $req->CollectionEntity->Id]
+        );
 
-            //remove guids which user already has access to
-            $guidsForUser = $guidsToSetFree;
-            foreach ($userCollections as $userCollection) {
-                //sorry for this clumsy code, but as this corner case should not happen at all, I'll leave it as it is
-                $guidsForUser = array_diff([$userCollection->collection_guid], $guidsForUser);
-            }
-
-            //add new accesses
-            foreach ($guidsForUser as $collectionGuid) {
-                $userCollection = new UserCollection();
-                $userCollection->user_guid = $item->Id;
-                $userCollection->create_date_time = time();
-                $userCollection->collection_guid = $collectionGuid;
-                if (!$this->getDatabaseService()->saveToDatabase($userCollection)) {
-                    throw new ServerException(ServerError::DATABASE_SAVE_FAILURE);
-                }
+        //user has not already access to collection, add him
+        if ($userCollection == null) {
+            $userCollection = new UserCollection();
+            $userCollection->user_guid = $req->UserEntity->Id;
+            $userCollection->create_date_time = time();
+            $userCollection->collection_guid = $req->CollectionEntity->Id;
+            if (!$this->getDatabaseService()->saveToDatabase($userCollection)) {
+                throw new ServerException(ServerError::DATABASE_SAVE_FAILURE);
             }
         }
 
