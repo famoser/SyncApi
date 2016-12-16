@@ -243,8 +243,11 @@ class SyncApiApp extends App
     private function addHandlers(Container $container)
     {
         $errorHandler = function (Container $container) {
-            return function (ServerRequestInterface $request, ResponseInterface $response, $error = null)
-            use ($container) {
+            return function (
+                ServerRequestInterface $request,
+                ResponseInterface $response,
+                $error = null
+            ) use ($container) {
                 if ($error instanceof \Exception || $error instanceof \Throwable) {
                     $errorString = $error->getFile() . " (" . $error->getLine() . ")\n" .
                         $error->getCode() . ": " . $error->getMessage() . "\n" .
@@ -318,20 +321,20 @@ class SyncApiApp extends App
      */
     private function addServices(Container $container)
     {
-        $container[SyncApiApp::LOGGING_SERVICE_KEY] = function (Container $c) {
-            return new LoggingService($c);
+        $container[SyncApiApp::LOGGING_SERVICE_KEY] = function (Container $container) {
+            return new LoggingService($container);
         };
-        $container[SyncApiApp::REQUEST_SERVICE_KEY] = function (Container $c) {
-            return new RequestService($c);
+        $container[SyncApiApp::REQUEST_SERVICE_KEY] = function (Container $container) {
+            return new RequestService($container);
         };
-        $container[SyncApiApp::DATABASE_SERVICE_KEY] = function (Container $c) {
-            return new DatabaseService($c);
+        $container[SyncApiApp::DATABASE_SERVICE_KEY] = function (Container $container) {
+            return new DatabaseService($container);
         };
-        $container[SyncApiApp::SESSION_SERVICE_KEY] = function (Container $c) {
-            return new SessionService($c);
+        $container[SyncApiApp::SESSION_SERVICE_KEY] = function (Container $container) {
+            return new SessionService($container);
         };
-        $container[SyncApiApp::MAIL_SERVICE_KEY] = function (Container $c) {
-            return new MailService($c);
+        $container[SyncApiApp::MAIL_SERVICE_KEY] = function (Container $container) {
+            return new MailService($container);
         };
     }
 }
