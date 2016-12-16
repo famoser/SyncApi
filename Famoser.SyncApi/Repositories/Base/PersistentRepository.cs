@@ -28,12 +28,14 @@ namespace Famoser.SyncApi.Repositories.Base
         protected readonly ApiInformation ApiInformation;
         private readonly IApiConfigurationService _apiConfigurationService;
         private readonly IApiStorageService _apiStorageService;
+        private readonly IApiTraceService _apiTraceService;
 
-        protected PersistentRepository(IApiConfigurationService apiConfigurationService, IApiStorageService apiStorageService)
-            : base(apiConfigurationService)
+        protected PersistentRepository(IApiConfigurationService apiConfigurationService, IApiStorageService apiStorageService, IApiTraceService traceService)
+            : base(apiConfigurationService, traceService)
         {
             _apiConfigurationService = apiConfigurationService;
             _apiStorageService = apiStorageService;
+            _apiTraceService = traceService;
 
             Manager = _apiConfigurationService.GetManager<TModel>();
             ApiInformation = apiConfigurationService.GetApiInformations();
@@ -41,12 +43,12 @@ namespace Famoser.SyncApi.Repositories.Base
 
         protected ApiClient GetAuthApiClient()
         {
-            return new ApiClient(ApiInformation.Uri);
+            return new ApiClient(ApiInformation.Uri, _apiTraceService);
         }
 
         public Task<TModel> GetAsync()
         {
-            return ExecuteSafe(async () =>
+            return ExecuteSafeAsync(async () =>
             {
                 if (_apiConfigurationService.StartSyncAutomatically())
                     await SyncAsync();
@@ -57,7 +59,7 @@ namespace Famoser.SyncApi.Repositories.Base
 
         public Task<bool> SaveAsync()
         {
-            return ExecuteSafe(async () =>
+            return ExecuteSafeAsync(async () =>
             {
                 if (CacheEntity.ModelInformation.PendingAction == PendingAction.None
                     || CacheEntity.ModelInformation.PendingAction == PendingAction.Delete
@@ -73,7 +75,7 @@ namespace Famoser.SyncApi.Repositories.Base
 
         public Task<bool> RemoveAsync()
         {
-            return ExecuteSafe(async () =>
+            return ExecuteSafeAsync(async () =>
             {
                 if (CacheEntity.ModelInformation.PendingAction != PendingAction.Create)
                 {

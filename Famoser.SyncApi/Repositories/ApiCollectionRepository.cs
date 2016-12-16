@@ -27,8 +27,8 @@ namespace Famoser.SyncApi.Repositories
         private readonly IApiConfigurationService _apiConfigurationService;
 
         public ApiCollectionRepository(IApiAuthenticationService apiAuthenticationService,
-            IApiStorageService apiStorageService, IApiConfigurationService apiConfigurationService)
-            : base(apiConfigurationService, apiStorageService, apiAuthenticationService)
+            IApiStorageService apiStorageService, IApiConfigurationService apiConfigurationService, IApiTraceService traceService)
+            : base(apiConfigurationService, apiStorageService, apiAuthenticationService, traceService)
         {
             _apiAuthenticationService = apiAuthenticationService;
             _apiStorageService = apiStorageService;
@@ -142,7 +142,7 @@ namespace Famoser.SyncApi.Repositories
 
         public Task<bool> AddUserToCollectionAsync(TCollection collection, IUserModel userModel)
         {
-            return ExecuteSafe(async () =>
+            return ExecuteSafeAsync(async () =>
             {
                 if (!_apiConfigurationService.CanUseWebConnection())
                     return false;

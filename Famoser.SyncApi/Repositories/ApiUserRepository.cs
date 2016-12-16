@@ -25,7 +25,8 @@ namespace Famoser.SyncApi.Repositories
         private readonly IApiStorageService _apiStorageService;
         private readonly IApiConfigurationService _apiConfigurationService;
 
-        public ApiUserRepository(IApiConfigurationService apiConfigurationService, IApiStorageService apiStorageService) : base(apiConfigurationService, apiStorageService)
+        public ApiUserRepository(IApiConfigurationService apiConfigurationService, IApiStorageService apiStorageService, IApiTraceService traceService)
+            : base(apiConfigurationService, apiStorageService, traceService)
         {
             _apiConfigurationService = apiConfigurationService;
             _apiStorageService = apiStorageService;
@@ -188,7 +189,7 @@ namespace Famoser.SyncApi.Repositories
 
         public async Task<ApiRoamingEntity> GetApiRoamingEntityAsync()
         {
-            await ExecuteSafe(async () =>
+            await ExecuteSafeAsync(async () =>
             {
                 if (_apiConfigurationService.CanUseWebConnection())
                     await SyncInternalAsync();

@@ -22,6 +22,7 @@ class ApiError
     const USER_NOT_FOUND = 2000;
     const USER_REMOVED = 2001;
     const USER_NOT_AUTHORIZED = 2002;
+
     const PERSONAL_SEED_MISSING = 2003;
     const PERSONAL_SEED_NOT_NUMERIC = 2004;
     const PERSONAL_SEED_TOO_SMALL = 2005;

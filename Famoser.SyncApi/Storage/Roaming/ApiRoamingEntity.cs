@@ -8,5 +8,6 @@ namespace Famoser.SyncApi.Storage.Roaming
         public Guid UserId { get; set; }
         public int PersonalSeed { get; set; }
         public AuthenticationState AuthenticationState { get; set; }
+        public DateTime CreatedAt { get; set; }
     }
 }

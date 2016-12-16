@@ -4,7 +4,6 @@ using System.Threading.Tasks;
 using Famoser.FrameworkEssentials.Logging.Interfaces;
 using Famoser.FrameworkEssentials.Services.Interfaces;
 using Famoser.SyncApi.Services.Interfaces;
-using Famoser.SyncApi.Storage.Cache;
 using Famoser.SyncApi.Storage.Roaming;
 using Newtonsoft.Json;
 using Nito.AsyncEx;
@@ -31,8 +30,33 @@ namespace Famoser.SyncApi.Services
             {
                 try
                 {
-                    var json = await _storageService.GetRoamingTextFileAsync(GetApiRoamingFilePath());
-                    _apiRoamingEntity = JsonConvert.DeserializeObject<ApiRoamingEntity>(json);
+                    var roamingFilePath = GetApiRoamingFilePath();
+                    var json1 = await _storageService.GetRoamingTextFileAsync(roamingFilePath);
+                    var json2 = await _storageService.GetCachedTextFileAsync(roamingFilePath);
+                    if (json1 == json2)
+                    {
+                        _apiRoamingEntity = JsonConvert.DeserializeObject<ApiRoamingEntity>(json1);
+                    }
+                    else
+                    {
+                        //this is not good.
+                        //szenario 1: roaming did not sync as expected, new installation has overwritten the roaming cache with new infos, user may lost all his data
+                        var roaming1 = JsonConvert.DeserializeObject<ApiRoamingEntity>(json1);
+                        var roaming2 = JsonConvert.DeserializeObject<ApiRoamingEntity>(json2);
+                        if (roaming1.CreatedAt < roaming2.CreatedAt)
+                        {
+                            //hmmmmmm, this is really unecpected. We will not modify the roaming storage, to not introduce more bugs
+                            //we'll just pretend as everything is OK, mabye some other instance of this application can figure out whats going on
+                            _apiRoamingEntity = roaming1;
+                        }
+                        else
+                        {
+                            //szenario 1 happened. too bad! At least we're smart enough to fix it (or not?). Override roaming storage with own storage
+                            await _storageService.SetCachedTextFileAsync(roamingFilePath, json2);
+                            _apiRoamingEntity = roaming2;
+                        }
+
+                    }
                 }
                 catch (Exception)
                 {
@@ -45,14 +69,16 @@ namespace Famoser.SyncApi.Services
             }
         }
 
+        private string _apiRoamingFilePathCache = null;
         private string GetApiRoamingFilePath()
         {
-            return _apiConfigurationService.GetFileName("api_roaming.json");
+            return _apiRoamingFilePathCache ?? (_apiRoamingFilePathCache = _apiConfigurationService.GetFileName("api_roaming.json"));
         }
 
+        private string _apiStorageFilePathCache = null;
         private string GetApiStorageFilePath()
         {
-            return _apiConfigurationService.GetFileName("api_storage_cache.json");
+            return _apiStorageFilePathCache ?? (_apiStorageFilePathCache = _apiConfigurationService.GetFileName("api_storage_cache.json"));
         }
 
         public Task<ApiRoamingEntity> GetApiRoamingEntityAsync()
@@ -63,9 +89,13 @@ namespace Famoser.SyncApi.Services
 
         public Task<bool> SaveApiRoamingEntityAsync()
         {
-            return
-                ExecuteSafe(async () => await _storageService.SetRoamingTextFileAsync(GetApiRoamingFilePath(),
-                                JsonConvert.SerializeObject(_apiRoamingEntity)));
+            return ExecuteSafe(async () =>
+            {
+                var json = JsonConvert.SerializeObject(_apiRoamingEntity);
+                var filePath = GetApiRoamingFilePath();
+                var res = await _storageService.SetRoamingTextFileAsync(filePath, json);
+                return res && await _storageService.SetCachedTextFileAsync(filePath, json);
+            });
         }
 
         public Task<bool> EraseRoamingAndCacheAsync()
@@ -134,7 +164,7 @@ namespace Famoser.SyncApi.Services
             await _storageService.DeleteCachedFileAsync(key);
             return true;
         }
-        
+
         public void SetExceptionLogger(IExceptionLogger logger)
         {
             _exceptionLogger = logger;

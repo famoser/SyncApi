@@ -36,6 +36,13 @@ namespace Famoser.SyncApi.Helpers
             set { _apiStorageService = value; }
         }
 
+        private IApiTraceService _apiTraceService;
+        public IApiTraceService ApiTraceService
+        {
+            get { return _apiTraceService ?? (_apiTraceService = new ApiTraceService()); }
+            set { _apiTraceService = value; }
+        }
+
         private IApiAuthenticationService _apiAuthenticationService;
         public IApiAuthenticationService ApiAuthenticationService
         {
@@ -46,21 +53,21 @@ namespace Famoser.SyncApi.Helpers
         private IApiUserRepository<UserModel> _apiUserRepository;
         public IApiUserRepository<UserModel> ApiUserRepository
         {
-            get { return _apiUserRepository ?? (_apiUserRepository = new ApiUserRepository<UserModel>(ApiConfigurationService, ApiStorageService)); }
+            get { return _apiUserRepository ?? (_apiUserRepository = new ApiUserRepository<UserModel>(ApiConfigurationService, ApiStorageService, ApiTraceService)); }
             set { _apiUserRepository = value; }
         }
 
         private IApiDeviceRepository<DeviceModel> _apiDeviceRepository;
         public IApiDeviceRepository<DeviceModel> ApiDeviceRepository
         {
-            get { return _apiDeviceRepository ?? (_apiDeviceRepository = new ApiDeviceRepository<DeviceModel>(ApiConfigurationService, ApiStorageService)); }
+            get { return _apiDeviceRepository ?? (_apiDeviceRepository = new ApiDeviceRepository<DeviceModel>(ApiConfigurationService, ApiStorageService, ApiTraceService)); }
             set { _apiDeviceRepository = value; }
         }
 
         private IApiCollectionRepository<CollectionModel> _apiCollectionRepository;
         public IApiCollectionRepository<CollectionModel> ApiCollectionRepository
         {
-            get { return _apiCollectionRepository ?? (_apiCollectionRepository = new ApiCollectionRepository<CollectionModel>(ApiAuthenticationService, ApiStorageService, ApiConfigurationService)); }
+            get { return _apiCollectionRepository ?? (_apiCollectionRepository = new ApiCollectionRepository<CollectionModel>(ApiAuthenticationService, ApiStorageService, ApiConfigurationService, ApiTraceService)); }
             set { _apiCollectionRepository = value; }
         }
 
@@ -68,7 +75,7 @@ namespace Famoser.SyncApi.Helpers
         public ApiRepository<T, CollectionModel> ResolveRepository<T>()
             where T : ISyncModel
         {
-            return new ApiRepository<T, CollectionModel>(ApiConfigurationService, ApiStorageService, ApiAuthenticationService);
+            return new ApiRepository<T, CollectionModel>(ApiConfigurationService, ApiStorageService, ApiAuthenticationService, ApiTraceService);
         }
 
         private bool _isDisposed;

@@ -8,6 +8,9 @@
         Update = 3,
         Delete = 4,
         ConfirmVersion = 5,
-        ConfirmAccess = 6
+        ConfirmAccess = 6,
+
+        AccessGranted = 10,
+        AccessDenied = 11
     }
 }

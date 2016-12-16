@@ -30,7 +30,8 @@ namespace Famoser.SyncApi.Repositories
         private readonly IApiStorageService _apiStorageService;
         private readonly IApiConfigurationService _apiConfigurationService;
         private readonly ApiClient _authApiClient;
-        public ApiDeviceRepository(IApiConfigurationService apiConfigurationService, IApiStorageService apiStorageService) : base(apiConfigurationService, apiStorageService)
+        public ApiDeviceRepository(IApiConfigurationService apiConfigurationService, IApiStorageService apiStorageService, IApiTraceService traceService) : 
+            base(apiConfigurationService, apiStorageService, traceService)
         {
             _apiStorageService = apiStorageService;
             _apiConfigurationService = apiConfigurationService;
@@ -258,7 +259,7 @@ namespace Famoser.SyncApi.Repositories
 
         public Task<ObservableCollection<TDevice>> GetAllAsync()
         {
-            return ExecuteSafe(async () =>
+            return ExecuteSafeAsync(async () =>
             {
                 await InitializeDevicesAsync().ContinueWith(t => SyncDevicesAsync());
 
@@ -268,7 +269,7 @@ namespace Famoser.SyncApi.Repositories
 
         public Task<bool> SyncDevicesAsync()
         {
-            return ExecuteSafe(async () =>
+            return ExecuteSafeAsync(async () =>
             {
                 await InitializeDevicesAsync();
                 return await SyncDevicesInternalAsync();
@@ -279,7 +280,7 @@ namespace Famoser.SyncApi.Repositories
         #region authentication methods
         public Task<bool> UnAuthenticateAsync(TDevice device)
         {
-            return ExecuteSafe(async () =>
+            return ExecuteSafeAsync(async () =>
             {
                 var resp = await _authApiClient.UnAuthenticateDeviceAsync(AuthorizeRequest(ApiInformation, _apiRoamingEntity, new AuthRequestEntity()
                 {
@@ -291,7 +292,7 @@ namespace Famoser.SyncApi.Repositories
 
         public Task<bool> AuthenticateAsync(TDevice device)
         {
-            return ExecuteSafe(async () =>
+            return ExecuteSafeAsync(async () =>
             {
                 var resp = await _authApiClient.AuthenticateDeviceAsync(AuthorizeRequest(ApiInformation, _apiRoamingEntity, new AuthRequestEntity()
                 {
@@ -303,7 +304,7 @@ namespace Famoser.SyncApi.Repositories
 
         public Task<string> CreateNewAuthenticationCodeAsync()
         {
-            return ExecuteSafe(async () =>
+            return ExecuteSafeAsync(async () =>
             {
                 var resp = await _authApiClient.CreateAuthorizationCodeAsync(AuthorizeRequest(ApiInformation, _apiRoamingEntity, new AuthRequestEntity()));
                 return resp.IsSuccessfull ? resp.ServerMessage : default(string);
@@ -312,7 +313,7 @@ namespace Famoser.SyncApi.Repositories
 
         public Task<bool> TryUseAuthenticationCodeAsync(string authenticationCode)
         {
-            return ExecuteSafe(async () =>
+            return ExecuteSafeAsync(async () =>
             {
                 var resp = await _authApiClient.UseAuthenticationCodeAsync(AuthorizeRequest(ApiInformation, _apiRoamingEntity, new AuthRequestEntity()
                 {

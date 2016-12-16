@@ -57,6 +57,7 @@ class DatabaseService extends BaseService implements DatabaseServiceInterface
      *
      * @param $scriptsPath
      */
+    /* commented because untested and unused
     public function executeScripts($scriptsPath)
     {
         $files = scandir($scriptsPath);
@@ -72,6 +73,7 @@ class DatabaseService extends BaseService implements DatabaseServiceInterface
             }
         }
     }
+    */
 
     /**
      * initialize the database

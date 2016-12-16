@@ -12,14 +12,16 @@ namespace Famoser.SyncApi.Repositories.Base
         where TModel : IUniqueSyncModel
     {
         private readonly IApiConfigurationService _apiConfigurationService;
-        protected BasePersistentRepository(IApiConfigurationService apiConfigurationService)
+        private readonly IApiTraceService _apiTraceService;
+        protected BasePersistentRepository(IApiConfigurationService apiConfigurationService, IApiTraceService traceService)
         {
             _apiConfigurationService = apiConfigurationService;
+            _apiTraceService = traceService;
         }
 
         public Task<bool> SyncAsync()
         {
-            return ExecuteSafe(async () =>
+            return ExecuteSafeAsync(async () =>
             {
                 if (_apiConfigurationService.CanUseWebConnection())
                     return await SyncInternalAsync();
@@ -36,7 +38,7 @@ namespace Famoser.SyncApi.Repositories.Base
         protected abstract Task<bool> InitializeAsync();
 
         protected IExceptionLogger ExceptionLogger;
-        protected async Task<T> ExecuteSafe<T>(Func<Task<T>> func, bool ensureWebCanBeUsed = false)
+        protected async Task<T> ExecuteSafeAsync<T>(Func<Task<T>> func, bool ensureWebCanBeUsed = false)
         {
             try
             {
@@ -53,7 +55,7 @@ namespace Famoser.SyncApi.Repositories.Base
             return default(T);
         }
 
-        protected async Task ExecuteSafe(Func<Task> func, bool ensureWebCanBeUsed = false)
+        protected async Task ExecuteSafeAsync(Func<Task> func, bool ensureWebCanBeUsed = false)
         {
             try
             {
@@ -103,7 +105,7 @@ namespace Famoser.SyncApi.Repositories.Base
             if (_apiClient != null)
                 return _apiClient;
 
-            _apiClient = new ApiClient(_apiConfigurationService.GetApiInformations().Uri);
+            _apiClient = new ApiClient(_apiConfigurationService.GetApiInformations().Uri, _apiTraceService);
             return _apiClient;
         }
 

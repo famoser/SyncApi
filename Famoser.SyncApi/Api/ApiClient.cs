@@ -3,12 +3,13 @@ using System.Threading.Tasks;
 using Famoser.SyncApi.Api.Base;
 using Famoser.SyncApi.Api.Communication.Request;
 using Famoser.SyncApi.Api.Communication.Response;
+using Famoser.SyncApi.Services.Interfaces;
 
 namespace Famoser.SyncApi.Api
 {
     public class ApiClient : BaseApiClient
     {
-        public ApiClient(Uri baseUri) : base(baseUri)
+        public ApiClient(Uri baseUri, IApiTraceService service) : base(baseUri, service)
         {
         }
 

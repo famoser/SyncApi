@@ -1,10 +1,9 @@
 ﻿using System;
 using System.Threading.Tasks;
-using Famoser.FrameworkEssentials.Logging;
-using Famoser.FrameworkEssentials.Logging.Interfaces;
 using Famoser.FrameworkEssentials.Services;
 using Famoser.SyncApi.Api.Communication.Response.Base;
 using Newtonsoft.Json;
+using Famoser.SyncApi.Services.Interfaces;
 
 namespace Famoser.SyncApi.Api.Base
 {
@@ -12,12 +11,12 @@ namespace Famoser.SyncApi.Api.Base
     {
         private readonly Uri _baseUri;
         private readonly RestService _restService;
-        private readonly IExceptionLogger _logger;
+        private readonly IApiTraceService _logger;
 
-        public BaseApiClient(Uri baseUri)
+        public BaseApiClient(Uri baseUri, IApiTraceService service)
         {
             _baseUri = baseUri;
-            _logger = new LogHelper();
+            _logger = service;
             _restService = new RestService(null, true, _logger);
         }
 
@@ -36,6 +35,14 @@ namespace Famoser.SyncApi.Api.Base
                 if (obj != null)
                 {
                     obj.RequestFailed = !response.IsRequestSuccessfull;
+                    if (obj.RequestFailed)
+                    {
+                        _logger.TraceFailedRequest(request, node, obj.ServerMessage);
+                    }
+                    else
+                    {
+                        _logger.TraceSuccessfulRequest(request, node);
+                    }
                     return obj;
                 }
                 return new T()

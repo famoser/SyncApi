@@ -32,8 +32,8 @@ namespace Famoser.SyncApi.Repositories.Base
         private readonly IApiAuthenticationService _apiAuthenticationService;
 
         protected PersistentCollectionRepository(IApiConfigurationService apiConfigurationService,
-            IApiStorageService apiStorageService, IApiAuthenticationService apiAuthenticationService)
-            : base(apiConfigurationService)
+            IApiStorageService apiStorageService, IApiAuthenticationService apiAuthenticationService, IApiTraceService traceService)
+            : base(apiConfigurationService, traceService)
         {
             _apiAuthenticationService = apiAuthenticationService;
             _apiStorageService = apiStorageService;
@@ -72,7 +72,7 @@ namespace Famoser.SyncApi.Repositories.Base
 
         public Task<bool> SaveAsync(TCollection model)
         {
-            return ExecuteSafe(async () =>
+            return ExecuteSafeAsync(async () =>
             {
                 var info = CollectionCache.ModelInformations.FirstOrDefault(s => s.Id == model.GetId());
                 if (info == null)
@@ -98,7 +98,7 @@ namespace Famoser.SyncApi.Repositories.Base
 
         public Task<bool> RemoveAsync(TCollection model)
         {
-            return ExecuteSafe(async () =>
+            return ExecuteSafeAsync(async () =>
             {
                 var info = CollectionCache.ModelInformations.FirstOrDefault(s => s.Id == model.GetId());
                 if (info == null)
@@ -177,7 +177,7 @@ namespace Famoser.SyncApi.Repositories.Base
 
         public Task<ObservableCollection<HistoryInformations<TCollection>>> GetHistoryAsync(TCollection model)
         {
-            return ExecuteSafe(async () =>
+            return ExecuteSafeAsync(async () =>
             {
                 EnsureExistanceOfHistoryManager(model);
 
@@ -243,7 +243,7 @@ namespace Famoser.SyncApi.Repositories.Base
 
         public Task<bool> SyncHistoryAsync(TCollection model)
         {
-            return ExecuteSafe(async () =>
+            return ExecuteSafeAsync(async () =>
             {
                 await InitializeHistoryAsync(model);
                 if (_apiConfigurationService.CanUseWebConnection())
