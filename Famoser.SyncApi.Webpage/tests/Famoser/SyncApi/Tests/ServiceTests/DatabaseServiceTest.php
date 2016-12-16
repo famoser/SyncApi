@@ -26,7 +26,7 @@ use Famoser\SyncApi\Tests\TestHelpers\FrontendTestHelper;
  */
 class DatabaseServiceTest extends BaseTestService
 {
-     /**
+    /**
      * tests the get by id method
      */
     public function testGetWithIn()
@@ -48,9 +48,9 @@ class DatabaseServiceTest extends BaseTestService
         $databaseService = $this->getDatabaseService();
         $user = $this->testHelper->getTestUser();
         $res = $databaseService->getSingleByIdFromDatabase(new FrontendUser(), $user->id);
-        static::assertTrue(count($res) == 1);
+        static::assertNotNull($res);
 
         $res = $databaseService->getSingleByIdFromDatabase(new FrontendUser(), $user->id + 1);
-        static::assertTrue(count($res) == 0);
+        static::assertNull($res);
     }
 }
