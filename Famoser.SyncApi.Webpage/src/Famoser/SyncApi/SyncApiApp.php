@@ -207,14 +207,14 @@ class SyncApiApp extends App
      */
     private function constructContainer($configuration)
     {
-        $c = new Container($configuration);
+        $container = new Container($configuration);
 
         //add handlers & services
-        $this->addHandlers($c);
-        $this->addServices($c);
+        $this->addHandlers($container);
+        $this->addServices($container);
 
         //add view
-        $c["view"] = function (Container $container) {
+        $container["view"] = function (Container $container) {
             $view = new Twig(
                 $container->get(SyncApiApp::SETTINGS_KEY)["template_path"],
                 [
@@ -232,7 +232,7 @@ class SyncApiApp extends App
             return $view;
         };
 
-        return $c;
+        return $container;
     }
 
     /**
@@ -276,7 +276,6 @@ class SyncApiApp extends App
                     $resp->ServerMessage = $errorString;
                     return $container['response']->withStatus(500)->withJson($resp);
                 } else {
-                    $type = "server_error";
                     //behaviour for FrontendExceptions
                     if ($error instanceof FrontendException) {
                         //tried to access page where you need to be logged in
@@ -300,14 +299,13 @@ class SyncApiApp extends App
         $container["errorHandler"] = $errorHandler;
 
         $container["notAllowedHandler"] = function (Container $container) {
-            return function (ServerRequestInterface $request, ResponseInterface $response, $allowedMethods)
-            use ($container) {
+            //third parameter can be $requestMethods array
+            return function (ServerRequestInterface $request, ResponseInterface $response) use ($container) {
                 return $container["view"]->render($response, "public/not_found.html.twig", []);
             };
         };
         $container["notFoundHandler"] = function (Container $container) {
-            return function (ServerRequestInterface $request, ResponseInterface $response)
-            use ($container) {
+            return function (ServerRequestInterface $request, ResponseInterface $response) use ($container) {
                 return $container["view"]->render($response, "public/not_found.html.twig", []);
             };
         };
@@ -318,8 +316,7 @@ class SyncApiApp extends App
      *
      * @param Container $container
      */
-    private
-    function addServices(Container $container)
+    private function addServices(Container $container)
     {
         $container[SyncApiApp::LOGGING_SERVICE_KEY] = function (Container $c) {
             return new LoggingService($c);
