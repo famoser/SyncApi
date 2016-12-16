@@ -103,6 +103,16 @@ interface DatabaseServiceInterface
     public function getSingleFromDatabase(BaseEntity $entity, $where = null, $parameters = null, $orderBy = null);
 
     /**
+     * get the first entry from the database which matches the conditions
+     *
+     * @param BaseEntity $entity
+     * @param $id
+     * @return Application|ApplicationSetting|AuthorizationCode|Collection|ContentVersion|Device|Entity|FrontendUser|
+     * User|UserCollection|bool
+     */
+    public function getSingleByIdFromDatabase(BaseEntity $entity, $id);
+
+    /**
      * save the entity to the database
      * if the entity was retrieved from the database before, it will replace the old data
      *

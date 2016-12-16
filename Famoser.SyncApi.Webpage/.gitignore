@@ -11,3 +11,4 @@ src/public/assets/vendor/*
 src/public/dist/js/pre/*
 src/public/dist/css/pre/*
 src/public/dist/fonts/pre/*
+mail-*-*-*.txt

@@ -244,7 +244,9 @@ class DatabaseService extends BaseService implements DatabaseServiceInterface
             $parameters[":" . $property . $i] = $values[$i];
             $variables[] = ":" . $property . $i;
         }
-        $where .= $property . (($invertIn) ? " NOT" : "") . " IN (" . implode(",", $variables) . ")";
+        if (count($variables)) {
+            $where .= $property . (($invertIn) ? " NOT" : "") . " IN (" . implode(",", $variables) . ")";
+        }
         $sql = $this->createQuery($entity, $where, $orderBy, $limit);
         $res = $this->executeAndFetch($entity, $sql, $parameters);
         return $res;
@@ -374,5 +376,18 @@ class DatabaseService extends BaseService implements DatabaseServiceInterface
     public function dispose()
     {
         $this->database = null;
+    }
+
+    /**
+     * get the first entry from the database which matches the conditions
+     *
+     * @param BaseEntity $entity
+     * @param $id
+     * @return Application|ApplicationSetting|AuthorizationCode|Collection|ContentVersion|Device|Entity|FrontendUser|
+     * User|UserCollection|bool
+     */
+    public function getSingleByIdFromDatabase(BaseEntity $entity, $id)
+    {
+        return $this->getSingleFromDatabase($entity, "id = :id", ["id" => $id]);
     }
 }

@@ -70,8 +70,6 @@ abstract class ApiSyncController extends ApiRequestController
 
             //check that no action can be executed which is not explicitly allowed
             if (!in_array($communicationEntity->OnlineAction, $allowedOA)) {
-                $this->getLoggingService()->log(json_encode($allowedOA), "debug.txt");
-                $this->getLoggingService()->log(json_encode($communicationEntity), "excel.txt");
                 throw new ApiException(ApiError::ACTION_PROHIBITED);
             }
 
