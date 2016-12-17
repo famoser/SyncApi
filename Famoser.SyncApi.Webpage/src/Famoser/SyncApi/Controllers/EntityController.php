@@ -125,6 +125,12 @@ class EntityController extends AbstractApiSyncController
         return $this->returnJson($response, $resp);
     }
 
+    /**
+     * convert numeric array keys to string array keys
+     *
+     * @param array $arr
+     * @return array
+     */
     private function convertToStringArrayKeys($arr)
     {
         $str = 'rawrrr';
@@ -141,7 +147,7 @@ class EntityController extends AbstractApiSyncController
      *
      * @param BaseRequest $req
      * @param $contentType
-     * @return \Famoser\SyncApi\Models\Entities\Base\BaseSyncEntity[]
+     * @return false|BaseSyncEntity[]
      * @throws ServerException
      */
     protected function getAllFromDatabase(BaseRequest $req, $contentType)
