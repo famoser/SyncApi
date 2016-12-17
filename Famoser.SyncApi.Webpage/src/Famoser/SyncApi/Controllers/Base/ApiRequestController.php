@@ -12,6 +12,7 @@ use Famoser\SyncApi\Exceptions\ApiException;
 use Famoser\SyncApi\Models\Communication\Request\Base\BaseRequest;
 use Famoser\SyncApi\Models\Communication\Response\Base\BaseResponse;
 use Famoser\SyncApi\Models\Entities\Application;
+use Famoser\SyncApi\Models\Entities\Base\BaseSyncEntity;
 use Famoser\SyncApi\Models\Entities\Device;
 use Famoser\SyncApi\Models\Entities\User;
 use Famoser\SyncApi\Models\Entities\UserCollection;
@@ -94,17 +95,11 @@ class ApiRequestController extends BaseController
         }
 
         $this->user = $this->tryGetUser($req);
-        if ($this->user == null) {
-            throw new ApiException(ApiError::USER_NOT_FOUND);
-        }
-        if ($this->user->is_deleted) {
-            throw new ApiException(ApiError::USER_REMOVED);
-        }
+        $this->checkForEntityValidity(ApiError::USER_NOT_FOUND, ApiError::USER_REMOVED, $this->user);
         return $this->user;
     }
 
     /**
-     * tries to get the user. does not fail if not found!
      * @param BaseRequest $req
      * @return User
      */
@@ -115,6 +110,22 @@ class ApiRequestController extends BaseController
             'guid = :guid AND application_id = :application_id',
             ['guid' => $req->UserId, 'application_id' => $req->ApplicationId]
         );
+    }
+
+    /**
+     * @param int $notFoundError
+     * @param int $removedError
+     * @param BaseSyncEntity|null $entity
+     * @throws ApiException
+     */
+    private function checkForEntityValidity($notFoundError, $removedError, BaseSyncEntity $entity = null)
+    {
+        if ($entity == null) {
+            throw new ApiException($notFoundError);
+        }
+        if ($entity->is_deleted) {
+            throw new ApiException($removedError);
+        }
     }
 
     /* @var Device $device */
@@ -132,12 +143,7 @@ class ApiRequestController extends BaseController
         }
 
         $this->device = $this->tryGetDevice($req);
-        if ($this->device == null) {
-            throw new ApiException(ApiError::DEVICE_NOT_FOUND);
-        }
-        if ($this->device->is_deleted) {
-            throw new ApiException(ApiError::DEVICE_REMOVED);
-        }
+        $this->checkForEntityValidity(ApiError::DEVICE_NOT_FOUND, ApiError::DEVICE_REMOVED, $this->device);
         return $this->device;
     }
 
