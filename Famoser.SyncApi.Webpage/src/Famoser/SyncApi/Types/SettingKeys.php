@@ -29,11 +29,11 @@ class SettingKeys
     public static function getSettingDescription($key)
     {
         switch ($key) {
-            case SettingKeys::AUTHORIZATION_CODE_VALID_TIME:
+            case self::AUTHORIZATION_CODE_VALID_TIME:
                 return 'authorization code valid time';
-            case SettingKeys::DEVICE_AUTHENTICATION_REQUIRED:
+            case self::DEVICE_AUTHENTICATION_REQUIRED:
                 return 'device authentication required';
-            case SettingKeys::AUTHORIZATION_CODE_LENGTH:
+            case self::AUTHORIZATION_CODE_LENGTH:
                 return 'length of the authorization code';
             default:
                 return 'unknown setting with key ' . $key;
@@ -49,11 +49,11 @@ class SettingKeys
     public static function getDefaultValue($key)
     {
         switch ($key) {
-            case SettingKeys::AUTHORIZATION_CODE_VALID_TIME:
+            case self::AUTHORIZATION_CODE_VALID_TIME:
                 return '300';
-            case SettingKeys::DEVICE_AUTHENTICATION_REQUIRED:
+            case self::DEVICE_AUTHENTICATION_REQUIRED:
                 return 'true';
-            case SettingKeys::AUTHORIZATION_CODE_LENGTH:
+            case self::AUTHORIZATION_CODE_LENGTH:
                 return '6';
             default:
                 return 'unknown default value for key ' . $key;
@@ -70,11 +70,11 @@ class SettingKeys
     public static function isValidValue($key, $val)
     {
         switch ($key) {
-            case SettingKeys::AUTHORIZATION_CODE_VALID_TIME:
+            case self::AUTHORIZATION_CODE_VALID_TIME:
                 return is_numeric($val);
-            case SettingKeys::DEVICE_AUTHENTICATION_REQUIRED:
+            case self::DEVICE_AUTHENTICATION_REQUIRED:
                 return $val == 'false' || $val == 'true';
-            case SettingKeys::AUTHORIZATION_CODE_LENGTH:
+            case self::AUTHORIZATION_CODE_LENGTH:
                 return is_numeric($val);
             default:
                 return false;

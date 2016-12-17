@@ -30,13 +30,13 @@ class ServerError
     public static function toString($serverError)
     {
         switch ($serverError) {
-            case ServerError::REQUEST_JSON_FAILURE:
+            case self::REQUEST_JSON_FAILURE:
                 return 'json request could not be processed';
-            case ServerError::FORBIDDEN:
+            case self::FORBIDDEN:
                 return 'you are not allowed to view this resource';
-            case ServerError::NOT_WELL_DEFINED:
+            case self::NOT_WELL_DEFINED:
                 return 'the request is not well defined';
-            case ServerError::DATABASE_SAVE_FAILURE:
+            case self::DATABASE_SAVE_FAILURE:
                 return 'changes could not be written to database';
             default:
                 return 'unknown server error occurred with code ' . $serverError;

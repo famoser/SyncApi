@@ -53,52 +53,52 @@ class ApiError
     public static function toString($apiError)
     {
         switch ($apiError) {
-            case ApiError::NONE:
+            case self::NONE:
                 return 'no error occurred';
-            case ApiError::APPLICATION_NOT_FOUND:
+            case self::APPLICATION_NOT_FOUND:
                 return 'application not found';
 
-            case ApiError::USER_NOT_FOUND:
+            case self::USER_NOT_FOUND:
                 return 'user not found';
-            case ApiError::USER_REMOVED:
+            case self::USER_REMOVED:
                 return 'user removed';
-            case ApiError::USER_NOT_AUTHORIZED:
+            case self::USER_NOT_AUTHORIZED:
                 return 'user not authorized';
 
-            case ApiError::PERSONAL_SEED_MISSING:
+            case self::PERSONAL_SEED_MISSING:
                 return 'user seed messing';
-            case ApiError::PERSONAL_SEED_NOT_NUMERIC:
+            case self::PERSONAL_SEED_NOT_NUMERIC:
                 return 'user seed not numeric';
-            case ApiError::PERSONAL_SEED_TOO_SMALL:
+            case self::PERSONAL_SEED_TOO_SMALL:
                 return 'user seed too small';
 
-            case ApiError::DEVICE_NOT_FOUND:
+            case self::DEVICE_NOT_FOUND:
                 return 'device not found';
-            case ApiError::DEVICE_NOT_AUTHORIZED:
+            case self::DEVICE_NOT_AUTHORIZED:
                 return 'device not authorized';
-            case ApiError::DEVICE_UNAUTHORIZED:
+            case self::DEVICE_UNAUTHORIZED:
                 return 'device unauthorized';
-            case ApiError::DEVICE_REMOVED:
+            case self::DEVICE_REMOVED:
                 return 'device removed';
 
-            case ApiError::RESOURCE_ALREADY_EXISTS:
+            case self::RESOURCE_ALREADY_EXISTS:
                 return 'resource already exists';
-            case ApiError::RESOURCE_NOT_FOUND:
+            case self::RESOURCE_NOT_FOUND:
                 return 'resource not found';
 
-            case ApiError::AUTHORIZATION_CODE_INVALID:
+            case self::AUTHORIZATION_CODE_INVALID:
                 return 'authorization code invalid';
 
-            case ApiError::ACTION_NOT_SUPPORTED:
+            case self::ACTION_NOT_SUPPORTED:
                 return 'action not supported';
-            case ApiError::ACTION_PROHIBITED:
+            case self::ACTION_PROHIBITED:
                 return 'action prohibited';
 
-            case ApiError::SERVER_ERROR:
+            case self::SERVER_ERROR:
                 return 'unknown server error occurred';
-            case ApiError::NODE_NOT_FOUND:
+            case self::NODE_NOT_FOUND:
                 return 'url is not available';
-            case ApiError::METHOD_NOT_ALLOWED:
+            case self::METHOD_NOT_ALLOWED:
                 return 'method is not allowed';
 
             default:

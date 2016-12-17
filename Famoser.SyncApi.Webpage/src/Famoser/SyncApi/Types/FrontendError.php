@@ -28,9 +28,9 @@ class FrontendError
     public static function toString($code)
     {
         switch ($code) {
-            case FrontendError::NOT_LOGGED_IN:
+            case self::NOT_LOGGED_IN:
                 return 'not logged in';
-            case FrontendError::ACCESS_DENIED:
+            case self::ACCESS_DENIED:
                 return 'you are not allowed to view this resource';
             default:
                 return 'unknown error occurred with code ' . $code;

@@ -28,11 +28,11 @@ class OnlineAction
     const ACCESS_DENIED = 11;
 
     const ALL_SYNC_ACTIONS = [
-        OnlineAction::CONFIRM_VERSION,
-        OnlineAction::CONFIRM_ACCESS,
-        OnlineAction::CREATE,
-        OnlineAction::READ,
-        OnlineAction::UPDATE,
-        OnlineAction::DELETE
+        self::CONFIRM_VERSION,
+        self::CONFIRM_ACCESS,
+        self::CREATE,
+        self::READ,
+        self::UPDATE,
+        self::DELETE
     ];
 }
