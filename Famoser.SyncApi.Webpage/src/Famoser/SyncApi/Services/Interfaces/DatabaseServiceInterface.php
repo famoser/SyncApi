@@ -35,8 +35,8 @@ interface DatabaseServiceInterface
      * @param null $orderBy
      * @param int $limit
      * @param string $selector
-     * @return Application[]|ApplicationSetting[]|AuthorizationCode[]|Collection[]|ContentVersion[]|Device[]|Entity[]|
-     * FrontendUser[]|User[]|UserCollection[]|bool
+     * @return Application[]|ApplicationSetting[]|AuthorizationCode[]|Collection[]|ContentVersion[]|Device[]|Entity[]|FrontendUser[]
+     * |User[]|UserCollection[]|bool
      */
     public function getFromDatabase(
         BaseEntity $entity,
@@ -76,8 +76,8 @@ interface DatabaseServiceInterface
      * @param null $parameters
      * @param null $orderBy
      * @param int $limit
-     * @return Application[]|ApplicationSetting[]|AuthorizationCode[]|Collection[]|ContentVersion[]|Device[]|Entity[]|
-     * FrontendUser[]|User[]|UserCollection[]|bool
+     * @return Application[]|ApplicationSetting[]|AuthorizationCode[]|Collection[]|ContentVersion[]|Device[]|Entity[]|FrontendUser[]
+     * |User[]|UserCollection[]|bool
      */
     public function getWithInFromDatabase(
         BaseEntity $entity,
@@ -97,8 +97,8 @@ interface DatabaseServiceInterface
      * @param null $where
      * @param null $parameters
      * @param null $orderBy
-     * @return Application|ApplicationSetting|AuthorizationCode|Collection|ContentVersion|Device|Entity|FrontendUser|
-     * User|UserCollection|bool
+     * @return Application|ApplicationSetting|AuthorizationCode|Collection|ContentVersion|Device|Entity|FrontendUser
+     * |User|UserCollection|bool
      */
     public function getSingleFromDatabase(BaseEntity $entity, $where = null, $parameters = null, $orderBy = null);
 
@@ -107,8 +107,8 @@ interface DatabaseServiceInterface
      *
      * @param BaseEntity $entity
      * @param $id
-     * @return Application|ApplicationSetting|AuthorizationCode|Collection|ContentVersion|Device|Entity|FrontendUser|
-     * User|UserCollection|bool
+     * @return Application|ApplicationSetting|AuthorizationCode|Collection|ContentVersion|Device|Entity|FrontendUser
+     * |User|UserCollection|bool
      */
     public function getSingleByIdFromDatabase(BaseEntity $entity, $id);
 

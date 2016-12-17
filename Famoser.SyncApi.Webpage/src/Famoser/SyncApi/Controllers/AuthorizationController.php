@@ -220,7 +220,7 @@ class AuthorizationController extends ApiSyncController
             );
 
             if (count($res) > 0) {
-                $resp->UserEntity = $res;
+                $resp->UserEntity = $res[0];
             }
         }
 
@@ -232,7 +232,7 @@ class AuthorizationController extends ApiSyncController
                 ContentType::DEVICE
             );
             if (count($res) > 0) {
-                $resp->DeviceEntity = $res;
+                $resp->DeviceEntity = $res[0];
             }
         }
         $resp = new AuthorizationResponse();

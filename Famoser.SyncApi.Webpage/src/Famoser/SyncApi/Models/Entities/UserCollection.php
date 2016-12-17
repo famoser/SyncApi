@@ -31,7 +31,7 @@ class UserCollection extends BaseEntity
     /* @var string $collection_guid type_of:guid */
     public $collection_guid;
 
-    /* @var \DateTime $create_date_time */
+    /* @var int $create_date_time type_of:timestamp*/
     public $create_date_time;
 
     /**

@@ -25,6 +25,7 @@ class FrontendTestController extends \PHPUnit_Framework_TestCase
      */
     public function __construct()
     {
+        parent::__construct();
         $this->testHelper = new FrontendTestHelper();
     }
 
@@ -34,5 +35,13 @@ class FrontendTestController extends \PHPUnit_Framework_TestCase
     protected function getTestHelper()
     {
         return $this->testHelper;
+    }
+
+    /**
+     * cleans test db etc
+     */
+    public function tearDown()
+    {
+        $this->testHelper->cleanEnvironment();
     }
 }

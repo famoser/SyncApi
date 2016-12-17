@@ -49,10 +49,10 @@ abstract class ApiSyncController extends ApiRequestController
      * does the sync in a generic fashion
      *
      * @param BaseRequest $req
-     * @param BaseSyncEntity[] $commEntities
+     * @param BaseCommunicationEntity[] $commEntities
      * @param $contentType
      * @param array $allowedOA
-     * @return \Famoser\SyncApi\Models\Entities\Base\BaseSyncEntity[]
+     * @return BaseCommunicationEntity[]
      * @throws ApiException
      * @throws ServerException
      */

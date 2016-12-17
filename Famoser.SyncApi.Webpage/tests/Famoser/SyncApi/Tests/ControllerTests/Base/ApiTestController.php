@@ -22,10 +22,11 @@ class ApiTestController extends \PHPUnit_Framework_TestCase
     protected $testHelper;
 
     /**
-     * create the $app and $testHelper
+     * ApiTestController constructor.
      */
-    public function setUp()
+    public function __construct()
     {
+        parent::__construct();
         $this->testHelper = new ApiTestHelper();
     }
 

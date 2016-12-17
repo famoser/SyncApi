@@ -44,7 +44,7 @@ class Application extends BaseEntity
     /* @var int $application_seed */
     public $application_seed;
 
-    /* @var int $release_date type_of:DateTime */
+    /* @var int $release_date type_of:timestamp */
     public $release_date_time;
 
     /**

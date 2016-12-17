@@ -58,13 +58,13 @@ class BaseController extends ContainerBase
      * check if $request contrails all specified properties
      *
      * @param  BaseRequest $request
-     * @param  $neededProps
-     * @param  null $neededArrays
+     * @param  array $neededProps
+     * @param  array $neededArrays
      * @return bool
      */
     protected function isWellDefined(BaseRequest $request, $neededProps, $neededArrays = null)
     {
-        if ($neededProps != null) {
+        if (is_array($neededProps)) {
             foreach ($neededProps as $neededProp) {
                 /** @noinspection PhpVariableVariableInspection */
                 if ($request->$neededProp == null) {
@@ -77,7 +77,7 @@ class BaseController extends ContainerBase
                 }
             }
         }
-        if ($neededArrays != null) {
+        if (is_array($neededArrays)) {
             foreach ($neededArrays as $neededArray) {
                 /** @noinspection PhpVariableVariableInspection */
                 if (!is_array($request->$neededArray)) {

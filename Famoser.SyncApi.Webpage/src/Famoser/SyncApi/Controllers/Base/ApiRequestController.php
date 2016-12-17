@@ -20,7 +20,7 @@ use Slim\Http\Response;
 
 /**
  * base class for all api requests
- * 
+ *
  * Class ApiRequestController
  * @package Famoser\SyncApi\Controllers\Base
  */
@@ -105,7 +105,6 @@ class ApiRequestController extends BaseController
 
     /**
      * tries to get the user. does not fail if not found!
-     *
      * @param BaseRequest $req
      * @return User
      */
@@ -145,7 +144,6 @@ class ApiRequestController extends BaseController
     /**
      * @param BaseRequest $req
      * @return Device
-     * @throws ApiException
      */
     protected function tryGetDevice(BaseRequest $req)
     {

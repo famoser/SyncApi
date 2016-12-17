@@ -31,7 +31,7 @@ class AuthorizationCode extends BaseEntity
     /* @var string $code */
     public $code;
 
-    /* @var \DateTime $id */
+    /* @var int $id type_of:timestamp*/
     public $valid_till_date_time;
 
     /**
