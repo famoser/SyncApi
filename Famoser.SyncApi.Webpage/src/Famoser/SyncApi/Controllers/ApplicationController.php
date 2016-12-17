@@ -222,7 +222,7 @@ class ApplicationController extends FrontendController
      * @param Request $request
      * @param Response $response
      * @param $args
-     * @return mixed|static
+     * @return ResponseInterface
      * @throws FrontendException
      */
     public function createPost(Request $request, Response $response, $args)
@@ -264,7 +264,7 @@ class ApplicationController extends FrontendController
      * @param Request $request
      * @param Response $response
      * @param $args
-     * @return mixed
+     * @return ResponseInterface
      * @throws FrontendException
      */
     public function edit(Request $request, Response $response, $args)
@@ -281,7 +281,7 @@ class ApplicationController extends FrontendController
      * @param Request $request
      * @param Response $response
      * @param $args
-     * @return mixed
+     * @return ResponseInterface
      * @throws FrontendException
      */
     public function editPost(Request $request, Response $response, $args)
@@ -305,7 +305,7 @@ class ApplicationController extends FrontendController
      * @param Request $request
      * @param Response $response
      * @param $args
-     * @return mixed
+     * @return ResponseInterface
      * @throws FrontendException
      */
     public function remove(Request $request, Response $response, $args)
@@ -342,18 +342,23 @@ class ApplicationController extends FrontendController
      *
      * @param Application $application
      * @param ServerRequestInterface $request
-     * @param $message
-     * @param string[] $propArr
+     * @param string $message
+     * @param string[] $propertyArray
      * @return bool
      * @internal param array $source
      */
-    private function writeFromPost(Application $application, ServerRequestInterface $request, &$message, array $propArr)
+    private function writeFromPost(
+        Application $application,
+        ServerRequestInterface $request,
+        &$message,
+        array $propertyArray
+    )
     {
         $source = $request->getParsedBody();
         if (!is_array($source)) {
             $source = [];
         }
-        $arr = $this->writePropertiesFromArray($source, $application, $propArr);
+        $arr = $this->writePropertiesFromArray($source, $application, $propertyArray);
         if (count($arr) == 0) {
             //validate application seed
             if (is_numeric($application->application_seed)) {
