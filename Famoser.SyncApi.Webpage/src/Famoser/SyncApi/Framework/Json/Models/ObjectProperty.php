@@ -9,35 +9,35 @@
 namespace Famoser\SyncApi\Framework\Json\Models;
 
 
-use Famoser\SyncApi\Framework\Json\Models\Base\JsonProperty;
-use Famoser\SyncApi\Framework\Json\Models\Base\JsonValueProperty;
-use Famoser\SyncApi\Interfaces\IJsonDeserializable;
+use Famoser\SyncApi\Framework\Json\Models\Base\AbstractJsonProperty;
+use Famoser\SyncApi\Framework\Json\Models\Base\AbstractJsonValueProperty;
+use Famoser\SyncApi\Interfaces\JsonDeserializableInterface;
 
 /**
  * object json property. hold json info about the object that should be created there
  *
  * @package Famoser\SyncApi\Framework\Json\Models
  */
-class ObjectProperty extends JsonValueProperty
+class ObjectProperty extends AbstractJsonValueProperty
 {
     /* @var string $className */
     private $className;
-    /* @var JsonValueProperty[] $properties */
+    /* @var AbstractJsonValueProperty[] $properties */
     private $properties = [];
 
     /**
      * ObjectProperty constructor.
      *
      * @param string $propertyName
-     * @param IJsonDeserializable $class
+     * @param JsonDeserializableInterface $class
      */
-    public function __construct($propertyName, IJsonDeserializable $class)
+    public function __construct($propertyName, JsonDeserializableInterface $class)
     {
         parent::__construct($propertyName);
         $this->className = get_class($class);
         $props = $class->getJsonProperties();
         foreach ($props as $key => $prop) {
-            if ($prop instanceof JsonValueProperty) {
+            if ($prop instanceof AbstractJsonValueProperty) {
                 $this->properties[$key] = $prop;
             } else {
                 break;
@@ -48,7 +48,7 @@ class ObjectProperty extends JsonValueProperty
     /**
      * returns properties of the object
      *
-     * @return JsonValueProperty[]
+     * @return AbstractJsonValueProperty[]
      */
     public function getProperties()
     {

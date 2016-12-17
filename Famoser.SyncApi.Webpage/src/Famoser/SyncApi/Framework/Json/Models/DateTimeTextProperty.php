@@ -9,14 +9,14 @@
 namespace Famoser\SyncApi\Framework\Json\Models;
 
 
-use Famoser\SyncApi\Framework\Json\Models\Base\JsonValueProperty;
+use Famoser\SyncApi\Framework\Json\Models\Base\AbstractJsonValueProperty;
 
 /**
  * a date time json property, but produces 'c' text output
  *
  * @package Famoser\SyncApi\Framework\Json\Models
  */
-class DateTimeTextProperty extends JsonValueProperty
+class DateTimeTextProperty extends AbstractJsonValueProperty
 {
     /**
      * converts an integer or string to time

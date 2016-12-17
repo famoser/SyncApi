@@ -11,7 +11,7 @@ namespace Famoser\SyncApi\Services;
 
 use Famoser\SyncApi\Framework\Json\Models\ObjectProperty;
 use Famoser\SyncApi\Framework\Json\SimpleJsonMapper;
-use Famoser\SyncApi\Interfaces\IJsonDeserializable;
+use Famoser\SyncApi\Interfaces\JsonDeserializableInterface;
 use Famoser\SyncApi\Models\Communication\Request\AuthorizationRequest;
 use Famoser\SyncApi\Models\Communication\Request\CollectionEntityRequest;
 use Famoser\SyncApi\Models\Communication\Request\HistoryEntityRequest;
@@ -73,7 +73,7 @@ class RequestService extends BaseService implements RequestServiceInterface
      * @return mixed
      * @throws \JsonMapper_Exception
      */
-    private function executeJsonMapper(Request $request, IJsonDeserializable $model)
+    private function executeJsonMapper(Request $request, JsonDeserializableInterface $model)
     {
         $json = $request->getBody()->getContents();
         $mapper = new SimpleJsonMapper();

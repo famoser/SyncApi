@@ -8,12 +8,12 @@
 
 namespace Famoser\SyncApi\Models\Communication\Entities\Base;
 
-use Famoser\SyncApi\Framework\Json\Models\Base\JsonProperty;
+use Famoser\SyncApi\Framework\Json\Models\Base\AbstractJsonProperty;
 use Famoser\SyncApi\Framework\Json\Models\DateTimeProperty;
 use Famoser\SyncApi\Framework\Json\Models\DateTimeTextProperty;
 use Famoser\SyncApi\Framework\Json\Models\IntProperty;
 use Famoser\SyncApi\Framework\Json\Models\TextProperty;
-use Famoser\SyncApi\Interfaces\IJsonDeserializable;
+use Famoser\SyncApi\Interfaces\JsonDeserializableInterface;
 
 
 /**
@@ -21,7 +21,7 @@ use Famoser\SyncApi\Interfaces\IJsonDeserializable;
  *
  * @package Famoser\SyncApi\Models\Communication\Entities\Base
  */
-class BaseCommunicationEntity implements IJsonDeserializable
+class BaseCommunicationEntity implements JsonDeserializableInterface
 {
     /* @var string $Id type_of:guid */
     public $Id;
@@ -47,7 +47,7 @@ class BaseCommunicationEntity implements IJsonDeserializable
     /**
      * gets the json properties needed to deserialize
      *
-     * @return JsonProperty[]
+     * @return AbstractJsonProperty[]
      */
     public function getJsonProperties()
     {

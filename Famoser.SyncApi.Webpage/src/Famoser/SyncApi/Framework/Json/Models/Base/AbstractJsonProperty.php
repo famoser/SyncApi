@@ -13,7 +13,7 @@ namespace Famoser\SyncApi\Framework\Json\Models\Base;
  *
  * @package Famoser\SyncApi\Framework\Json\Models\Base
  */
-abstract class JsonProperty
+abstract class AbstractJsonProperty
 {
     /* @var string $propertyName */
     private $propertyName;

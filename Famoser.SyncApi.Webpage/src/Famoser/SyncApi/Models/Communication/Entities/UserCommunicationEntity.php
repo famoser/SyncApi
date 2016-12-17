@@ -9,7 +9,7 @@
 namespace Famoser\SyncApi\Models\Communication\Entities;
 
 
-use Famoser\SyncApi\Framework\Json\Models\Base\JsonProperty;
+use Famoser\SyncApi\Framework\Json\Models\Base\AbstractJsonProperty;
 use Famoser\SyncApi\Framework\Json\Models\TextProperty;
 use Famoser\SyncApi\Models\Communication\Entities\Base\BaseCommunicationEntity;
 
@@ -27,7 +27,7 @@ class UserCommunicationEntity extends BaseCommunicationEntity
     /**
      * gets the json properties needed to deserialize
      *
-     * @return JsonProperty[]
+     * @return AbstractJsonProperty[]
      */
     public function getJsonProperties()
     {

@@ -10,7 +10,7 @@ namespace Famoser\SyncApi\Framework\Json;
 
 
 use Famoser\SyncApi\Framework\Json\Models\ArrayProperty;
-use Famoser\SyncApi\Framework\Json\Models\Base\JsonValueProperty;
+use Famoser\SyncApi\Framework\Json\Models\Base\AbstractJsonValueProperty;
 use Famoser\SyncApi\Framework\Json\Models\ObjectProperty;
 
 /**
@@ -59,7 +59,7 @@ class SimpleJsonMapper
                     $inst->$key = $this->mapArrayInternal($content[$jsonPropertyName], $property);
                 } else if ($property instanceof ObjectProperty) {
                     $inst->$key = $this->mapObjectInternal($content[$jsonPropertyName], $property);
-                } else if ($property instanceof JsonValueProperty) {
+                } else if ($property instanceof AbstractJsonValueProperty) {
                     $inst->$key = $property->parseValue($content[$jsonPropertyName]);
                 }
             } else {
@@ -81,7 +81,7 @@ class SimpleJsonMapper
             $prop = $property->getProperty();
             if ($prop instanceof ObjectProperty) {
                 $res[] = $this->mapObjectInternal($arrayContent, $prop);
-            } else if ($prop instanceof JsonValueProperty) {
+            } else if ($prop instanceof AbstractJsonValueProperty) {
                 $res[] = $prop->parseValue($arrayContent);
             }
         }

@@ -9,13 +9,13 @@
 namespace Famoser\SyncApi\Framework\Json\Models;
 
 
-use Famoser\SyncApi\Framework\Json\Models\Base\JsonValueProperty;
+use Famoser\SyncApi\Framework\Json\Models\Base\AbstractJsonValueProperty;
 
 /**
  * Class TextProperty
  * @package Famoser\SyncApi\Framework\Json\Models
  */
-class TextProperty extends JsonValueProperty
+class TextProperty extends AbstractJsonValueProperty
 {
     /**
      * returns a string

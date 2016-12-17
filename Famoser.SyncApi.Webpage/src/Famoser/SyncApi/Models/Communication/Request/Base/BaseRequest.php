@@ -8,9 +8,9 @@
 
 namespace Famoser\SyncApi\Models\Communication\Request\Base;
 
-use Famoser\SyncApi\Framework\Json\Models\Base\JsonValueProperty;
+use Famoser\SyncApi\Framework\Json\Models\Base\AbstractJsonValueProperty;
 use Famoser\SyncApi\Framework\Json\Models\TextProperty;
-use Famoser\SyncApi\Interfaces\IJsonDeserializable;
+use Famoser\SyncApi\Interfaces\JsonDeserializableInterface;
 
 
 /**
@@ -19,7 +19,7 @@ use Famoser\SyncApi\Interfaces\IJsonDeserializable;
  *
  * @package Famoser\SyncApi\Models\Communication\Request\Base
  */
-class BaseRequest implements IJsonDeserializable
+class BaseRequest implements JsonDeserializableInterface
 {
     /* @var string $UserId type_of:guid */
     public $UserId;
@@ -36,7 +36,7 @@ class BaseRequest implements IJsonDeserializable
     /**
      * gets the json properties needed to deserialize
      *
-     * @return JsonValueProperty[]
+     * @return AbstractJsonValueProperty[]
      */
     public function getJsonProperties()
     {

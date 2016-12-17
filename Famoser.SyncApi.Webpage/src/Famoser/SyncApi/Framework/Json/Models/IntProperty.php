@@ -9,14 +9,14 @@
 namespace Famoser\SyncApi\Framework\Json\Models;
 
 
-use Famoser\SyncApi\Framework\Json\Models\Base\JsonValueProperty;
+use Famoser\SyncApi\Framework\Json\Models\Base\AbstractJsonValueProperty;
 
 /**
  * integer json property
  *
  * @package Famoser\SyncApi\Framework\Json\Models
  */
-class IntProperty extends JsonValueProperty
+class IntProperty extends AbstractJsonValueProperty
 {
     /**
      * returns an integer

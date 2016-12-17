@@ -9,17 +9,17 @@
 namespace Famoser\SyncApi\Framework\Json\Models;
 
 
-use Famoser\SyncApi\Framework\Json\Models\Base\JsonProperty;
-use Famoser\SyncApi\Framework\Json\Models\Base\JsonValueProperty;
+use Famoser\SyncApi\Framework\Json\Models\Base\AbstractJsonProperty;
+use Famoser\SyncApi\Framework\Json\Models\Base\AbstractJsonValueProperty;
 
 /**
  * an array property. contains information about the objects or values contained in the array
  *
  * @package Famoser\SyncApi\Framework\Json\Models
  */
-class ArrayProperty extends JsonValueProperty
+class ArrayProperty extends AbstractJsonValueProperty
 {
-    /* @var JsonProperty $properties */
+    /* @var AbstractJsonProperty $properties */
     private $objectProperty;
 
     /**
@@ -35,7 +35,7 @@ class ArrayProperty extends JsonValueProperty
     }
 
     /**
-     * @return JsonProperty
+     * @return AbstractJsonProperty
      */
     public function getProperty()
     {
