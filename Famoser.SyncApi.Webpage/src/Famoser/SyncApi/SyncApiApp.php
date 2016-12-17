@@ -21,6 +21,7 @@ use Famoser\SyncApi\Services\SessionService;
 use Famoser\SyncApi\Types\ApiError;
 use Famoser\SyncApi\Types\FrontendError;
 use Guzzle\Http\Message\RequestInterface;
+use Interop\Container\ContainerInterface;
 use InvalidArgumentException;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -262,17 +263,11 @@ class SyncApiApp extends App
                 );
 
                 //return json if api request
-                if (strpos($request->getUri()->getPath(), '/1.0/') === 0 && $request->getMethod() == 'POST') {
+                if ($this->isApiRequest($request)) {
                     $resp = new BaseResponse();
                     $resp->RequestFailed = true;
                     if ($error instanceof ApiException) {
                         $resp->ApiError = $error->getCode();
-                    } elseif ($error instanceof NotFoundException) {
-                        $resp->ApiError = ApiError::NODE_NOT_FOUND;
-                        $errorString = ApiError::toString(ApiError::NODE_NOT_FOUND);
-                    } elseif ($error instanceof MethodNotAllowedException) {
-                        $resp->ApiError = ApiError::METHOD_NOT_ALLOWED;
-                        $errorString = ApiError::toString(ApiError::METHOD_NOT_ALLOWED);
                     } else {
                         $resp->ApiError = ApiError::SERVER_ERROR;
                     }
@@ -304,14 +299,31 @@ class SyncApiApp extends App
         $container['notAllowedHandler'] = function (Container $container) {
             //third parameter can be $requestMethods array
             return function (ServerRequestInterface $request, ResponseInterface $response) use ($container) {
-                return $container['view']->render($response, 'public/not_found.html.twig', []);
+                return $this->returnError($container, $request, $response, ApiError::METHOD_NOT_ALLOWED, 'not_found');
             };
         };
-        $container['notFoundHandler'] = function (Container $container) {
+        $container['notFoundHandler'] = function (ContainerInterface $container) {
             return function (ServerRequestInterface $request, ResponseInterface $response) use ($container) {
-                return $container['view']->render($response, 'public/not_found.html.twig', []);
+                return $this->returnError($container, $request, $response, ApiError::NODE_NOT_FOUND, 'not_found');
             };
         };
+    }
+
+    private function isApiRequest(ServerRequestInterface $request)
+    {
+        return strpos($request->getUri()->getPath(), '/1.0/') === 0 && $request->getMethod() == 'POST';
+    }
+
+    private function returnError(ContainerInterface $container, ServerRequestInterface $request, ResponseInterface $response, $apiError, $filePath)
+    {
+        if ($this->isApiRequest($request)) {
+            $resp = new BaseResponse();
+            $resp->RequestFailed = true;
+            $resp->ApiError = $apiError;
+            $resp->ServerMessage = ApiError::toString($apiError);
+            return $container['response']->withStatus(500)->withJson($resp);
+        }
+        return $container['view']->render($response, 'public/' . $filePath . '.html.twig', []);
     }
 
     /**

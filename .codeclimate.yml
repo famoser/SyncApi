@@ -22,5 +22,5 @@ engines:
 
 
 ratings:
-  paths: ["Famoser.SyncApi.Webpage/src/**/*"]
+  paths: ["Famoser.SyncApi.Webpage/src/Famoser/**/*"]
 exclude_paths: ["Famoser.SyncApi.Webpage/src/public/assets/**/*"]
