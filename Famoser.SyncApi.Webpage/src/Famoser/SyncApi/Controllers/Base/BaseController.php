@@ -49,44 +49,6 @@ class BaseController extends ContainerBase
     }
 
     /**
-     * check if $request contrails all specified properties
-     *
-     * @param  BaseRequest $request
-     * @param  array $neededProps
-     * @param  array $neededArrays
-     * @return bool
-     */
-    protected function isWellDefined(BaseRequest $request, $neededProps, $neededArrays = null)
-    {
-        if (is_array($neededProps)) {
-            foreach ($neededProps as $neededProp) {
-                /** @noinspection PhpVariableVariableInspection */
-                if ($request->$neededProp == null) {
-                    $this->getLoggingService()->log(
-                        'not a property: ' . $neededProp .
-                        ' in object ' . json_encode($request, JSON_PRETTY_PRINT),
-                        'isWellDefined_' . uniqid() . '.txt'
-                    );
-                    return false;
-                }
-            }
-        }
-        if (is_array($neededArrays)) {
-            foreach ($neededArrays as $neededArray) {
-                /** @noinspection PhpVariableVariableInspection */
-                if (!is_array($request->$neededArray)) {
-                    $this->getLoggingService()->log('not an array: ' . $neededArray .
-                        ' in object ' . json_encode($request, JSON_PRETTY_PRINT),
-                        'isWellDefined_' . uniqid() . '.txt'
-                    );
-                    return false;
-                }
-            }
-        }
-        return true;
-    }
-
-    /**
      * writes all properties from array to object, and returns all missing ones
      *
      * @param  array $source

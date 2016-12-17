@@ -9,7 +9,7 @@
 namespace Famoser\SyncApi\Controllers;
 
 
-use Famoser\SyncApi\Controllers\Base\ApiSyncController;
+use Famoser\SyncApi\Controllers\Base\AbstractApiSyncController;
 use Famoser\SyncApi\Exceptions\ApiException;
 use Famoser\SyncApi\Exceptions\ServerException;
 use Famoser\SyncApi\Models\Communication\Entities\Base\BaseCommunicationEntity;
@@ -31,7 +31,7 @@ use Slim\Http\Response;
  * api controllers which takes care of the entities
  * @package Famoser\SyncApi\Controllers
  */
-class EntityController extends ApiSyncController
+class EntityControllerAbstract extends AbstractApiSyncController
 {
     /**
      * sync entities, return missing & updated entities

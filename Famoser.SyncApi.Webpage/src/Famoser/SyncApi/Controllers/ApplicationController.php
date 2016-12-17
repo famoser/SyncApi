@@ -19,6 +19,7 @@ use Famoser\SyncApi\Models\Entities\User;
 use Famoser\SyncApi\Models\Entities\UserCollection;
 use Famoser\SyncApi\Repositories\SettingsRepository;
 use Famoser\SyncApi\Types\FrontendError;
+use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Slim\Http\Request;
 use Slim\Http\Response;
@@ -321,7 +322,7 @@ class ApplicationController extends FrontendController
      * @param Request $request
      * @param Response $response
      * @param $args
-     * @return mixed|static
+     * @return ResponseInterface
      * @throws FrontendException
      */
     public function removePost(Request $request, Response $response, $args)
@@ -342,17 +343,17 @@ class ApplicationController extends FrontendController
      * @param Application $application
      * @param ServerRequestInterface $request
      * @param $message
-     * @param string[] $propArray
+     * @param string[] $propArr
      * @return bool
      * @internal param array $source
      */
-    private function writeFromPost(Application $application, ServerRequestInterface $request, &$message, array $propArray)
+    private function writeFromPost(Application $application, ServerRequestInterface $request, &$message, array $propArr)
     {
         $source = $request->getParsedBody();
         if (!is_array($source)) {
             $source = [];
         }
-        $arr = $this->writePropertiesFromArray($source, $application, $propArray);
+        $arr = $this->writePropertiesFromArray($source, $application, $propArr);
         if (count($arr) == 0) {
             //validate application seed
             if (is_numeric($application->application_seed)) {

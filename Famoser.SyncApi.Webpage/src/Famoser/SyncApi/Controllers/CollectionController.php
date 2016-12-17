@@ -8,7 +8,7 @@
 
 namespace Famoser\SyncApi\Controllers;
 
-use Famoser\SyncApi\Controllers\Base\ApiSyncController;
+use Famoser\SyncApi\Controllers\Base\AbstractApiSyncController;
 use Famoser\SyncApi\Exceptions\ApiException;
 use Famoser\SyncApi\Exceptions\ServerException;
 use Famoser\SyncApi\Models\Communication\Entities\Base\BaseCommunicationEntity;
@@ -26,7 +26,7 @@ use Slim\Http\Response;
  * the collection controller syncs collections
  * @package Famoser\SyncApi\Controllers
  */
-class CollectionController extends ApiSyncController
+class CollectionControllerAbstract extends AbstractApiSyncController
 {
     /**
      * sync the collections

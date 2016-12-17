@@ -53,29 +53,6 @@ class DatabaseService extends BaseService implements DatabaseServiceInterface
     }
 
     /**
-     * execute scripts from an .sql file
-     *
-     * @param $scriptsPath
-     */
-    /* commented because untested and unused
-    public function executeScripts($scriptsPath)
-    {
-        $files = scandir($scriptsPath);
-        foreach ($files as $file) {
-            if (substr($file, -3) == 'sql') {
-                $queries = file_get_contents($scriptsPath . '/' . $file);
-                $queryArray = explode(';', $queries);
-                foreach ($queryArray as $item) {
-                    if (trim($item) != '') {
-                        $this->getConnection()->query($item);
-                    }
-                }
-            }
-        }
-    }
-    */
-
-    /**
      * initialize the database
      */
     private function initializeDatabase()
@@ -109,7 +86,7 @@ class DatabaseService extends BaseService implements DatabaseServiceInterface
      *
      * @param BaseEntity $entity
      * @param null|string $where
-     * @param null $orderBy
+     * @param null|string $orderBy
      * @param int $limit
      * @param string $selector
      * @return string
@@ -134,10 +111,10 @@ class DatabaseService extends BaseService implements DatabaseServiceInterface
      *
      * @param BaseEntity $entity
      * @param string $sql
-     * @param $parameters
-     * @return array|bool|null
+     * @param null|array $parameters
+     * @return false|array|null
      */
-    private function executeAndFetch(BaseEntity $entity, $sql, $parameters)
+    private function executeAndFetch(BaseEntity $entity, $sql, $parameters = null)
     {
         try {
             $this->getLoggingService()->log(
@@ -164,13 +141,13 @@ class DatabaseService extends BaseService implements DatabaseServiceInterface
      * gets all entities which match the specified conditions from the database
      *
      * @param BaseEntity $entity
-     * @param null $where
-     * @param null $parameters
-     * @param null $orderBy
+     * @param null|string $where
+     * @param null|string $orderBy
+     * @param null|array $parameters
      * @param int $limit
      * @param string $selector
-     * @return Application[]|ApplicationSetting[]|AuthorizationCode[]|Collection[]|ContentVersion[]|Device[]|Entity[]|
-     * FrontendUser[]|User[]|UserCollection[]|bool
+     * @return false|Application[]|ApplicationSetting[]|AuthorizationCode[]|Collection[]|ContentVersion[]|Device[]|
+     * Entity[]|FrontendUser[]|User[]|UserCollection[]
      */
     public function getFromDatabase(
         BaseEntity $entity,
@@ -190,11 +167,11 @@ class DatabaseService extends BaseService implements DatabaseServiceInterface
      * counts the entities which match the conditions
      *
      * @param BaseEntity $entity
-     * @param null $where
-     * @param null $parameters
-     * @param null $orderBy
+     * @param null|string $where
+     * @param null|string $orderBy
+     * @param null|array $parameters
      * @param int $limit
-     * @return int
+     * @return int|false
      */
     public function countFromDatabase(
         BaseEntity $entity,
@@ -213,14 +190,14 @@ class DatabaseService extends BaseService implements DatabaseServiceInterface
      *
      * @param BaseEntity $entity
      * @param string $property
-     * @param int[] $values
+     * @param array $values
      * @param bool $invertIn
-     * @param null $where
-     * @param null $parameters
-     * @param null $orderBy
+     * @param null|string $where
+     * @param null|string $orderBy
+     * @param null|array $parameters
      * @param int $limit
-     * @return Application[]|ApplicationSetting[]|AuthorizationCode[]|Collection[]|ContentVersion[]|Device[]|Entity[]|
-     * FrontendUser[]|User[]|UserCollection[]|bool
+     * @return false|Application[]|ApplicationSetting[]|AuthorizationCode[]|Collection[]|ContentVersion[]|Device[]|
+     * Entity[]|FrontendUser[]|User[]|UserCollection[]
      */
     public function getWithInFromDatabase(
         BaseEntity $entity,
@@ -242,7 +219,8 @@ class DatabaseService extends BaseService implements DatabaseServiceInterface
             $where .= ' AND ';
         }
         $variables = [];
-        for ($i = 0; $i < count($values); $i++) {
+        $valueCount = count($values);
+        for ($i = 0; $i < $valueCount; $i++) {
             $parameters[':' . $property . $i] = $values[$i];
             $variables[] = ':' . $property . $i;
         }
@@ -258,11 +236,11 @@ class DatabaseService extends BaseService implements DatabaseServiceInterface
      * get the first entry from the database which matches the conditions
      *
      * @param BaseEntity $entity
-     * @param string $where
-     * @param null $parameters
-     * @param null $orderBy
-     * @return Application|ApplicationSetting|AuthorizationCode|Collection|ContentVersion|Device|Entity|FrontendUser|
-     * User|UserCollection|bool
+     * @param null|string $where
+     * @param null|array $parameters
+     * @param null|string $orderBy
+     * @return false|Application|ApplicationSetting|AuthorizationCode|Collection|ContentVersion|Device|Entity|
+     * FrontendUser|User|UserCollection
      */
     public function getSingleFromDatabase(BaseEntity $entity, $where = null, $parameters = null, $orderBy = null)
     {
@@ -327,27 +305,27 @@ class DatabaseService extends BaseService implements DatabaseServiceInterface
     /**
      * execute the specified sql query, return if the query was successful
      *
-     * @param $sql
-     * @param null $arr
+     * @param string $sql
+     * @param null|array $parameters
      * @return bool
      */
-    public function execute($sql, $arr = null)
+    public function execute($sql, $parameters = null)
     {
         $prep = $this->getConnection()->prepare($sql);
-        return $prep->execute($arr);
+        return $prep->execute($parameters);
     }
 
     /**
      * execute the specified sql query, return the FETCH_NUM result
      *
      * @param string $sql
-     * @param null $arr
-     * @return bool|int
+     * @param null|array $parameters
+     * @return false|int
      */
-    public function executeAndCount($sql, $arr = null)
+    public function executeAndCount($sql, $parameters = null)
     {
         $prep = $this->getConnection()->prepare($sql);
-        if (!$prep->execute($arr)) {
+        if (!$prep->execute($parameters)) {
             return false;
         }
         $fetched = $prep->fetchAll(PDO::FETCH_NUM);
@@ -384,12 +362,12 @@ class DatabaseService extends BaseService implements DatabaseServiceInterface
      * get the first entry from the database which matches the conditions
      *
      * @param BaseEntity $entity
-     * @param $id
-     * @return Application|ApplicationSetting|AuthorizationCode|Collection|ContentVersion|Device|Entity|FrontendUser|
-     * User|UserCollection|bool
+     * @param int $entityId
+     * @return false|Application|ApplicationSetting|AuthorizationCode|Collection|ContentVersion|Device|Entity|
+     * FrontendUser|User|UserCollection
      */
-    public function getSingleByIdFromDatabase(BaseEntity $entity, $id)
+    public function getSingleByIdFromDatabase(BaseEntity $entity, $entityId)
     {
-        return $this->getSingleFromDatabase($entity, 'id = :id', ['id' => $id]);
+        return $this->getSingleFromDatabase($entity, 'id = :id', ['id' => $entityId]);
     }
 }

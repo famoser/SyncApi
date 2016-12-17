@@ -9,7 +9,7 @@
 namespace Famoser\SyncApi\Controllers;
 
 
-use Famoser\SyncApi\Controllers\Base\ApiSyncController;
+use Famoser\SyncApi\Controllers\Base\AbstractApiSyncController;
 use Famoser\SyncApi\Exceptions\ApiException;
 use Famoser\SyncApi\Exceptions\ServerException;
 use Famoser\SyncApi\Models\Communication\Entities\Base\BaseCommunicationEntity;
@@ -29,7 +29,7 @@ use Slim\Http\Response;
  * the device controller can authenticate devices and return all devices from a specific user
  * @package Famoser\SyncApi\Controllers
  */
-class DeviceController extends ApiSyncController
+class DeviceControllerAbstract extends AbstractApiSyncController
 {
     /**
      * gets all devices from a specific user

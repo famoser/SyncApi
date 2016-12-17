@@ -9,7 +9,7 @@
 namespace Famoser\SyncApi\Controllers;
 
 use Exception;
-use Famoser\SyncApi\Controllers\Base\ApiSyncController;
+use Famoser\SyncApi\Controllers\Base\AbstractApiSyncController;
 use Famoser\SyncApi\Exceptions\ApiException;
 use Famoser\SyncApi\Exceptions\ServerException;
 use Famoser\SyncApi\Models\Communication\Entities\Base\BaseCommunicationEntity;
@@ -34,7 +34,7 @@ use Slim\Http\Response;
  *
  * @package Famoser\SyncApi\Controllers
  */
-class AuthorizationController extends ApiSyncController
+class AuthorizationControllerAbstract extends AbstractApiSyncController
 {
     /**
      * generates easily readable random string

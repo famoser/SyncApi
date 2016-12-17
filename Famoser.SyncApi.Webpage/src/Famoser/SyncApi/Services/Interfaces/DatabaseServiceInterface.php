@@ -30,13 +30,13 @@ interface DatabaseServiceInterface
      * gets all entities which match the specified conditions from the database
      *
      * @param BaseEntity $entity
-     * @param string $where
-     * @param null $parameters
+     * @param null|string $where
      * @param null|string $orderBy
+     * @param null|array $parameters
      * @param int $limit
      * @param string $selector
-     * @return Application[]|ApplicationSetting[]|AuthorizationCode[]|Collection[]|ContentVersion[]|Device[]|Entity[]|FrontendUser[]
-     * |User[]|UserCollection[]|bool
+     * @return false|Application[]|ApplicationSetting[]|AuthorizationCode[]|Collection[]|ContentVersion[]|Device[]|
+     * Entity[]|FrontendUser[]|User[]|UserCollection[]
      */
     public function getFromDatabase(
         BaseEntity $entity,
@@ -51,11 +51,11 @@ interface DatabaseServiceInterface
      * counts the entities which match the conditions
      *
      * @param BaseEntity $entity
-     * @param string $where
-     * @param null $parameters
-     * @param null $orderBy
+     * @param null|string $where
+     * @param null|string $orderBy
+     * @param null|array $parameters
      * @param int $limit
-     * @return int
+     * @return false|int
      */
     public function countFromDatabase(
         BaseEntity $entity,
@@ -72,12 +72,12 @@ interface DatabaseServiceInterface
      * @param string $property
      * @param int[] $values
      * @param bool $invertIn
-     * @param null $where
-     * @param null $parameters
-     * @param null $orderBy
+     * @param null|string $where
+     * @param null|string $orderBy
+     * @param null|array $parameters
      * @param int $limit
-     * @return Application[]|ApplicationSetting[]|AuthorizationCode[]|Collection[]|ContentVersion[]|Device[]|Entity[]|FrontendUser[]
-     * |User[]|UserCollection[]|bool
+     * @return false|Application[]|ApplicationSetting[]|AuthorizationCode[]|Collection[]|ContentVersion[]|Device[]|
+     * Entity[]|FrontendUser[]|User[]|UserCollection[]
      */
     public function getWithInFromDatabase(
         BaseEntity $entity,
@@ -94,11 +94,11 @@ interface DatabaseServiceInterface
      * get the first entry from the database which matches the conditions
      *
      * @param BaseEntity $entity
-     * @param string $where
-     * @param null $parameters
-     * @param string $orderBy
-     * @return Application|ApplicationSetting|AuthorizationCode|Collection|ContentVersion|Device|Entity|FrontendUser
-     * |User|UserCollection|bool
+     * @param null|string $where
+     * @param null|array $parameters
+     * @param null|string $orderBy
+     * @return false|Application|ApplicationSetting|AuthorizationCode|Collection|ContentVersion|Device|Entity|
+     * FrontendUser|User|UserCollection
      */
     public function getSingleFromDatabase(BaseEntity $entity, $where = null, $parameters = null, $orderBy = null);
 
@@ -106,11 +106,11 @@ interface DatabaseServiceInterface
      * get the first entry from the database which matches the conditions
      *
      * @param BaseEntity $entity
-     * @param $id
-     * @return Application|ApplicationSetting|AuthorizationCode|Collection|ContentVersion|Device|Entity|FrontendUser
-     * |User|UserCollection|bool
+     * @param int $entityId
+     * @return false|Application|ApplicationSetting|AuthorizationCode|Collection|ContentVersion|Device|Entity|
+     * FrontendUser|User|UserCollection
      */
-    public function getSingleByIdFromDatabase(BaseEntity $entity, $id);
+    public function getSingleByIdFromDatabase(BaseEntity $entity, $entityId);
 
     /**
      * save the entity to the database
@@ -125,19 +125,19 @@ interface DatabaseServiceInterface
      * execute the specified sql query, return if the query was successful
      *
      * @param string $sql
-     * @param null $arr
+     * @param null|array $parameters
      * @return bool
      */
-    public function execute($sql, $arr = null);
+    public function execute($sql, $parameters = null);
 
     /**
      * execute the specified sql query, return the FETCH_NUM result
      *
      * @param $sql
-     * @param null $arr
-     * @return bool
+     * @param null|array $parameters
+     * @return false|int
      */
-    public function executeAndCount($sql, $arr = null);
+    public function executeAndCount($sql, $parameters = null);
 
     /**
      * deletes the entity from the database

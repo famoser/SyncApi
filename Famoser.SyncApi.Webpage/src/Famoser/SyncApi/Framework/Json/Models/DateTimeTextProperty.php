@@ -12,7 +12,7 @@ namespace Famoser\SyncApi\Framework\Json\Models;
 use Famoser\SyncApi\Framework\Json\Models\Base\JsonValueProperty;
 
 /**
- * a date time json property, but produces "c" text output
+ * a date time json property, but produces 'c' text output
  *
  * @package Famoser\SyncApi\Framework\Json\Models
  */
@@ -22,20 +22,20 @@ class DateTimeTextProperty extends JsonValueProperty
      * converts an integer or string to time
      *
      * @param $value
-     * @return \DateTime
+     * @return string
      */
     public function parseValue($value)
     {
-        return (new \DateTime($value))->format("c");
+        return (new \DateTime($value))->format('c');
     }
 
     /**
      * returns a null object
      *
-     * @return null
+     * @return string
      */
     public function getNullValue()
     {
-        return "";
+        return '';
     }
 }

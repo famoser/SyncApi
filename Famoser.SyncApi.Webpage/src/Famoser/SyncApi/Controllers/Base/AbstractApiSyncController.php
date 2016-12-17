@@ -28,7 +28,7 @@ use Famoser\SyncApi\Types\ServerError;
  *
  * @package Famoser\SyncApi\Controllers\Base
  */
-abstract class ApiSyncController extends ApiRequestController
+abstract class AbstractApiSyncController extends ApiRequestController
 {
     /**
      * get all entities the user has access to
@@ -128,7 +128,8 @@ abstract class ApiSyncController extends ApiRequestController
             //traverse list only once as array_diff returns sorted array (not sure about this one)
             $ind = 0;
             foreach ($newOnes as $newOne) {
-                for (; $ind < count($existingEntityIds); $ind++) {
+                $exitingIdCount = count($existingEntityIds);
+                for (; $ind < $exitingIdCount; $ind++) {
                     if ($existingEntityIds[$ind] != $newOne) {
                         //not the Id we are looking for; skip
                         continue;
@@ -192,7 +193,7 @@ abstract class ApiSyncController extends ApiRequestController
      * @param  BaseRequest $req
      * @param string $guid
      * @param $contentType
-     * @return BaseSyncEntity
+     * @return BaseSyncEntity|null
      */
     private function getByIdInternal(BaseRequest $req, $guid, $contentType)
     {
@@ -203,7 +204,7 @@ abstract class ApiSyncController extends ApiRequestController
     /**
      * @param BaseSyncEntity $syncEntity
      * @param $contentType
-     * @return ContentVersion
+     * @return ContentVersion|null
      */
     private function getActiveVersion(BaseSyncEntity $syncEntity, $contentType)
     {
@@ -220,7 +221,7 @@ abstract class ApiSyncController extends ApiRequestController
      *
      * @param BaseCommunicationEntity $commEntity
      * @param $contentType
-     * @param BaseSyncEntity $entity
+     * @param BaseSyncEntity|null $entity
      * @return BaseCommunicationEntity|null
      * @throws ApiException
      */
@@ -264,7 +265,7 @@ abstract class ApiSyncController extends ApiRequestController
      * creates a new entity to be inserted into the database
      *
      * @param BaseRequest $req
-     * @param BaseSyncEntity $syncEntity
+     * @param BaseSyncEntity|null $syncEntity
      * @param BaseCommunicationEntity $commEntity
      * @param $contentType
      * @throws ApiException
@@ -300,8 +301,8 @@ abstract class ApiSyncController extends ApiRequestController
     /**
      * reads the active version of the specified entity from database
      *
-     * @param BaseSyncEntity $entity
      * @param $contentType
+     * @param BaseSyncEntity|null $entity
      * @return BaseCommunicationEntity
      * @throws ApiException
      */
@@ -327,7 +328,7 @@ abstract class ApiSyncController extends ApiRequestController
      * updates sync entity, by creating a new content version
      *
      * @param BaseCommunicationEntity $syncEntity
-     * @param BaseSyncEntity $entity
+     * @param BaseSyncEntity|null $entity
      * @throws ApiException
      * @throws ServerException
      */
@@ -354,7 +355,7 @@ abstract class ApiSyncController extends ApiRequestController
     /**
      * marks sync entity as deleted
      *
-     * @param BaseSyncEntity $entity
+     * @param BaseSyncEntity|null $entity
      * @throws ApiException
      * @throws ServerException
      */
