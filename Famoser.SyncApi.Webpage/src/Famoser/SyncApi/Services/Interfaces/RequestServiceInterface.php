@@ -50,9 +50,9 @@ interface RequestServiceInterface
     public function parseSyncEntityRequest(Request $request);
 
     /**
-     * @param $authCode
-     * @param $applicationSeed
-     * @param $personSeed
+     * @param string $authCode
+     * @param integer $applicationSeed
+     * @param string $personSeed
      * @param int $modulo
      * @return bool
      */

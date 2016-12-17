@@ -85,7 +85,7 @@ class SettingsRepository
     /**
      * sets the value to an existing entity or creates a new one
      *
-     * @param $key
+     * @param string $key
      * @param $val
      */
     private function setOrCreateValue($key, $val)

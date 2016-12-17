@@ -30,7 +30,7 @@ class ApiRequestController extends BaseController
     private $application;
 
     /**
-     * @param $applicationId
+     * @param string $applicationId
      * @return Application
      * @throws ApiException
      */

@@ -168,8 +168,8 @@ abstract class ApiSyncController extends ApiRequestController
     /**
      * returns an array which value are the specified property of the object.
      *
-     * @param array $objects
-     * @param $property
+     * @param BaseSyncEntity[] $objects
+     * @param string $property
      * @return array
      */
     private function getArrayOfObjectProperty(array $objects, $property)
@@ -186,7 +186,7 @@ abstract class ApiSyncController extends ApiRequestController
      * get a collection by a guid accessible for the user
      *
      * @param  BaseRequest $req
-     * @param $guid
+     * @param string $guid
      * @param $contentType
      * @return BaseSyncEntity
      */
@@ -199,7 +199,7 @@ abstract class ApiSyncController extends ApiRequestController
     /**
      * @param BaseSyncEntity $syncEntity
      * @param $contentType
-     * @return bool|ContentVersion
+     * @return ContentVersion
      */
     private function getActiveVersion(BaseSyncEntity $syncEntity, $contentType)
     {

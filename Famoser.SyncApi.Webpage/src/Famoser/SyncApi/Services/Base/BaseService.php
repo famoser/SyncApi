@@ -10,10 +10,6 @@ namespace Famoser\SyncApi\Services\Base;
 
 
 use Famoser\SyncApi\Framework\ContainerBase;
-use Famoser\SyncApi\Services\Interfaces\LoggingServiceInterface;
-use Famoser\SyncApi\SyncApiApp;
-use Interop\Container\ContainerInterface;
-use Slim\Container;
 
 /**
  * Class BaseService: to be extended by all services
@@ -25,7 +21,7 @@ class BaseService extends ContainerBase
     /**
      * return the modulo used in the application
      *
-     * @return int
+     * @return string
      */
     protected function getModulo()
     {
