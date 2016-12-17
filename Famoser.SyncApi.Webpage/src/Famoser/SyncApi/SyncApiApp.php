@@ -243,12 +243,61 @@ class SyncApiApp extends App
      */
     private function addHandlers(Container $container)
     {
-        $errorHandler = function (Container $container) {
-            return function (
-                ServerRequestInterface $request,
-                ResponseInterface $response,
-                $error = null
-            ) use ($container) {
+        $errorHandler = $this->createErrorHandlerClosure($container);
+
+        //third argument: \Throwable
+        $container['phpErrorHandler'] = $errorHandler;
+        //third argument: \Exception
+        $container['errorHandler'] = $errorHandler;
+
+        $container['notAllowedHandler'] = $this->createNotFoundHandlerClosure($container, ApiError::METHOD_NOT_ALLOWED);
+        $container['notFoundHandler'] = $this->createNotFoundHandlerClosure($container, ApiError::NODE_NOT_FOUND);
+    }
+
+    /**
+     * checks if a specific request is done by the api library
+     *
+     * @param ServerRequestInterface $request
+     * @return bool
+     */
+    private function isApiRequest(ServerRequestInterface $request)
+    {
+        return strpos($request->getUri()->getPath(), '/1.0/') === 0 && $request->getMethod() == 'POST';
+    }
+
+    /**
+     * creates a closure which has no third argument
+     *
+     * @param ContainerInterface $container
+     * @param $apiError
+     * @return \Closure
+     */
+    private function createNotFoundHandlerClosure(ContainerInterface $container, $apiError)
+    {
+        return function () use ($container, $apiError) {
+            return function (ServerRequestInterface $request, ResponseInterface $response) use ($container, $apiError) {
+                if ($this->isApiRequest($request)) {
+                    $resp = new BaseResponse();
+                    $resp->RequestFailed = true;
+                    $resp->ApiError = $apiError;
+                    $resp->ServerMessage = ApiError::toString($apiError);
+                    return $container['response']->withStatus(500)->withJson($resp);
+                }
+                return $container['view']->render($response, 'public/not_found.html.twig', []);
+            };
+        };
+    }
+
+    /**
+     * creates a closure which accepts \Exception and \Throwable as third argument
+     *
+     * @param ContainerInterface $container
+     * @return \Closure
+     */
+    private function createErrorHandlerClosure(ContainerInterface $container)
+    {
+        return function () use ($container) {
+            return function (ServerRequestInterface $request, ResponseInterface $response, $error = null) use ($container) {
                 if ($error instanceof \Exception || $error instanceof \Throwable) {
                     $errorString = $error->getFile() . ' (' . $error->getLine() . ')\n' .
                         $error->getCode() . ': ' . $error->getMessage() . '\n' .
@@ -290,40 +339,6 @@ class SyncApiApp extends App
                 }
             };
         };
-
-        //third argument: \Throwable
-        $container['phpErrorHandler'] = $errorHandler;
-        //third argument: \Exception
-        $container['errorHandler'] = $errorHandler;
-
-        $container['notAllowedHandler'] = function (Container $container) {
-            //third parameter can be $requestMethods array
-            return function (ServerRequestInterface $request, ResponseInterface $response) use ($container) {
-                return $this->returnError($container, $request, $response, ApiError::METHOD_NOT_ALLOWED, 'not_found');
-            };
-        };
-        $container['notFoundHandler'] = function (ContainerInterface $container) {
-            return function (ServerRequestInterface $request, ResponseInterface $response) use ($container) {
-                return $this->returnError($container, $request, $response, ApiError::NODE_NOT_FOUND, 'not_found');
-            };
-        };
-    }
-
-    private function isApiRequest(ServerRequestInterface $request)
-    {
-        return strpos($request->getUri()->getPath(), '/1.0/') === 0 && $request->getMethod() == 'POST';
-    }
-
-    private function returnError(ContainerInterface $container, ServerRequestInterface $request, ResponseInterface $response, $apiError, $filePath)
-    {
-        if ($this->isApiRequest($request)) {
-            $resp = new BaseResponse();
-            $resp->RequestFailed = true;
-            $resp->ApiError = $apiError;
-            $resp->ServerMessage = ApiError::toString($apiError);
-            return $container['response']->withStatus(500)->withJson($resp);
-        }
-        return $container['view']->render($response, 'public/' . $filePath . '.html.twig', []);
     }
 
     /**
