@@ -27,7 +27,7 @@ interface LoggingServiceInterface
 
     /**
      * get path where the log files are saved
-     * 
+     *
      * @return string
      */
     public function getLogPath();

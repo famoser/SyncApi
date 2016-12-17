@@ -48,7 +48,7 @@ class CollectionController extends AbstractApiSyncController
             $req,
             $req->CollectionEntities,
             ContentType::COLLECTION
-        ); ;
+        );
 
         return $this->returnJson($response, $resp);
     }

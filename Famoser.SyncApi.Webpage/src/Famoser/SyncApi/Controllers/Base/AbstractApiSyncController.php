@@ -77,7 +77,6 @@ abstract class AbstractApiSyncController extends ApiRequestController
                 throw new ApiException(ApiError::ACTION_PROHIBITED);
             }
 
-
             //execute the OnlineAction
             switch ($communicationEntity->OnlineAction) {
                 case OnlineAction::NONE:
@@ -124,7 +123,6 @@ abstract class AbstractApiSyncController extends ApiRequestController
 
         if (count($newOnes) > 0) {
             //add new Objects to response
-
             //traverse list only once as array_diff returns sorted array (not sure about this one)
             $ind = 0;
             foreach ($newOnes as $newOne) {
@@ -145,7 +143,6 @@ abstract class AbstractApiSyncController extends ApiRequestController
                 }
             }
         }
-
         return $resultArray;
     }
 

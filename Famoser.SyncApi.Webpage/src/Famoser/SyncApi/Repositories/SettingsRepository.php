@@ -123,7 +123,7 @@ class SettingsRepository
     }
 
     /**
-     * gte the authentication code valid time in seconds
+     * get the authentication code valid time in seconds
      *
      * @return string
      */
@@ -191,10 +191,10 @@ class SettingsRepository
      */
     private function createSettingModel($key)
     {
-        $sm = new SettingModel();
-        $sm->value = $this->getOrCreateValue($key);
-        $sm->key = 'setting_' . $key;
-        $sm->description = SettingKeys::getSettingDescription($key);
-        return $sm;
+        $settingModel = new SettingModel();
+        $settingModel->value = $this->getOrCreateValue($key);
+        $settingModel->key = 'setting_' . $key;
+        $settingModel->description = SettingKeys::getSettingDescription($key);
+        return $settingModel;
     }
 }

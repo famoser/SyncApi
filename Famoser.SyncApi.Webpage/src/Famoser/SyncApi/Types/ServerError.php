@@ -23,7 +23,7 @@ class ServerError
 
     /**
      * convert to string
-     * 
+     *
      * @param string $serverError
      * @return string
      */

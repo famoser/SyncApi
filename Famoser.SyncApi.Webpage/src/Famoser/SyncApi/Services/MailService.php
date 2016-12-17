@@ -33,7 +33,10 @@ class MailService extends BaseService implements MailServiceInterface
     public function sendMail($sender, $receiver, $subject, $body)
     {
         //check if mail settings are defined
-        $mailSettings = isset($this->getSettingsArray()['mail']) ? $this->getSettingsArray()['mail'] : ['type' => 'mail'];
+        $mailSettings = isset($this->getSettingsArray()['mail']) ?
+            $this->getSettingsArray()['mail'] :
+            ['type' => 'mail'];
+
         if ($mailSettings['type'] == 'smtp') {
             $transport = Swift_SmtpTransport::newInstance($mailSettings['url'], $mailSettings['port'])
                 ->setUsername($mailSettings['username'])

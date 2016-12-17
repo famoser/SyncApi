@@ -75,15 +75,10 @@ class RequestService extends BaseService implements RequestServiceInterface
      */
     private function executeJsonMapper(Request $request, IJsonDeserializable $model)
     {
-        if (isset($_POST['json'])) {
-            $json = $_POST['json'];
-        } else {
-            $json = $request->getBody()->getContents();
-        }
-
+        $json = $request->getBody()->getContents();
         $mapper = new SimpleJsonMapper();
-        $om = new ObjectProperty('root', $model);
-        $resObj = $mapper->mapObject($json, $om);
+        $objProp = new ObjectProperty('root', $model);
+        $resObj = $mapper->mapObject($json, $objProp);
         $this->getLoggingService()->log(json_encode($resObj, JSON_PRETTY_PRINT), 'RequestHelper.txt');
         return $resObj;
     }
