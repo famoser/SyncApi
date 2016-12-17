@@ -74,10 +74,9 @@ checks:
         align_assignments: true
         encourage_single_quotes: true
         fix_line_ending: true
-    javascript: true
 
 filter:
-    paths: ["Famoser.SyncApi.Webpage/src/**/*"]
+    paths: ["Famoser.SyncApi.Webpage/src/Famoser/**/*"]
 coding_style:
     php:
         spaces:
@@ -85,3 +84,6 @@ coding_style:
                 concatenation: true
             other:
                 after_type_cast: false
+
+tools:
+    external_code_coverage: true
