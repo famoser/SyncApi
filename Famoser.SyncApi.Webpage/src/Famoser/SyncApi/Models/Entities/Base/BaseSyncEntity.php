@@ -53,7 +53,7 @@ abstract class BaseSyncEntity extends BaseEntity
         $content->entity_guid = $entity->Id;
         $content->version_guid = $entity->VersionId;
         $content->content = $entity->Content;
-        $content->create_date_time = $entity->CreateDateTime->getTimestamp();
+        $content->create_date_time = (new \DateTime($entity->CreateDateTime))->getTimestamp();
         $content->device_guid = $entity->DeviceId;
         return $content;
     }

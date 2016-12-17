@@ -13,6 +13,8 @@ use Famoser\SyncApi\Controllers\Base\ApiSyncController;
 use Famoser\SyncApi\Exceptions\ApiException;
 use Famoser\SyncApi\Exceptions\ServerException;
 use Famoser\SyncApi\Models\Communication\Entities\Base\BaseCommunicationEntity;
+use Famoser\SyncApi\Models\Communication\Entities\DeviceCommunicationEntity;
+use Famoser\SyncApi\Models\Communication\Entities\UserCommunicationEntity;
 use Famoser\SyncApi\Models\Communication\Request\AuthorizationRequest;
 use Famoser\SyncApi\Models\Communication\Request\Base\BaseRequest;
 use Famoser\SyncApi\Models\Communication\Response\AuthorizationResponse;
@@ -219,7 +221,7 @@ class AuthorizationController extends ApiSyncController
                 ContentType::USER
             );
 
-            if (count($res) > 0) {
+            if (count($res) > 0 && $res[0] instanceof UserCommunicationEntity) {
                 $resp->UserEntity = $res[0];
             }
         }
@@ -231,7 +233,7 @@ class AuthorizationController extends ApiSyncController
                 [$req->DeviceEntity],
                 ContentType::DEVICE
             );
-            if (count($res) > 0) {
+            if (count($res) > 0 && $res[0] instanceof DeviceCommunicationEntity) {
                 $resp->DeviceEntity = $res[0];
             }
         }

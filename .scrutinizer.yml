@@ -1,11 +1,11 @@
 checks:
     php:
-        fix_php_opening_tag: false
-        remove_php_closing_tag: false
+        fix_php_opening_tag: true
+        remove_php_closing_tag: true
         one_class_per_file: true
         side_effects_or_types: true
-        no_mixed_inline_html: false
-        require_braces_around_control_structures: false
+        no_mixed_inline_html: true
+        require_braces_around_control_structures: true
         php5_style_constructor: true
         no_global_keyword: true
         avoid_usage_of_logical_operators: true
@@ -15,7 +15,7 @@ checks:
         blank_line_after_namespace_declaration: true
         single_namespace_per_use: true
         psr2_switch_declaration: true
-        psr2_control_structure_declaration: false
+        psr2_control_structure_declaration: true
         avoid_superglobals: true
         security_vulnerabilities: true
         no_exit: true
@@ -71,9 +71,9 @@ checks:
         avoid_perl_style_comments: true
         avoid_multiple_statements_on_same_line: true
         avoid_fixme_comments: true
-        align_assignments: true
         encourage_single_quotes: true
         fix_line_ending: true
+        align_assignments: false
 
 filter:
     paths: ["Famoser.SyncApi.Webpage/src/Famoser/**/*"]

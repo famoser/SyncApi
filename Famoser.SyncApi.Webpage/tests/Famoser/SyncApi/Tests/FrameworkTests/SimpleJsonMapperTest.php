@@ -55,7 +55,7 @@ class SimpleJsonMapperTest extends \PHPUnit_Framework_TestCase
         static::assertEquals($res->DeviceId, "00000000-0000-0000-0000-000000000000");
         static::assertEquals($res->AuthorizationCode, "13431239_-8215860");
         static::assertEquals($res->ApplicationId, "test_appl");
-        static::assertEquals($res->UserEntity->CreateDateTime->format("c"), "2016-11-28T12:43:13+01:00");
+        static::assertEquals((new \DateTime($res->UserEntity->CreateDateTime))->format("c"), "2016-11-28T12:43:13+01:00");
         static::assertEquals($res->UserEntity->VersionId, "6b73667e-0229-4350-9c0e-831845bbda8f");
     }
 }

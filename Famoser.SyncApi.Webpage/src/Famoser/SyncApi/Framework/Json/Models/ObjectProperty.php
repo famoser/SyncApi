@@ -23,7 +23,7 @@ class ObjectProperty extends JsonProperty
     /* @var string $className */
     private $className;
     /* @var JsonValueProperty[] $properties */
-    private $properties;
+    private $properties = [];
 
     /**
      * ObjectProperty constructor.
@@ -35,12 +35,18 @@ class ObjectProperty extends JsonProperty
     {
         parent::__construct($propertyName);
         $this->className = get_class($class);
+        $props = $class->getJsonProperties();
+        foreach ($props as $prop) {
+            if ($prop instanceof JsonValueProperty) {
+                $this->properties[] = $prop;
+            }
+        }
         $this->properties = $class->getJsonProperties();
     }
 
     /**
      * returns properties of the object
-     * 
+     *
      * @return JsonValueProperty[]
      */
     public function getProperties()

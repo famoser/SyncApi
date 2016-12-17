@@ -97,7 +97,7 @@ interface DatabaseServiceInterface
      * @param string $where
      * @param null $parameters
      * @param string $orderBy
-     * @return BaseEntity
+     * @return Application|ApplicationSetting|AuthorizationCode|Collection|ContentVersion|Device|Entity|FrontendUser
      * |User|UserCollection|bool
      */
     public function getSingleFromDatabase(BaseEntity $entity, $where = null, $parameters = null, $orderBy = null);

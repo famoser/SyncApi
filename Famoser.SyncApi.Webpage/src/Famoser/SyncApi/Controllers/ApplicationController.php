@@ -19,6 +19,7 @@ use Famoser\SyncApi\Models\Entities\User;
 use Famoser\SyncApi\Models\Entities\UserCollection;
 use Famoser\SyncApi\Repositories\SettingsRepository;
 use Famoser\SyncApi\Types\FrontendError;
+use Psr\Http\Message\ServerRequestInterface;
 use Slim\Http\Request;
 use Slim\Http\Response;
 
@@ -230,7 +231,7 @@ class ApplicationController extends FrontendController
         $message = '';
         if ($this->writeFromPost(
             $application,
-            $request->getParsedBody(),
+            $request,
             $message,
             ['name', 'description', 'application_id', 'application_seed']
         )
@@ -286,7 +287,7 @@ class ApplicationController extends FrontendController
     {
         $this->ensureHasAccess();
         $application = $this->getAuthorizedApplication($args['id']);
-        if ($this->writeFromPost($application, $request->getParsedBody(), $message, ['name', 'description'])) {
+        if ($this->writeFromPost($application, $request, $message, ['name', 'description'])) {
             if (!$this->getDatabaseService()->saveToDatabase($application)) {
                 $args['message'] = 'application could not be saved (database error)';
             }
@@ -339,13 +340,18 @@ class ApplicationController extends FrontendController
      * write all specified application properties
      *
      * @param Application $application
-     * @param array $source
+     * @param ServerRequestInterface $request
      * @param $message
      * @param string[] $propArray
      * @return bool
+     * @internal param array $source
      */
-    private function writeFromPost(Application $application, array $source, &$message, array $propArray)
+    private function writeFromPost(Application $application, ServerRequestInterface $request, &$message, array $propArray)
     {
+        $source = $request->getParsedBody();
+        if (!is_array($source)) {
+            $source = [];
+        }
         $arr = $this->writePropertiesFromArray($source, $application, $propArray);
         if (count($arr) == 0) {
             //validate application seed

@@ -10,6 +10,7 @@ namespace Famoser\SyncApi\Models\Communication\Entities\Base;
 
 use Famoser\SyncApi\Framework\Json\Models\Base\JsonProperty;
 use Famoser\SyncApi\Framework\Json\Models\DateTimeProperty;
+use Famoser\SyncApi\Framework\Json\Models\DateTimeTextProperty;
 use Famoser\SyncApi\Framework\Json\Models\IntProperty;
 use Famoser\SyncApi\Framework\Json\Models\TextProperty;
 use Famoser\SyncApi\Interfaces\IJsonDeserializable;
@@ -37,7 +38,7 @@ class BaseCommunicationEntity implements IJsonDeserializable
     /* @var string $Content */
     public $Content;
 
-    /* @var \DateTime $CreateDateTime */
+    /* @var string $CreateDateTime type_of:datetime */
     public $CreateDateTime;
 
     /* @var string $Identifier */
@@ -55,7 +56,7 @@ class BaseCommunicationEntity implements IJsonDeserializable
         $props['VersionId'] = new TextProperty('VersionId');
         $props['OnlineAction'] = new IntProperty('OnlineAction');
         $props['Content'] = new TextProperty('Content');
-        $props['CreateDateTime'] = new DateTimeProperty('CreateDateTime');
+        $props['CreateDateTime'] = new DateTimeTextProperty('CreateDateTime');
         $props['Identifier'] = new TextProperty('Identifier');
         return $props;
     }

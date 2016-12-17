@@ -45,7 +45,7 @@ class PublicController extends FrontendController
     public function info(Request $request, Response $response, $args)
     {
         $apiInfo = new ApiInformation();
-        $apiInfo->Modulo = $this->getSettingsArray()['api_modulo'];
+        $apiInfo->Modulo = (int)$this->getSettingsArray()['api_modulo'];
         return $this->returnJsonObject($response, $apiInfo);
     }
 }
