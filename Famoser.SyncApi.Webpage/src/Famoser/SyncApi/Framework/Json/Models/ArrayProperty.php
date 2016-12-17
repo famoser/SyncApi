@@ -10,13 +10,14 @@ namespace Famoser\SyncApi\Framework\Json\Models;
 
 
 use Famoser\SyncApi\Framework\Json\Models\Base\JsonProperty;
+use Famoser\SyncApi\Framework\Json\Models\Base\JsonValueProperty;
 
 /**
  * an array property. contains information about the objects or values contained in the array
  *
  * @package Famoser\SyncApi\Framework\Json\Models
  */
-class ArrayProperty extends JsonProperty
+class ArrayProperty extends JsonValueProperty
 {
     /* @var JsonProperty $properties */
     private $objectProperty;
@@ -39,5 +40,27 @@ class ArrayProperty extends JsonProperty
     public function getProperty()
     {
         return $this->objectProperty;
+    }
+
+    /**
+     * parse the value
+     *
+     * @param $value
+     * @return mixed
+     */
+    public function parseValue($value)
+    {
+        //can't just parse this! The JsonMapper must take care of this
+        return [];
+    }
+
+    /**
+     * return the default value for the value
+     *
+     * @return mixed
+     */
+    public function getNullValue()
+    {
+        return [];
     }
 }

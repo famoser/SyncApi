@@ -35,7 +35,7 @@ interface DatabaseServiceInterface
      * @param null|array $parameters
      * @param int $limit
      * @param string $selector
-     * @return false|Application[]|ApplicationSetting[]|AuthorizationCode[]|Collection[]|ContentVersion[]|Device[]|
+     * @return Application[]|ApplicationSetting[]|AuthorizationCode[]|Collection[]|ContentVersion[]|Device[]|
      * Entity[]|FrontendUser[]|User[]|UserCollection[]
      */
     public function getFromDatabase(
@@ -76,7 +76,7 @@ interface DatabaseServiceInterface
      * @param null|string $orderBy
      * @param null|array $parameters
      * @param int $limit
-     * @return false|Application[]|ApplicationSetting[]|AuthorizationCode[]|Collection[]|ContentVersion[]|Device[]|
+     * @return Application[]|ApplicationSetting[]|AuthorizationCode[]|Collection[]|ContentVersion[]|Device[]|
      * Entity[]|FrontendUser[]|User[]|UserCollection[]
      */
     public function getWithInFromDatabase(
@@ -97,7 +97,7 @@ interface DatabaseServiceInterface
      * @param null|string $where
      * @param null|array $parameters
      * @param null|string $orderBy
-     * @return false|Application|ApplicationSetting|AuthorizationCode|Collection|ContentVersion|Device|Entity|
+     * @return null|Application|ApplicationSetting|AuthorizationCode|Collection|ContentVersion|Device|Entity|
      * FrontendUser|User|UserCollection
      */
     public function getSingleFromDatabase(BaseEntity $entity, $where = null, $parameters = null, $orderBy = null);
@@ -107,7 +107,7 @@ interface DatabaseServiceInterface
      *
      * @param BaseEntity $entity
      * @param int $entityId
-     * @return false|Application|ApplicationSetting|AuthorizationCode|Collection|ContentVersion|Device|Entity|
+     * @return null|Application|ApplicationSetting|AuthorizationCode|Collection|ContentVersion|Device|Entity|
      * FrontendUser|User|UserCollection
      */
     public function getSingleByIdFromDatabase(BaseEntity $entity, $entityId);

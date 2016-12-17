@@ -18,7 +18,7 @@ use Famoser\SyncApi\Interfaces\IJsonDeserializable;
  *
  * @package Famoser\SyncApi\Framework\Json\Models
  */
-class ObjectProperty extends JsonProperty
+class ObjectProperty extends JsonValueProperty
 {
     /* @var string $className */
     private $className;
@@ -36,12 +36,13 @@ class ObjectProperty extends JsonProperty
         parent::__construct($propertyName);
         $this->className = get_class($class);
         $props = $class->getJsonProperties();
-        foreach ($props as $prop) {
+        foreach ($props as $key => $prop) {
             if ($prop instanceof JsonValueProperty) {
-                $this->properties[] = $prop;
+                $this->properties[$key] = $prop;
+            } else {
+                break;
             }
         }
-        $this->properties = $class->getJsonProperties();
     }
 
     /**
@@ -62,5 +63,27 @@ class ObjectProperty extends JsonProperty
     public function getInstance()
     {
         return new $this->className();
+    }
+
+    /**
+     * parse the value
+     *
+     * @param $value
+     * @return mixed
+     */
+    public function parseValue($value)
+    {
+        //can't just parse this! The JsonMapper must take care of this
+        return null;
+    }
+
+    /**
+     * return the default value for the value
+     *
+     * @return mixed
+     */
+    public function getNullValue()
+    {
+        return null;
     }
 }

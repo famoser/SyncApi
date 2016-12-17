@@ -94,10 +94,10 @@ class DatabaseService extends BaseService implements DatabaseServiceInterface
     private function createQuery(BaseEntity $entity, $where = null, $orderBy = null, $limit = 1000, $selector = '*')
     {
         $sql = 'SELECT ' . $selector . ' FROM ' . $entity->getTableName();
-        if ($where != null) {
+        if ($where !== null) {
             $sql .= ' WHERE ' . $where;
         }
-        if ($orderBy != null) {
+        if ($orderBy !== null) {
             $sql .= ' ORDER BY ' . $orderBy;
         }
         if ($limit > 0) {
@@ -117,13 +117,13 @@ class DatabaseService extends BaseService implements DatabaseServiceInterface
     private function executeAndFetch(BaseEntity $entity, $sql, $parameters = null)
     {
         try {
-            $this->getLoggingService()->log(
-                $sql . '     ' . json_encode($parameters),
-                'DatabaseHelper' . uniqid() . '.txt'
-            );
             $request = $this->getConnection()->prepare($sql);
             if (!$request->execute($parameters)) {
-                return false;
+                $this->getLoggingService()->log(
+                    $sql . '     ' . json_encode($parameters),
+                    'DatabaseHelper' . uniqid() . '.txt'
+                );
+                return [];
             }
             return $request->fetchAll(PDO::FETCH_CLASS, get_class($entity));
         } catch (\Exception $ex) {
@@ -146,7 +146,7 @@ class DatabaseService extends BaseService implements DatabaseServiceInterface
      * @param null|array $parameters
      * @param int $limit
      * @param string $selector
-     * @return false|Application[]|ApplicationSetting[]|AuthorizationCode[]|Collection[]|ContentVersion[]|Device[]|
+     * @return Application[]|ApplicationSetting[]|AuthorizationCode[]|Collection[]|ContentVersion[]|Device[]|
      * Entity[]|FrontendUser[]|User[]|UserCollection[]
      */
     public function getFromDatabase(
@@ -196,7 +196,7 @@ class DatabaseService extends BaseService implements DatabaseServiceInterface
      * @param null|string $orderBy
      * @param null|array $parameters
      * @param int $limit
-     * @return false|Application[]|ApplicationSetting[]|AuthorizationCode[]|Collection[]|ContentVersion[]|Device[]|
+     * @return Application[]|ApplicationSetting[]|AuthorizationCode[]|Collection[]|ContentVersion[]|Device[]|
      * Entity[]|FrontendUser[]|User[]|UserCollection[]
      */
     public function getWithInFromDatabase(
@@ -213,7 +213,7 @@ class DatabaseService extends BaseService implements DatabaseServiceInterface
         if ($parameters == null) {
             $parameters = [];
         }
-        if ($where == null) {
+        if ($where === null) {
             $where = ' ';
         } else {
             $where .= ' AND ';
@@ -239,7 +239,7 @@ class DatabaseService extends BaseService implements DatabaseServiceInterface
      * @param null|string $where
      * @param null|array $parameters
      * @param null|string $orderBy
-     * @return false|Application|ApplicationSetting|AuthorizationCode|Collection|ContentVersion|Device|Entity|
+     * @return Application|ApplicationSetting|AuthorizationCode|Collection|ContentVersion|Device|Entity|
      * FrontendUser|User|UserCollection
      */
     public function getSingleFromDatabase(BaseEntity $entity, $where = null, $parameters = null, $orderBy = null)
@@ -363,7 +363,7 @@ class DatabaseService extends BaseService implements DatabaseServiceInterface
      *
      * @param BaseEntity $entity
      * @param int $entityId
-     * @return false|Application|ApplicationSetting|AuthorizationCode|Collection|ContentVersion|Device|Entity|
+     * @return Application|ApplicationSetting|AuthorizationCode|Collection|ContentVersion|Device|Entity|
      * FrontendUser|User|UserCollection
      */
     public function getSingleByIdFromDatabase(BaseEntity $entity, $entityId)

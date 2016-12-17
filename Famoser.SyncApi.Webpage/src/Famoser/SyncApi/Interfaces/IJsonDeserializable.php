@@ -9,7 +9,7 @@
 namespace Famoser\SyncApi\Interfaces;
 
 
-use Famoser\SyncApi\Framework\Json\Models\Base\JsonProperty;
+use Famoser\SyncApi\Framework\Json\Models\Base\JsonValueProperty;
 
 /**
  * Interface IJsonDeserializable
@@ -22,7 +22,7 @@ interface IJsonDeserializable
     /**
      * gets the json properties need to deserialize
      *
-     * @return JsonProperty[]
+     * @return JsonValueProperty[]
      */
     public function getJsonProperties();
 }

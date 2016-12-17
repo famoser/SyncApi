@@ -54,24 +54,16 @@ class SimpleJsonMapper
         $inst = $property->getInstance();
         foreach ($property->getProperties() as $key => $property) {
             $jsonPropertyName = $property->getPropertyName();
-            if ($property instanceof JsonValueProperty) {
-                if (isset($content[$jsonPropertyName])) {
-                    $inst->$key = $property->parseValue($content[$jsonPropertyName]);
-                } else {
-                    $inst->$key = $property->getNullValue();
-                }
-            } else if ($property instanceof ArrayProperty) {
-                if (isset($content[$jsonPropertyName])) {
+            if (isset($content[$jsonPropertyName])) {
+                if ($property instanceof ArrayProperty) {
                     $inst->$key = $this->mapArrayInternal($content[$jsonPropertyName], $property);
-                } else {
-                    $inst->$key = [];
-                }
-            } else if ($property instanceof ObjectProperty) {
-                if (isset($content[$jsonPropertyName])) {
+                } else if ($property instanceof ObjectProperty) {
                     $inst->$key = $this->mapObjectInternal($content[$jsonPropertyName], $property);
-                } else {
-                    $inst->$key = null;
+                } else if ($property instanceof JsonValueProperty) {
+                    $inst->$key = $property->parseValue($content[$jsonPropertyName]);
                 }
+            } else {
+                $inst->$key = $property->getNullValue();
             }
         }
         return $inst;

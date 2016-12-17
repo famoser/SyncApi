@@ -10,6 +10,7 @@ namespace Famoser\SyncApi\Models\Communication\Request;
 
 
 use Famoser\SyncApi\Framework\Json\Models\Base\JsonProperty;
+use Famoser\SyncApi\Framework\Json\Models\Base\JsonValueProperty;
 use Famoser\SyncApi\Framework\Json\Models\ObjectProperty;
 use Famoser\SyncApi\Framework\Json\Models\TextProperty;
 use Famoser\SyncApi\Models\Communication\Entities\CollectionCommunicationEntity;
@@ -39,7 +40,7 @@ class AuthorizationRequest extends BaseRequest
     /**
      * gets the json properties needed to deserialize
      *
-     * @return JsonProperty[]
+     * @return JsonValueProperty[]
      */
     public function getJsonProperties()
     {
