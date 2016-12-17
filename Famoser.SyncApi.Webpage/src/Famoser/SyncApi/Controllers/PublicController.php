@@ -31,7 +31,7 @@ class PublicController extends FrontendController
      */
     public function index(Request $request, Response $response, $args)
     {
-        return $this->renderTemplate($response, "public/index", $args);
+        return $this->renderTemplate($response, 'public/index', $args);
     }
 
     /**
@@ -45,7 +45,7 @@ class PublicController extends FrontendController
     public function info(Request $request, Response $response, $args)
     {
         $apiInfo = new ApiInformation();
-        $apiInfo->Modulo = $this->getSettingsArray()["api_modulo"];
+        $apiInfo->Modulo = $this->getSettingsArray()['api_modulo'];
         return $this->returnJsonObject($response, $apiInfo);
     }
 }

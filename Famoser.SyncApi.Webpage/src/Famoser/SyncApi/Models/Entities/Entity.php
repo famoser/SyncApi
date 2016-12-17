@@ -46,7 +46,7 @@ class Entity extends BaseSyncEntity
      */
     public function getTableName()
     {
-        return "entities";
+        return 'entities';
     }
 
     /**

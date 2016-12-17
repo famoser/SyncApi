@@ -41,6 +41,6 @@ class AuthorizationCode extends BaseEntity
      */
     public function getTableName()
     {
-        return "authorization_codes";
+        return 'authorization_codes';
     }
 }

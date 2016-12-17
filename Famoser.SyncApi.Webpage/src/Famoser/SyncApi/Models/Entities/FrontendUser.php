@@ -45,6 +45,6 @@ class FrontendUser extends BaseEntity
      */
     public function getTableName()
     {
-        return "frontend_users";
+        return 'frontend_users';
     }
 }

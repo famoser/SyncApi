@@ -31,15 +31,15 @@ class ServerError
     {
         switch ($serverError) {
             case ServerError::REQUEST_JSON_FAILURE:
-                return "json request could not be processed";
+                return 'json request could not be processed';
             case ServerError::FORBIDDEN:
-                return "you are not allowed to view this resource";
+                return 'you are not allowed to view this resource';
             case ServerError::NOT_WELL_DEFINED:
-                return "the request is not well defined";
+                return 'the request is not well defined';
             case ServerError::DATABASE_SAVE_FAILURE:
-                return "changes could not be written to database";
+                return 'changes could not be written to database';
             default:
-                return "unknown server error occurred with code " . $serverError;
+                return 'unknown server error occurred with code ' . $serverError;
         }
     }
 }

@@ -42,7 +42,7 @@ class Device extends BaseSyncEntity
      */
     public function getTableName()
     {
-        return "devices";
+        return 'devices';
     }
 
     /**

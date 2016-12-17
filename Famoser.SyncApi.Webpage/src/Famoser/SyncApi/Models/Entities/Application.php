@@ -54,6 +54,6 @@ class Application extends BaseEntity
      */
     public function getTableName()
     {
-        return "applications";
+        return 'applications';
     }
 }

@@ -105,7 +105,7 @@ class ContainerBase
      */
     public function getRouter()
     {
-        return $this->container->get("router");
+        return $this->container->get('router');
     }
 
     /**
@@ -115,6 +115,6 @@ class ContainerBase
      */
     public function getView()
     {
-        return $this->container->get("view");
+        return $this->container->get('view');
     }
 }

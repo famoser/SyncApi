@@ -103,8 +103,8 @@ class DeviceController extends ApiSyncController
 
         $dev = $this->getDatabaseService()->getSingleFromDatabase(
             new Device(),
-            "user_guid = :user_guid AND guid = :guid",
-            ["user_guid" => $this->getUser($req)->guid, "guid" => $req->ClientMessage]
+            'user_guid = :user_guid AND guid = :guid',
+            ['user_guid' => $this->getUser($req)->guid, 'guid' => $req->ClientMessage]
         );
         if ($dev == null) {
             throw new ApiException(ApiError::RESOURCE_NOT_FOUND);
@@ -134,8 +134,8 @@ class DeviceController extends ApiSyncController
 
         return $this->getDatabaseService()->getFromDatabase(
             new Device(),
-            "user_guid = :user_guid",
-            ["user_guid" => $this->getUser($req)->guid]
+            'user_guid = :user_guid',
+            ['user_guid' => $this->getUser($req)->guid]
         );
     }
 

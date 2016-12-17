@@ -79,7 +79,7 @@ class CollectionController extends ApiSyncController
         //get all collections
         return $this->getDatabaseService()->getFromDatabase(
             new Collection(),
-            "guid IN (:" . implode(',:', array_keys($collectionIds)) . ")",
+            'guid IN (:' . implode(',:', array_keys($collectionIds)) . ')',
             $collectionIds);
     }
 

@@ -32,7 +32,7 @@ class UserCommunicationEntity extends BaseCommunicationEntity
     public function getJsonProperties()
     {
         $props = parent::getJsonProperties();
-        $props["PersonalSeed"] = new TextProperty("PersonalSeed");
+        $props['PersonalSeed'] = new TextProperty('PersonalSeed');
         return $props;
     }
 }

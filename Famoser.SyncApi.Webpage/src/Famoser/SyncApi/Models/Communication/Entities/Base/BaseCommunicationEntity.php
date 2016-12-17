@@ -51,12 +51,12 @@ class BaseCommunicationEntity implements IJsonDeserializable
     public function getJsonProperties()
     {
         $props = [];
-        $props["Id"] = new TextProperty("Id");
-        $props["VersionId"] = new TextProperty("VersionId");
-        $props["OnlineAction"] = new IntProperty("OnlineAction");
-        $props["Content"] = new TextProperty("Content");
-        $props["CreateDateTime"] = new DateTimeProperty("CreateDateTime");
-        $props["Identifier"] = new TextProperty("Identifier");
+        $props['Id'] = new TextProperty('Id');
+        $props['VersionId'] = new TextProperty('VersionId');
+        $props['OnlineAction'] = new IntProperty('OnlineAction');
+        $props['Content'] = new TextProperty('Content');
+        $props['CreateDateTime'] = new DateTimeProperty('CreateDateTime');
+        $props['Identifier'] = new TextProperty('Identifier');
         return $props;
     }
 }

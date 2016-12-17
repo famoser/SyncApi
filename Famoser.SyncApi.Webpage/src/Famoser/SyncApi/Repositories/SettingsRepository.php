@@ -56,8 +56,8 @@ class SettingsRepository
 
         $settings = $this->helper->getFromDatabase(
             new ApplicationSetting(),
-            "application_id = :application_id",
-            ["application_id" => $this->applicationId]
+            'application_id = :application_id',
+            ['application_id' => $this->applicationId]
         );
         $this->dic = [];
         foreach ($settings as $setting) {
@@ -139,7 +139,7 @@ class SettingsRepository
      */
     public function getDeviceAuthenticationRequired()
     {
-        return $this->getOrCreateValue(SettingKeys::DEVICE_AUTHENTICATION_REQUIRED) == "true";
+        return $this->getOrCreateValue(SettingKeys::DEVICE_AUTHENTICATION_REQUIRED) == 'true';
     }
 
     /**
@@ -176,8 +176,8 @@ class SettingsRepository
     public function setSettings($keyValPairs)
     {
         foreach ($keyValPairs as $key => $val) {
-            if (strrpos($key, "setting_") === 0) {
-                $intKey = substr($key, strlen("setting_"));
+            if (strrpos($key, 'setting_') === 0) {
+                $intKey = substr($key, strlen('setting_'));
                 $this->setOrCreateValue($intKey, $val);
             }
         }
@@ -193,7 +193,7 @@ class SettingsRepository
     {
         $sm = new SettingModel();
         $sm->value = $this->getOrCreateValue($key);
-        $sm->key = "setting_" . $key;
+        $sm->key = 'setting_' . $key;
         $sm->description = SettingKeys::getSettingDescription($key);
         return $sm;
     }

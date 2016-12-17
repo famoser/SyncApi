@@ -35,8 +35,8 @@ class DeviceCommunicationEntity extends BaseCommunicationEntity
     public function getJsonProperties()
     {
         $props = parent::getJsonProperties();
-        $props["UserId"] = new TextProperty("UserId");
-        $props["IsAuthenticated"] = new BooleanProperty("IsAuthenticated");
+        $props['UserId'] = new TextProperty('UserId');
+        $props['IsAuthenticated'] = new BooleanProperty('IsAuthenticated');
         return $props;
     }
 }

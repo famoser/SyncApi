@@ -69,9 +69,9 @@ class BaseController extends ContainerBase
                 /** @noinspection PhpVariableVariableInspection */
                 if ($request->$neededProp == null) {
                     $this->getLoggingService()->log(
-                        "not a property: " . $neededProp . 
-                        " in object " . json_encode($request, JSON_PRETTY_PRINT), 
-                        "isWellDefined_" . uniqid() . ".txt"
+                        'not a property: ' . $neededProp .
+                        ' in object ' . json_encode($request, JSON_PRETTY_PRINT),
+                        'isWellDefined_' . uniqid() . '.txt'
                     );
                     return false;
                 }
@@ -81,9 +81,9 @@ class BaseController extends ContainerBase
             foreach ($neededArrays as $neededArray) {
                 /** @noinspection PhpVariableVariableInspection */
                 if (!is_array($request->$neededArray)) {
-                    $this->getLoggingService()->log("not an array: " . $neededArray .
-                        " in object " . json_encode($request, JSON_PRETTY_PRINT), 
-                        "isWellDefined_" . uniqid() . ".txt"
+                    $this->getLoggingService()->log('not an array: ' . $neededArray .
+                        ' in object ' . json_encode($request, JSON_PRETTY_PRINT),
+                        'isWellDefined_' . uniqid() . '.txt'
                     );
                     return false;
                 }

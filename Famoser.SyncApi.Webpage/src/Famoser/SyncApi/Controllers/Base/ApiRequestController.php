@@ -42,8 +42,8 @@ class ApiRequestController extends BaseController
 
         $this->application = $this->getDatabaseService()->getSingleFromDatabase(
             new Application(),
-            "application_id = :application_id",
-            ["application_id" => $applicationId]
+            'application_id = :application_id',
+            ['application_id' => $applicationId]
         );
 
         if ($this->application == null) {
@@ -113,8 +113,8 @@ class ApiRequestController extends BaseController
     {
         return $this->getDatabaseService()->getSingleFromDatabase(
             new User(),
-            "guid = :guid AND application_id = :application_id",
-            ["guid" => $req->UserId, "application_id" => $req->ApplicationId]
+            'guid = :guid AND application_id = :application_id',
+            ['guid' => $req->UserId, 'application_id' => $req->ApplicationId]
         );
     }
 
@@ -151,8 +151,8 @@ class ApiRequestController extends BaseController
     {
         return $this->getDatabaseService()->getSingleFromDatabase(
             new Device(),
-            "guid = :guid AND user_guid = :user_guid AND is_deleted = :is_deleted",
-            ["guid" => $req->DeviceId, "user_guid" => $this->getUser($req)->guid, "is_deleted" => false]
+            'guid = :guid AND user_guid = :user_guid AND is_deleted = :is_deleted',
+            ['guid' => $req->DeviceId, 'user_guid' => $this->getUser($req)->guid, 'is_deleted' => false]
         );
     }
 
@@ -172,11 +172,11 @@ class ApiRequestController extends BaseController
 
         $userCollectionIds = $this->getDatabaseService()->getFromDatabase(
             new UserCollection(),
-            "user_guid =:user_guid",
-            ["user_guid" => $this->getUser($req)->guid],
+            'user_guid =:user_guid',
+            ['user_guid' => $this->getUser($req)->guid],
             null,
             1000,
-            "collection_guid"
+            'collection_guid'
         );
 
         $this->collectionIds = [];

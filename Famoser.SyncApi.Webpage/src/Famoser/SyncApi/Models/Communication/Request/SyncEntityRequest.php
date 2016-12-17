@@ -31,9 +31,9 @@ class SyncEntityRequest extends BaseRequest
     public function getJsonProperties()
     {
         $arr = parent::getJsonProperties();
-        $arr["SyncEntities"] = new ArrayProperty(
-            "SyncEntities",
-            new ObjectProperty("SyncEntities", new SyncCommunicationEntity())
+        $arr['SyncEntities'] = new ArrayProperty(
+            'SyncEntities',
+            new ObjectProperty('SyncEntities', new SyncCommunicationEntity())
         );
         return $arr;
     }

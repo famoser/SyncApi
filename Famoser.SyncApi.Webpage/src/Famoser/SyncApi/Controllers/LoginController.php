@@ -33,7 +33,7 @@ class LoginController extends FrontendController
      */
     public function login(Request $request, Response $response, $args)
     {
-        return $this->renderTemplate($response, "login/login", $args);
+        return $this->renderTemplate($response, 'login/login', $args);
     }
 
     /**
@@ -47,20 +47,20 @@ class LoginController extends FrontendController
     public function loginPost(Request $request, Response $response, $args)
     {
         $req = $request->getParsedBody();
-        if (isset($req["username"]) && isset($req["password"])) {
+        if (isset($req['username']) && isset($req['password'])) {
             $user = $this->getDatabaseService()->getSingleFromDatabase(
                 new FrontendUser(),
-                "username = :username",
-                ["username" => $req["username"]]
+                'username = :username',
+                ['username' => $req['username']]
             );
-            if ($user != null && password_verify($req["password"], $user->password)) {
+            if ($user != null && password_verify($req['password'], $user->password)) {
                 $this->setFrontendUser($user);
-                return $this->redirect($request, $response, "application_index");
+                return $this->redirect($request, $response, 'application_index');
             }
         }
-        $args["message"] = "something went wrong with the login :/";
-        $args["last_request"] = $req;
-        return $this->renderTemplate($response, "login/login", $args);
+        $args['message'] = 'something went wrong with the login :/';
+        $args['last_request'] = $req;
+        return $this->renderTemplate($response, 'login/login', $args);
     }
 
     /**
@@ -73,7 +73,7 @@ class LoginController extends FrontendController
      */
     public function register(Request $request, Response $response, $args)
     {
-        return $this->renderTemplate($response, "login/register", $args);
+        return $this->renderTemplate($response, 'login/register', $args);
     }
 
     /**
@@ -89,36 +89,36 @@ class LoginController extends FrontendController
     {
         $req = $request->getParsedBody();
         if (
-            isset($req["username"]) &&
-            isset($req["email"]) &&
-            isset($req["password"]) &&
-            $req["password"] == $req["password2"]
+            isset($req['username']) &&
+            isset($req['email']) &&
+            isset($req['password']) &&
+            $req['password'] == $req['password2']
         ) {
             $usr = $this->getDatabaseService()->getSingleFromDatabase(
                 new FrontendUser(),
-                "username = :username OR email = :email",
-                ["username" => $req["username"], "email" => $req["email"]]
+                'username = :username OR email = :email',
+                ['username' => $req['username'], 'email' => $req['email']]
             );
             if ($usr == null) {
                 $frontendUser = new FrontendUser();
-                $frontendUser->email = $req["email"];
-                $frontendUser->password = password_hash($req["password"], PASSWORD_BCRYPT);
-                $frontendUser->username = $req["username"];
+                $frontendUser->email = $req['email'];
+                $frontendUser->password = password_hash($req['password'], PASSWORD_BCRYPT);
+                $frontendUser->username = $req['username'];
                 $frontendUser->reset_key = md5(rand(0, 100000));
                 if (!$this->getDatabaseService()->saveToDatabase($frontendUser)) {
                     throw new ServerException(ServerError::DATABASE_SAVE_FAILURE);
                 }
-                return $this->redirect($request, $response, "login");
+                return $this->redirect($request, $response, 'login');
             } else {
-                $args["message"] = "username or email already registered";
+                $args['message'] = 'username or email already registered';
             }
         } else {
-            $args["message"] = "something went wrong :/ <br/>please check you've filled out all fields correctly";
+            $args['message'] = 'something went wrong :/ <br/>please check you\'ve filled out all fields correctly';
         }
-        unset($req["password"]);
-        unset($req["password2"]);
-        $args["last_request"] = $req;
-        return $this->renderTemplate($response, "login/register", $args);
+        unset($req['password']);
+        unset($req['password2']);
+        $args['last_request'] = $req;
+        return $this->renderTemplate($response, 'login/register', $args);
     }
 
     /**
@@ -131,7 +131,7 @@ class LoginController extends FrontendController
      */
     public function forgot(Request $request, Response $response, $args)
     {
-        return $this->renderTemplate($response, "login/forgot", $args);
+        return $this->renderTemplate($response, 'login/forgot', $args);
     }
 
     /**
@@ -146,11 +146,11 @@ class LoginController extends FrontendController
     public function forgotPost(Request $request, Response $response, $args)
     {
         $req = $request->getParsedBody();
-        if (isset($req["username"]) && isset($req["email"])) {
+        if (isset($req['username']) && isset($req['email'])) {
             $user = $this->getDatabaseService()->getSingleFromDatabase(
                 new FrontendUser(),
-                "username = :username AND email = :email",
-                ["username" => $req["username"], "email" => $req["email"]]
+                'username = :username AND email = :email',
+                ['username' => $req['username'], 'email' => $req['email']]
             );
             if ($user != null) {
                 //generate new reset key
@@ -160,15 +160,15 @@ class LoginController extends FrontendController
                 }
                 //send mail
                 $this->getMailService()->sendMail(
-                    ["server@famoser.ch" => "webmaster"],
+                    ['server@famoser.ch' => 'webmaster'],
                     [$user->email => $user->username],
-                    "password reset on sync api",
-                    "hi " . $user->username . ", here's your code to recover your password: " . $user->reset_key
+                    'password reset on sync api',
+                    'hi ' . $user->username . ', here\'s your code to recover your password: ' . $user->reset_key
                 );
             }
         }
-        $args["message"] = "you've probably received an email with a code to reset your password";
-        return $this->renderTemplate($response, "login/forgot", $args);
+        $args['message'] = 'you\'ve probably received an email with a code to reset your password';
+        return $this->renderTemplate($response, 'login/forgot', $args);
     }
 
     /**
@@ -181,7 +181,7 @@ class LoginController extends FrontendController
      */
     public function recover(Request $request, Response $response, $args)
     {
-        return $this->renderTemplate($response, "login/recover", $args);
+        return $this->renderTemplate($response, 'login/recover', $args);
     }
 
     /**
@@ -197,29 +197,29 @@ class LoginController extends FrontendController
     {
         $req = $request->getParsedBody();
         if (
-            isset($req["username"]) &&
-            isset($req["authorization_code"]) &&
-            isset($req["password"]) && $req["password"] == $req["password2"]
+            isset($req['username']) &&
+            isset($req['authorization_code']) &&
+            isset($req['password']) && $req['password'] == $req['password2']
         ) {
             $user = $this->getDatabaseService()->getSingleFromDatabase(
                 new FrontendUser(),
-                "username = :username AND reset_key = :reset_key",
-                ["username" => $req["username"], "reset_key" => $req["authorization_code"]]
+                'username = :username AND reset_key = :reset_key',
+                ['username' => $req['username'], 'reset_key' => $req['authorization_code']]
             );
             if ($user != null) {
-                $user->password = password_hash($req["password"], PASSWORD_BCRYPT);
+                $user->password = password_hash($req['password'], PASSWORD_BCRYPT);
                 //generate new reset key
                 $user->reset_key = substr(md5(rand(0, 100000)), 0, 10);
                 if (!$this->getDatabaseService()->saveToDatabase($user)) {
                     throw new ServerException(ServerError::DATABASE_SAVE_FAILURE);
                 }
-                return $this->redirect($request, $response, "login");
+                return $this->redirect($request, $response, 'login');
             }
         }
-        unset($req["password"]);
-        unset($req["password2"]);
-        $args["last_request"] = $req;
-        $args["message"] = "something went wrong :/ <br/>please double check you've filled out all fields correctly";
-        return $this->renderTemplate($response, "login/recover", $args);
+        unset($req['password']);
+        unset($req['password2']);
+        $args['last_request'] = $req;
+        $args['message'] = 'something went wrong :/ <br/>please double check you\'ve filled out all fields correctly';
+        return $this->renderTemplate($response, 'login/recover', $args);
     }
 }

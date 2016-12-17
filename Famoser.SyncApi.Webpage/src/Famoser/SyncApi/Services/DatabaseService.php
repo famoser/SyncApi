@@ -62,11 +62,11 @@ class DatabaseService extends BaseService implements DatabaseServiceInterface
     {
         $files = scandir($scriptsPath);
         foreach ($files as $file) {
-            if (substr($file, -3) == "sql") {
-                $queries = file_get_contents($scriptsPath . "/" . $file);
-                $queryArray = explode(";", $queries);
+            if (substr($file, -3) == 'sql') {
+                $queries = file_get_contents($scriptsPath . '/' . $file);
+                $queryArray = explode(';', $queries);
                 foreach ($queryArray as $item) {
-                    if (trim($item) != "") {
+                    if (trim($item) != '') {
                         $this->getConnection()->query($item);
                     }
                 }
@@ -80,10 +80,10 @@ class DatabaseService extends BaseService implements DatabaseServiceInterface
      */
     private function initializeDatabase()
     {
-        $dataPath = $this->getSettingsArray()["db_path"];
+        $dataPath = $this->getSettingsArray()['db_path'];
 
         if (!file_exists($dataPath)) {
-            $templatePath = $this->getSettingsArray()["db_template_path"];
+            $templatePath = $this->getSettingsArray()['db_template_path'];
             copy($templatePath, $dataPath);
         }
 
@@ -98,7 +98,7 @@ class DatabaseService extends BaseService implements DatabaseServiceInterface
      */
     private function constructPdo($path)
     {
-        $pdo = new PDO("sqlite:" . $path);
+        $pdo = new PDO('sqlite:' . $path);
         $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
         $pdo->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
         return $pdo;
@@ -114,17 +114,17 @@ class DatabaseService extends BaseService implements DatabaseServiceInterface
      * @param string $selector
      * @return string
      */
-    private function createQuery(BaseEntity $entity, $where = null, $orderBy = null, $limit = 1000, $selector = "*")
+    private function createQuery(BaseEntity $entity, $where = null, $orderBy = null, $limit = 1000, $selector = '*')
     {
-        $sql = "SELECT " . $selector . " FROM " . $entity->getTableName();
+        $sql = 'SELECT ' . $selector . ' FROM ' . $entity->getTableName();
         if ($where != null) {
-            $sql .= " WHERE " . $where;
+            $sql .= ' WHERE ' . $where;
         }
         if ($orderBy != null) {
-            $sql .= " ORDER BY " . $orderBy;
+            $sql .= ' ORDER BY ' . $orderBy;
         }
         if ($limit > 0) {
-            $sql .= " LIMIT " . $limit;
+            $sql .= ' LIMIT ' . $limit;
         }
         return $sql;
     }
@@ -141,8 +141,8 @@ class DatabaseService extends BaseService implements DatabaseServiceInterface
     {
         try {
             $this->getLoggingService()->log(
-                $sql . "     " . json_encode($parameters),
-                "DatabaseHelper" . uniqid() . ".txt"
+                $sql . '     ' . json_encode($parameters),
+                'DatabaseHelper' . uniqid() . '.txt'
             );
             $request = $this->getConnection()->prepare($sql);
             if (!$request->execute($parameters)) {
@@ -151,10 +151,10 @@ class DatabaseService extends BaseService implements DatabaseServiceInterface
             return $request->fetchAll(PDO::FETCH_CLASS, get_class($entity));
         } catch (\Exception $ex) {
             $this->getLoggingService()->log(
-                $ex->getMessage() . "     " .
-                $ex->getTraceAsString() . "     " .
-                $sql . "     " . json_encode($parameters),
-                "DatabaseHelper.txt"
+                $ex->getMessage() . '     ' .
+                $ex->getTraceAsString() . '     ' .
+                $sql . '     ' . json_encode($parameters),
+                'DatabaseHelper.txt'
             );
         }
         return null;
@@ -178,7 +178,7 @@ class DatabaseService extends BaseService implements DatabaseServiceInterface
         $parameters = null,
         $orderBy = null,
         $limit = -1,
-        $selector = "*"
+        $selector = '*'
     )
     {
         $sql = $this->createQuery($entity, $where, $orderBy, $limit, $selector);
@@ -204,7 +204,7 @@ class DatabaseService extends BaseService implements DatabaseServiceInterface
         $limit = -1
     )
     {
-        $sql = $this->createQuery($entity, $where, $orderBy, $limit, "COUNT(*)");
+        $sql = $this->createQuery($entity, $where, $orderBy, $limit, 'COUNT(*)');
         return $this->executeAndCount($sql, $parameters);
     }
 
@@ -237,17 +237,17 @@ class DatabaseService extends BaseService implements DatabaseServiceInterface
             $parameters = [];
         }
         if ($where == null) {
-            $where = " ";
+            $where = ' ';
         } else {
-            $where .= " AND ";
+            $where .= ' AND ';
         }
         $variables = [];
         for ($i = 0; $i < count($values); $i++) {
-            $parameters[":" . $property . $i] = $values[$i];
-            $variables[] = ":" . $property . $i;
+            $parameters[':' . $property . $i] = $values[$i];
+            $variables[] = ':' . $property . $i;
         }
         if (count($variables)) {
-            $where .= $property . (($invertIn) ? " NOT" : "") . " IN (" . implode(",", $variables) . ")";
+            $where .= $property . (($invertIn) ? ' NOT' : '') . ' IN (' . implode(',', $variables) . ')';
         }
         $sql = $this->createQuery($entity, $where, $orderBy, $limit);
         $res = $this->executeAndFetch($entity, $sql, $parameters);
@@ -285,18 +285,18 @@ class DatabaseService extends BaseService implements DatabaseServiceInterface
     {
         $properties = (array)$entity;
         $this->getLoggingService()->log(
-            json_encode($properties, JSON_PRETTY_PRINT) . "\n\n\n" . json_encode($entity, JSON_PRETTY_PRINT),
-            "DatabaseHelper_" . $entity->getTableName() . '_' . time() . "_" . uniqid() . ".txt"
+            json_encode($properties, JSON_PRETTY_PRINT) . '\n\n\n' . json_encode($entity, JSON_PRETTY_PRINT),
+            'DatabaseHelper_' . $entity->getTableName() . '_' . time() . '_' . uniqid() . '.txt'
         );
-        unset($properties["id"]);
+        unset($properties['id']);
         if ($entity->id > 0) {
             //update
-            $sql = "UPDATE " . $entity->getTableName() . " SET ";
+            $sql = 'UPDATE ' . $entity->getTableName() . ' SET ';
             foreach ($properties as $key => $val) {
-                $sql .= $key . "=:" . $key . ",";
+                $sql .= $key . '=:' . $key . ',';
             }
             $sql = substr($sql, 0, -1);
-            $sql .= " WHERE id=:id";
+            $sql .= ' WHERE id=:id';
             $properties = (array)$entity;
             $request = $this->getConnection()->prepare($sql);
             if (!$request->execute($properties)) {
@@ -304,17 +304,17 @@ class DatabaseService extends BaseService implements DatabaseServiceInterface
             }
         } else {
             //create
-            $sql = "INSERT INTO " . $entity->getTableName() . "(";
+            $sql = 'INSERT INTO ' . $entity->getTableName() . '(';
             foreach ($properties as $key => $val) {
-                $sql .= $key . ",";
+                $sql .= $key . ',';
             }
             $sql = substr($sql, 0, -1);
-            $sql .= ") VALUES (";
+            $sql .= ') VALUES (';
             foreach ($properties as $key => $val) {
-                $sql .= ":" . $key . ",";
+                $sql .= ':' . $key . ',';
             }
             $sql = substr($sql, 0, -1);
-            $sql .= ")";
+            $sql .= ')';
             $request = $this->getConnection()->prepare($sql);
             if (!$request->execute($properties)) {
                 return false;
@@ -365,8 +365,8 @@ class DatabaseService extends BaseService implements DatabaseServiceInterface
      */
     public function deleteFromDatabase(BaseEntity $entity)
     {
-        $sql = "DELETE FROM " . $entity->getTableName() . " WHERE id=:id";
-        $params = ["id" => $entity->id];
+        $sql = 'DELETE FROM ' . $entity->getTableName() . ' WHERE id=:id';
+        $params = ['id' => $entity->id];
         $prep = $this->getConnection()->prepare($sql);
         return $prep->execute($params);
     }
@@ -390,6 +390,6 @@ class DatabaseService extends BaseService implements DatabaseServiceInterface
      */
     public function getSingleByIdFromDatabase(BaseEntity $entity, $id)
     {
-        return $this->getSingleFromDatabase($entity, "id = :id", ["id" => $id]);
+        return $this->getSingleFromDatabase($entity, 'id = :id', ['id' => $id]);
     }
 }

@@ -18,7 +18,7 @@ use Famoser\SyncApi\Services\Interfaces\SessionServiceInterface;
  */
 class SessionService implements SessionServiceInterface
 {
-    const FRONTEND_USER_ID = "frontend_user_id";
+    const FRONTEND_USER_ID = 'frontend_user_id';
 
     /**
      * get the value from the sassion storage, returns the default if not set

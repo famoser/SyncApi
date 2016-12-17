@@ -81,10 +81,10 @@ class EntityController extends ApiSyncController
 
         $arr = $this->convertToStringArrayKeys($collectionIds);
         $inner = implode(',:', array_keys($arr));
-        $arr["guid"] = $req->Id;
+        $arr['guid'] = $req->Id;
         $entity = $this->getDatabaseService()->getSingleFromDatabase(
             new Entity(),
-            "guid = :guid AND collection_guid IN (:" . $inner . ")",
+            'guid = :guid AND collection_guid IN (:' . $inner . ')',
             $arr
         );
 
@@ -96,23 +96,23 @@ class EntityController extends ApiSyncController
         /* @var ContentVersion[] $newOnes */
         if ($req->VersionIds == null || count($req->VersionIds) == 0) {
             $arr = [];
-            $arr["entity_guid"] = $entity->guid;
+            $arr['entity_guid'] = $entity->guid;
             /* @var ContentVersion[] $newOnes */
             $newOnes = $this->getDatabaseService()->getFromDatabase(
                 new ContentVersion(),
-                "entity_guid = :entity_guid",
+                'entity_guid = :entity_guid',
                 $arr,
-                "create_date_time"
+                'create_date_time'
             );
         } else {
             $arr = $this->convertToStringArrayKeys($req->VersionIds);
             $inner = implode(',:', array_keys($arr));
-            $arr["entity_guid"] = $entity->guid;
+            $arr['entity_guid'] = $entity->guid;
             $newOnes = $this->getDatabaseService()->getFromDatabase(
                 new ContentVersion(),
-                "entity_guid = :entity_guid AND version_guid NOT IN (:" . $inner . ")",
+                'entity_guid = :entity_guid AND version_guid NOT IN (:' . $inner . ')',
                 $arr,
-                "create_date_time"
+                'create_date_time'
             );
         }
 
@@ -127,7 +127,7 @@ class EntityController extends ApiSyncController
 
     private function convertToStringArrayKeys($arr)
     {
-        $str = "rawrrr";
+        $str = 'rawrrr';
         $counter = 1;
         $result = [];
         foreach ($arr as $item) {
@@ -161,7 +161,7 @@ class EntityController extends ApiSyncController
         //get all collections
         return $this->getDatabaseService()->getFromDatabase(
             new Entity(),
-            "collection_guid IN (:" . implode(',:', array_keys($collectionIds)) . ")",
+            'collection_guid IN (:' . implode(',:', array_keys($collectionIds)) . ')',
             $collectionIds);
     }
 

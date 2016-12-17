@@ -29,11 +29,11 @@ class FrontendError
     {
         switch ($code) {
             case FrontendError::NOT_LOGGED_IN:
-                return "not logged in";
+                return 'not logged in';
             case FrontendError::ACCESS_DENIED:
-                return "you are not allowed to view this resource";
+                return 'you are not allowed to view this resource';
             default:
-                return "unknown error occurred with code " . $code;
+                return 'unknown error occurred with code ' . $code;
         }
     }
 }

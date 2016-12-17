@@ -43,7 +43,7 @@ class Collection extends BaseSyncEntity
      */
     public function getTableName()
     {
-        return "collections";
+        return 'collections';
     }
 
     /**

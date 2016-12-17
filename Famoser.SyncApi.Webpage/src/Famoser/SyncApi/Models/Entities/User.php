@@ -42,7 +42,7 @@ class User extends BaseSyncEntity
      */
     public function getTableName()
     {
-        return "users";
+        return 'users';
     }
 
     /**

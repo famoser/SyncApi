@@ -41,8 +41,8 @@ class FrontendController extends BaseController
         $helper = $this->getDatabaseService();
         $this->frontendUser = $helper->getSingleFromDatabase(
             new FrontendUser(),
-            "id = :id",
-            ["id" => $userId]
+            'id = :id',
+            ['id' => $userId]
         );
         return $this->frontendUser;
     }
@@ -66,6 +66,6 @@ class FrontendController extends BaseController
      */
     protected function renderTemplate(Response $response, $path, $args)
     {
-        return $this->getView()->render($response, $path . ".html.twig", $args);
+        return $this->getView()->render($response, $path . '.html.twig', $args);
     }
 }

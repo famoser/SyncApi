@@ -29,7 +29,7 @@ class BaseService extends ContainerBase
      */
     protected function getModulo()
     {
-        return $this->getSettingsArray()["api_modulo"];
+        return $this->getSettingsArray()['api_modulo'];
     }
 
     /**
@@ -39,6 +39,6 @@ class BaseService extends ContainerBase
      */
     protected function getLoggingBasePath()
     {
-        return $this->getSettingsArray()["log_path"];
+        return $this->getSettingsArray()['log_path'];
     }
 }

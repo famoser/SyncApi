@@ -30,13 +30,13 @@ class SettingKeys
     {
         switch ($key) {
             case SettingKeys::AUTHORIZATION_CODE_VALID_TIME:
-                return "authorization code valid time";
+                return 'authorization code valid time';
             case SettingKeys::DEVICE_AUTHENTICATION_REQUIRED:
-                return "device authentication required";
+                return 'device authentication required';
             case SettingKeys::AUTHORIZATION_CODE_LENGTH:
-                return "length of the authorization code";
+                return 'length of the authorization code';
             default:
-                return "unknown setting with key " . $key;
+                return 'unknown setting with key ' . $key;
         }
     }
 
@@ -50,13 +50,13 @@ class SettingKeys
     {
         switch ($key) {
             case SettingKeys::AUTHORIZATION_CODE_VALID_TIME:
-                return "300";
+                return '300';
             case SettingKeys::DEVICE_AUTHENTICATION_REQUIRED:
-                return "true";
+                return 'true';
             case SettingKeys::AUTHORIZATION_CODE_LENGTH:
-                return "6";
+                return '6';
             default:
-                return "unknown default value for key " . $key;
+                return 'unknown default value for key ' . $key;
         }
     }
 
@@ -73,7 +73,7 @@ class SettingKeys
             case SettingKeys::AUTHORIZATION_CODE_VALID_TIME:
                 return is_numeric($val);
             case SettingKeys::DEVICE_AUTHENTICATION_REQUIRED:
-                return $val == "false" || $val == "true";
+                return $val == 'false' || $val == 'true';
             case SettingKeys::AUTHORIZATION_CODE_LENGTH:
                 return is_numeric($val);
             default:

@@ -113,7 +113,7 @@ abstract class ApiSyncController extends ApiRequestController
 
         //add new ones
         $existingEntities = $this->getAllInternal($req, $contentType);
-        $existingEntityIds = $this->getArrayOfObjectProperty($existingEntities, "guid");
+        $existingEntityIds = $this->getArrayOfObjectProperty($existingEntities, 'guid');
 
         //get new Ids
         $newOnes = array_diff($existingEntityIds, $askedForGuids);
@@ -205,9 +205,9 @@ abstract class ApiSyncController extends ApiRequestController
     {
         return $this->getDatabaseService()->getSingleFromDatabase(
             new ContentVersion(),
-            "content_type = :content_type AND entity_guid = :entity_guid",
-            ["content_type" => $contentType, "entity_guid" => $syncEntity->guid],
-            "create_date_time DESC, id DESC"
+            'content_type = :content_type AND entity_guid = :entity_guid',
+            ['content_type' => $contentType, 'entity_guid' => $syncEntity->guid],
+            'create_date_time DESC, id DESC'
         );
     }
 

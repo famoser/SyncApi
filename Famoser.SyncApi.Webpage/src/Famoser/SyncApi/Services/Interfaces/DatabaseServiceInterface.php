@@ -44,7 +44,7 @@ interface DatabaseServiceInterface
         $parameters = null,
         $orderBy = null,
         $limit = -1,
-        $selector = "*"
+        $selector = '*'
     );
 
     /**

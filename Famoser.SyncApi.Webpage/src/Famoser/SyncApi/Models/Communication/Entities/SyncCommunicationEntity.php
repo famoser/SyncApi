@@ -30,7 +30,7 @@ class SyncCommunicationEntity extends CollectionCommunicationEntity
     public function getJsonProperties()
     {
         $props = parent::getJsonProperties();
-        $props["CollectionId"] = new TextProperty("CollectionId");
+        $props['CollectionId'] = new TextProperty('CollectionId');
         return $props;
     }
 }

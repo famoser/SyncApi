@@ -35,8 +35,8 @@ class HistoryEntityRequest extends BaseRequest
     public function getJsonProperties()
     {
         $arr = parent::getJsonProperties();
-        $arr["Id"] = new TextProperty("Id");
-        $arr["VersionIds"] = new ArrayProperty("VersionIds", new TextProperty("VersionIds"));
+        $arr['Id'] = new TextProperty('Id');
+        $arr['VersionIds'] = new ArrayProperty('VersionIds', new TextProperty('VersionIds'));
         return $arr;
     }
 }

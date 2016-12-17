@@ -25,7 +25,7 @@ class BooleanProperty extends JsonValueProperty
      */
     public function parseValue($value)
     {
-        if ($value == 1 || $value == "true") {
+        if ($value == 1 || $value == 'true') {
             return true;
         }
         return false;

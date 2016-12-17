@@ -44,10 +44,10 @@ class AuthorizationController extends ApiSyncController
     {
         //only taking consonants which sound unique
         $consonants = [
-            "b", "c", "d", "g", "h", "k", "l",
-            "n", "p", "r", "s", "t", "x", "z"];
-        $vocals = ["a", "e", "i", "o", "u"];
-        $random = "";
+            'b', 'c', 'd', 'g', 'h', 'k', 'l',
+            'n', 'p', 'r', 's', 't', 'x', 'z'];
+        $vocals = ['a', 'e', 'i', 'o', 'u'];
+        $random = '';
         srand((double)microtime() * 1000000);
         $max = $length / 2;
         for ($i = 0; $i < $max; $i++) {
@@ -68,7 +68,7 @@ class AuthorizationController extends ApiSyncController
      */
     private function ensureValidPersonalSeed($personalSeed)
     {
-        if ($personalSeed == "") {
+        if ($personalSeed == '') {
             throw new ApiException(ApiError::PERSONAL_SEED_MISSING);
         }
         if (!is_numeric($personalSeed)) {
@@ -95,14 +95,14 @@ class AuthorizationController extends ApiSyncController
 
         //clean up expired auth codes
         $this->getDatabaseService()->execute(
-            "DELETE FROM authorization_codes WHERE valid_till_date_time < :valid_till_date_time",
-            ["valid_till_date_time" => time()]);
+            'DELETE FROM authorization_codes WHERE valid_till_date_time < :valid_till_date_time',
+            ['valid_till_date_time' => time()]);
 
         //try to get auth code
         $authCode = $this->getDatabaseService()->getSingleFromDatabase(
             new AuthorizationCode(),
-            "code = :code AND user_guid = :user_guid",
-            ["code" => $req->ClientMessage, "user_guid" => $req->UserId]
+            'code = :code AND user_guid = :user_guid',
+            ['code' => $req->ClientMessage, 'user_guid' => $req->UserId]
         );
 
         if ($authCode == null) {
@@ -294,8 +294,8 @@ class AuthorizationController extends ApiSyncController
         } elseif ($contentType == ContentType::DEVICE) {
             $deviceCount = $this->getDatabaseService()->countFromDatabase(
                 new Device(),
-                "user_guid = :user_guid AND is_deleted = :is_deleted",
-                ["user_guid" => $this->getUser($req)->guid, "is_deleted" => false]
+                'user_guid = :user_guid AND is_deleted = :is_deleted',
+                ['user_guid' => $this->getUser($req)->guid, 'is_deleted' => false]
             );
 
             $settingsRepo = $this->getSettingRepository($req->ApplicationId);

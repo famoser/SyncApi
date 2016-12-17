@@ -41,6 +41,6 @@ class ApplicationSetting extends BaseEntity
      */
     public function getTableName()
     {
-        return "application_settings";
+        return 'application_settings';
     }
 }

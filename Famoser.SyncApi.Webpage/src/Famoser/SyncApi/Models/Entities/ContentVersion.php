@@ -53,6 +53,6 @@ class ContentVersion extends BaseEntity
      */
     public function getTableName()
     {
-        return "content_versions";
+        return 'content_versions';
     }
 }

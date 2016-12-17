@@ -28,7 +28,7 @@ class CollectionCommunicationEntity extends DeviceCommunicationEntity
     public function getJsonProperties()
     {
         $props = parent::getJsonProperties();
-        $props["DeviceId"] = new TextProperty("DeviceId");
+        $props['DeviceId'] = new TextProperty('DeviceId');
         return $props;
     }
 }

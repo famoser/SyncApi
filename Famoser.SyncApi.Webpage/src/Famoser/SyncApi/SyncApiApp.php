@@ -43,13 +43,13 @@ class SyncApiApp extends App
 {
     private $controllerNamespace = 'Famoser\SyncApi\Controllers\\';
 
-    const DATABASE_SERVICE_KEY = "databaseService";
-    const LOGGING_SERVICE_KEY = "loggingService";
-    const REQUEST_SERVICE_KEY = "requestService";
-    const SESSION_SERVICE_KEY = "sessionService";
-    const MAIL_SERVICE_KEY = "mailService";
+    const DATABASE_SERVICE_KEY = 'databaseService';
+    const LOGGING_SERVICE_KEY = 'loggingService';
+    const REQUEST_SERVICE_KEY = 'requestService';
+    const SESSION_SERVICE_KEY = 'sessionService';
+    const MAIL_SERVICE_KEY = 'mailService';
 
-    const SETTINGS_KEY = "settings";
+    const SETTINGS_KEY = 'settings';
 
     /**
      * Create new application
@@ -81,8 +81,8 @@ class SyncApiApp extends App
         $this->add(new LoggingMiddleware($this->getContainer()));
 
         //add routes
-        $this->group("", $this->getWebAppRoutes());
-        $this->group("/1.0", $this->getApiRoutes());
+        $this->group('', $this->getWebAppRoutes());
+        $this->group('/1.0', $this->getApiRoutes());
     }
 
     /**
@@ -92,7 +92,7 @@ class SyncApiApp extends App
      */
     public function overrideEnvironment(Environment $environment)
     {
-        $this->getContainer()["environment"] = $environment;
+        $this->getContainer()['environment'] = $environment;
     }
 
     /**
@@ -104,43 +104,43 @@ class SyncApiApp extends App
     {
         $controllerNamespace = $this->controllerNamespace;
         return function () use ($controllerNamespace) {
-            $this->get('/', $controllerNamespace . 'PublicController:index')->setName("index");
-            $this->get('/info', $controllerNamespace . 'PublicController:info')->setName("api_info");
+            $this->get('/', $controllerNamespace . 'PublicController:index')->setName('index');
+            $this->get('/info', $controllerNamespace . 'PublicController:info')->setName('api_info');
 
-            $this->get('/login', $controllerNamespace . 'LoginController:login')->setName("login");
+            $this->get('/login', $controllerNamespace . 'LoginController:login')->setName('login');
             $this->post('/login', $controllerNamespace . 'LoginController:loginPost');
 
-            $this->get('/register', $controllerNamespace . 'LoginController:register')->setName("register");
+            $this->get('/register', $controllerNamespace . 'LoginController:register')->setName('register');
             $this->post('/register', $controllerNamespace . 'LoginController:registerPost');
 
-            $this->get('/forgot', $controllerNamespace . 'LoginController:forgot')->setName("forgot");
+            $this->get('/forgot', $controllerNamespace . 'LoginController:forgot')->setName('forgot');
             $this->post('/forgot', $controllerNamespace . 'LoginController:forgotPost');
 
-            $this->get('/recover', $controllerNamespace . 'LoginController:recover')->setName("recover");
+            $this->get('/recover', $controllerNamespace . 'LoginController:recover')->setName('recover');
             $this->post('/recover', $controllerNamespace . 'LoginController:recoverPost');
 
             $this->group(
-                "/dashboard",
+                '/dashboard',
                 function () use ($controllerNamespace) {
                     $this->get('/', $controllerNamespace . 'ApplicationController:index')
-                        ->setName("application_index");
+                        ->setName('application_index');
                     $this->get('/show/{id}', $controllerNamespace . 'ApplicationController:show')
-                        ->setName("application_show");
+                        ->setName('application_show');
 
                     $this->get('/new', $controllerNamespace . 'ApplicationController:create')
-                        ->setName("application_new");
+                        ->setName('application_new');
                     $this->post('/new', $controllerNamespace . 'ApplicationController:createPost');
 
                     $this->get('/edit/{id}', $controllerNamespace . 'ApplicationController:edit')
-                        ->setName("application_edit");
+                        ->setName('application_edit');
                     $this->post('/edit/{id}', $controllerNamespace . 'ApplicationController:editPost');
 
                     $this->get('/settings/{id}', $controllerNamespace . 'ApplicationController:settings')
-                        ->setName("application_settings");
+                        ->setName('application_settings');
                     $this->post('/settings/{id}', $controllerNamespace . 'ApplicationController:settingsPost');
 
                     $this->get('/delete/{id}', $controllerNamespace . 'ApplicationController:remove')
-                        ->setName("application_delete");
+                        ->setName('application_delete');
                     $this->post('/delete/{id}', $controllerNamespace . 'ApplicationController:removePost');
                 }
             );
@@ -157,7 +157,7 @@ class SyncApiApp extends App
         $controllerNamespace = $this->controllerNamespace;
         return function () use ($controllerNamespace) {
             $this->group(
-                "/auth",
+                '/auth',
                 function () use ($controllerNamespace) {
                     $this->post('/use', $controllerNamespace . 'AuthorizationController:useCode');
                     $this->post('/generate', $controllerNamespace . 'AuthorizationController:generate');
@@ -167,14 +167,14 @@ class SyncApiApp extends App
             );
 
             $this->group(
-                "/users",
+                '/users',
                 function () use ($controllerNamespace) {
                     $this->post('/auth', $controllerNamespace . 'UserController:auth');
                 }
             );
 
             $this->group(
-                "/devices",
+                '/devices',
                 function () use ($controllerNamespace) {
                     $this->post('/get', $controllerNamespace . 'DeviceController:get');
                     $this->post('/auth', $controllerNamespace . 'DeviceController:auth');
@@ -183,14 +183,14 @@ class SyncApiApp extends App
             );
 
             $this->group(
-                "/collections",
+                '/collections',
                 function () use ($controllerNamespace) {
                     $this->post('/sync', $controllerNamespace . 'CollectionController:sync');
                 }
             );
 
             $this->group(
-                "/entities",
+                '/entities',
                 function () use ($controllerNamespace) {
                     $this->post('/sync', $controllerNamespace . 'EntityController:sync');
                     $this->post('/history/sync', $controllerNamespace . 'EntityController:historySync');
@@ -214,12 +214,12 @@ class SyncApiApp extends App
         $this->addServices($container);
 
         //add view
-        $container["view"] = function (Container $container) {
+        $container['view'] = function (Container $container) {
             $view = new Twig(
-                $container->get(SyncApiApp::SETTINGS_KEY)["template_path"],
+                $container->get(SyncApiApp::SETTINGS_KEY)['template_path'],
                 [
-                    'cache' => $container->get(SyncApiApp::SETTINGS_KEY)["cache_path"],
-                    'debug' => $container->get(SyncApiApp::SETTINGS_KEY)["debug_mode"]
+                    'cache' => $container->get(SyncApiApp::SETTINGS_KEY)['cache_path'],
+                    'debug' => $container->get(SyncApiApp::SETTINGS_KEY)['debug_mode']
                 ]
             );
             $view->addExtension(
@@ -249,20 +249,20 @@ class SyncApiApp extends App
                 $error = null
             ) use ($container) {
                 if ($error instanceof \Exception || $error instanceof \Throwable) {
-                    $errorString = $error->getFile() . " (" . $error->getLine() . ")\n" .
-                        $error->getCode() . ": " . $error->getMessage() . "\n" .
+                    $errorString = $error->getFile() . ' (' . $error->getLine() . ')\n' .
+                        $error->getCode() . ': ' . $error->getMessage() . '\n' .
                         $error->getTraceAsString();
                 } else {
-                    $errorString = "unknown error type occurred :/. Details: " . print_r($error);
+                    $errorString = 'unknown error type occurred :/. Details: ' . print_r($error);
                 }
 
                 $container[SyncApiApp::LOGGING_SERVICE_KEY]->log(
                     $errorString,
-                    "exception.txt"
+                    'exception.txt'
                 );
 
                 //return json if api request
-                if (strpos($request->getUri()->getPath(), "/1.0/") === 0 && $request->getMethod() == "POST") {
+                if (strpos($request->getUri()->getPath(), '/1.0/') === 0 && $request->getMethod() == 'POST') {
                     $resp = new BaseResponse();
                     $resp->RequestFailed = true;
                     if ($error instanceof ApiException) {
@@ -283,33 +283,33 @@ class SyncApiApp extends App
                     if ($error instanceof FrontendException) {
                         //tried to access page where you need to be logged in
                         if ($error->getCode() == FrontendError::NOT_LOGGED_IN) {
-                            $reqUri = $request->getUri()->withPath($container->get("router")->pathFor("login"));
+                            $reqUri = $request->getUri()->withPath($container->get('router')->pathFor('login'));
                             return $container['response']->withStatus(403)->withRedirect($reqUri);
                         }
                     }
 
                     //general error page
                     $args = [];
-                    $args["error"] = $errorString;
-                    return $container["view"]->render($response, "public/server_error.html.twig", $args);
+                    $args['error'] = $errorString;
+                    return $container['view']->render($response, 'public/server_error.html.twig', $args);
                 }
             };
         };
 
         //third argument: \Throwable
-        $container["phpErrorHandler"] = $errorHandler;
+        $container['phpErrorHandler'] = $errorHandler;
         //third argument: \Exception
-        $container["errorHandler"] = $errorHandler;
+        $container['errorHandler'] = $errorHandler;
 
-        $container["notAllowedHandler"] = function (Container $container) {
+        $container['notAllowedHandler'] = function (Container $container) {
             //third parameter can be $requestMethods array
             return function (ServerRequestInterface $request, ResponseInterface $response) use ($container) {
-                return $container["view"]->render($response, "public/not_found.html.twig", []);
+                return $container['view']->render($response, 'public/not_found.html.twig', []);
             };
         };
-        $container["notFoundHandler"] = function (Container $container) {
+        $container['notFoundHandler'] = function (Container $container) {
             return function (ServerRequestInterface $request, ResponseInterface $response) use ($container) {
-                return $container["view"]->render($response, "public/not_found.html.twig", []);
+                return $container['view']->render($response, 'public/not_found.html.twig', []);
             };
         };
     }

@@ -11,6 +11,7 @@ namespace Famoser\SyncApi\Tests\TestHelpers\Base;
 
 use Famoser\SyncApi\Framework\ContainerBase;
 use Famoser\SyncApi\SyncApiApp;
+use Famoser\SyncApi\Tests\TestHelpers\TestApp\TestSyncApiApp;
 
 /**
  * helps to test a Slim application
@@ -33,7 +34,7 @@ abstract class BaseTestHelper extends ContainerBase
         $this->config = $this->constructConfig();
 
         //create test app
-        $this->testApp = new SyncApiApp($this->config);
+        $this->testApp = new TestSyncApiApp($this->config);
 
         //use container to initialize parent
         parent::__construct($this->testApp->getContainer());
@@ -56,7 +57,7 @@ abstract class BaseTestHelper extends ContainerBase
         $this->getDatabaseService()->dispose();
 
         //create test app
-        $this->testApp = new SyncApiApp($this->config);
+        $this->testApp = new TestSyncApiApp($this->config);
 
         //use container to initialize parent
         parent::__construct($this->testApp->getContainer());
@@ -71,7 +72,7 @@ abstract class BaseTestHelper extends ContainerBase
     {
         $ds = DIRECTORY_SEPARATOR;
         $oneUp = ".." . $ds;
-        $basePath = realpath(__DIR__ . "/" . $oneUp . $oneUp. $oneUp. $oneUp . $oneUp . $oneUp) . $ds;
+        $basePath = realpath(__DIR__ . "/" . $oneUp . $oneUp . $oneUp . $oneUp . $oneUp . $oneUp) . $ds;
         $config =
             [
                 'displayErrorDetails' => true,
@@ -85,6 +86,7 @@ abstract class BaseTestHelper extends ContainerBase
                 'template_path' => $basePath . "app" . $ds . "templates",
                 'public_path' => $basePath . "src" . $ds . "public",
                 'src_path' => $basePath . "src",
+                'mail' => ['type' => 'mock']
             ];
 
         return $config;

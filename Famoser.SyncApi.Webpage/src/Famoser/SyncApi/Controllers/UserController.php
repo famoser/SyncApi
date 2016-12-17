@@ -43,7 +43,6 @@ class UserController extends ApiRequestController
 
         //check if requesting user has access to collection, if yes, add to $guidsToSetFree
         $allowedGuids = $this->getCollectionIds($req);
-        $guidsToSetFree = [];
         if (!in_array($req->CollectionEntity->Id, $allowedGuids)) {
             throw new ApiException(ApiError::USER_NOT_AUTHORIZED);
         }
@@ -51,8 +50,8 @@ class UserController extends ApiRequestController
         //check if user already in collection
         $userCollection = $this->getDatabaseService()->getSingleFromDatabase(
             new UserCollection(),
-            "user_guid =:user_guid AND collection_guid = :collection_guid",
-            ["user_guid" => $req->UserEntity->Id, "collection_guid" => $req->CollectionEntity->Id]
+            'user_guid =:user_guid AND collection_guid = :collection_guid',
+            ['user_guid' => $req->UserEntity->Id, 'collection_guid' => $req->CollectionEntity->Id]
         );
 
         //user has not already access to collection, add him

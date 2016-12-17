@@ -41,10 +41,10 @@ class BaseRequest implements IJsonDeserializable
     public function getJsonProperties()
     {
         $arr = [];
-        $arr["UserId"] = new TextProperty("UserId");
-        $arr["DeviceId"] = new TextProperty("DeviceId");
-        $arr["AuthorizationCode"] = new TextProperty("AuthorizationCode");
-        $arr["ApplicationId"] = new TextProperty("ApplicationId");
+        $arr['UserId'] = new TextProperty('UserId');
+        $arr['DeviceId'] = new TextProperty('DeviceId');
+        $arr['AuthorizationCode'] = new TextProperty('AuthorizationCode');
+        $arr['ApplicationId'] = new TextProperty('ApplicationId');
         return $arr;
     }
 }

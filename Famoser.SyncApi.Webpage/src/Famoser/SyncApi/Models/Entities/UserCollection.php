@@ -41,6 +41,6 @@ class UserCollection extends BaseEntity
      */
     public function getTableName()
     {
-        return "user_collections";
+        return 'user_collections';
     }
 }

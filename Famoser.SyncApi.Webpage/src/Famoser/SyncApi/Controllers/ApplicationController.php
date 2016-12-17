@@ -46,8 +46,8 @@ class ApplicationController extends FrontendController
     {
         $application = $this->getDatabaseService()->getSingleFromDatabase(
             new Application(),
-            "id = :id",
-            ["id" => $entityId]
+            'id = :id',
+            ['id' => $entityId]
         );
         if ($this->getFrontendUser() && $this->getFrontendUser()->id == $application->admin_id) {
             return $application;
@@ -70,11 +70,11 @@ class ApplicationController extends FrontendController
         $this->ensureHasAccess();
         $applications = $this->getDatabaseService()->getFromDatabase(
             new Application(),
-            "admin_id = :admin_id",
-            ["admin_id" => $this->getFrontendUser()->id]
+            'admin_id = :admin_id',
+            ['admin_id' => $this->getFrontendUser()->id]
         );
-        $args["applications"] = $applications;
-        return $this->renderTemplate($response, "application/index", $args);
+        $args['applications'] = $applications;
+        return $this->renderTemplate($response, 'application/index', $args);
     }
 
     /**
@@ -89,10 +89,10 @@ class ApplicationController extends FrontendController
     public function show(Request $request, Response $response, $args)
     {
         $this->ensureHasAccess();
-        $application = $this->getAuthorizedApplication($args["id"]);
-        $args["application"] = $application;
-        $args["stats"] = $this->getApplicationStats($application->application_id);
-        return $this->renderTemplate($response, "application/show", $args);
+        $application = $this->getAuthorizedApplication($args['id']);
+        $args['application'] = $application;
+        $args['stats'] = $this->getApplicationStats($application->application_id);
+        return $this->renderTemplate($response, 'application/show', $args);
     }
 
     /**
@@ -107,11 +107,11 @@ class ApplicationController extends FrontendController
     public function settings(Request $request, Response $response, $args)
     {
         $this->ensureHasAccess();
-        $application = $this->getAuthorizedApplication($args["id"]);
+        $application = $this->getAuthorizedApplication($args['id']);
         $settingsRepo = new SettingsRepository($this->getDatabaseService(), $application->application_id);
-        $args["settings"] = $settingsRepo->getAllSettings();
-        $args["application"] = $application;
-        return $this->renderTemplate($response, "application/settings", $args);
+        $args['settings'] = $settingsRepo->getAllSettings();
+        $args['application'] = $application;
+        return $this->renderTemplate($response, 'application/settings', $args);
     }
 
     /**
@@ -126,11 +126,11 @@ class ApplicationController extends FrontendController
     public function settingsPost(Request $request, Response $response, $args)
     {
         $this->ensureHasAccess();
-        $application = $this->getAuthorizedApplication($args["id"]);
+        $application = $this->getAuthorizedApplication($args['id']);
         $settingsRepo = new SettingsRepository($this->getDatabaseService(), $application->id);
         $settingsRepo->setSettings($request->getParsedBody());
-        $args["settings"] = $settingsRepo->getAllSettings();
-        return $this->renderTemplate($response, "application/settings", $args);
+        $args['settings'] = $settingsRepo->getAllSettings();
+        return $this->renderTemplate($response, 'application/settings', $args);
     }
 
     /**
@@ -144,11 +144,11 @@ class ApplicationController extends FrontendController
         $appStats = new ApplicationStatistic();
         $users = $this->getDatabaseService()->getFromDatabase(
             new User(),
-            "application_id = :application_id",
-            ["application_id" => $applicationId],
+            'application_id = :application_id',
+            ['application_id' => $applicationId],
             null,
             -1,
-            "guid"
+            'guid'
         );
         $appStats->usersCount = count($users);
         if ($appStats->usersCount == 0) {
@@ -162,11 +162,11 @@ class ApplicationController extends FrontendController
 
         $devices = $this->getDatabaseService()->getFromDatabase(
             new Device(),
-            "user_guid IN (:" . implode(",:", array_keys($userGuids)) . ")",
+            'user_guid IN (:' . implode(',:', array_keys($userGuids)) . ')',
             $userGuids,
             null,
             -1,
-            "guid"
+            'guid'
         );
         $appStats->devicesCount = count($devices);
         if ($appStats->devicesCount == 0) {
@@ -175,11 +175,11 @@ class ApplicationController extends FrontendController
 
         $userCollections = $this->getDatabaseService()->getFromDatabase(
             new UserCollection(),
-            "user_guid IN (:" . implode(",:", array_keys($userGuids)) . ")",
+            'user_guid IN (:' . implode(',:', array_keys($userGuids)) . ')',
             $userGuids,
             null,
             -1,
-            "collection_guid"
+            'collection_guid'
         );
         $collectionGuids = [];
         foreach ($userCollections as $userCollection) {
@@ -193,7 +193,7 @@ class ApplicationController extends FrontendController
 
         $appStats->itemsCount = $this->getDatabaseService()->countFromDatabase(
             new Entity(),
-            "collection_guid IN (:" . implode(",:", array_keys($collectionGuids)) . ")",
+            'collection_guid IN (:' . implode(',:', array_keys($collectionGuids)) . ')',
             $collectionGuids
         );
         return $appStats;
@@ -211,7 +211,7 @@ class ApplicationController extends FrontendController
     public function create(Request $request, Response $response, $args)
     {
         $this->ensureHasAccess();
-        return $this->renderTemplate($response, "application/create", $args);
+        return $this->renderTemplate($response, 'application/create', $args);
     }
 
     /**
@@ -227,12 +227,12 @@ class ApplicationController extends FrontendController
     {
         $this->ensureHasAccess();
         $application = new Application();
-        $message = "";
+        $message = '';
         if ($this->writeFromPost(
             $application,
             $request->getParsedBody(),
             $message,
-            ["name", "description", "application_id", "application_seed"]
+            ['name', 'description', 'application_id', 'application_seed']
         )
         ) {
             $application->admin_id = $this->getFrontendUser()->id;
@@ -240,20 +240,20 @@ class ApplicationController extends FrontendController
 
             $existing = $this->getDatabaseService()->getSingleFromDatabase(
                 new Application(),
-                "application_id = :application_id",
-                ["application_id" => $application->application_id]
+                'application_id = :application_id',
+                ['application_id' => $application->application_id]
             );
             if ($existing != null) {
-                $args["message"] = "application with this id already exists";
+                $args['message'] = 'application with this id already exists';
             } elseif ($this->getDatabaseService()->saveToDatabase($application)) {
-                return $this->redirect($request, $response, "application_index");
+                return $this->redirect($request, $response, 'application_index');
             } else {
-                $args["message"] = "application could not be saved (database error)";
+                $args['message'] = 'application could not be saved (database error)';
             }
         } else {
-            $args["message"] = $message;
+            $args['message'] = $message;
         }
-        return $this->renderTemplate($response, "application/create", $args);
+        return $this->renderTemplate($response, 'application/create', $args);
     }
 
     /**
@@ -268,9 +268,9 @@ class ApplicationController extends FrontendController
     public function edit(Request $request, Response $response, $args)
     {
         $this->ensureHasAccess();
-        $application = $this->getAuthorizedApplication($args["id"]);
-        $args["application"] = $application;
-        return $this->renderTemplate($response, "application/edit", $args);
+        $application = $this->getAuthorizedApplication($args['id']);
+        $args['application'] = $application;
+        return $this->renderTemplate($response, 'application/edit', $args);
     }
 
     /**
@@ -285,16 +285,16 @@ class ApplicationController extends FrontendController
     public function editPost(Request $request, Response $response, $args)
     {
         $this->ensureHasAccess();
-        $application = $this->getAuthorizedApplication($args["id"]);
-        if ($this->writeFromPost($application, $request->getParsedBody(), $message, ["name", "description"])) {
+        $application = $this->getAuthorizedApplication($args['id']);
+        if ($this->writeFromPost($application, $request->getParsedBody(), $message, ['name', 'description'])) {
             if (!$this->getDatabaseService()->saveToDatabase($application)) {
-                $args["message"] = "application could not be saved (database error)";
+                $args['message'] = 'application could not be saved (database error)';
             }
         } else {
-            $args["message"] = $message;
+            $args['message'] = $message;
         }
-        $args["application"] = $application;
-        return $this->renderTemplate($response, "application/edit", $args);
+        $args['application'] = $application;
+        return $this->renderTemplate($response, 'application/edit', $args);
     }
 
     /**
@@ -309,9 +309,9 @@ class ApplicationController extends FrontendController
     public function remove(Request $request, Response $response, $args)
     {
         $this->ensureHasAccess();
-        $application = $this->getAuthorizedApplication($args["id"]);
-        $args["application"] = $application;
-        return $this->renderTemplate($response, "application/delete", $args);
+        $application = $this->getAuthorizedApplication($args['id']);
+        $args['application'] = $application;
+        return $this->renderTemplate($response, 'application/delete', $args);
     }
 
     /**
@@ -326,13 +326,13 @@ class ApplicationController extends FrontendController
     public function removePost(Request $request, Response $response, $args)
     {
         $this->ensureHasAccess();
-        $application = $this->getAuthorizedApplication($args["id"]);
+        $application = $this->getAuthorizedApplication($args['id']);
         if (!$this->getDatabaseService()->deleteFromDatabase($application)) {
-            $args["message"] = "application could not be saved (database error)";
-            $args["application"] = $application;
-            return $this->renderTemplate($response, "application/delete", $args);
+            $args['message'] = 'application could not be saved (database error)';
+            $args['application'] = $application;
+            return $this->renderTemplate($response, 'application/delete', $args);
         }
-        return $this->redirect($request, $response, "application_index");
+        return $this->redirect($request, $response, 'application_index');
     }
 
     /**
@@ -352,12 +352,12 @@ class ApplicationController extends FrontendController
             if (is_numeric($application->application_seed)) {
                 return true;
             }
-            $message = "the application seed has to be numeric";
+            $message = 'the application seed has to be numeric';
         } else {
-            $message = "the application could not be saved. please add the necessary information to ";
+            $message = 'the application could not be saved. please add the necessary information to ';
             if (count($arr) > 1) {
-                $message .= implode(", ", array_splice($arr, -1));
-                $message .= " and " . $arr[count($arr) - 1];
+                $message .= implode(', ', array_splice($arr, -1));
+                $message .= ' and ' . $arr[count($arr) - 1];
             } else {
                 $message .= $arr[0];
             }

@@ -27,7 +27,7 @@ class LoggingService extends BaseService implements LoggingServiceInterface
      */
     public function log($message, $filename, $clearOld = true)
     {
-        $path = $this->getLoggingBasePath() . "/" . $filename;
+        $path = $this->getLoggingBasePath() . '/' . $filename;
         if ($clearOld && file_exists($path)) {
             unlink($path);
         }

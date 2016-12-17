@@ -44,10 +44,10 @@ class AuthorizationRequest extends BaseRequest
     public function getJsonProperties()
     {
         $props = parent::getJsonProperties();
-        $props["UserEntity"] = new ObjectProperty("UserEntity", new UserCommunicationEntity());
-        $props["DeviceEntity"] = new ObjectProperty("DeviceEntity", new DeviceCommunicationEntity());
-        $props["CollectionEntity"] = new ObjectProperty("CollectionEntity", new CollectionCommunicationEntity());
-        $props["ClientMessage"] = new TextProperty("ClientMessage");
+        $props['UserEntity'] = new ObjectProperty('UserEntity', new UserCommunicationEntity());
+        $props['DeviceEntity'] = new ObjectProperty('DeviceEntity', new DeviceCommunicationEntity());
+        $props['CollectionEntity'] = new ObjectProperty('CollectionEntity', new CollectionCommunicationEntity());
+        $props['ClientMessage'] = new TextProperty('ClientMessage');
         return $props;
     }
 }

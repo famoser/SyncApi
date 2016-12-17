@@ -38,17 +38,17 @@ class LoggingMiddleware extends BaseMiddleware
         }
 
         //log current request
-        $str = $request->getMethod() . ": " . $request->getUri()->getPath() . "\n";
+        $str = $request->getMethod() . ': ' . $request->getUri()->getPath() . '\n';
         $jsonObj = $request->getParsedBody();
         if ($jsonObj == null) {
             $this->getLoggingService()->log(
                 $str . $request->getBody(),
-                "Request.txt"
+                'Request.txt'
             );
         } else {
             $this->getLoggingService()->log(
                 $str . json_encode($request->getParsedBody(), JSON_PRETTY_PRINT),
-                "Request.txt"
+                'Request.txt'
             );
         }
 

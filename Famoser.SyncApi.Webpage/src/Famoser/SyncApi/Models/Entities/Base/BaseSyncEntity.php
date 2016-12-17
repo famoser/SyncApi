@@ -72,7 +72,7 @@ abstract class BaseSyncEntity extends BaseEntity
         $entity->Id = $this->guid;
 
         $entity->Content = $version->content;
-        $entity->CreateDateTime = date("c", $version->create_date_time);
+        $entity->CreateDateTime = date('c', $version->create_date_time);
         $entity->VersionId = $version->version_guid;
 
         $entity->OnlineAction = $onlineAction;

@@ -32,9 +32,9 @@ class CollectionEntityRequest extends BaseRequest
     public function getJsonProperties()
     {
         $arr = parent::getJsonProperties();
-        $arr["CollectionEntities"] = new ArrayProperty(
-            "CollectionEntities",
-            new ObjectProperty("CollectionEntities", new CollectionCommunicationEntity())
+        $arr['CollectionEntities'] = new ArrayProperty(
+            'CollectionEntities',
+            new ObjectProperty('CollectionEntities', new CollectionCommunicationEntity())
         );
         return $arr;
     }
