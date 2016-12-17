@@ -29,7 +29,7 @@ use Slim\Http\Response;
  * the device controller can authenticate devices and return all devices from a specific user
  * @package Famoser\SyncApi\Controllers
  */
-class DeviceControllerAbstract extends AbstractApiSyncController
+class DeviceController extends AbstractApiSyncController
 {
     /**
      * gets all devices from a specific user

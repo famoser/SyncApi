@@ -31,7 +31,7 @@ use Slim\Http\Response;
  * api controllers which takes care of the entities
  * @package Famoser\SyncApi\Controllers
  */
-class EntityControllerAbstract extends AbstractApiSyncController
+class EntityController extends AbstractApiSyncController
 {
     /**
      * sync entities, return missing & updated entities

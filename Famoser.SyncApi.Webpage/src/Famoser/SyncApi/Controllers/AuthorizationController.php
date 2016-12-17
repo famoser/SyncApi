@@ -34,7 +34,7 @@ use Slim\Http\Response;
  *
  * @package Famoser\SyncApi\Controllers
  */
-class AuthorizationControllerAbstract extends AbstractApiSyncController
+class AuthorizationController extends AbstractApiSyncController
 {
     /**
      * generates easily readable random string

@@ -26,7 +26,7 @@ use Slim\Http\Response;
  * the collection controller syncs collections
  * @package Famoser\SyncApi\Controllers
  */
-class CollectionControllerAbstract extends AbstractApiSyncController
+class CollectionController extends AbstractApiSyncController
 {
     /**
      * sync the collections
