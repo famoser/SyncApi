@@ -21,8 +21,8 @@ interface MailServiceInterface
      * @param string $sender
      * @param string|array $receiver
      * @param string $subject
-     * @param string $message
+     * @param string $body
      * @return bool
      */
-    public function sendMail($sender, $receiver, $subject, $message);
+    public function sendMail($sender, $receiver, $subject, $body);
 }

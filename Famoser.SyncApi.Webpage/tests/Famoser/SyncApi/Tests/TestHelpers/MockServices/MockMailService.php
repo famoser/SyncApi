@@ -25,16 +25,16 @@ class MockMailService implements MailServiceInterface
      * @param string $sender
      * @param string|array $receiver
      * @param string $subject
-     * @param string $message
+     * @param string $body
      * @return bool
      */
-    public function sendMail($sender, $receiver, $subject, $message)
+    public function sendMail($sender, $receiver, $subject, $body)
     {
         $this->cache = [];
         $this->cache["sender"] = $sender;
         $this->cache["receiver"] = $receiver;
         $this->cache["subject"] = $subject;
-        $this->cache["message"] = $message;
+        $this->cache["message"] = $body;
         return true;
     }
 

@@ -27,10 +27,10 @@ class MailService extends BaseService implements MailServiceInterface
      * @param string $sender
      * @param string|array $receiver
      * @param string $subject
-     * @param string $message
+     * @param string $body
      * @return bool
      */
-    public function sendMail($sender, $receiver, $subject, $message)
+    public function sendMail($sender, $receiver, $subject, $body)
     {
         //check if mail settings are defined
         $mailSettings = isset($this->getSettingsArray()['mail']) ? $this->getSettingsArray()['mail'] : ['type' => 'mail'];
@@ -47,12 +47,12 @@ class MailService extends BaseService implements MailServiceInterface
         $mailer = Swift_Mailer::newInstance($transport);
 
         // Create a message
-        $message = Swift_Message::newInstance($subject)
+        $body = Swift_Message::newInstance($subject)
             ->setFrom($sender)
             ->setTo($receiver)
-            ->setBody($message);
+            ->setBody($body);
 
-        $result = $mailer->send($message);
+        $result = $mailer->send($body);
         return $result == count($receiver);
     }
 }
