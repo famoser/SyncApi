@@ -63,7 +63,7 @@ class AuthorizationController extends ApiSyncController
      * - numeric
      * - bigger than 1000
      *
-     * @param  $personalSeed
+     * @param  string $personalSeed
      * @throws ApiException
      */
     private function ensureValidPersonalSeed($personalSeed)

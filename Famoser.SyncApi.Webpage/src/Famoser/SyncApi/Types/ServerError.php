@@ -24,7 +24,7 @@ class ServerError
     /**
      * convert to string
      * 
-     * @param $serverError
+     * @param string $serverError
      * @return string
      */
     public static function toString($serverError)

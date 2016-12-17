@@ -60,7 +60,7 @@ class FrontendController extends BaseController
 
     /**
      * @param Response $response
-     * @param $path
+     * @param string $path
      * @param $args
      * @return mixed
      */

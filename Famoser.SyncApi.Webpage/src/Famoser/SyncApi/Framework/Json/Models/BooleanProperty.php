@@ -21,7 +21,7 @@ class BooleanProperty extends JsonValueProperty
      * returns a string
      *
      * @param $value
-     * @return string
+     * @return boolean
      */
     public function parseValue($value)
     {
@@ -34,7 +34,7 @@ class BooleanProperty extends JsonValueProperty
     /**
      * returns null
      *
-     * @return mixed
+     * @return boolean
      */
     public function getNullValue()
     {

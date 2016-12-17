@@ -41,7 +41,7 @@ class ObjectProperty extends JsonProperty
     /**
      * returns properties of the object
      * 
-     * @return Base\JsonProperty[]
+     * @return JsonValueProperty[]
      */
     public function getProperties()
     {

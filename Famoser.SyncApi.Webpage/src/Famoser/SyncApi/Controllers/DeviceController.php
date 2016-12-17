@@ -90,7 +90,7 @@ class DeviceController extends ApiSyncController
      *
      * @param Request $request
      * @param Response $response
-     * @param $action
+     * @param boolean $action
      * @return Response
      * @throws ServerException
      * @throws \Famoser\SyncApi\Exceptions\ApiException
