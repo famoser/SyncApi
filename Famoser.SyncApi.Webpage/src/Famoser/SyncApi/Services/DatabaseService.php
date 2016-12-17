@@ -93,7 +93,7 @@ class DatabaseService extends BaseService implements DatabaseServiceInterface
     /**
      * construct a sqlite pdo object from a path
      *
-     * @param $path
+     * @param string $path
      * @return PDO
      */
     private function constructPdo($path)
@@ -108,7 +108,7 @@ class DatabaseService extends BaseService implements DatabaseServiceInterface
      * creates the sql query
      *
      * @param BaseEntity $entity
-     * @param null $where
+     * @param null|string $where
      * @param null $orderBy
      * @param int $limit
      * @param string $selector
@@ -133,7 +133,7 @@ class DatabaseService extends BaseService implements DatabaseServiceInterface
      * executes query and fetches all results
      *
      * @param BaseEntity $entity
-     * @param $sql
+     * @param string $sql
      * @param $parameters
      * @return array|bool|null
      */
@@ -258,7 +258,7 @@ class DatabaseService extends BaseService implements DatabaseServiceInterface
      * get the first entry from the database which matches the conditions
      *
      * @param BaseEntity $entity
-     * @param null $where
+     * @param string $where
      * @param null $parameters
      * @param null $orderBy
      * @return Application|ApplicationSetting|AuthorizationCode|Collection|ContentVersion|Device|Entity|FrontendUser|
@@ -340,7 +340,7 @@ class DatabaseService extends BaseService implements DatabaseServiceInterface
     /**
      * execute the specified sql query, return the FETCH_NUM result
      *
-     * @param $sql
+     * @param string $sql
      * @param null $arr
      * @return bool|int
      */

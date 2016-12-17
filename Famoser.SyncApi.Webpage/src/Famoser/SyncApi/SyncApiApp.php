@@ -20,18 +20,13 @@ use Famoser\SyncApi\Services\RequestService;
 use Famoser\SyncApi\Services\SessionService;
 use Famoser\SyncApi\Types\ApiError;
 use Famoser\SyncApi\Types\FrontendError;
-use Guzzle\Http\Message\RequestInterface;
 use Interop\Container\ContainerInterface;
 use InvalidArgumentException;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Slim\App;
 use Slim\Container;
-use Slim\Exception\MethodNotAllowedException;
-use Slim\Exception\NotFoundException;
 use Slim\Http\Environment;
-use Slim\Http\Request;
-use Slim\Http\Response;
 use Slim\Views\Twig;
 use Slim\Views\TwigExtension;
 
@@ -104,7 +99,7 @@ class SyncApiApp extends App
     private function getWebAppRoutes()
     {
         $controllerNamespace = $this->controllerNamespace;
-        return function () use ($controllerNamespace) {
+        return function() use ($controllerNamespace) {
             $this->get('/', $controllerNamespace . 'PublicController:index')->setName('index');
             $this->get('/info', $controllerNamespace . 'PublicController:info')->setName('api_info');
 
@@ -122,7 +117,7 @@ class SyncApiApp extends App
 
             $this->group(
                 '/dashboard',
-                function () use ($controllerNamespace) {
+                function() use ($controllerNamespace) {
                     $this->get('/', $controllerNamespace . 'ApplicationController:index')
                         ->setName('application_index');
                     $this->get('/show/{id}', $controllerNamespace . 'ApplicationController:show')
@@ -156,10 +151,10 @@ class SyncApiApp extends App
     private function getApiRoutes()
     {
         $controllerNamespace = $this->controllerNamespace;
-        return function () use ($controllerNamespace) {
+        return function() use ($controllerNamespace) {
             $this->group(
                 '/auth',
-                function () use ($controllerNamespace) {
+                function() use ($controllerNamespace) {
                     $this->post('/use', $controllerNamespace . 'AuthorizationController:useCode');
                     $this->post('/generate', $controllerNamespace . 'AuthorizationController:generate');
                     $this->post('/sync', $controllerNamespace . 'AuthorizationController:sync');
@@ -169,14 +164,14 @@ class SyncApiApp extends App
 
             $this->group(
                 '/users',
-                function () use ($controllerNamespace) {
+                function() use ($controllerNamespace) {
                     $this->post('/auth', $controllerNamespace . 'UserController:auth');
                 }
             );
 
             $this->group(
                 '/devices',
-                function () use ($controllerNamespace) {
+                function() use ($controllerNamespace) {
                     $this->post('/get', $controllerNamespace . 'DeviceController:get');
                     $this->post('/auth', $controllerNamespace . 'DeviceController:auth');
                     $this->post('/unauth', $controllerNamespace . 'DeviceController:unAuth');
@@ -185,14 +180,14 @@ class SyncApiApp extends App
 
             $this->group(
                 '/collections',
-                function () use ($controllerNamespace) {
+                function() use ($controllerNamespace) {
                     $this->post('/sync', $controllerNamespace . 'CollectionController:sync');
                 }
             );
 
             $this->group(
                 '/entities',
-                function () use ($controllerNamespace) {
+                function() use ($controllerNamespace) {
                     $this->post('/sync', $controllerNamespace . 'EntityController:sync');
                     $this->post('/history/sync', $controllerNamespace . 'EntityController:historySync');
                 }
@@ -215,7 +210,7 @@ class SyncApiApp extends App
         $this->addServices($container);
 
         //add view
-        $container['view'] = function (Container $container) {
+        $container['view'] = function(Container $container) {
             $view = new Twig(
                 $container->get(SyncApiApp::SETTINGS_KEY)['template_path'],
                 [
@@ -243,8 +238,8 @@ class SyncApiApp extends App
      */
     private function addHandlers(Container $container)
     {
-        $errorHandler = function (Container $container) {
-            return function (
+        $errorHandler = function(Container $container) {
+            return function(
                 ServerRequestInterface $request,
                 ResponseInterface $response,
                 $error = null
@@ -296,14 +291,14 @@ class SyncApiApp extends App
         //third argument: \Exception
         $container['errorHandler'] = $errorHandler;
 
-        $container['notAllowedHandler'] = function (Container $container) {
+        $container['notAllowedHandler'] = function(Container $container) {
             //third parameter can be $requestMethods array
-            return function (ServerRequestInterface $request, ResponseInterface $response) use ($container) {
+            return function(ServerRequestInterface $request, ResponseInterface $response) use ($container) {
                 return $this->returnError($container, $request, $response, ApiError::METHOD_NOT_ALLOWED, 'not_found');
             };
         };
-        $container['notFoundHandler'] = function (ContainerInterface $container) {
-            return function (ServerRequestInterface $request, ResponseInterface $response) use ($container) {
+        $container['notFoundHandler'] = function(ContainerInterface $container) {
+            return function(ServerRequestInterface $request, ResponseInterface $response) use ($container) {
                 return $this->returnError($container, $request, $response, ApiError::NODE_NOT_FOUND, 'not_found');
             };
         };
@@ -314,6 +309,9 @@ class SyncApiApp extends App
         return strpos($request->getUri()->getPath(), '/1.0/') === 0 && $request->getMethod() == 'POST';
     }
 
+    /**
+     * @param string $filePath
+     */
     private function returnError(ContainerInterface $container, ServerRequestInterface $request, ResponseInterface $response, $apiError, $filePath)
     {
         if ($this->isApiRequest($request)) {
@@ -333,19 +331,19 @@ class SyncApiApp extends App
      */
     private function addServices(Container $container)
     {
-        $container[SyncApiApp::LOGGING_SERVICE_KEY] = function (Container $container) {
+        $container[SyncApiApp::LOGGING_SERVICE_KEY] = function(Container $container) {
             return new LoggingService($container);
         };
-        $container[SyncApiApp::REQUEST_SERVICE_KEY] = function (Container $container) {
+        $container[SyncApiApp::REQUEST_SERVICE_KEY] = function(Container $container) {
             return new RequestService($container);
         };
-        $container[SyncApiApp::DATABASE_SERVICE_KEY] = function (Container $container) {
+        $container[SyncApiApp::DATABASE_SERVICE_KEY] = function(Container $container) {
             return new DatabaseService($container);
         };
-        $container[SyncApiApp::SESSION_SERVICE_KEY] = function (Container $container) {
+        $container[SyncApiApp::SESSION_SERVICE_KEY] = function(Container $container) {
             return new SessionService($container);
         };
-        $container[SyncApiApp::MAIL_SERVICE_KEY] = function (Container $container) {
+        $container[SyncApiApp::MAIL_SERVICE_KEY] = function(Container $container) {
             return new MailService($container);
         };
     }

@@ -18,9 +18,10 @@ interface LoggingServiceInterface
     /**
      * log your message
      *
-     * @param $message
-     * @param $filename
+     * @param string $message
+     * @param string $filename
      * @param bool $clearOld
+     * @return void
      */
     public function log($message, $filename, $clearOld = true);
 

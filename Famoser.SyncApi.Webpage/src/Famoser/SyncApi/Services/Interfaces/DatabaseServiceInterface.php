@@ -30,9 +30,9 @@ interface DatabaseServiceInterface
      * gets all entities which match the specified conditions from the database
      *
      * @param BaseEntity $entity
-     * @param null $where
+     * @param string $where
      * @param null $parameters
-     * @param null $orderBy
+     * @param null|string $orderBy
      * @param int $limit
      * @param string $selector
      * @return Application[]|ApplicationSetting[]|AuthorizationCode[]|Collection[]|ContentVersion[]|Device[]|Entity[]|FrontendUser[]
@@ -51,7 +51,7 @@ interface DatabaseServiceInterface
      * counts the entities which match the conditions
      *
      * @param BaseEntity $entity
-     * @param null $where
+     * @param string $where
      * @param null $parameters
      * @param null $orderBy
      * @param int $limit
@@ -94,10 +94,10 @@ interface DatabaseServiceInterface
      * get the first entry from the database which matches the conditions
      *
      * @param BaseEntity $entity
-     * @param null $where
+     * @param string $where
      * @param null $parameters
-     * @param null $orderBy
-     * @return Application|ApplicationSetting|AuthorizationCode|Collection|ContentVersion|Device|Entity|FrontendUser
+     * @param string $orderBy
+     * @return BaseEntity
      * |User|UserCollection|bool
      */
     public function getSingleFromDatabase(BaseEntity $entity, $where = null, $parameters = null, $orderBy = null);
@@ -124,7 +124,7 @@ interface DatabaseServiceInterface
     /**
      * execute the specified sql query, return if the query was successful
      *
-     * @param $sql
+     * @param string $sql
      * @param null $arr
      * @return bool
      */
@@ -150,6 +150,7 @@ interface DatabaseServiceInterface
     /**
      * frees up any resources / files locks
      * behaviour of service calls after disposing it is undefined
+     * @return void
      */
     public function dispose();
 }

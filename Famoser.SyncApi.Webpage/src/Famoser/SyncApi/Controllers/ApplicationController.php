@@ -136,7 +136,7 @@ class ApplicationController extends FrontendController
     /**
      * generate application statistic
      *
-     * @param $applicationId
+     * @param string $applicationId
      * @return ApplicationStatistic
      */
     private function getApplicationStats($applicationId)
@@ -341,7 +341,7 @@ class ApplicationController extends FrontendController
      * @param Application $application
      * @param array $source
      * @param $message
-     * @param array $propArray
+     * @param string[] $propArray
      * @return bool
      */
     private function writeFromPost(Application $application, array $source, &$message, array $propArray)

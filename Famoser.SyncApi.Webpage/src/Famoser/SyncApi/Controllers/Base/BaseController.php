@@ -12,14 +12,8 @@ namespace Famoser\SyncApi\Controllers\Base;
 use Famoser\SyncApi\Framework\ContainerBase;
 use Famoser\SyncApi\Models\Communication\Request\Base\BaseRequest;
 use Famoser\SyncApi\Repositories\SettingsRepository;
-use Famoser\SyncApi\Services\Interfaces\DatabaseServiceInterface;
-use Famoser\SyncApi\Services\Interfaces\LoggingServiceInterface;
-use Famoser\SyncApi\Services\Interfaces\RequestServiceInterface;
-use Famoser\SyncApi\SyncApiApp;
-use Interop\Container\ContainerInterface;
 use Slim\Http\Request;
 use Slim\Http\Response;
-use Slim\Interfaces\RouterInterface;
 
 /**
  * the base controller which provides access to the environment
@@ -45,8 +39,8 @@ class BaseController extends ContainerBase
      *
      * @param  Request $request
      * @param  Response $response
-     * @param  $slug
-     * @return static
+     * @param  string $slug
+     * @return Response
      */
     protected function redirect(Request $request, Response $response, $slug)
     {
@@ -96,7 +90,7 @@ class BaseController extends ContainerBase
      * writes all properties from array to object, and returns all missing ones
      *
      * @param  array $source
-     * @param  object $targetObject
+     * @param  \Famoser\SyncApi\Models\Entities\Application $targetObject
      * @param  array $properties
      * @return array
      */
@@ -119,7 +113,7 @@ class BaseController extends ContainerBase
      * returns model as json
      *
      * @param  Response $response
-     * @param  $model
+     * @param  \Famoser\SyncApi\Models\ApiInformation $model
      * @return Response
      */
     protected function returnJsonObject(Response $response, $model)

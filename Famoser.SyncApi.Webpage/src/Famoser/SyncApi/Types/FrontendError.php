@@ -22,7 +22,7 @@ class FrontendError
     /**
      * convert to string
      *
-     * @param $code
+     * @param string $code
      * @return string
      */
     public static function toString($code)
