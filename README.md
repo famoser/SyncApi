@@ -1,10 +1,5 @@
 # SyncApi
-C#: [![Build status](https://ci.appveyor.com/api/projects/status/un5aq493586670k3?svg=true)](https://ci.appveyor.com/project/famoser/syncapi)
-php: [![Travis Build Status](https://travis-ci.org/famoser/SyncApi.svg?branch=master)](https://travis-ci.org/famoser/SyncApi)
-[![Code Climate](https://codeclimate.com/github/famoser/SyncApi/badges/gpa.svg)](https://codeclimate.com/github/famoser/SyncApi)
-[![Codacy](https://api.codacy.com/project/badge/Grade/9ba78fbd408b40aabfa3ee220a2f5ea0)](https://www.codacy.com/app/products/SyncApi?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=famoser/SyncApi&amp;utm_campaign=Badge_Grade)
-[![Scrutinizer](https://scrutinizer-ci.com/g/famoser/SyncApi/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/famoser/SyncApi)
-[![Test Coverage](https://codeclimate.com/github/famoser/SyncApi/badges/coverage.svg)](https://codeclimate.com/github/famoser/SyncApi/coverage)
+[![Build status](https://ci.appveyor.com/api/projects/status/un5aq493586670k3?svg=true)](https://ci.appveyor.com/project/famoser/syncapi)
 
 a nuget portable library to sync entities in a very convenient way.
 
