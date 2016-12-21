@@ -1,2 +1,0 @@
-changes links to be all mehr oder einzahl
-collectionentity soll deviceid haben oder nicht? Entity entsprechend anpassen, eventuell datenbank anpassen
