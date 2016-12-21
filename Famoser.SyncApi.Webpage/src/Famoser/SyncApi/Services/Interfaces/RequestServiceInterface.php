@@ -56,5 +56,5 @@ interface RequestServiceInterface
      * @param int $modulo
      * @return bool
      */
-    public function validateAuthCode($authCode, $applicationSeed, $personSeed, $modulo = 10000019);
+    public function isAuthenticationCodeValid($authCode, $applicationSeed, $personSeed, $modulo = 10000019);
 }

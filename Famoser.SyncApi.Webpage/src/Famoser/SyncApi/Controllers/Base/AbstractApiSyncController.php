@@ -134,6 +134,9 @@ abstract class AbstractApiSyncController extends ApiRequestController
                     }
                     if (!$existingEntities[$newOne]->is_deleted) {
                         $ver = $this->getActiveVersion($existingEntities[$newOne], $contentType);
+                        if ($ver == null) {
+                            throw new ApiException(ApiError::RESOURCE_NOT_FOUND);
+                        }
                         $resultArray[] = $existingEntities[$newOne]->createCommunicationEntity(
                             $ver,
                             OnlineAction::CREATE
@@ -311,7 +314,7 @@ abstract class AbstractApiSyncController extends ApiRequestController
 
         $ver = $this->getActiveVersion($entity, $contentType);
 
-        if ($entity == null) {
+        if ($ver == null) {
             throw new ApiException(ApiError::RESOURCE_NOT_FOUND);
         }
 

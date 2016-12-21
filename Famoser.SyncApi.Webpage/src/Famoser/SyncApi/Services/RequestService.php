@@ -90,7 +90,7 @@ class RequestService extends BaseService implements RequestServiceInterface
      * @param int $modulo
      * @return bool
      */
-    public function validateAuthCode($authCode, $applicationSeed, $personSeed, $modulo = 10000019)
+    public function isAuthenticationCodeValid($authCode, $applicationSeed, $personSeed, $modulo = 10000019)
     {
         //return true if $applicationSeed is 0 (= not configured)
         if ($applicationSeed == 0) {

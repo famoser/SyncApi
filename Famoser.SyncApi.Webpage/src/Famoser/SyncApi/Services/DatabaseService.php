@@ -297,7 +297,7 @@ class DatabaseService extends BaseService implements DatabaseServiceInterface
             if (!$request->execute($properties)) {
                 return false;
             }
-            $entity->id = $this->getConnection()->lastInsertId();
+            $entity->id = (int)$this->getConnection()->lastInsertId();
         }
         return true;
     }
