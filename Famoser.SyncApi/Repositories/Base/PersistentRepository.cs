@@ -1,22 +1,14 @@
 ﻿using System;
-using System.Collections.ObjectModel;
 using System.Threading.Tasks;
 using Famoser.SyncApi.Api;
-using Famoser.SyncApi.Api.Communication.Entities;
-using Famoser.SyncApi.Api.Communication.Request;
 using Famoser.SyncApi.Api.Configuration;
 using Famoser.SyncApi.Enums;
-using Famoser.SyncApi.Helpers;
-using Famoser.SyncApi.Managers;
 using Famoser.SyncApi.Managers.Interfaces;
 using Famoser.SyncApi.Models.Information;
 using Famoser.SyncApi.Models.Interfaces.Base;
 using Famoser.SyncApi.Repositories.Interfaces.Base;
 using Famoser.SyncApi.Services.Interfaces;
-using Famoser.SyncApi.Services.Interfaces.Authentication;
 using Famoser.SyncApi.Storage.Cache;
-using Newtonsoft.Json;
-using Nito.AsyncEx;
 
 namespace Famoser.SyncApi.Repositories.Base
 {

@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Famoser.SyncApi.Api.Communication.Entities;
 using Famoser.SyncApi.Api.Communication.Request;
 using Famoser.SyncApi.Enums;
 using Famoser.SyncApi.Helpers;
@@ -17,7 +16,7 @@ using Nito.AsyncEx;
 
 namespace Famoser.SyncApi.Repositories
 {
-    public class ApiRepository<TModel, TCollection> : PersistentCollectionRepository<TModel>, IApiRepository<TModel, TCollection>
+    public class ApiRepository<TModel, TCollection> : PersistentCollectionRepository<TModel>, IApiRepository<TModel>
         where TModel : ISyncModel
         where TCollection : ICollectionModel
     {
@@ -101,6 +100,7 @@ namespace Famoser.SyncApi.Repositories
                     var index = CollectionCache.ModelInformations.FindIndex(d => d.Id == syncEntity.Id);
                     CollectionCache.ModelInformations[index].VersionId = syncEntity.VersionId;
                     var model = JsonConvert.DeserializeObject<TModel>(syncEntity.Content);
+                    model.SetId(syncEntity.Id);
                     CollectionManager.Replace(CollectionCache.Models[index], model);
                     CollectionCache.Models[index] = model;
                 }

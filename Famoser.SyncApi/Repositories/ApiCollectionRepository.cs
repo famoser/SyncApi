@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Famoser.SyncApi.Api.Communication.Entities;
@@ -119,6 +118,7 @@ namespace Famoser.SyncApi.Repositories
                     var index = CollectionCache.ModelInformations.FindIndex(d => d.Id == respCollectionEntity.Id);
                     CollectionCache.ModelInformations[index].VersionId = respCollectionEntity.VersionId;
                     var model = JsonConvert.DeserializeObject<TCollection>(respCollectionEntity.Content);
+                    model.SetId(respCollectionEntity.Id);
                     CollectionManager.Replace(CollectionCache.Models[index], model);
                     CollectionCache.Models[index] = model;
                 }

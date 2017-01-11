@@ -2,12 +2,10 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-using System.Runtime.InteropServices.ComTypes;
 using System.Threading.Tasks;
 using Famoser.SyncApi.Api.Communication.Request;
 using Famoser.SyncApi.Enums;
 using Famoser.SyncApi.Helpers;
-using Famoser.SyncApi.Managers;
 using Famoser.SyncApi.Managers.Interfaces;
 using Famoser.SyncApi.Models.Information;
 using Famoser.SyncApi.Models.Interfaces.Base;
@@ -226,6 +224,7 @@ namespace Famoser.SyncApi.Repositories.Base
                 if (syncEntity.OnlineAction == OnlineAction.Create)
                 {
                     var tcol = JsonConvert.DeserializeObject<TCollection>(syncEntity.Content);
+                    tcol.SetId(syncEntity.Id);
                     var mi = ApiEntityHelper.CreateHistoryInformation<TCollection>(syncEntity);
                     mi.Model = tcol;
                     tcol.SetId(mi.Id);

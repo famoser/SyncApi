@@ -2,10 +2,6 @@
 using Famoser.FrameworkEssentials.Logging.Interfaces;
 using Famoser.SyncApi.Services.Interfaces;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Famoser.SyncApi.Services
 {

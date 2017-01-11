@@ -1,6 +1,4 @@
-﻿using System;
-using Famoser.SyncApi.Models.Information.Base;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 
 namespace Famoser.SyncApi.Models.Information
 {

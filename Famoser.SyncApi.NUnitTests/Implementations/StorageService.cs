@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Famoser.FrameworkEssentials.Services.Interfaces;
-using NUnit.Framework.Interfaces;
 
 #pragma warning disable 1998
 namespace Famoser.SyncApi.NUnitTests.Implementations

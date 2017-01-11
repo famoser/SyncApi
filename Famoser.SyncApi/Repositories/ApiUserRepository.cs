@@ -124,7 +124,9 @@ namespace Famoser.SyncApi.Repositories
                     }));
                 if (resp.IsSuccessfull)
                 {
-                    Manager.Set(JsonConvert.DeserializeObject<TUser>(resp.UserEntity.Content));
+                    var user = JsonConvert.DeserializeObject<TUser>(resp.UserEntity.Content);
+                    user.SetId(CacheEntity.ModelInformation.Id);
+                    Manager.Set(user);
                 }
                 else
                     return false;

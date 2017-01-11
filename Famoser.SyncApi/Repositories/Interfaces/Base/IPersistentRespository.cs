@@ -1,5 +1,4 @@
-﻿using System.Collections.ObjectModel;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Famoser.SyncApi.Models.Information;
 
 namespace Famoser.SyncApi.Repositories.Interfaces.Base

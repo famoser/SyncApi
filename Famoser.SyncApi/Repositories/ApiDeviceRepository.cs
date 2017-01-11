@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
@@ -10,7 +9,6 @@ using Famoser.SyncApi.Api.Communication.Request.Base;
 using Famoser.SyncApi.Api.Configuration;
 using Famoser.SyncApi.Enums;
 using Famoser.SyncApi.Helpers;
-using Famoser.SyncApi.Managers;
 using Famoser.SyncApi.Managers.Interfaces;
 using Famoser.SyncApi.Models.Information;
 using Famoser.SyncApi.Models.Interfaces;
@@ -227,6 +225,7 @@ namespace Famoser.SyncApi.Repositories
                     var index = _deviceCache.ModelInformations.FindIndex(d => d.Id == syncEntity.Id);
                     _deviceCache.ModelInformations[index].VersionId = syncEntity.VersionId;
                     var model = JsonConvert.DeserializeObject<TDevice>(syncEntity.Content);
+                    model.SetId(syncEntity.Id);
                     _deviceManager.Replace(_deviceCache.Models[index], model);
                     _deviceCache.Models[index] = model;
                 }

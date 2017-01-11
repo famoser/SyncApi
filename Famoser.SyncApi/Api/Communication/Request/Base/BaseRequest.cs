@@ -1,5 +1,4 @@
 ﻿using System;
-using Famoser.SyncApi.Enums;
 
 namespace Famoser.SyncApi.Api.Communication.Request.Base
 {
