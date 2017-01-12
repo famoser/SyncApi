@@ -57,7 +57,7 @@ namespace Famoser.SyncApi.Services
             return IsAuthenticated();
         }
 
-        public async Task<T> CreateRequestAsync<T>() where T : BaseRequest, new()
+        public async Task<T> CreateRequestAsync<T>(int messageCount = 0) where T : BaseRequest, new()
         {
             await IsAuthenticatedAsync();
             if (!IsAuthenticated())
@@ -65,7 +65,7 @@ namespace Famoser.SyncApi.Services
 
             var request = new T
             {
-                AuthorizationCode = AuthorizationHelper.GenerateAuthorizationCode(_apiInformation, _apiRoamingEntity),
+                AuthorizationCode = AuthorizationHelper.GenerateAuthorizationCode(_apiInformation, _apiRoamingEntity, messageCount),
                 UserId = _apiRoamingEntity.UserId,
                 DeviceId = _deviceModel.GetId(),
                 ApplicationId = _apiInformation.ApplicationId

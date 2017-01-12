@@ -15,7 +15,7 @@ namespace Famoser.SyncApi.Api.Configuration
         /// A modulo unique to the api, you can generate one here: http://www.numberempire.com/primenumbers.php
         /// Why: Is used to authenticate your request. 
         /// </summary>
-        public int Modulo { get; set; }
+        public int ApiModulo { get; set; }
         /// <summary>
         /// A unique id for your application
         /// Why: The api will able to tell the difference between multiple application consuming it

@@ -28,7 +28,7 @@ namespace Famoser.SyncApi.Repositories
         private readonly IApiStorageService _apiStorageService;
         private readonly IApiConfigurationService _apiConfigurationService;
         private readonly ApiClient _authApiClient;
-        public ApiDeviceRepository(IApiConfigurationService apiConfigurationService, IApiStorageService apiStorageService, IApiTraceService traceService) : 
+        public ApiDeviceRepository(IApiConfigurationService apiConfigurationService, IApiStorageService apiStorageService, IApiTraceService traceService) :
             base(apiConfigurationService, apiStorageService, traceService)
         {
             _apiStorageService = apiStorageService;
@@ -338,6 +338,7 @@ namespace Famoser.SyncApi.Repositories
             request.AuthorizationCode = AuthorizationHelper.GenerateAuthorizationCode(apiInformation, apiRoamingInfo);
             request.UserId = _apiRoamingEntity.UserId;
             request.DeviceId = CacheEntity.Model.GetId();
+            request.ApplicationId = apiInformation.ApplicationId;
             return request;
         }
 

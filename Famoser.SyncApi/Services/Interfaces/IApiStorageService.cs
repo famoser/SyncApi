@@ -12,7 +12,7 @@ namespace Famoser.SyncApi.Services.Interfaces
     {
         /// <summary>
         /// get the roaming entity
-        /// this object should be synced accross all devices of the same user
+        /// this object should be synced across all devices of the same user
         /// 
         /// this object will be unique, each call must return the same instance
         /// </summary>

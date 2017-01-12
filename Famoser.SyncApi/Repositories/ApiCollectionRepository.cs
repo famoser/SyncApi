@@ -73,13 +73,10 @@ namespace Famoser.SyncApi.Repositories
                 return false;
             }
 
-            var req = await _apiAuthenticationService.CreateRequestAsync<CollectionEntityRequest>();
-            if (req == null)
-                return false;
-
             var client = GetApiClient();
 
             var synced = new List<int>();
+            var entities = new List<CollectionEntity>();
             //first: push local data. This potentially will overwrite data from other devices, but with the VersionId we'll be able to revert back at any time
             for (int index = 0; index < CollectionCache.ModelInformations.Count; index++)
             {
@@ -89,10 +86,16 @@ namespace Famoser.SyncApi.Repositories
                     GetModelIdentifier(), () => CollectionCache.Models[index1]);
                 if (mdl != null)
                 {
-                    req.CollectionEntities.Add(mdl);
+                    entities.Add(mdl);
                     synced.Add(index);
                 }
             }
+
+            var req = await _apiAuthenticationService.CreateRequestAsync<CollectionEntityRequest>();
+            if (req == null)
+                return false;
+
+            req.CollectionEntities = entities;
             var resp = await client.DoSyncRequestAsync(req);
             if (!resp.IsSuccessfull)
                 return false;

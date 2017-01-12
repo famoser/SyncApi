@@ -6,20 +6,10 @@ namespace Famoser.SyncApi.Helpers
 {
     public class AuthorizationHelper
     {
-        private static Random _random = new Random((int)DateTime.Now.Ticks);
-        public static string GenerateAuthorizationCode(ApiInformation info, ApiRoamingEntity apiRoamingEntity)
+        public static string GenerateAuthorizationCode(ApiInformation info, ApiRoamingEntity apiRoamingEntity, int requestMagicNumber = 0)
         {
-            var rand = _random.Next(0, 99);
-            var seconds = DateTime.Now.Second;
-            var minutes = DateTime.Now.Minute;
-            var hours = DateTime.Now.Hour;
-            var baseStringNumber = seconds.ToString("00") + minutes.ToString("00") + hours.ToString("00") + rand.ToString("00");
-
-            var baseNumber = seconds + minutes * 100 + hours * 10000 + rand;
-
-            long authCode = baseNumber * info.ApplicationSeed * apiRoamingEntity.PersonalSeed;
-            authCode %= info.Modulo;
-            return baseStringNumber + "_" + authCode;
+            var authCode = apiRoamingEntity.PersonalSeed * apiRoamingEntity.RequestCount + requestMagicNumber * info.ApplicationSeed;
+            return (authCode % info.ApiModulo).ToString();
         }
     }
 }

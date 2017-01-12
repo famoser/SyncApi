@@ -31,7 +31,7 @@ namespace Famoser.SyncApi.Services.Interfaces.Authentication
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
-        Task<T> CreateRequestAsync<T>() where T : BaseRequest, new();
+        Task<T> CreateRequestAsync<T>(int messageCount = 0) where T : BaseRequest, new();
 
         /// <summary>
         /// create a valid, authenticated request.

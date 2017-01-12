@@ -49,6 +49,7 @@ namespace Famoser.SyncApi.Repositories
                     //totally new installation
                     _roaming.UserId = Guid.NewGuid();
                     _roaming.AuthenticationState = AuthenticationState.NotYetAuthenticated;
+                    _roaming.CreatedAt = DateTime.Now;
 
                     var random = new Random(ApiInformation.ApplicationSeed);
                     _roaming.PersonalSeed = random.Next();
@@ -91,6 +92,7 @@ namespace Famoser.SyncApi.Repositories
 
             if (CacheEntity.ModelInformation.PendingAction == PendingAction.Create)
             {
+                var json = JsonConvert.SerializeObject(CacheEntity.Model);
                 var resp = await _authApiClient.DoSyncRequestAsync(
                     AuthorizeRequest(ApiInformation, _roaming, new AuthRequestEntity()
                     {
@@ -99,7 +101,7 @@ namespace Famoser.SyncApi.Repositories
                             Id = CacheEntity.ModelInformation.Id,
                             OnlineAction = OnlineAction.Create,
                             VersionId = CacheEntity.ModelInformation.VersionId,
-                            Content = JsonConvert.SerializeObject(CacheEntity.Model),
+                            Content = json,
                             PersonalSeed = _roaming.PersonalSeed,
                             CreateDateTime = CacheEntity.ModelInformation.CreateDateTime,
                             Identifier = CacheEntity.Model.GetClassIdentifier()
@@ -133,6 +135,7 @@ namespace Famoser.SyncApi.Repositories
             }
             else if (CacheEntity.ModelInformation.PendingAction == PendingAction.Update)
             {
+                var json = JsonConvert.SerializeObject(CacheEntity.Model);
                 var resp = await _authApiClient.DoSyncRequestAsync(
                     AuthorizeRequest(ApiInformation, _roaming, new AuthRequestEntity()
                     {
@@ -141,7 +144,7 @@ namespace Famoser.SyncApi.Repositories
                             Id = CacheEntity.ModelInformation.Id,
                             OnlineAction = OnlineAction.Update,
                             VersionId = CacheEntity.ModelInformation.VersionId,
-                            Content = JsonConvert.SerializeObject(CacheEntity.Model),
+                            Content = json,
                             CreateDateTime = CacheEntity.ModelInformation.CreateDateTime
                         }
                     }));

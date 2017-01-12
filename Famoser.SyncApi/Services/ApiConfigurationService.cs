@@ -26,7 +26,7 @@ namespace Famoser.SyncApi.Services
             return new ApiInformation()
             {
                 Uri = _baseUri,
-                Modulo = 10000019,
+                ApiModulo = 10000019,
                 ApplicationSeed = 3102,
                 ApplicationId = _applicationId
             };
