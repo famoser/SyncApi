@@ -10,7 +10,6 @@ namespace Famoser.SyncApi.NUnitTests.Repository
     public class SyncRepositoryTests
     {
         [Test]
-        [Ignore("api not ready yet")]
         public async Task TestSaveAndRetrieve()
         {
             //arrange

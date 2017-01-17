@@ -285,6 +285,8 @@ namespace Famoser.SyncApi.Repositories
                 {
                     ClientMessage = device.GetId().ToString()
                 }));
+                if (resp.IsSuccessfull)
+                    device.SetAuthenticationState(AuthenticationState.UnAuthenticated);
                 return resp.IsSuccessfull;
             }, true);
         }
@@ -297,6 +299,8 @@ namespace Famoser.SyncApi.Repositories
                 {
                     ClientMessage = device.GetId().ToString()
                 }));
+                if (resp.IsSuccessfull)
+                    device.SetAuthenticationState(AuthenticationState.Authenticated);
                 return resp.IsSuccessfull;
             }, true);
         }
@@ -328,6 +332,8 @@ namespace Famoser.SyncApi.Repositories
         {
             _apiRoamingEntity = apiRoamingEntity;
             await SyncAsync();
+            if (Manager.GetModel().GetAuthenticationState() != AuthenticationState.Authenticated)
+                await AuthenticateAsync(Manager.GetModel());
             return Manager.GetModel();
         }
 

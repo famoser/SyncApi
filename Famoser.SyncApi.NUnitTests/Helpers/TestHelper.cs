@@ -9,7 +9,7 @@ namespace Famoser.SyncApi.NUnitTests.Helpers
     {
         private static string _applicationId = "test_appl";
         private static long _applicationSeed = 1341451215173;
-        private static string _testUri = "https://testing.syncapi.famoser.ch/";
+        private static string _testUri = "https://dev.syncapi.famoser.ch/";
         public static SyncApiHelper GetOfflineApiHelper(IStorageService storageService = null)
         {
             if (storageService == null)
