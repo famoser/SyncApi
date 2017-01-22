@@ -10,6 +10,7 @@ namespace Famoser.SyncApi.NUnitTests.Repository
     public class SyncRepositoryTests
     {
         [Test]
+        [Ignore("need to restructure repository design, not well enough though out right now")]
         public async Task TestSaveAndRetrieve()
         {
             //arrange
@@ -20,6 +21,10 @@ namespace Famoser.SyncApi.NUnitTests.Repository
 
             var helper2 = TestHelper.GetOnlineApiHelper(ss);
             var repo2 = helper2.ResolveRepository<NoteModel>();
+
+            //todo: restructure!
+            //the ApiRepository must have (a) clearly defined parent(s)
+            //so resolve it from a CollectionRepository
 
             //act
             var saveRes = await repo.SaveAsync(model);

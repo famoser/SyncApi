@@ -63,10 +63,9 @@ namespace Famoser.SyncApi.Repositories
             var client = GetApiClient();
 
             var synced = new List<int>();
-            //first: push local data. This potentially will overwrite data from other devices, but with the VersionId we'll be able to revert back at any time
+            //first: push local data. This potentially will overwrite data from other devices, but with the VersionId we'll be able to revert back if things go wrong
             for (int index = 0; index < CollectionCache.ModelInformations.Count; index++)
             {
-                //such elegance wooooow
                 var index1 = index;
                 var mdl = ApiEntityHelper.CreateSyncEntity(CollectionCache.ModelInformations[index], GetModelIdentifier(), () => CollectionCache.Models[index1]);
                 if (mdl != null)
