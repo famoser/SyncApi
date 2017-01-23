@@ -53,7 +53,7 @@ namespace Famoser.SyncApi.Repositories
 
                     var random = new Random(ApiInformation.ApplicationSeed);
                     _roaming.PersonalSeed = random.Next();
-                    await _apiStorageService.SaveApiRoamingEntityAsync();
+                    await _apiStorageService.SaveApiRoamingEntityAsync(_roaming);
 
                     CacheEntity = await _apiStorageService.GetCacheEntityAsync<CacheEntity<TUser>>(GetModelCacheFilePath());
                     CacheEntity.Model = await _apiConfigurationService.GetUserObjectAsync<TUser>();
@@ -179,7 +179,8 @@ namespace Famoser.SyncApi.Repositories
                 return true;
 
             CacheEntity.ModelInformation.PendingAction = PendingAction.None;
-            return await _apiStorageService.SaveCacheEntityAsync<CacheEntity<TUser>>();
+            var res = await _apiStorageService.SaveCacheEntityAsync<CacheEntity<TUser>>();
+            return res && await _apiStorageService.SaveApiRoamingEntityAsync(_roaming);
         }
 
 

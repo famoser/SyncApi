@@ -11,6 +11,7 @@ namespace Famoser.SyncApi.NUnitTests.Repository
     public class SyncRepositoryTests
     {
         [Test]
+        //[Ignore("Not ready yet")]
         public async Task TestSaveAndRetrieve()
         {
             //arrange
@@ -25,14 +26,12 @@ namespace Famoser.SyncApi.NUnitTests.Repository
 
             //act
             var saveRes = await repo.SaveAsync(model);
-            var syncres = await repo.SyncAsync();
             //clear cache to ensure the notemodel is downloaded
             ss.ClearCache();
             var model2 = await repo2.GetAllAsync();
 
             //assert
             Assert.IsTrue(saveRes);
-            Assert.IsTrue(syncres);
             Assert.IsTrue(repo.GetAllLazy().Contains(model));
             Assert.IsTrue(model2.Count == 1);
             Assert.IsTrue(model2[0].Content == "Hallo Welt!");
