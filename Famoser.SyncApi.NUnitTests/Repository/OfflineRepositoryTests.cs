@@ -1,4 +1,5 @@
 ﻿using System.Threading.Tasks;
+using Famoser.SyncApi.Models;
 using Famoser.SyncApi.NUnitTests.Helpers;
 using Famoser.SyncApi.NUnitTests.Implementations;
 using Famoser.SyncApi.NUnitTests.Models;

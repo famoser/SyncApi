@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Famoser.SyncApi.Api.Communication.Entities;
@@ -19,7 +20,7 @@ namespace Famoser.SyncApi.Repositories
 {
     public class ApiCollectionRepository<TCollection> : PersistentCollectionRepository<TCollection>,
             IApiCollectionRepository<TCollection>
-        where TCollection : class, ICollectionModel
+        where TCollection : class, ICollectionModel, new()
     {
         private readonly IApiAuthenticationService _apiAuthenticationService;
         private readonly IApiStorageService _apiStorageService;
@@ -37,7 +38,6 @@ namespace Famoser.SyncApi.Repositories
         }
 
         private readonly AsyncLock _asyncLock = new AsyncLock();
-
         protected override async Task<bool> InitializeAsync()
         {
             using (await _asyncLock.LockAsync())
@@ -102,7 +102,7 @@ namespace Famoser.SyncApi.Repositories
 
             foreach (var modelInformation in synced)
                 CollectionCache.ModelInformations[modelInformation].PendingAction = PendingAction.None;
-           
+
             foreach (var respCollectionEntity in resp.CollectionEntities)
             {
                 //new
@@ -162,6 +162,41 @@ namespace Famoser.SyncApi.Repositories
                 var apiClient = GetApiClient();
                 var resp = await apiClient.AuthenticateUserRequestAsync(req);
                 return resp.IsSuccessfull;
+            });
+        }
+
+        public Task<bool> SaveAsync(TCollection model)
+        {
+            return ExecuteSafeAsync(async () =>
+            {
+                var info = CollectionCache.ModelInformations.FirstOrDefault(s => s.Id == model.GetId());
+                if (info == null)
+                {
+                    info = await _apiAuthenticationService.CreateModelInformationAsync();
+
+                    model.SetId(info.Id);
+                    CollectionCache.ModelInformations.Add(info);
+                    CollectionCache.Models.Add(model);
+                    CollectionManager.Add(model);
+                }
+                else if (info.PendingAction == PendingAction.None
+                         || info.PendingAction == PendingAction.Delete
+                         || info.PendingAction == PendingAction.Read)
+                {
+                    info.PendingAction = PendingAction.Update;
+                }
+                info.VersionId = Guid.NewGuid();
+                await SaveCacheAsync();
+                return true;
+            });
+        }
+
+        public Task<TCollection> GetDefaultCollection()
+        {
+            return ExecuteSafeAsync(async () =>
+            {
+                await SyncAsync();
+                return CollectionCache.Models.FirstOrDefault();
             });
         }
     }

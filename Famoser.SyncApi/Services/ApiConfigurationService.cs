@@ -60,7 +60,7 @@ namespace Famoser.SyncApi.Services
 
         public async Task<TCollection> GetCollectionObjectAsync<TCollection>() where TCollection : class
         {
-            if (typeof(TCollection) == typeof(UserModel))
+            if (typeof(TCollection) == typeof(CollectionModel))
                 return new CollectionModel() as TCollection;
             return default(TCollection);
         }

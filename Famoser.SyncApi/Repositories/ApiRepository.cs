@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Famoser.SyncApi.Api.Communication.Request;
@@ -16,17 +17,19 @@ using Nito.AsyncEx;
 
 namespace Famoser.SyncApi.Repositories
 {
-    public class ApiRepository<TModel, TCollection> : PersistentCollectionRepository<TModel>, IApiRepository<TModel>
+    public class ApiRepository<TModel, TCollection> : PersistentCollectionRepository<TModel>, IApiRepository<TModel, TCollection>
         where TModel : ISyncModel
         where TCollection : ICollectionModel
     {
+        private readonly IApiCollectionRepository<TCollection> _collectionRepository;
         private readonly IApiConfigurationService _apiConfigurationService;
         private readonly IApiStorageService _apiStorageService;
         private readonly IApiAuthenticationService _apiAuthenticationService;
 
-        public ApiRepository(IApiConfigurationService apiConfigurationService, IApiStorageService apiStorageService, IApiAuthenticationService apiAuthenticationService, IApiTraceService traceService)
+        public ApiRepository(IApiCollectionRepository<TCollection> collectionRepository, IApiConfigurationService apiConfigurationService, IApiStorageService apiStorageService, IApiAuthenticationService apiAuthenticationService, IApiTraceService traceService)
             : base(apiConfigurationService, apiStorageService, apiAuthenticationService, traceService)
         {
+            _collectionRepository = collectionRepository;
             _apiConfigurationService = apiConfigurationService;
             _apiStorageService = apiStorageService;
             _apiAuthenticationService = apiAuthenticationService;
@@ -119,6 +122,47 @@ namespace Famoser.SyncApi.Repositories
             }
 
             return true;
+        }
+
+        public Task<bool> SaveToCollectionAsync(TModel model, TCollection collection)
+        {
+            return ExecuteSafeAsync(async () =>
+            {
+                var info = CollectionCache.ModelInformations.FirstOrDefault(s => s.Id == model.GetId());
+                if (info == null)
+                {
+                    info = await _apiAuthenticationService.CreateModelInformationAsync();
+
+                    //get default collection if null
+                    if (EqualityComparer<TCollection>.Default.Equals(collection, default(TCollection)))
+                    {
+                        collection = await _collectionRepository.GetDefaultCollection();
+                    }
+
+                    model.SetId(info.Id);
+                    CollectionCache.ModelInformations.Add(info);
+                    CollectionCache.Models.Add(model);
+                    CollectionManager.Add(model);
+                }
+                else if (info.PendingAction == PendingAction.None
+                         || info.PendingAction == PendingAction.Delete
+                         || info.PendingAction == PendingAction.Read)
+                {
+                    info.PendingAction = PendingAction.Update;
+                }
+                if (!EqualityComparer<TCollection>.Default.Equals(collection, default(TCollection)))
+                {
+                    info.CollectionId = collection.GetId();
+                }
+                info.VersionId = Guid.NewGuid();
+                await SaveCacheAsync();
+                return true;
+            });
+        }
+
+        public Task<bool> SaveAsync(TModel model)
+        {
+            return SaveToCollectionAsync(model, default(TCollection));
         }
     }
 }

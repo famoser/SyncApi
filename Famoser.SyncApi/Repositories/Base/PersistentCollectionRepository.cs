@@ -68,32 +68,6 @@ namespace Famoser.SyncApi.Repositories.Base
             return CollectionManager.GetObservableCollection();
         }
 
-        public Task<bool> SaveAsync(TCollection model)
-        {
-            return ExecuteSafeAsync(async () =>
-            {
-                var info = CollectionCache.ModelInformations.FirstOrDefault(s => s.Id == model.GetId());
-                if (info == null)
-                {
-                    info = await _apiAuthenticationService.CreateModelInformationAsync();
-
-                    model.SetId(info.Id);
-                    CollectionCache.ModelInformations.Add(info);
-                    CollectionCache.Models.Add(model);
-                    CollectionManager.Add(model);
-                }
-                else if (info.PendingAction == PendingAction.None
-                         || info.PendingAction == PendingAction.Delete
-                         || info.PendingAction == PendingAction.Read)
-                {
-                    info.VersionId = Guid.NewGuid();
-                    info.PendingAction = PendingAction.Update;
-                }
-                await SaveCacheAsync();
-                return true;
-            });
-        }
-
         public Task<bool> RemoveAsync(TCollection model)
         {
             return ExecuteSafeAsync(async () =>

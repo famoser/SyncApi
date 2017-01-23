@@ -14,5 +14,7 @@ namespace Famoser.SyncApi.Repositories.Interfaces
         /// <param name="userModel"></param>
         /// <returns></returns>
         Task<bool> AddUserToCollectionAsync(TCollection collection, IUserModel userModel);
+        Task<bool> SaveAsync(TCollection model);
+        Task<TCollection> GetDefaultCollection();
     }
 }

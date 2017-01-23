@@ -55,6 +55,23 @@ namespace Famoser.SyncApi.Repositories.Base
             return default(T);
         }
 
+        protected async Task<T> ExecuteSafeAsync<T>(Func<T> func, bool ensureWebCanBeUsed = false)
+        {
+            try
+            {
+                if (!await InitializeAsync())
+                    return default(T);
+
+                if (!ensureWebCanBeUsed || _apiConfigurationService.CanUseWebConnection())
+                    return func();
+            }
+            catch (Exception ex)
+            {
+                ExceptionLogger?.LogException(ex, this);
+            }
+            return default(T);
+        }
+
         protected async Task ExecuteSafeAsync(Func<Task> func, bool ensureWebCanBeUsed = false)
         {
             try

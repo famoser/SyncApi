@@ -32,7 +32,13 @@ namespace Famoser.SyncApi.Helpers
 
         public static CollectionEntity CreateCollectionEntity(CacheInformations info, string identifier, Func<object> getModelFunc)
         {
-            return CreateApiEntity<CollectionEntity>(info, identifier, getModelFunc);
+            var collEntity =  CreateApiEntity<CollectionEntity>(info, identifier, getModelFunc);
+            if (collEntity != null)
+            {
+                collEntity.DeviceId = info.DeviceId;
+                collEntity.UserId = info.UserId;
+            }
+            return collEntity;
         }
 
         public static SyncEntity CreateSyncEntity(CacheInformations info, string identifier, Func<object> getModelFunc)

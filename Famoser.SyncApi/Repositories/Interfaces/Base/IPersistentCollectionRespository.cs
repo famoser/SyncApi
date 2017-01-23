@@ -10,7 +10,6 @@ namespace Famoser.SyncApi.Repositories.Interfaces.Base
         ObservableCollection<T> GetAllLazy();
         Task<ObservableCollection<T>> GetAllAsync();
 
-        Task<bool> SaveAsync(T model);
         Task<bool> RemoveAsync(T model);
         ObservableCollection<HistoryInformations<T>> GetHistoryLazy(T model);
         Task<ObservableCollection<HistoryInformations<T>>> GetHistoryAsync(T model);
