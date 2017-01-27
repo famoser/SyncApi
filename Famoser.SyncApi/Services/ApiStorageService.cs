@@ -180,6 +180,7 @@ namespace Famoser.SyncApi.Services
             _exceptionLogger = logger;
         }
         private IExceptionLogger _exceptionLogger;
+
         protected async Task<T> ExecuteSafe<T>(Func<Task<T>> func)
             where T : new()
         {

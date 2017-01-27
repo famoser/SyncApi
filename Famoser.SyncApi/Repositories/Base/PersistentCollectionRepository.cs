@@ -4,6 +4,7 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
 using Famoser.SyncApi.Api.Communication.Request;
+using Famoser.SyncApi.Api.Enums;
 using Famoser.SyncApi.Enums;
 using Famoser.SyncApi.Helpers;
 using Famoser.SyncApi.Managers.Interfaces;
@@ -31,7 +32,7 @@ namespace Famoser.SyncApi.Repositories.Base
 
         protected PersistentCollectionRepository(IApiConfigurationService apiConfigurationService,
             IApiStorageService apiStorageService, IApiAuthenticationService apiAuthenticationService, IApiTraceService traceService)
-            : base(apiConfigurationService, traceService)
+            : base(apiConfigurationService, apiAuthenticationService, traceService)
         {
             _apiAuthenticationService = apiAuthenticationService;
             _apiStorageService = apiStorageService;
@@ -50,50 +51,53 @@ namespace Famoser.SyncApi.Repositories.Base
             return CollectionManager.GetObservableCollection();
         }
 
-        public async Task<ObservableCollection<TCollection>> GetAllAsync()
-        {
-            if (_apiConfigurationService.StartSyncAutomatically())
-                await SyncAsync();
-            else
-            {
-                try
-                {
-                    await InitializeAsync();
-                }
-                catch (Exception ex)
-                {
-                    ExceptionLogger?.LogException(ex, this);
-                }
-            }
-            return CollectionManager.GetObservableCollection();
-        }
-
-        public Task<bool> RemoveAsync(TCollection model)
+        public Task<ObservableCollection<TCollection>> GetAllAsync()
         {
             return ExecuteSafeAsync(async () =>
             {
-                var info = CollectionCache.ModelInformations.FirstOrDefault(s => s.Id == model.GetId());
-                if (info == null)
-                {
-                    return true;
-                }
-                if (info.PendingAction == PendingAction.Create)
-                {
-                    CollectionManager.Remove(model);
-                    CollectionCache.ModelInformations.Remove(info);
-                    CollectionCache.Models.Remove(model);
-                    return await _apiStorageService.SaveCacheEntityAsync<CollectionCacheEntity<TCollection>>();
-                }
-                if (info.PendingAction == PendingAction.None
-                    || info.PendingAction == PendingAction.Update
-                    || info.PendingAction == PendingAction.Read)
-                {
-                    info.PendingAction = PendingAction.Delete;
-                }
-                await SaveCacheAsync();
-                return true;
+
             });
+            if (_apiConfigurationService.StartSyncAutomatically())
+            {
+                await SyncAsync();
+                return CollectionManager.GetObservableCollection();
+            }
+            else
+            {
+                await InitializeAsync();
+            }
         }
+
+        protected async Task<SyncActionError> RemoveInternalAsync(TCollection model)
+        {
+            var info = CollectionCache.ModelInformations.FirstOrDefault(s => s.Id == model.GetId());
+            if (info == null)
+            {
+                return SyncActionError.EntityAlreadyRemoved;
+            }
+            if (info.PendingAction == PendingAction.Create)
+            {
+                CollectionManager.Remove(model);
+                CollectionCache.ModelInformations.Remove(info);
+                CollectionCache.Models.Remove(model);
+
+                await _apiStorageService.SaveCacheEntityAsync<CollectionCacheEntity<TCollection>>();
+            }
+            else if (info.PendingAction == PendingAction.None
+                || info.PendingAction == PendingAction.Update
+                || info.PendingAction == PendingAction.Read)
+            {
+                info.PendingAction = PendingAction.Delete;
+
+                await _apiStorageService.SaveCacheEntityAsync<CollectionCacheEntity<TCollection>>();
+                if (_apiConfigurationService.CanUseWebConnection())
+                    await SyncAsync();
+            }
+
+            return SyncActionError.None;
+        }
+
+        public abstract Task<bool> RemoveAsync(TCollection model);
         
         protected readonly Dictionary<TCollection, ICollectionManager<HistoryInformations<TCollection>>>
             HistoryCollectionManagers
@@ -229,20 +233,6 @@ namespace Famoser.SyncApi.Repositories.Base
         {
             var index = CollectionCache.Models.IndexOf(model);
             return CollectionCache.ModelInformations[index];
-        }
-
-        protected async Task SaveCacheAsync()
-        {
-            try
-            {
-                await _apiStorageService.SaveCacheEntityAsync<CollectionCacheEntity<TCollection>>();
-                if (_apiConfigurationService.CanUseWebConnection())
-                    await SyncInternalAsync();
-            }
-            catch (Exception ex)
-            {
-                ExceptionLogger?.LogException(ex, this);
-            }
         }
 
         public void SetCollectionManager(ICollectionManager<TCollection> manager)

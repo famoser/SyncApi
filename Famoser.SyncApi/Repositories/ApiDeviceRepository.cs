@@ -6,7 +6,9 @@ using Famoser.SyncApi.Api;
 using Famoser.SyncApi.Api.Communication.Entities;
 using Famoser.SyncApi.Api.Communication.Request;
 using Famoser.SyncApi.Api.Communication.Request.Base;
+using Famoser.SyncApi.Api.Communication.Response;
 using Famoser.SyncApi.Api.Configuration;
+using Famoser.SyncApi.Api.Enums;
 using Famoser.SyncApi.Enums;
 using Famoser.SyncApi.Helpers;
 using Famoser.SyncApi.Managers.Interfaces;
@@ -15,6 +17,7 @@ using Famoser.SyncApi.Models.Interfaces;
 using Famoser.SyncApi.Repositories.Base;
 using Famoser.SyncApi.Repositories.Interfaces;
 using Famoser.SyncApi.Services.Interfaces;
+using Famoser.SyncApi.Services.Interfaces.Authentication;
 using Famoser.SyncApi.Storage.Cache;
 using Famoser.SyncApi.Storage.Roaming;
 using Newtonsoft.Json;
@@ -27,11 +30,13 @@ namespace Famoser.SyncApi.Repositories
     {
         private readonly IApiStorageService _apiStorageService;
         private readonly IApiConfigurationService _apiConfigurationService;
+        private readonly IApiAuthenticationService _apiAuthenticationService;
         private readonly ApiClient _authApiClient;
-        public ApiDeviceRepository(IApiConfigurationService apiConfigurationService, IApiStorageService apiStorageService, IApiTraceService traceService) :
-            base(apiConfigurationService, apiStorageService, traceService)
+        public ApiDeviceRepository(IApiConfigurationService apiConfigurationService, IApiStorageService apiStorageService, IApiTraceService traceService, IApiAuthenticationService apiAuthenticationService) :
+            base(apiConfigurationService, apiStorageService, traceService, apiAuthenticationService)
         {
             _apiStorageService = apiStorageService;
+            _apiAuthenticationService = apiAuthenticationService;
             _apiConfigurationService = apiConfigurationService;
 
             _authApiClient = GetAuthApiClient();
@@ -69,77 +74,71 @@ namespace Famoser.SyncApi.Repositories
             }
         }
 
-        protected override async Task<bool> SyncInternalAsync()
+        public override Task<bool> SyncAsync()
         {
-            if (CacheEntity.ModelInformation.PendingAction == PendingAction.None)
-                return true;
-
-            if (CacheEntity.ModelInformation.PendingAction == PendingAction.Create)
+            return ExecuteSafeAsync(async () =>
             {
-                var resp = await _authApiClient.DoSyncRequestAsync(
-                    AuthorizeRequest(ApiInformation, _apiRoamingEntity, new AuthRequestEntity()
-                    {
-                        DeviceEntity = new DeviceEntity()
-                        {
-                            Id = CacheEntity.ModelInformation.Id,
-                            OnlineAction = OnlineAction.Create,
-                            VersionId = CacheEntity.ModelInformation.VersionId,
-                            Content = JsonConvert.SerializeObject(CacheEntity.Model)
-                        }
-                    }));
-                if (resp.RequestFailed)
+                AuthorizationResponse resp = null;
+                if (CacheEntity.ModelInformation.PendingAction == PendingAction.Delete)
                 {
-                    return false;
+                    resp = await _authApiClient.DoSyncRequestAsync(
+                        AuthorizeRequest(ApiInformation, _apiRoamingEntity, new AuthRequestEntity()
+                        {
+                            UserEntity = new UserEntity()
+                            {
+                                Id = CacheEntity.ModelInformation.Id,
+                                OnlineAction = OnlineAction.Delete
+                            }
+                        }));
                 }
-            }
-            // read is not valid action in this repo
-            //else if (CacheEntity.ModelInformation.PendingAction == PendingAction.Read)
-            //{
-            //}
-            else if (CacheEntity.ModelInformation.PendingAction == PendingAction.Update)
-            {
-                var resp = await _authApiClient.DoSyncRequestAsync(
-                    AuthorizeRequest(ApiInformation, _apiRoamingEntity, new AuthRequestEntity()
-                    {
-                        DeviceEntity = new DeviceEntity()
-                        {
-                            Id = CacheEntity.ModelInformation.Id,
-                            OnlineAction = OnlineAction.Update,
-                            VersionId = CacheEntity.ModelInformation.VersionId,
-                            Content = JsonConvert.SerializeObject(CacheEntity.Model)
-                        }
-                    }));
-                if (resp.RequestFailed)
+                else if (CacheEntity.ModelInformation.PendingAction == PendingAction.Create)
                 {
-                    return false;
+                    resp = await _authApiClient.DoSyncRequestAsync(
+                        AuthorizeRequest(ApiInformation, _apiRoamingEntity, new AuthRequestEntity()
+                        {
+                            DeviceEntity = new DeviceEntity()
+                            {
+                                Id = CacheEntity.ModelInformation.Id,
+                                OnlineAction = OnlineAction.Create,
+                                VersionId = CacheEntity.ModelInformation.VersionId,
+                                Content = JsonConvert.SerializeObject(CacheEntity.Model)
+                            }
+                        }));
                 }
-            }
-            else if (CacheEntity.ModelInformation.PendingAction == PendingAction.Delete)
-            {
-                var resp = await _authApiClient.DoSyncRequestAsync(
-                    AuthorizeRequest(ApiInformation, _apiRoamingEntity, new AuthRequestEntity()
-                    {
-                        UserEntity = new UserEntity()
-                        {
-                            Id = CacheEntity.ModelInformation.Id,
-                            OnlineAction = OnlineAction.Delete
-                        }
-                    }));
-                if (resp.RequestFailed)
+                else if (CacheEntity.ModelInformation.PendingAction == PendingAction.Update)
                 {
-                    return false;
+                    resp = await _authApiClient.DoSyncRequestAsync(
+                        AuthorizeRequest(ApiInformation, _apiRoamingEntity, new AuthRequestEntity()
+                        {
+                            DeviceEntity = new DeviceEntity()
+                            {
+                                Id = CacheEntity.ModelInformation.Id,
+                                OnlineAction = OnlineAction.Update,
+                                VersionId = CacheEntity.ModelInformation.VersionId,
+                                Content = JsonConvert.SerializeObject(CacheEntity.Model)
+                            }
+                        }));
                 }
 
-                //clean up
-                CacheEntity.ModelInformation.PendingAction = PendingAction.None;
-                return await _apiStorageService.EraseCacheEntityAsync<CacheEntity<TDevice>>();
-            }
-            else
-                return true;
+                if (resp != null && resp.RequestFailed)
+                {
+                    return new Tuple<bool, SyncActionError>(false, SyncActionError.RequestUnsuccessful);
+                }
 
-
-            CacheEntity.ModelInformation.PendingAction = PendingAction.None;
-            return await _apiStorageService.SaveCacheEntityAsync<CacheEntity<TDevice>>();
+                if (CacheEntity.ModelInformation.PendingAction == PendingAction.Delete)
+                {
+                    //clean up
+                    CacheEntity.ModelInformation.PendingAction = PendingAction.None;
+                    await _apiStorageService.EraseCacheEntityAsync<CacheEntity<TDevice>>();
+                }
+                else
+                {
+                    //save cache
+                    CacheEntity.ModelInformation.PendingAction = PendingAction.None;
+                    await _apiStorageService.SaveCacheEntityAsync<CacheEntity<TDevice>>();
+                }
+                return new Tuple<bool, SyncActionError>(true, SyncActionError.None);
+            }, SyncAction.SyncDevice, VerificationOption.CanAccessInternet);
         }
 
         #region device methods
@@ -189,63 +188,6 @@ namespace Famoser.SyncApi.Repositories
             }
         }
 
-        private async Task<bool> SyncDevicesInternalAsync()
-        {
-            //sync devices
-            var req = new CollectionEntityRequest();
-            // this will return missing, updated & removed entities
-            foreach (var collectionCacheModelInformation in _deviceCache.ModelInformations)
-            {
-                req.CollectionEntities.Add(new SyncEntity()
-                {
-                    Id = collectionCacheModelInformation.Id,
-                    VersionId = collectionCacheModelInformation.VersionId,
-                    OnlineAction = OnlineAction.ConfirmVersion
-                });
-            }
-            var resp = await _authApiClient.GetDevicesAsync(AuthorizeRequest(ApiInformation, _apiRoamingEntity, req));
-            if (!resp.IsSuccessfull)
-                return false;
-
-            foreach (var syncEntity in resp.SyncEntities)
-            {
-                //new!
-                if (syncEntity.OnlineAction == OnlineAction.Create)
-                {
-                    var mi = ApiEntityHelper.CreateCacheInformation<CacheInformations>(syncEntity);
-                    var tcol = JsonConvert.DeserializeObject<TDevice>(syncEntity.Content);
-                    tcol.SetId(mi.Id);
-                    _deviceCache.ModelInformations.Add(mi);
-                    _deviceCache.Models.Add(tcol);
-                    _deviceManager.Add(tcol);
-                }
-                //updated
-                else if (syncEntity.OnlineAction == OnlineAction.Update)
-                {
-                    var index = _deviceCache.ModelInformations.FindIndex(d => d.Id == syncEntity.Id);
-                    _deviceCache.ModelInformations[index].VersionId = syncEntity.VersionId;
-                    var model = JsonConvert.DeserializeObject<TDevice>(syncEntity.Content);
-                    model.SetId(syncEntity.Id);
-                    _deviceManager.Replace(_deviceCache.Models[index], model);
-                    _deviceCache.Models[index] = model;
-                }
-                //removed
-                else if (syncEntity.OnlineAction == OnlineAction.Delete)
-                {
-                    var index = _deviceCache.ModelInformations.FindIndex(d => d.Id == syncEntity.Id);
-                    _deviceManager.Remove(_deviceCache.Models[index]);
-                    _deviceCache.ModelInformations.RemoveAt(index);
-                    _deviceCache.Models.RemoveAt(index);
-                }
-            }
-
-            if (resp.SyncEntities.Any())
-            {
-                await _apiStorageService.SaveCacheEntityAsync<CollectionCacheEntity<TDevice>>();
-            }
-            return true;
-        }
-
         private ICollectionManager<TDevice> _deviceManager;
         public ObservableCollection<TDevice> GetAllLazy()
         {
@@ -262,8 +204,8 @@ namespace Famoser.SyncApi.Repositories
             {
                 await InitializeDevicesAsync().ContinueWith(t => SyncDevicesAsync());
 
-                return _deviceManager.GetObservableCollection();
-            });
+                return new Tuple<ObservableCollection<TDevice>, SyncActionError>(_deviceManager.GetObservableCollection(), SyncActionError.None);
+            }, SyncAction.GetAllDevices, VerificationOption.CanAccessInternet | VerificationOption.IsAuthenticatedFully);
         }
 
         public Task<bool> SyncDevicesAsync()
@@ -271,8 +213,62 @@ namespace Famoser.SyncApi.Repositories
             return ExecuteSafeAsync(async () =>
             {
                 await InitializeDevicesAsync();
-                return await SyncDevicesInternalAsync();
-            }, true);
+
+                //sync devices
+                var req = new CollectionEntityRequest();
+                // this will return missing, updated & removed entities
+                foreach (var collectionCacheModelInformation in _deviceCache.ModelInformations)
+                {
+                    req.CollectionEntities.Add(new SyncEntity()
+                    {
+                        Id = collectionCacheModelInformation.Id,
+                        VersionId = collectionCacheModelInformation.VersionId,
+                        OnlineAction = OnlineAction.ConfirmVersion
+                    });
+                }
+                var resp = await _authApiClient.GetDevicesAsync(AuthorizeRequest(ApiInformation, _apiRoamingEntity, req));
+                if (!resp.IsSuccessfull)
+                    return new Tuple<bool, SyncActionError>(false, SyncActionError.RequestUnsuccessful);
+
+                foreach (var syncEntity in resp.SyncEntities)
+                {
+                    //new!
+                    if (syncEntity.OnlineAction == OnlineAction.Create)
+                    {
+                        var mi = ApiEntityHelper.CreateCacheInformation<CacheInformations>(syncEntity);
+                        var tcol = JsonConvert.DeserializeObject<TDevice>(syncEntity.Content);
+                        tcol.SetId(mi.Id);
+                        _deviceCache.ModelInformations.Add(mi);
+                        _deviceCache.Models.Add(tcol);
+                        _deviceManager.Add(tcol);
+                    }
+                    //updated
+                    else if (syncEntity.OnlineAction == OnlineAction.Update)
+                    {
+                        var index = _deviceCache.ModelInformations.FindIndex(d => d.Id == syncEntity.Id);
+                        _deviceCache.ModelInformations[index].VersionId = syncEntity.VersionId;
+                        var model = JsonConvert.DeserializeObject<TDevice>(syncEntity.Content);
+                        model.SetId(syncEntity.Id);
+                        _deviceManager.Replace(_deviceCache.Models[index], model);
+                        _deviceCache.Models[index] = model;
+                    }
+                    //removed
+                    else if (syncEntity.OnlineAction == OnlineAction.Delete)
+                    {
+                        var index = _deviceCache.ModelInformations.FindIndex(d => d.Id == syncEntity.Id);
+                        _deviceManager.Remove(_deviceCache.Models[index]);
+                        _deviceCache.ModelInformations.RemoveAt(index);
+                        _deviceCache.Models.RemoveAt(index);
+                    }
+                }
+
+                if (resp.SyncEntities.Any())
+                {
+                    await _apiStorageService.SaveCacheEntityAsync<CollectionCacheEntity<TDevice>>();
+                }
+                return new Tuple<bool, SyncActionError>(true, SyncActionError.None);
+            }, SyncAction.GetAllDevices, VerificationOption.CanAccessInternet | VerificationOption.IsAuthenticatedFully);
+
         }
         #endregion
 
@@ -285,10 +281,16 @@ namespace Famoser.SyncApi.Repositories
                 {
                     ClientMessage = device.GetId().ToString()
                 }));
-                if (resp.IsSuccessfull)
-                    device.SetAuthenticationState(AuthenticationState.UnAuthenticated);
-                return resp.IsSuccessfull;
-            }, true);
+
+                if (resp.RequestFailed)
+                {
+                    return new Tuple<bool, SyncActionError>(false, SyncActionError.RequestUnsuccessful);
+                }
+
+                device.SetAuthenticationState(AuthenticationState.UnAuthenticated);
+                await _apiStorageService.SaveCacheEntityAsync<CollectionCacheEntity<TDevice>>();
+                return new Tuple<bool, SyncActionError>(true, SyncActionError.None);
+            }, SyncAction.UnAuthenticateDevice, VerificationOption.IsAuthenticatedFully | VerificationOption.CanAccessInternet);
         }
 
         public Task<bool> AuthenticateAsync(TDevice device)
@@ -299,10 +301,16 @@ namespace Famoser.SyncApi.Repositories
                 {
                     ClientMessage = device.GetId().ToString()
                 }));
-                if (resp.IsSuccessfull)
-                    device.SetAuthenticationState(AuthenticationState.Authenticated);
-                return resp.IsSuccessfull;
-            }, true);
+
+                if (resp.RequestFailed)
+                {
+                    return new Tuple<bool, SyncActionError>(false, SyncActionError.RequestUnsuccessful);
+                }
+
+                device.SetAuthenticationState(AuthenticationState.Authenticated);
+                await _apiStorageService.SaveCacheEntityAsync<CollectionCacheEntity<TDevice>>();
+                return new Tuple<bool, SyncActionError>(true, SyncActionError.None);
+            }, SyncAction.AuthenticateDevice, VerificationOption.IsAuthenticatedFully | VerificationOption.CanAccessInternet);
         }
 
         public Task<string> CreateNewAuthenticationCodeAsync()
@@ -310,20 +318,29 @@ namespace Famoser.SyncApi.Repositories
             return ExecuteSafeAsync(async () =>
             {
                 var resp = await _authApiClient.CreateAuthorizationCodeAsync(AuthorizeRequest(ApiInformation, _apiRoamingEntity, new AuthRequestEntity()));
-                return resp.IsSuccessfull ? resp.ServerMessage : default(string);
-            }, true);
+
+                if (resp.RequestFailed)
+                {
+                    return new Tuple<string, SyncActionError>(default(string), SyncActionError.RequestUnsuccessful);
+                }
+                
+                return new Tuple<string, SyncActionError>(resp.ServerMessage, SyncActionError.None);
+            }, SyncAction.CreateAuthCode, VerificationOption.IsAuthenticatedFully | VerificationOption.CanAccessInternet);
         }
 
         public Task<bool> TryUseAuthenticationCodeAsync(string authenticationCode)
         {
             return ExecuteSafeAsync(async () =>
             {
-                var resp = await _authApiClient.UseAuthenticationCodeAsync(AuthorizeRequest(ApiInformation, _apiRoamingEntity, new AuthRequestEntity()
+                var resp = await _authApiClient.CreateAuthorizationCodeAsync(AuthorizeRequest(ApiInformation, _apiRoamingEntity, new AuthRequestEntity()));
+
+                if (resp.RequestFailed)
                 {
-                    ClientMessage = authenticationCode
-                }));
-                return resp.IsSuccessfull;
-            }, true);
+                    return new Tuple<bool, SyncActionError>(false, SyncActionError.RequestUnsuccessful);
+                }
+                
+                return new Tuple<bool, SyncActionError>(true, SyncActionError.None);
+            }, SyncAction.UseAuthCode, VerificationOption.CanAccessInternet);
         }
         #endregion
 

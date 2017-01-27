@@ -53,6 +53,9 @@
     <Compile Include="Api\Communication\Response\Base\BaseResponse.cs" />
     <Compile Include="Api\Communication\Request\CollectionEntityRequest.cs" />
     <Compile Include="Api\Communication\Response\SyncEntityResponse.cs" />
+    <Compile Include="Enums\SyncAction.cs" />
+    <Compile Include="Enums\SyncActionError.cs" />
+    <Compile Include="Enums\VerificationOption.cs" />
     <Compile Include="Helpers\ApiEntityHelper.cs" />
     <Compile Include="Helpers\SyncApiHelper.cs" />
     <Compile Include="Models\AbstractSyncModel.cs" />
@@ -61,6 +64,8 @@
     <Compile Include="Models\DeviceModel.cs" />
     <Compile Include="Models\Information\Base\BaseInformations.cs" />
     <Compile Include="Models\Information\HistoryInformations.cs" />
+    <Compile Include="Models\Interfaces\ISyncActionInformation.cs" />
+    <Compile Include="Models\SyncActionInformation.cs" />
     <Compile Include="Models\UserModel.cs" />
     <Compile Include="Repositories\ApiDeviceRepository.cs" />
     <Compile Include="Repositories\ApiUserRepository.cs" />

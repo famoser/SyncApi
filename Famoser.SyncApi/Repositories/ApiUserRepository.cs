@@ -4,6 +4,7 @@ using Famoser.SyncApi.Api;
 using Famoser.SyncApi.Api.Communication.Entities;
 using Famoser.SyncApi.Api.Communication.Request;
 using Famoser.SyncApi.Api.Configuration;
+using Famoser.SyncApi.Api.Enums;
 using Famoser.SyncApi.Enums;
 using Famoser.SyncApi.Helpers;
 using Famoser.SyncApi.Models.Information;
@@ -11,6 +12,7 @@ using Famoser.SyncApi.Models.Interfaces;
 using Famoser.SyncApi.Repositories.Base;
 using Famoser.SyncApi.Repositories.Interfaces;
 using Famoser.SyncApi.Services.Interfaces;
+using Famoser.SyncApi.Services.Interfaces.Authentication;
 using Famoser.SyncApi.Storage.Cache;
 using Famoser.SyncApi.Storage.Roaming;
 using Newtonsoft.Json;
@@ -24,12 +26,14 @@ namespace Famoser.SyncApi.Repositories
         private readonly ApiClient _authApiClient;
         private readonly IApiStorageService _apiStorageService;
         private readonly IApiConfigurationService _apiConfigurationService;
+        private readonly IApiAuthenticationService _apiAuthenticationService;
 
-        public ApiUserRepository(IApiConfigurationService apiConfigurationService, IApiStorageService apiStorageService, IApiTraceService traceService)
-            : base(apiConfigurationService, apiStorageService, traceService)
+        public ApiUserRepository(IApiConfigurationService apiConfigurationService, IApiStorageService apiStorageService, IApiTraceService traceService, IApiAuthenticationService apiAuthenticationService)
+            : base(apiConfigurationService, apiStorageService, traceService, apiAuthenticationService)
         {
             _apiConfigurationService = apiConfigurationService;
             _apiStorageService = apiStorageService;
+            _apiAuthenticationService = apiAuthenticationService;
 
             _authApiClient = GetAuthApiClient();
         }
@@ -85,102 +89,107 @@ namespace Famoser.SyncApi.Repositories
             }
         }
 
-        protected override async Task<bool> SyncInternalAsync()
+        public override Task<bool> SyncAsync()
         {
-            if (CacheEntity.ModelInformation.PendingAction == PendingAction.None)
-                return true;
+            return ExecuteSafeAsync(async () =>
+            {
+                if (CacheEntity.ModelInformation.PendingAction == PendingAction.None)
+                        return new Tuple<bool, SyncActionError>(true, SyncActionError.None); ;
 
-            if (CacheEntity.ModelInformation.PendingAction == PendingAction.Create)
-            {
-                var json = JsonConvert.SerializeObject(CacheEntity.Model);
-                var resp = await _authApiClient.DoSyncRequestAsync(
-                    AuthorizeRequest(ApiInformation, _roaming, new AuthRequestEntity()
-                    {
-                        UserEntity = new UserEntity()
-                        {
-                            Id = CacheEntity.ModelInformation.Id,
-                            OnlineAction = OnlineAction.Create,
-                            VersionId = CacheEntity.ModelInformation.VersionId,
-                            Content = json,
-                            PersonalSeed = _roaming.PersonalSeed,
-                            CreateDateTime = CacheEntity.ModelInformation.CreateDateTime,
-                            Identifier = CacheEntity.Model.GetClassIdentifier()
-                        }
-                    }));
-                if (resp.RequestFailed)
+                if (CacheEntity.ModelInformation.PendingAction == PendingAction.Create)
                 {
-                    return false;
+                    var json = JsonConvert.SerializeObject(CacheEntity.Model);
+                    var resp = await _authApiClient.DoSyncRequestAsync(
+                        AuthorizeRequest(ApiInformation, _roaming, new AuthRequestEntity()
+                        {
+                            UserEntity = new UserEntity()
+                            {
+                                Id = CacheEntity.ModelInformation.Id,
+                                OnlineAction = OnlineAction.Create,
+                                VersionId = CacheEntity.ModelInformation.VersionId,
+                                Content = json,
+                                PersonalSeed = _roaming.PersonalSeed,
+                                CreateDateTime = CacheEntity.ModelInformation.CreateDateTime,
+                                Identifier = CacheEntity.Model.GetClassIdentifier()
+                            }
+                        }));
+                    if (resp.RequestFailed)
+                    {
+                        return new Tuple<bool, SyncActionError>(false, SyncActionError.RequestUnsuccessful);
+                    }
+                    _roaming.AuthenticationState = AuthenticationState.Authenticated;
                 }
-                _roaming.AuthenticationState = AuthenticationState.Authenticated;
-            }
-            else if (CacheEntity.ModelInformation.PendingAction == PendingAction.Read)
-            {
-                var resp = await _authApiClient.DoSyncRequestAsync(
-                    AuthorizeRequest(ApiInformation, _roaming, new AuthRequestEntity()
-                    {
-                        UserEntity = new UserEntity()
-                        {
-                            Id = CacheEntity.ModelInformation.Id,
-                            OnlineAction = OnlineAction.Read
-                        }
-                    }));
-                if (resp.IsSuccessfull)
+                else if (CacheEntity.ModelInformation.PendingAction == PendingAction.Read)
                 {
-                    var user = JsonConvert.DeserializeObject<TUser>(resp.UserEntity.Content);
-                    user.SetId(CacheEntity.ModelInformation.Id);
-                    Manager.Set(user);
+                    var resp = await _authApiClient.DoSyncRequestAsync(
+                        AuthorizeRequest(ApiInformation, _roaming, new AuthRequestEntity()
+                        {
+                            UserEntity = new UserEntity()
+                            {
+                                Id = CacheEntity.ModelInformation.Id,
+                                OnlineAction = OnlineAction.Read
+                            }
+                        }));
+                    if (resp.IsSuccessfull)
+                    {
+                        var user = JsonConvert.DeserializeObject<TUser>(resp.UserEntity.Content);
+                        user.SetId(CacheEntity.ModelInformation.Id);
+                        Manager.Set(user);
+                    }
+                    else
+                        return new Tuple<bool, SyncActionError>(false, SyncActionError.RequestUnsuccessful);
                 }
-                else
-                    return false;
-            }
-            else if (CacheEntity.ModelInformation.PendingAction == PendingAction.Update)
-            {
-                var json = JsonConvert.SerializeObject(CacheEntity.Model);
-                var resp = await _authApiClient.DoSyncRequestAsync(
-                    AuthorizeRequest(ApiInformation, _roaming, new AuthRequestEntity()
-                    {
-                        UserEntity = new UserEntity()
-                        {
-                            Id = CacheEntity.ModelInformation.Id,
-                            OnlineAction = OnlineAction.Update,
-                            VersionId = CacheEntity.ModelInformation.VersionId,
-                            Content = json,
-                            CreateDateTime = CacheEntity.ModelInformation.CreateDateTime
-                        }
-                    }));
-                if (resp.RequestFailed)
+                else if (CacheEntity.ModelInformation.PendingAction == PendingAction.Update)
                 {
-                    return false;
+                    var json = JsonConvert.SerializeObject(CacheEntity.Model);
+                    var resp = await _authApiClient.DoSyncRequestAsync(
+                        AuthorizeRequest(ApiInformation, _roaming, new AuthRequestEntity()
+                        {
+                            UserEntity = new UserEntity()
+                            {
+                                Id = CacheEntity.ModelInformation.Id,
+                                OnlineAction = OnlineAction.Update,
+                                VersionId = CacheEntity.ModelInformation.VersionId,
+                                Content = json,
+                                CreateDateTime = CacheEntity.ModelInformation.CreateDateTime
+                            }
+                        }));
+                    if (resp.RequestFailed)
+                    {
+                        return new Tuple<bool, SyncActionError>(false, SyncActionError.RequestUnsuccessful);
+                    }
                 }
-            }
-            else if (CacheEntity.ModelInformation.PendingAction == PendingAction.Delete)
-            {
-                var resp = await _authApiClient.DoSyncRequestAsync(
-                    AuthorizeRequest(ApiInformation, _roaming, new AuthRequestEntity()
-                    {
-                        UserEntity = new UserEntity()
-                        {
-                            Id = CacheEntity.ModelInformation.Id,
-                            OnlineAction = OnlineAction.Delete
-                        }
-                    }));
-                if (resp.RequestFailed)
+                else if (CacheEntity.ModelInformation.PendingAction == PendingAction.Delete)
                 {
-                    return false;
+                    var resp = await _authApiClient.DoSyncRequestAsync(
+                        AuthorizeRequest(ApiInformation, _roaming, new AuthRequestEntity()
+                        {
+                            UserEntity = new UserEntity()
+                            {
+                                Id = CacheEntity.ModelInformation.Id,
+                                OnlineAction = OnlineAction.Delete
+                            }
+                        }));
+                    if (resp.RequestFailed)
+                    {
+                        return new Tuple<bool, SyncActionError>(false, SyncActionError.RequestUnsuccessful);
+                    }
+
+                    //clean up
+                    _roaming.UserId = Guid.Empty;
+                    _roaming.AuthenticationState = AuthenticationState.UnAuthenticated;
+                    CacheEntity.ModelInformation.PendingAction = PendingAction.None;
+                    await _apiStorageService.EraseRoamingAndCacheAsync();
+
+                    return new Tuple<bool, SyncActionError>(true, SyncActionError.None);
                 }
 
-                //clean up
-                _roaming.UserId = Guid.Empty;
-                _roaming.AuthenticationState = AuthenticationState.UnAuthenticated;
                 CacheEntity.ModelInformation.PendingAction = PendingAction.None;
-                return await _apiStorageService.EraseRoamingAndCacheAsync();
-            }
-            else
-                return true;
-
-            CacheEntity.ModelInformation.PendingAction = PendingAction.None;
-            var res = await _apiStorageService.SaveCacheEntityAsync<CacheEntity<TUser>>();
-            return res && await _apiStorageService.SaveApiRoamingEntityAsync(_roaming);
+                await _apiStorageService.SaveCacheEntityAsync<CacheEntity<TUser>>();
+                await _apiStorageService.SaveApiRoamingEntityAsync(_roaming);
+                
+                return new Tuple<bool, SyncActionError>(true,SyncActionError.None);
+            }, SyncAction.SyncUser, VerificationOption.CanAccessInternet);
         }
 
 
@@ -195,11 +204,10 @@ namespace Famoser.SyncApi.Repositories
 
         public async Task<ApiRoamingEntity> GetApiRoamingEntityAsync()
         {
-            await ExecuteSafeAsync(async () =>
-            {
-                if (_apiConfigurationService.CanUseWebConnection())
-                    await SyncInternalAsync();
-            });
+            //double validation for small perf. boost
+            if (CacheEntity.ModelInformation.PendingAction != PendingAction.None)
+                await SyncAsync();
+
             return _roaming;
         }
     }

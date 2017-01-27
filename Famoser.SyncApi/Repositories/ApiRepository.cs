@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Famoser.SyncApi.Api.Communication.Request;
+using Famoser.SyncApi.Api.Enums;
 using Famoser.SyncApi.Enums;
 using Famoser.SyncApi.Helpers;
 using Famoser.SyncApi.Models.Information;
@@ -54,74 +55,75 @@ namespace Famoser.SyncApi.Repositories
             }
         }
 
-        protected override async Task<bool> SyncInternalAsync()
+        public override Task<bool> SyncAsync()
         {
-            if (!await _apiAuthenticationService.IsAuthenticatedAsync())
-                return false;
-
-            var req = await _apiAuthenticationService.CreateRequestAsync<SyncEntityRequest, TCollection>();
-            if (req == null)
-                return false;
-
-            var client = GetApiClient();
-
-            var synced = new List<int>();
-            //first: push local data. This potentially will overwrite data from other devices, but with the VersionId we'll be able to revert back if things go wrong
-            for (int index = 0; index < CollectionCache.ModelInformations.Count; index++)
+            return ExecuteSafeAsync(async () =>
             {
-                var index1 = index;
-                var mdl = ApiEntityHelper.CreateSyncEntity(CollectionCache.ModelInformations[index], GetModelIdentifier(), () => CollectionCache.Models[index1]);
-                if (mdl != null)
-                {
-                    req.SyncEntities.Add(mdl);
-                    synced.Add(index);
-                }
-            }
-            var resp = await client.DoSyncRequestAsync(req);
-            if (!resp.IsSuccessfull)
-                return false;
+                var req = await _apiAuthenticationService.CreateRequestAsync<SyncEntityRequest, TCollection>();
+                if (req == null)
+                    return new Tuple<bool, SyncActionError>(false, SyncActionError.RequestCreationFailed);
 
-            foreach (var modelInformation in synced)
-                CollectionCache.ModelInformations[modelInformation].PendingAction = PendingAction.None;
-            
-            foreach (var syncEntity in resp.SyncEntities)
-            {
-                //new!
-                if (syncEntity.OnlineAction == OnlineAction.Create)
-                {
-                    var mi = ApiEntityHelper.CreateCacheInformation<CacheInformations>(syncEntity);
-                    var tcol = JsonConvert.DeserializeObject<TModel>(syncEntity.Content);
-                    tcol.SetId(mi.Id);
-                    CollectionCache.ModelInformations.Add(mi);
-                    CollectionCache.Models.Add(tcol);
-                    CollectionManager.Add(tcol);
-                }
-                //updated
-                else if (syncEntity.OnlineAction == OnlineAction.Update)
-                {
-                    var index = CollectionCache.ModelInformations.FindIndex(d => d.Id == syncEntity.Id);
-                    CollectionCache.ModelInformations[index].VersionId = syncEntity.VersionId;
-                    var model = JsonConvert.DeserializeObject<TModel>(syncEntity.Content);
-                    model.SetId(syncEntity.Id);
-                    CollectionManager.Replace(CollectionCache.Models[index], model);
-                    CollectionCache.Models[index] = model;
-                }
-                //removed
-                else if (syncEntity.OnlineAction == OnlineAction.Delete)
-                {
-                    var index = CollectionCache.ModelInformations.FindIndex(d => d.Id == syncEntity.Id);
-                    CollectionManager.Remove(CollectionCache.Models[index]);
-                    CollectionCache.ModelInformations.RemoveAt(index);
-                    CollectionCache.Models.RemoveAt(index);
-                }
-            }
+                var client = GetApiClient();
 
-            if (resp.SyncEntities.Any() || synced.Any())
-            {
-                await _apiStorageService.SaveCacheEntityAsync<CollectionCacheEntity<TModel>>();
-            }
+                var synced = new List<int>();
+                //first: push local data. This potentially will overwrite data from other devices, but with the VersionId we'll be able to revert back if things go wrong
+                for (int index = 0; index < CollectionCache.ModelInformations.Count; index++)
+                {
+                    var index1 = index;
+                    var mdl = ApiEntityHelper.CreateSyncEntity(CollectionCache.ModelInformations[index],
+                        GetModelIdentifier(), () => CollectionCache.Models[index1]);
+                    if (mdl != null)
+                    {
+                        req.SyncEntities.Add(mdl);
+                        synced.Add(index);
+                    }
+                }
+                var resp = await client.DoSyncRequestAsync(req);
+                if (!resp.IsSuccessfull)
+                    return new Tuple<bool, SyncActionError>(false, SyncActionError.RequestUnsuccessful);
 
-            return true;
+                foreach (var modelInformation in synced)
+                    CollectionCache.ModelInformations[modelInformation].PendingAction = PendingAction.None;
+
+                foreach (var syncEntity in resp.SyncEntities)
+                {
+                    //new!
+                    if (syncEntity.OnlineAction == OnlineAction.Create)
+                    {
+                        var mi = ApiEntityHelper.CreateCacheInformation<CacheInformations>(syncEntity);
+                        var tcol = JsonConvert.DeserializeObject<TModel>(syncEntity.Content);
+                        tcol.SetId(mi.Id);
+                        CollectionCache.ModelInformations.Add(mi);
+                        CollectionCache.Models.Add(tcol);
+                        CollectionManager.Add(tcol);
+                    }
+                    //updated
+                    else if (syncEntity.OnlineAction == OnlineAction.Update)
+                    {
+                        var index = CollectionCache.ModelInformations.FindIndex(d => d.Id == syncEntity.Id);
+                        CollectionCache.ModelInformations[index].VersionId = syncEntity.VersionId;
+                        var model = JsonConvert.DeserializeObject<TModel>(syncEntity.Content);
+                        model.SetId(syncEntity.Id);
+                        CollectionManager.Replace(CollectionCache.Models[index], model);
+                        CollectionCache.Models[index] = model;
+                    }
+                    //removed
+                    else if (syncEntity.OnlineAction == OnlineAction.Delete)
+                    {
+                        var index = CollectionCache.ModelInformations.FindIndex(d => d.Id == syncEntity.Id);
+                        CollectionManager.Remove(CollectionCache.Models[index]);
+                        CollectionCache.ModelInformations.RemoveAt(index);
+                        CollectionCache.Models.RemoveAt(index);
+                    }
+                }
+
+                if (resp.SyncEntities.Any() || synced.Any())
+                {
+                    await _apiStorageService.SaveCacheEntityAsync<CollectionCacheEntity<TModel>>();
+                }
+
+                return new Tuple<bool, SyncActionError>(true, SyncActionError.None);
+            },SyncAction.SyncEntity,VerificationOption.CanAccessInternet | VerificationOption.IsAuthenticatedFully);
         }
 
         public Task<bool> SaveToCollectionAsync(TModel model, TCollection collection)
@@ -156,13 +158,22 @@ namespace Famoser.SyncApi.Repositories
                 }
                 info.VersionId = Guid.NewGuid();
                 await SaveCacheAsync();
-                return true;
-            });
+                return new Tuple<bool, SyncActionError>(true, SyncActionError.None);
+            }, SyncAction.SaveEntity, VerificationOption.IsAuthenticatedFully);
         }
 
         public Task<bool> SaveAsync(TModel model)
         {
             return SaveToCollectionAsync(model, default(TCollection));
+        }
+
+        public override Task<bool> RemoveAsync(TModel model)
+        {
+            return ExecuteSafeAsync(async () =>
+            {
+                var resp = await RemoveInternalAsync(model);
+                return new Tuple<bool, SyncActionError>(true, resp);
+            }, SyncAction.RemoveCollection, VerificationOption.None);
         }
     }
 }

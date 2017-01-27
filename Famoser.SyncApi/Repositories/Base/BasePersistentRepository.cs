@@ -2,9 +2,12 @@
 using System.Threading.Tasks;
 using Famoser.FrameworkEssentials.Logging.Interfaces;
 using Famoser.SyncApi.Api;
+using Famoser.SyncApi.Enums;
+using Famoser.SyncApi.Models;
 using Famoser.SyncApi.Models.Interfaces.Base;
 using Famoser.SyncApi.Repositories.Interfaces.Base;
 using Famoser.SyncApi.Services.Interfaces;
+using Famoser.SyncApi.Services.Interfaces.Authentication;
 
 namespace Famoser.SyncApi.Repositories.Base
 {
@@ -12,79 +15,117 @@ namespace Famoser.SyncApi.Repositories.Base
         where TModel : IUniqueSyncModel
     {
         private readonly IApiConfigurationService _apiConfigurationService;
+        private readonly IApiAuthenticationService _apiAuthenticationService;
         private readonly IApiTraceService _apiTraceService;
-        protected BasePersistentRepository(IApiConfigurationService apiConfigurationService, IApiTraceService traceService)
+        protected BasePersistentRepository(IApiConfigurationService apiConfigurationService, IApiAuthenticationService apiAuthenticationService, IApiTraceService traceService)
         {
             _apiConfigurationService = apiConfigurationService;
+            _apiAuthenticationService = apiAuthenticationService;
             _apiTraceService = traceService;
         }
 
-        public Task<bool> SyncAsync()
-        {
-            return ExecuteSafeAsync(async () =>
-            {
-                if (_apiConfigurationService.CanUseWebConnection())
-                    return await SyncInternalAsync();
-                return false;
-            });
-        }
-
-        public void SetExceptionLogger(IExceptionLogger exceptionLogger)
-        {
-            ExceptionLogger = exceptionLogger;
-        }
-
-        protected abstract Task<bool> SyncInternalAsync();
         protected abstract Task<bool> InitializeAsync();
 
-        protected IExceptionLogger ExceptionLogger;
-        protected async Task<T> ExecuteSafeAsync<T>(Func<Task<T>> func, bool ensureWebCanBeUsed = false)
+        protected async Task<T> ExecuteSafeAsync<T>(Func<Task<Tuple<T, SyncActionError>>> func, SyncAction action, VerificationOption verification)
         {
+            var ev = _apiTraceService.CreateSyncActionInformation(action);
+
             try
             {
                 if (!await InitializeAsync())
+                {
+                    ev.SetSyncActionResult(SyncActionError.InitializationFailed);
                     return default(T);
+                }
 
-                if (!ensureWebCanBeUsed || _apiConfigurationService.CanUseWebConnection())
-                    return await func();
+                if (verification.HasFlag(VerificationOption.CanAccessInternet) && !_apiConfigurationService.CanUseWebConnection())
+                {
+                    ev.SetSyncActionResult(SyncActionError.WebAccessDenied);
+                }
+                else if (verification.HasFlag(VerificationOption.CanAccessInternet) && await _apiAuthenticationService.IsAuthenticatedAsync())
+                {
+                    ev.SetSyncActionResult(SyncActionError.NotAuthenticatedFully);
+                }
+                else
+                {
+                    var res = await func();
+                    ev.SetSyncActionResult(res.Item2);
+                    return res.Item1;
+                }
             }
             catch (Exception ex)
             {
-                ExceptionLogger?.LogException(ex, this);
+                ev.SetSyncActionException(ex);
             }
             return default(T);
         }
 
-        protected async Task<T> ExecuteSafeAsync<T>(Func<T> func, bool ensureWebCanBeUsed = false)
+        protected async Task<T> ExecuteSafeAsync<T>(Func<Tuple<T, SyncActionError>> func, SyncAction action, VerificationOption verification)
         {
+            var ev = _apiTraceService.CreateSyncActionInformation(action);
+
             try
             {
                 if (!await InitializeAsync())
+                {
+                    ev.SetSyncActionResult(SyncActionError.InitializationFailed);
                     return default(T);
+                }
 
-                if (!ensureWebCanBeUsed || _apiConfigurationService.CanUseWebConnection())
-                    return func();
+                if (verification.HasFlag(VerificationOption.CanAccessInternet) && !_apiConfigurationService.CanUseWebConnection())
+                {
+                    ev.SetSyncActionResult(SyncActionError.WebAccessDenied);
+                }
+                else if (verification.HasFlag(VerificationOption.CanAccessInternet) && await _apiAuthenticationService.IsAuthenticatedAsync())
+                {
+                    ev.SetSyncActionResult(SyncActionError.NotAuthenticatedFully);
+                }
+                else
+                {
+                    var res = func();
+                    ev.SetSyncActionResult(res.Item2);
+                    return res.Item1;
+                }
+                ev.SetSyncActionResult(SyncActionError.WebAccessDenied);
             }
             catch (Exception ex)
             {
-                ExceptionLogger?.LogException(ex, this);
+                ev.SetSyncActionException(ex);
             }
             return default(T);
         }
 
-        protected async Task ExecuteSafeAsync(Func<Task> func, bool ensureWebCanBeUsed = false)
+        protected async Task ExecuteSafeAsync(Func<Task<SyncActionError>> func, SyncAction action, VerificationOption verification)
         {
+            var ev = _apiTraceService.CreateSyncActionInformation(action);
+
             try
             {
                 if (!await InitializeAsync())
+                {
+                    ev.SetSyncActionResult(SyncActionError.InitializationFailed);
                     return;
+                }
 
-                if (!ensureWebCanBeUsed || _apiConfigurationService.CanUseWebConnection())
-                    await func();
+                if (verification.HasFlag(VerificationOption.CanAccessInternet) && !_apiConfigurationService.CanUseWebConnection())
+                {
+                    ev.SetSyncActionResult(SyncActionError.WebAccessDenied);
+                }
+                else if (verification.HasFlag(VerificationOption.CanAccessInternet) && await _apiAuthenticationService.IsAuthenticatedAsync())
+                {
+                    ev.SetSyncActionResult(SyncActionError.NotAuthenticatedFully);
+                }
+                else
+                {
+                    var res = await func();
+                    ev.SetSyncActionResult(res);
+                    return;
+                }
+                ev.SetSyncActionResult(SyncActionError.WebAccessDenied);
             }
             catch (Exception ex)
             {
-                ExceptionLogger?.LogException(ex, this);
+                ev.SetSyncActionException(ex);
             }
         }
 
@@ -140,5 +181,7 @@ namespace Famoser.SyncApi.Repositories.Base
             Dispose(true);
             GC.SuppressFinalize(this);
         }
+
+        public abstract Task<bool> SyncAsync();
     }
 }

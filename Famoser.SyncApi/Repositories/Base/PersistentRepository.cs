@@ -8,6 +8,7 @@ using Famoser.SyncApi.Models.Information;
 using Famoser.SyncApi.Models.Interfaces.Base;
 using Famoser.SyncApi.Repositories.Interfaces.Base;
 using Famoser.SyncApi.Services.Interfaces;
+using Famoser.SyncApi.Services.Interfaces.Authentication;
 using Famoser.SyncApi.Storage.Cache;
 
 namespace Famoser.SyncApi.Repositories.Base
@@ -21,13 +22,15 @@ namespace Famoser.SyncApi.Repositories.Base
         private readonly IApiConfigurationService _apiConfigurationService;
         private readonly IApiStorageService _apiStorageService;
         private readonly IApiTraceService _apiTraceService;
+        private readonly IApiAuthenticationService _apiAuthenticationService;
 
-        protected PersistentRepository(IApiConfigurationService apiConfigurationService, IApiStorageService apiStorageService, IApiTraceService traceService)
-            : base(apiConfigurationService, traceService)
+        protected PersistentRepository(IApiConfigurationService apiConfigurationService, IApiStorageService apiStorageService, IApiTraceService traceService, IApiAuthenticationService apiAuthenticationService)
+            : base(apiConfigurationService, apiAuthenticationService, traceService)
         {
             _apiConfigurationService = apiConfigurationService;
             _apiStorageService = apiStorageService;
             _apiTraceService = traceService;
+            _apiAuthenticationService = apiAuthenticationService;
 
             Manager = _apiConfigurationService.GetManager<TModel>();
             ApiInformation = apiConfigurationService.GetApiInformations();
