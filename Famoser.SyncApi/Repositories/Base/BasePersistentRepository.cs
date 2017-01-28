@@ -14,7 +14,7 @@ namespace Famoser.SyncApi.Repositories.Base
         where TModel : IUniqueSyncModel
     {
         private readonly IApiConfigurationService _apiConfigurationService;
-        private readonly IApiAuthenticationService _apiAuthenticationService;
+        private IApiAuthenticationService _apiAuthenticationService;
         private readonly IApiTraceService _apiTraceService;
         protected BasePersistentRepository(IApiConfigurationService apiConfigurationService, IApiAuthenticationService apiAuthenticationService, IApiTraceService traceService)
         {
@@ -207,5 +207,10 @@ namespace Famoser.SyncApi.Repositories.Base
         }
 
         public abstract Task<bool> SyncAsync();
+
+        public void SetAuthenticationService(IApiAuthenticationService apiAuthenticationService)
+        {
+            _apiAuthenticationService = apiAuthenticationService;
+        }
     }
 }

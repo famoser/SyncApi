@@ -12,7 +12,6 @@ using Famoser.SyncApi.Models.Interfaces;
 using Famoser.SyncApi.Repositories.Base;
 using Famoser.SyncApi.Repositories.Interfaces;
 using Famoser.SyncApi.Services.Interfaces;
-using Famoser.SyncApi.Services.Interfaces.Authentication;
 using Famoser.SyncApi.Storage.Cache;
 using Famoser.SyncApi.Storage.Roaming;
 using Newtonsoft.Json;
@@ -27,12 +26,11 @@ namespace Famoser.SyncApi.Repositories
         private readonly IApiStorageService _apiStorageService;
         private readonly IApiConfigurationService _apiConfigurationService;
 
-        public ApiUserRepository(IApiConfigurationService apiConfigurationService, IApiStorageService apiStorageService, IApiTraceService traceService, IApiAuthenticationService apiAuthenticationService)
-            : base(apiConfigurationService, apiStorageService, traceService, apiAuthenticationService)
+        public ApiUserRepository(IApiConfigurationService apiConfigurationService, IApiStorageService apiStorageService, IApiTraceService traceService)
+            : base(apiConfigurationService, apiStorageService, traceService)
         {
             _apiConfigurationService = apiConfigurationService;
             _apiStorageService = apiStorageService;
-            apiAuthenticationService.SetUserAuthenticationService(this);
 
             _authApiClient = GetAuthApiClient();
         }

@@ -2,12 +2,9 @@
 using System.Reflection;
 using System.Threading.Tasks;
 using Famoser.SyncApi.Api;
-using Famoser.SyncApi.Api.Communication.Request;
-using Famoser.SyncApi.Api.Communication.Request.Base;
 using Famoser.SyncApi.Api.Communication.Response.Base;
 using Famoser.SyncApi.Api.Enums;
 using Famoser.SyncApi.NUnitTests.Helpers;
-using Famoser.SyncApi.NUnitTests.Implementations;
 using Famoser.SyncApi.NUnitTests.Models;
 using Famoser.SyncApi.Services;
 using NUnit.Framework;

@@ -27,7 +27,6 @@ namespace Famoser.SyncApi.Repositories
         private readonly IApiConfigurationService _apiConfigurationService;
         private readonly IApiStorageService _apiStorageService;
         private readonly IApiAuthenticationService _apiAuthenticationService;
-        private readonly IApiTraceService _apiTraceService;
 
         public ApiRepository(IApiCollectionRepository<TCollection> collectionRepository, IApiConfigurationService apiConfigurationService, IApiStorageService apiStorageService, IApiAuthenticationService apiAuthenticationService, IApiTraceService apiTraceService)
             : base(apiConfigurationService, apiStorageService, apiAuthenticationService, apiTraceService)
@@ -36,7 +35,6 @@ namespace Famoser.SyncApi.Repositories
             _apiConfigurationService = apiConfigurationService;
             _apiStorageService = apiStorageService;
             _apiAuthenticationService = apiAuthenticationService;
-            _apiTraceService = apiTraceService;
         }
 
         private readonly AsyncLock _asyncLock = new AsyncLock();

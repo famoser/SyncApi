@@ -46,21 +46,21 @@ namespace Famoser.SyncApi.Helpers
         private IApiAuthenticationService _apiAuthenticationService;
         public IApiAuthenticationService ApiAuthenticationService
         {
-            get { return _apiAuthenticationService ?? (_apiAuthenticationService = new ApiAuthenticationService(ApiConfigurationService)); }
+            get { return _apiAuthenticationService ?? (_apiAuthenticationService = new ApiAuthenticationService(ApiConfigurationService, ApiUserRepository, ApiDeviceRepository)); }
             set { _apiAuthenticationService = value; }
         }
 
         private IApiUserRepository<UserModel> _apiUserRepository;
         public IApiUserRepository<UserModel> ApiUserRepository
         {
-            get { return _apiUserRepository ?? (_apiUserRepository = new ApiUserRepository<UserModel>(ApiConfigurationService, ApiStorageService, ApiTraceService, ApiAuthenticationService)); }
+            get { return _apiUserRepository ?? (_apiUserRepository = new ApiUserRepository<UserModel>(ApiConfigurationService, ApiStorageService, ApiTraceService)); }
             set { _apiUserRepository = value; }
         }
 
         private IApiDeviceRepository<DeviceModel> _apiDeviceRepository;
         public IApiDeviceRepository<DeviceModel> ApiDeviceRepository
         {
-            get { return _apiDeviceRepository ?? (_apiDeviceRepository = new ApiDeviceRepository<DeviceModel>(ApiConfigurationService, ApiStorageService, ApiTraceService, ApiAuthenticationService)); }
+            get { return _apiDeviceRepository ?? (_apiDeviceRepository = new ApiDeviceRepository<DeviceModel>(ApiConfigurationService, ApiStorageService, ApiTraceService)); }
             set { _apiDeviceRepository = value; }
         }
 

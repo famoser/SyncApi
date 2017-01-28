@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.ObjectModel;
-using Famoser.FrameworkEssentials.Logging;
 using Famoser.SyncApi.Api.Communication.Request.Base;
 using Famoser.SyncApi.Services.Interfaces;
 using Famoser.SyncApi.Enums;

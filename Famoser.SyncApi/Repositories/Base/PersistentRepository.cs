@@ -24,7 +24,7 @@ namespace Famoser.SyncApi.Repositories.Base
         private readonly IApiTraceService _apiTraceService;
         private readonly IApiAuthenticationService _apiAuthenticationService;
 
-        protected PersistentRepository(IApiConfigurationService apiConfigurationService, IApiStorageService apiStorageService, IApiTraceService traceService, IApiAuthenticationService apiAuthenticationService)
+        protected PersistentRepository(IApiConfigurationService apiConfigurationService, IApiStorageService apiStorageService, IApiTraceService traceService, IApiAuthenticationService apiAuthenticationService = null)
             : base(apiConfigurationService, apiAuthenticationService, traceService)
         {
             _apiConfigurationService = apiConfigurationService;
