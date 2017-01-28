@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 using Famoser.FrameworkEssentials.Services;
+using Famoser.SyncApi.Api.Communication.Request.Base;
 using Famoser.SyncApi.Api.Communication.Response.Base;
 using Newtonsoft.Json;
 using Famoser.SyncApi.Services.Interfaces;
@@ -25,7 +26,7 @@ namespace Famoser.SyncApi.Api.Base
             return new Uri(_baseUri.AbsoluteUri + "1.0/" + node);
         }
 
-        protected virtual async Task<T> DoApiRequestAsync<T>(object request, string node = "") where T : BaseResponse, new()
+        protected virtual async Task<T> DoApiRequestAsync<T>(BaseRequest request, string node = "") where T : BaseResponse, new()
         {
             var response = await _restService.PostJsonAsync(GetUri(node), JsonConvert.SerializeObject(request));
             if (response != null)

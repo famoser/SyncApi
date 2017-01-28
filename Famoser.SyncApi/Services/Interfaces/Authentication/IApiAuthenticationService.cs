@@ -70,5 +70,17 @@ namespace Famoser.SyncApi.Services.Interfaces.Authentication
         /// <param name="repository"></param>
         void RegisterCollectionRepository<TCollection>(IApiCollectionRepository<TCollection> repository)
             where TCollection : ICollectionModel;
+
+        /// <summary>
+        /// set the service to use for device authenticaion
+        /// </summary>
+        /// <param name="userAuthenticationService"></param>
+        void SetUserAuthenticationService(IApiUserAuthenticationService userAuthenticationService);
+
+        /// <summary>
+        /// set the service to use for user authentication
+        /// </summary>
+        /// <param name="deviceAuthenticationService"></param>
+        void SetDeviceAuthenticationService(IApiDeviceAuthenticationService deviceAuthenticationService);
     }
 }

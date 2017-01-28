@@ -9,7 +9,7 @@ namespace Famoser.SyncApi.NUnitTests.CSharpTests
     [TestFixture]
     public class AsyncTests
     {
-        public async Task CheckForSameInstance()
+        public async Task CheckForSameInstanceAsync()
         {
             var instance = await GetInstanceAsync();
             Assert.IsTrue(instance.Item1 == _collectionModel);
@@ -19,7 +19,7 @@ namespace Famoser.SyncApi.NUnitTests.CSharpTests
             Assert.IsTrue(instance2.Item1 == _collectionModel);
         }
 
-        private CollectionModel _collectionModel;
+        private readonly CollectionModel _collectionModel = new CollectionModel();
         private async Task<Tuple<CollectionModel, byte[]>> GetInstanceAsync()
         {
             using (var client = new WebClient())

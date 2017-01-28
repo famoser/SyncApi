@@ -26,14 +26,13 @@ namespace Famoser.SyncApi.Repositories
         private readonly ApiClient _authApiClient;
         private readonly IApiStorageService _apiStorageService;
         private readonly IApiConfigurationService _apiConfigurationService;
-        private readonly IApiAuthenticationService _apiAuthenticationService;
 
         public ApiUserRepository(IApiConfigurationService apiConfigurationService, IApiStorageService apiStorageService, IApiTraceService traceService, IApiAuthenticationService apiAuthenticationService)
             : base(apiConfigurationService, apiStorageService, traceService, apiAuthenticationService)
         {
             _apiConfigurationService = apiConfigurationService;
             _apiStorageService = apiStorageService;
-            _apiAuthenticationService = apiAuthenticationService;
+            apiAuthenticationService.SetUserAuthenticationService(this);
 
             _authApiClient = GetAuthApiClient();
         }

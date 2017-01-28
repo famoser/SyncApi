@@ -1,7 +1,10 @@
 ﻿using System;
+using System.Collections.ObjectModel;
 using Famoser.FrameworkEssentials.Logging;
+using Famoser.SyncApi.Api.Communication.Request.Base;
 using Famoser.SyncApi.Services.Interfaces;
 using Famoser.SyncApi.Enums;
+using Famoser.SyncApi.Events;
 using Famoser.SyncApi.Models;
 using Famoser.SyncApi.Models.Interfaces;
 
@@ -9,24 +12,30 @@ namespace Famoser.SyncApi.Services
 {
     public class ApiTraceService : IApiTraceService
     {
-        public void TraceFailedRequest(object request, string link, string message)
+        public ObservableCollection<SyncActionInformation> SyncActionInformations { get; } = new ObservableCollection<SyncActionInformation>();
+
+        public EventHandler<RequestEventArgs> RequestFailed;
+        public EventHandler<RequestEventArgs> RequestSuccessful;
+        public void TraceFailedRequest(BaseRequest request, string link, string message)
         {
-            //don't do shit
+            RequestFailed?.Invoke(this, new RequestEventArgs(request, link, false,message));
         }
 
-        public void TraceSuccessfulRequest(object request, string link)
+        public void TraceSuccessfulRequest(BaseRequest request, string link)
         {
-            //don't do shit
+            RequestSuccessful?.Invoke(this, new RequestEventArgs(request, link));
         }
 
         public ISyncActionInformation CreateSyncActionInformation(SyncAction action)
         {
-            return new SyncActionInformation(action);
+            var info = new SyncActionInformation(action);
+            SyncActionInformations.Add(info);
+            return info;
         }
 
         public void LogException(Exception ex, object @from = null)
         {
-            //ignore too
+            //ignore
         }
     }
 }

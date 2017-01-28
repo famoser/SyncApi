@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System.Linq;
+using System.Threading.Tasks;
 using Famoser.SyncApi.NUnitTests.Helpers;
 using Famoser.SyncApi.NUnitTests.Implementations;
 using Famoser.SyncApi.NUnitTests.Models;
@@ -10,11 +11,11 @@ namespace Famoser.SyncApi.NUnitTests.Repository
     public class OfflineRepositoryTests
     {
         [Test]
-        public async Task TestSave()
+        public async Task TestSaveAsync()
         {
             //arrange
-            var helper = TestHelper.GetOfflineApiHelper();
-            var repo = helper.ResolveRepository<NoteModel>();
+            var testHelper = new TestHelper { CanUserWebConnectionFunc = () => false };
+            var repo = testHelper.SyncApiHelper.ResolveRepository<NoteModel>();
             var model = new NoteModel { Content = "Hallo Welt!" };
 
             //act
@@ -23,19 +24,24 @@ namespace Famoser.SyncApi.NUnitTests.Repository
             //assert
             Assert.IsTrue(saveRes);
             Assert.IsTrue(repo.GetAllLazy().Contains(model));
+            testHelper.AssertNoErrors();
         }
 
         [Test]
-        public async Task TestSaveAndRetrieve()
+        public async Task TestSaveAndRetrieveAsync()
         {
             //arrange
-            var ss = new StorageService();
-            var helper = TestHelper.GetOfflineApiHelper(ss);
-            var repo = helper.ResolveRepository<NoteModel>();
+            var testHelper = new TestHelper { CanUserWebConnectionFunc = () => false };
+            var repo = testHelper.SyncApiHelper.ResolveRepository<NoteModel>();
             var model = new NoteModel { Content = "Hallo Welt!" };
 
-            var helper2 = TestHelper.GetOfflineApiHelper(ss);
-            var repo2 = helper2.ResolveRepository<NoteModel>();
+            var testHelper2 = new TestHelper
+            {
+                CanUserWebConnectionFunc = () => false,
+                //preservce storage service to check retrieval of cache files
+                StorageService = testHelper.StorageService
+            };
+            var repo2 = testHelper2.SyncApiHelper.ResolveRepository<NoteModel>();
 
             //act
             var saveRes = await repo.SaveAsync(model);
@@ -46,19 +52,23 @@ namespace Famoser.SyncApi.NUnitTests.Repository
             Assert.IsTrue(repo.GetAllLazy().Contains(model));
             Assert.IsTrue(model2.Count == 1);
             Assert.IsTrue(model2[0].Content == "Hallo Welt!");
+
+            //ensure no requests
+            testHelper.AssertNoErrors();
+            Assert.IsFalse(testHelper.SuccessfulRequestEventArgs.Any());
+            Assert.IsFalse(testHelper.FailedRequestEventArgs.Any());
         }
 
         [Test]
-        public async Task TestMultipleSave()
+        public async Task TestMultipleSaveAsync()
         {
             //arrange
-            var ss = new StorageService();
-            var helper = TestHelper.GetOfflineApiHelper(ss);
-            var repo = helper.ResolveRepository<NoteModel>();
+            var testHelper = new TestHelper { CanUserWebConnectionFunc = () => false };
+            var repo = testHelper.SyncApiHelper.ResolveRepository<NoteModel>();
             var model = new NoteModel { Content = "Hallo Welt!" };
 
-            var helper2 = TestHelper.GetOfflineApiHelper(ss);
-            var repo2 = helper2.ResolveRepository<NoteModel>();
+            var testHelper2 = new TestHelper { CanUserWebConnectionFunc = () => false };
+            var repo2 = testHelper2.SyncApiHelper.ResolveRepository<NoteModel>();
 
             //act
             var saveRes = await repo.SaveAsync(model);
@@ -72,9 +82,6 @@ namespace Famoser.SyncApi.NUnitTests.Repository
             Assert.IsTrue(model2.Count == 1);
             Assert.IsTrue(model2[0].Content == "Hallo Welt!");
 
-            helper2 = TestHelper.GetOfflineApiHelper(ss);
-            repo2 = helper2.ResolveRepository<NoteModel>();
-
             //act
             var saveRes3 = await repo.SaveAsync(model);
             var saveRes4 = await repo.SaveAsync(model);
@@ -85,6 +92,8 @@ namespace Famoser.SyncApi.NUnitTests.Repository
             Assert.IsTrue(saveRes4);
             Assert.IsTrue(model3.Count == 1);
             Assert.IsTrue(model3[0].Content == "Hallo Welt!");
+            testHelper.AssertNoErrors();
+            testHelper2.AssertNoErrors();
         }
     }
 }

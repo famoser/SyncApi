@@ -56,6 +56,7 @@
     <Compile Include="Enums\SyncAction.cs" />
     <Compile Include="Enums\SyncActionError.cs" />
     <Compile Include="Enums\VerificationOption.cs" />
+    <Compile Include="Events\RequestEventArgs.cs" />
     <Compile Include="Helpers\ApiEntityHelper.cs" />
     <Compile Include="Helpers\SyncApiHelper.cs" />
     <Compile Include="Models\AbstractSyncModel.cs" />

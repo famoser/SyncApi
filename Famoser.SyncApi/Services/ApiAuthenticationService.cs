@@ -21,16 +21,13 @@ namespace Famoser.SyncApi.Services
     public class ApiAuthenticationService : IApiAuthenticationService
     {
         private readonly AsyncLock _asyncLock = new AsyncLock();
-        private readonly IApiUserAuthenticationService _apiUserAuthenticationService;
-        private readonly IApiDeviceAuthenticationService _apiDeviceAuthenticationService;
+        private IApiUserAuthenticationService _apiUserAuthenticationService;
+        private IApiDeviceAuthenticationService _apiDeviceAuthenticationService;
         private readonly ApiInformation _apiInformation;
 
-        public ApiAuthenticationService(IApiConfigurationService apiConfigurationService, IApiUserAuthenticationService apiUserAuthenticationService, IApiDeviceAuthenticationService apiDeviceAuthenticationService)
+        public ApiAuthenticationService(IApiConfigurationService apiConfigurationService)
         {
             _apiInformation = apiConfigurationService.GetApiInformations();
-
-            _apiUserAuthenticationService = apiUserAuthenticationService;
-            _apiDeviceAuthenticationService = apiDeviceAuthenticationService;
         }
 
         private bool IsAuthenticated()
@@ -137,6 +134,16 @@ namespace Famoser.SyncApi.Services
                 _dictionary[typeof(TCollection)] = repository;
             else
                 _dictionary.Add(typeof(TCollection), repository);
+        }
+
+        public void SetUserAuthenticationService(IApiUserAuthenticationService userAuthenticationService)
+        {
+            _apiUserAuthenticationService = userAuthenticationService;
+        }
+
+        public void SetDeviceAuthenticationService(IApiDeviceAuthenticationService deviceAuthenticationService)
+        {
+            _apiDeviceAuthenticationService = deviceAuthenticationService;
         }
     }
 }

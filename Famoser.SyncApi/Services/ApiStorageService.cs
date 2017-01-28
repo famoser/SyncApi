@@ -93,13 +93,13 @@ namespace Famoser.SyncApi.Services
 
         public Task<ApiRoamingEntity> GetApiRoamingEntityAsync()
         {
-            return ExecuteSafe(() => _apiRoamingEntity);
+            return ExecuteSafeAsync(() => _apiRoamingEntity);
 
         }
 
         public Task<bool> SaveApiRoamingEntityAsync(ApiRoamingEntity entity)
         {
-            return ExecuteSafe(async () =>
+            return ExecuteSafeAsync(async () =>
             {
                 var json = JsonConvert.SerializeObject(_apiRoamingEntity);
                 var filePath = GetApiRoamingFilePath();
@@ -110,7 +110,7 @@ namespace Famoser.SyncApi.Services
 
         public Task<bool> EraseRoamingAndCacheAsync()
         {
-            return ExecuteSafe(async () =>
+            return ExecuteSafeAsync(async () =>
             {
                 await _storageService.DeleteRoamingFileAsync(GetApiRoamingFilePath());
                 await _storageService.DeleteCachedFileAsync(GetApiStorageFilePath());
@@ -181,7 +181,7 @@ namespace Famoser.SyncApi.Services
         }
         private IExceptionLogger _exceptionLogger;
 
-        protected async Task<T> ExecuteSafe<T>(Func<Task<T>> func)
+        protected async Task<T> ExecuteSafeAsync<T>(Func<Task<T>> func)
             where T : new()
         {
             try
@@ -198,7 +198,7 @@ namespace Famoser.SyncApi.Services
             return default(T);
         }
 
-        protected async Task<T> ExecuteSafe<T>(Func<T> func)
+        protected async Task<T> ExecuteSafeAsync<T>(Func<T> func)
             where T : new()
         {
             try

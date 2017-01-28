@@ -3,6 +3,8 @@ using System.Reflection;
 using System.Threading.Tasks;
 using Famoser.SyncApi.Api;
 using Famoser.SyncApi.Api.Communication.Request;
+using Famoser.SyncApi.Api.Communication.Request.Base;
+using Famoser.SyncApi.Api.Communication.Response.Base;
 using Famoser.SyncApi.Api.Enums;
 using Famoser.SyncApi.NUnitTests.Helpers;
 using Famoser.SyncApi.NUnitTests.Implementations;
@@ -16,22 +18,20 @@ namespace Famoser.SyncApi.NUnitTests.Repository
     public class SyncRepositoryTests
     {
         [Test]
-        public async Task TestSaveAndRetrieve()
+        public async Task TestSaveAndRetrieveAsync()
         {
             //arrange
-            var ss = new StorageService();
-            var helper = TestHelper.GetOnlineApiHelper(ss);
-
-            var repo = helper.ResolveRepository<NoteModel>();
+            var testHelper = new TestHelper { CanUserWebConnectionFunc = () => false };
+            var repo = testHelper.SyncApiHelper.ResolveRepository<NoteModel>();
             var model = new NoteModel { Content = "Hallo Welt!" };
+            
+            var testHelper2 = new TestHelper { CanUserWebConnectionFunc = () => false };
+            var repo2 = testHelper2.SyncApiHelper.ResolveRepository<NoteModel>();
 
-            var helper2 = TestHelper.GetOnlineApiHelper(ss);
-            var repo2 = helper2.ResolveRepository<NoteModel>();
 
             //act
             var saveRes = await repo.SaveAsync(model);
-            //clear cache to ensure the notemodel is downloaded
-            ss.ClearCache();
+            //new instance with empty cache to ensure the notemodel is downloaded
             var model2 = await repo2.GetAllAsync();
 
             //assert
@@ -42,17 +42,17 @@ namespace Famoser.SyncApi.NUnitTests.Repository
         }
 
         [Test]
-        public async Task TestSaveThreeAndRetrieve()
+        public async Task TestSaveThreeAndRetrieveAsync()
         {
             //arrange
-            var ss = new StorageService();
-            var helper = TestHelper.GetOnlineApiHelper(ss);
+            var testHelper = new TestHelper { CanUserWebConnectionFunc = () => false };
+            var repo = testHelper.SyncApiHelper.ResolveRepository<NoteModel>();
 
-            var repo = helper.ResolveRepository<NoteModel>();
             var model = new NoteModel { Content = "Hallo Welt!" };
 
-            var helper2 = TestHelper.GetOnlineApiHelper(ss);
-            var repo2 = helper2.ResolveRepository<NoteModel>();
+            var testHelper2 = new TestHelper { CanUserWebConnectionFunc = () => false };
+            var repo2 = testHelper2.SyncApiHelper.ResolveRepository<NoteModel>();
+
 
             //act
             await repo.SaveAsync(model);
@@ -60,8 +60,7 @@ namespace Famoser.SyncApi.NUnitTests.Repository
             await repo.SaveAsync(model);
             model.Content = "Hallo Welt 3";
             await repo.SaveAsync(model);
-            //clear cache to ensure the notemodel is downloaded
-            ss.ClearCache();
+            //new instance with empty cache to ensure the notemodel is downloaded
             var model2 = await repo2.GetAllAsync();
 
             //assert
@@ -76,20 +75,30 @@ namespace Famoser.SyncApi.NUnitTests.Repository
             Assert.IsTrue(history[2].Model.Content == "Hallo Welt 3");
         }
 
-
-        public async Task TestAllEndpoints()
+        [Test]
+        public async Task TestAllEndpointsAsync()
         {
-            var ss = new StorageService();
-            var helper = TestHelper.GetOnlineApiHelper(ss);
             var traceService = new ApiTraceService();
             var client = new ApiClient(new Uri(TestHelper.TestUri), traceService);
 
             //confirm test is up to date 
-            var methods = client.GetType().GetMethods(BindingFlags.Public);
-            Assert.IsTrue(methods.Length == 3);
+            var methods = client.GetType().GetMethods(BindingFlags.Public | BindingFlags.Instance);
+            Assert.IsTrue(methods.Length == 15);
 
-            var req = await client.AuthenticateDeviceAsync(new AuthRequestEntity());
-            Assert.AreNotEqual(ApiError.ResourceNotFound, req.ApiError);
+
+            //irgnore last five bc Dispose(), ToString() etc
+            for (var index = 0; index < methods.Length - 5; index++)
+            {
+                var methodInfo = methods[index];
+                var resp = methodInfo.Invoke(client, new object[] {null});
+                var tsk = resp as Task;
+                if (tsk != null)
+                {
+                    await tsk;
+                    var result = tsk.GetType().GetProperty("Result").GetValue(tsk);
+                    Assert.AreNotEqual(ApiError.ResourceNotFound, ((BaseResponse) result).ApiError);
+                }
+            }
         }
     }
 }

@@ -46,7 +46,7 @@ namespace Famoser.SyncApi.Helpers
         private IApiAuthenticationService _apiAuthenticationService;
         public IApiAuthenticationService ApiAuthenticationService
         {
-            get { return _apiAuthenticationService ?? (_apiAuthenticationService = new ApiAuthenticationService(ApiConfigurationService, ApiUserRepository, ApiDeviceRepository)); }
+            get { return _apiAuthenticationService ?? (_apiAuthenticationService = new ApiAuthenticationService(ApiConfigurationService)); }
             set { _apiAuthenticationService = value; }
         }
 
