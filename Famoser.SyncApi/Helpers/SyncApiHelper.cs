@@ -53,14 +53,14 @@ namespace Famoser.SyncApi.Helpers
         private IApiUserRepository<UserModel> _apiUserRepository;
         public IApiUserRepository<UserModel> ApiUserRepository
         {
-            get { return _apiUserRepository ?? (_apiUserRepository = new ApiUserRepository<UserModel>(ApiConfigurationService, ApiStorageService, ApiTraceService)); }
+            get { return _apiUserRepository ?? (_apiUserRepository = new ApiUserRepository<UserModel>(ApiConfigurationService, ApiStorageService, ApiTraceService, ApiAuthenticationService)); }
             set { _apiUserRepository = value; }
         }
 
         private IApiDeviceRepository<DeviceModel> _apiDeviceRepository;
         public IApiDeviceRepository<DeviceModel> ApiDeviceRepository
         {
-            get { return _apiDeviceRepository ?? (_apiDeviceRepository = new ApiDeviceRepository<DeviceModel>(ApiConfigurationService, ApiStorageService, ApiTraceService)); }
+            get { return _apiDeviceRepository ?? (_apiDeviceRepository = new ApiDeviceRepository<DeviceModel>(ApiConfigurationService, ApiStorageService, ApiTraceService, ApiAuthenticationService)); }
             set { _apiDeviceRepository = value; }
         }
 

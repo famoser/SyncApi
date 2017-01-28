@@ -11,7 +11,6 @@ using Famoser.SyncApi.Models.Information;
 using Famoser.SyncApi.Models.Interfaces;
 using Famoser.SyncApi.Repositories.Base;
 using Famoser.SyncApi.Repositories.Interfaces;
-using Famoser.SyncApi.Services;
 using Famoser.SyncApi.Services.Interfaces;
 using Famoser.SyncApi.Services.Interfaces.Authentication;
 using Famoser.SyncApi.Storage.Cache;
@@ -162,7 +161,10 @@ namespace Famoser.SyncApi.Repositories
                 }
                 info.VersionId = Guid.NewGuid();
 
-                await SaveCacheAsync();
+                await _apiStorageService.SaveCacheEntityAsync<CollectionCacheEntity<TModel>>();
+                if (_apiConfigurationService.StartSyncAutomatically())
+                    await SyncAsync();
+
                 return new Tuple<bool, SyncActionError>(true, SyncActionError.None);
             }, SyncAction.SaveEntity, VerificationOption.IsAuthenticatedFully);
         }

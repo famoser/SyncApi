@@ -1,7 +1,6 @@
-﻿using Famoser.FrameworkEssentials.Logging;
-using Famoser.FrameworkEssentials.Logging.Interfaces;
+﻿using System;
+using Famoser.FrameworkEssentials.Logging;
 using Famoser.SyncApi.Services.Interfaces;
-using System;
 using Famoser.SyncApi.Enums;
 using Famoser.SyncApi.Models;
 using Famoser.SyncApi.Models.Interfaces;
@@ -23,6 +22,11 @@ namespace Famoser.SyncApi.Services
         public ISyncActionInformation CreateSyncActionInformation(SyncAction action)
         {
             return new SyncActionInformation(action);
+        }
+
+        public void LogException(Exception ex, object @from = null)
+        {
+            //ignore too
         }
     }
 }

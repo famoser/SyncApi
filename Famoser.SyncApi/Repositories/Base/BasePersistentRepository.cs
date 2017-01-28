@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
-using Famoser.FrameworkEssentials.Logging.Interfaces;
 using Famoser.SyncApi.Api;
 using Famoser.SyncApi.Enums;
-using Famoser.SyncApi.Models;
 using Famoser.SyncApi.Models.Interfaces;
 using Famoser.SyncApi.Models.Interfaces.Base;
 using Famoser.SyncApi.Repositories.Interfaces.Base;
@@ -27,9 +25,9 @@ namespace Famoser.SyncApi.Repositories.Base
 
         protected abstract Task<bool> InitializeAsync();
 
-        protected async Task<T> ExecuteSafeAsync<T>(Func<Task<Tuple<T, SyncActionError>>> func, SyncAction action, VerificationOption verification)
+        protected Task<T> ExecuteSafeAsync<T>(Func<Task<Tuple<T, SyncActionError>>> func, SyncAction action, VerificationOption verification)
         {
-            return await ExecuteSafeInternalAsync(() => default(T),
+            return ExecuteSafeInternalAsync(() => default(T),
                 async ev =>
                 {
                     var res = await func();
@@ -54,23 +52,26 @@ namespace Famoser.SyncApi.Repositories.Base
             );
         }
 
-        protected async Task<T> ExecuteSafeAsync<T>(Func<Tuple<T, SyncActionError>> func, SyncAction action, VerificationOption verification)
+        protected Task<T> ExecuteSafeAsync<T>(Func<Tuple<T, SyncActionError>> func, SyncAction action, VerificationOption verification)
         {
-            return await ExecuteSafeInternalAsync(() => default(T),
+            return ExecuteSafeInternalAsync(() => default(T),
+#pragma warning disable CS1998 // Async method lacks 'await' operators and will run synchronously
+                //to not have to duplicate code further I will not refactor to also accept a non Task func
                 async ev =>
                 {
                     var res = func();
                     ev.SetSyncActionResult(res.Item2);
                     return res.Item1;
                 },
+#pragma warning restore CS1998 // Async method lacks 'await' operators and will run synchronously
                 action,
                 verification
             );
         }
 
-        protected async Task ExecuteSafeAsync(Func<Task<SyncActionError>> func, SyncAction action, VerificationOption verification)
+        protected Task ExecuteSafeAsync(Func<Task<SyncActionError>> func, SyncAction action, VerificationOption verification)
         {
-            await ExecuteSafeInternalAsync(() => false,
+            return ExecuteSafeInternalAsync(() => false,
                 async ev =>
                 {
                     var res = await func();
@@ -88,6 +89,7 @@ namespace Famoser.SyncApi.Repositories.Base
 
             try
             {
+                //very similar logic in ExecuteSafeInternalLazy
                 if (!await InitializeAsync())
                 {
                     ev.SetSyncActionResult(SyncActionError.InitializationFailed);
@@ -120,21 +122,20 @@ namespace Famoser.SyncApi.Repositories.Base
 
             try
             {
-                InitializeAsync().ContinueWith(async (e) =>
+                InitializeAsync().ContinueWith(async e =>
                 {
+                    //very similar logic in ExecuteSafeInternalAsync
                     if (!e.Result)
                     {
                         ev.SetSyncActionResult(SyncActionError.InitializationFailed);
                     }
                     else
                     {
-                        if (verification.HasFlag(VerificationOption.CanAccessInternet) &&
-                            !_apiConfigurationService.CanUseWebConnection())
+                        if (verification.HasFlag(VerificationOption.CanAccessInternet) && !_apiConfigurationService.CanUseWebConnection())
                         {
                             ev.SetSyncActionResult(SyncActionError.WebAccessDenied);
                         }
-                        else if (verification.HasFlag(VerificationOption.CanAccessInternet) &&
-                                 await _apiAuthenticationService.IsAuthenticatedAsync())
+                        else if (verification.HasFlag(VerificationOption.CanAccessInternet) &&  await _apiAuthenticationService.IsAuthenticatedAsync())
                         {
                             ev.SetSyncActionResult(SyncActionError.NotAuthenticatedFully);
                         }

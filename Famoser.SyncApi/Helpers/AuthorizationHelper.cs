@@ -1,5 +1,4 @@
-﻿using System;
-using Famoser.SyncApi.Api.Configuration;
+﻿using Famoser.SyncApi.Api.Configuration;
 using Famoser.SyncApi.Storage.Roaming;
 
 namespace Famoser.SyncApi.Helpers

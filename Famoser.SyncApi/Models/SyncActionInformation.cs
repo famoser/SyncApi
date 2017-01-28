@@ -1,10 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Text;
-using System.Threading.Tasks;
 using Famoser.FrameworkEssentials.Models;
 using Famoser.SyncApi.Enums;
 using Famoser.SyncApi.Models.Interfaces;
