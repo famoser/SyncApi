@@ -70,5 +70,21 @@ namespace Famoser.SyncApi.NUnitTests.Repository
             Assert.IsTrue(history[1].Model.Content == "Hallo Welt 2");
             Assert.IsTrue(history[2].Model.Content == "Hallo Welt 3");
         }
+
+
+        public async Task TestAllEndpoints()
+        {
+            var ss = new StorageService();
+            var helper = TestHelper.GetOnlineApiHelper(ss);
+            var traceService = new ApiTraceService();
+            var client = new ApiClient(new Uri(TestHelper.TestUri), traceService);
+
+            //confirm test is up to date 
+            var methods = client.GetType().GetMethods(BindingFlags.Public);
+            Assert.IsTrue(methods.Length == 3);
+
+            var req = await client.AuthenticateDeviceAsync(new AuthRequestEntity());
+            Assert.AreNotEqual(ApiError.ResourceNotFound, req.ApiError);
+        }
     }
 }
