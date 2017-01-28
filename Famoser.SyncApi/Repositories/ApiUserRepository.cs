@@ -94,7 +94,7 @@ namespace Famoser.SyncApi.Repositories
             return ExecuteSafeAsync(async () =>
             {
                 if (CacheEntity.ModelInformation.PendingAction == PendingAction.None)
-                        return new Tuple<bool, SyncActionError>(true, SyncActionError.None); ;
+                    return new Tuple<bool, SyncActionError>(true, SyncActionError.None); ;
 
                 if (CacheEntity.ModelInformation.PendingAction == PendingAction.Create)
                 {
@@ -187,8 +187,8 @@ namespace Famoser.SyncApi.Repositories
                 CacheEntity.ModelInformation.PendingAction = PendingAction.None;
                 await _apiStorageService.SaveCacheEntityAsync<CacheEntity<TUser>>();
                 await _apiStorageService.SaveApiRoamingEntityAsync(_roaming);
-                
-                return new Tuple<bool, SyncActionError>(true,SyncActionError.None);
+
+                return new Tuple<bool, SyncActionError>(true, SyncActionError.None);
             }, SyncAction.SyncUser, VerificationOption.CanAccessInternet);
         }
 
@@ -209,6 +209,33 @@ namespace Famoser.SyncApi.Repositories
                 await SyncAsync();
 
             return _roaming;
+        }
+
+        public override Task<TUser> GetAsync()
+        {
+            return ExecuteSafeAsync(
+                async () => new Tuple<TUser, SyncActionError>(await GetInternalAsync(), SyncActionError.None),
+                SyncAction.GetUser,
+                VerificationOption.None
+            );
+        }
+
+        public override Task<bool> SaveAsync()
+        {
+            return ExecuteSafeAsync(
+                async () => new Tuple<bool, SyncActionError>(await SaveInternalAsync(), SyncActionError.None),
+                SyncAction.SaveUser,
+                VerificationOption.None
+            );
+        }
+
+        public override Task<bool> RemoveAsync()
+        {
+            return ExecuteSafeAsync(
+                async () => new Tuple<bool, SyncActionError>(await RemoveInternalAsync(), SyncActionError.None),
+                SyncAction.RemoveUser,
+                VerificationOption.None
+            );
         }
     }
 }

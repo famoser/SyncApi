@@ -376,5 +376,33 @@ namespace Famoser.SyncApi.Repositories
         {
             return AuthorizeRequestBase(apiInformation, apiRoamingInfo, request);
         }
+
+
+        public override Task<TDevice> GetAsync()
+        {
+            return ExecuteSafeAsync(
+                async () => new Tuple<TDevice, SyncActionError>(await GetInternalAsync(), SyncActionError.None),
+                SyncAction.GetDevice,
+                VerificationOption.None
+            );
+        }
+
+        public override Task<bool> SaveAsync()
+        {
+            return ExecuteSafeAsync(
+                async () => new Tuple<bool, SyncActionError>(await SaveInternalAsync(), SyncActionError.None),
+                SyncAction.SaveDevice,
+                VerificationOption.None
+            );
+        }
+
+        public override Task<bool> RemoveAsync()
+        {
+            return ExecuteSafeAsync(
+                async () => new Tuple<bool, SyncActionError>(await RemoveInternalAsync(), SyncActionError.None),
+                SyncAction.RemoveDevice,
+                VerificationOption.None
+            );
+        }
     }
 }

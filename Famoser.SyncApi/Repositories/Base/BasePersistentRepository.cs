@@ -4,6 +4,7 @@ using Famoser.FrameworkEssentials.Logging.Interfaces;
 using Famoser.SyncApi.Api;
 using Famoser.SyncApi.Enums;
 using Famoser.SyncApi.Models;
+using Famoser.SyncApi.Models.Interfaces;
 using Famoser.SyncApi.Models.Interfaces.Base;
 using Famoser.SyncApi.Repositories.Interfaces.Base;
 using Famoser.SyncApi.Services.Interfaces;
@@ -28,74 +29,60 @@ namespace Famoser.SyncApi.Repositories.Base
 
         protected async Task<T> ExecuteSafeAsync<T>(Func<Task<Tuple<T, SyncActionError>>> func, SyncAction action, VerificationOption verification)
         {
-            var ev = _apiTraceService.CreateSyncActionInformation(action);
-
-            try
-            {
-                if (!await InitializeAsync())
-                {
-                    ev.SetSyncActionResult(SyncActionError.InitializationFailed);
-                    return default(T);
-                }
-
-                if (verification.HasFlag(VerificationOption.CanAccessInternet) && !_apiConfigurationService.CanUseWebConnection())
-                {
-                    ev.SetSyncActionResult(SyncActionError.WebAccessDenied);
-                }
-                else if (verification.HasFlag(VerificationOption.CanAccessInternet) && await _apiAuthenticationService.IsAuthenticatedAsync())
-                {
-                    ev.SetSyncActionResult(SyncActionError.NotAuthenticatedFully);
-                }
-                else
+            return await ExecuteSafeInternalAsync(() => default(T),
+                async ev =>
                 {
                     var res = await func();
                     ev.SetSyncActionResult(res.Item2);
                     return res.Item1;
-                }
-            }
-            catch (Exception ex)
-            {
-                ev.SetSyncActionException(ex);
-            }
-            return default(T);
+                },
+                action,
+                verification
+            );
+        }
+
+        protected T ExecuteSafeLazy<T>(Func<T> returnExecute, Func<Task<SyncActionError>> func, SyncAction action, VerificationOption verification)
+        {
+            return ExecuteSafeInternalLazy(returnExecute,
+                async ev =>
+                {
+                    var res = await func();
+                    ev.SetSyncActionResult(res);
+                },
+                action,
+                verification
+            );
         }
 
         protected async Task<T> ExecuteSafeAsync<T>(Func<Tuple<T, SyncActionError>> func, SyncAction action, VerificationOption verification)
         {
-            var ev = _apiTraceService.CreateSyncActionInformation(action);
-
-            try
-            {
-                if (!await InitializeAsync())
-                {
-                    ev.SetSyncActionResult(SyncActionError.InitializationFailed);
-                    return default(T);
-                }
-
-                if (verification.HasFlag(VerificationOption.CanAccessInternet) && !_apiConfigurationService.CanUseWebConnection())
-                {
-                    ev.SetSyncActionResult(SyncActionError.WebAccessDenied);
-                }
-                else if (verification.HasFlag(VerificationOption.CanAccessInternet) && await _apiAuthenticationService.IsAuthenticatedAsync())
-                {
-                    ev.SetSyncActionResult(SyncActionError.NotAuthenticatedFully);
-                }
-                else
+            return await ExecuteSafeInternalAsync(() => default(T),
+                async ev =>
                 {
                     var res = func();
                     ev.SetSyncActionResult(res.Item2);
                     return res.Item1;
-                }
-                ev.SetSyncActionResult(SyncActionError.WebAccessDenied);
-            }
-            catch (Exception ex)
-            {
-                ev.SetSyncActionException(ex);
-            }
-            return default(T);
+                },
+                action,
+                verification
+            );
         }
 
         protected async Task ExecuteSafeAsync(Func<Task<SyncActionError>> func, SyncAction action, VerificationOption verification)
+        {
+            await ExecuteSafeInternalAsync(() => false,
+                async ev =>
+                {
+                    var res = await func();
+                    ev.SetSyncActionResult(res);
+                    return true;
+                },
+                action,
+                verification
+            );
+        }
+
+        private async Task<T> ExecuteSafeInternalAsync<T>(Func<T> defaultReturn, Func<ISyncActionInformation, Task<T>> executeReturn, SyncAction action, VerificationOption verification)
         {
             var ev = _apiTraceService.CreateSyncActionInformation(action);
 
@@ -104,7 +91,7 @@ namespace Famoser.SyncApi.Repositories.Base
                 if (!await InitializeAsync())
                 {
                     ev.SetSyncActionResult(SyncActionError.InitializationFailed);
-                    return;
+                    return defaultReturn();
                 }
 
                 if (verification.HasFlag(VerificationOption.CanAccessInternet) && !_apiConfigurationService.CanUseWebConnection())
@@ -117,16 +104,52 @@ namespace Famoser.SyncApi.Repositories.Base
                 }
                 else
                 {
-                    var res = await func();
-                    ev.SetSyncActionResult(res);
-                    return;
+                    return await executeReturn(ev);
                 }
-                ev.SetSyncActionResult(SyncActionError.WebAccessDenied);
             }
             catch (Exception ex)
             {
                 ev.SetSyncActionException(ex);
             }
+            return defaultReturn();
+        }
+
+        private T ExecuteSafeInternalLazy<T>(Func<T> returnAction, Func<ISyncActionInformation, Task> executeAction, SyncAction action, VerificationOption verification)
+        {
+            var ev = _apiTraceService.CreateSyncActionInformation(action);
+
+            try
+            {
+                InitializeAsync().ContinueWith(async (e) =>
+                {
+                    if (!e.Result)
+                    {
+                        ev.SetSyncActionResult(SyncActionError.InitializationFailed);
+                    }
+                    else
+                    {
+                        if (verification.HasFlag(VerificationOption.CanAccessInternet) &&
+                            !_apiConfigurationService.CanUseWebConnection())
+                        {
+                            ev.SetSyncActionResult(SyncActionError.WebAccessDenied);
+                        }
+                        else if (verification.HasFlag(VerificationOption.CanAccessInternet) &&
+                                 await _apiAuthenticationService.IsAuthenticatedAsync())
+                        {
+                            ev.SetSyncActionResult(SyncActionError.NotAuthenticatedFully);
+                        }
+                        else
+                        {
+                            await executeAction(ev);
+                        }
+                    }
+                });
+            }
+            catch (Exception ex)
+            {
+                ev.SetSyncActionException(ex);
+            }
+            return returnAction();
         }
 
         protected string GetModelHistoryCacheFilePath(TModel model)

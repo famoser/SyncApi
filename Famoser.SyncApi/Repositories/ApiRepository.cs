@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
 using Famoser.SyncApi.Api.Communication.Request;
@@ -10,6 +11,7 @@ using Famoser.SyncApi.Models.Information;
 using Famoser.SyncApi.Models.Interfaces;
 using Famoser.SyncApi.Repositories.Base;
 using Famoser.SyncApi.Repositories.Interfaces;
+using Famoser.SyncApi.Services;
 using Famoser.SyncApi.Services.Interfaces;
 using Famoser.SyncApi.Services.Interfaces.Authentication;
 using Famoser.SyncApi.Storage.Cache;
@@ -26,14 +28,16 @@ namespace Famoser.SyncApi.Repositories
         private readonly IApiConfigurationService _apiConfigurationService;
         private readonly IApiStorageService _apiStorageService;
         private readonly IApiAuthenticationService _apiAuthenticationService;
+        private readonly IApiTraceService _apiTraceService;
 
-        public ApiRepository(IApiCollectionRepository<TCollection> collectionRepository, IApiConfigurationService apiConfigurationService, IApiStorageService apiStorageService, IApiAuthenticationService apiAuthenticationService, IApiTraceService traceService)
-            : base(apiConfigurationService, apiStorageService, apiAuthenticationService, traceService)
+        public ApiRepository(IApiCollectionRepository<TCollection> collectionRepository, IApiConfigurationService apiConfigurationService, IApiStorageService apiStorageService, IApiAuthenticationService apiAuthenticationService, IApiTraceService apiTraceService)
+            : base(apiConfigurationService, apiStorageService, apiAuthenticationService, apiTraceService)
         {
             _collectionRepository = collectionRepository;
             _apiConfigurationService = apiConfigurationService;
             _apiStorageService = apiStorageService;
             _apiAuthenticationService = apiAuthenticationService;
+            _apiTraceService = apiTraceService;
         }
 
         private readonly AsyncLock _asyncLock = new AsyncLock();
@@ -123,7 +127,7 @@ namespace Famoser.SyncApi.Repositories
                 }
 
                 return new Tuple<bool, SyncActionError>(true, SyncActionError.None);
-            },SyncAction.SyncEntity,VerificationOption.CanAccessInternet | VerificationOption.IsAuthenticatedFully);
+            }, SyncAction.SyncEntity, VerificationOption.CanAccessInternet | VerificationOption.IsAuthenticatedFully);
         }
 
         public Task<bool> SaveToCollectionAsync(TModel model, TCollection collection)
@@ -157,6 +161,7 @@ namespace Famoser.SyncApi.Repositories
                     info.CollectionId = collection.GetId();
                 }
                 info.VersionId = Guid.NewGuid();
+
                 await SaveCacheAsync();
                 return new Tuple<bool, SyncActionError>(true, SyncActionError.None);
             }, SyncAction.SaveEntity, VerificationOption.IsAuthenticatedFully);
@@ -174,6 +179,70 @@ namespace Famoser.SyncApi.Repositories
                 var resp = await RemoveInternalAsync(model);
                 return new Tuple<bool, SyncActionError>(true, resp);
             }, SyncAction.RemoveCollection, VerificationOption.None);
+        }
+
+        public override ObservableCollection<TModel> GetAllLazy()
+        {
+            return ExecuteSafeLazy(GetAllLazyInternal,
+                async () =>
+                {
+                    if (_apiConfigurationService.StartSyncAutomatically())
+                        await SyncAsync();
+                    return SyncActionError.None;
+                },
+                SyncAction.GetEntities,
+                VerificationOption.None
+            );
+        }
+
+        public override Task<ObservableCollection<TModel>> GetAllAsync()
+        {
+            return ExecuteSafeAsync(
+                async () => new Tuple<ObservableCollection<TModel>, SyncActionError>(
+                    await GetAllInternalAsync(),
+                    SyncActionError.None
+                    ),
+                SyncAction.GetEntitiesAsync,
+                VerificationOption.None
+                );
+        }
+
+        public override ObservableCollection<HistoryInformations<TModel>> GetHistoryLazy(TModel model)
+        {
+            return ExecuteSafeLazy(() => GetHistoryInternalLazy(model),
+                async () =>
+                {
+                    if (_apiConfigurationService.StartSyncAutomatically())
+                        await SyncHistoryAsync(model);
+                    return SyncActionError.None;
+                },
+                SyncAction.GetEntityHistory,
+                VerificationOption.None
+            );
+        }
+
+        public override Task<ObservableCollection<HistoryInformations<TModel>>> GetHistoryAsync(TModel model)
+        {
+            return ExecuteSafeAsync(
+                async () => new Tuple<ObservableCollection<HistoryInformations<TModel>>, SyncActionError>(
+                    await GetHistoryInternalAsync(model),
+                    SyncActionError.None
+                    ),
+                SyncAction.GetEntityHistory,
+                VerificationOption.None
+            );
+        }
+
+        public override Task<bool> SyncHistoryAsync(TModel model)
+        {
+            return ExecuteSafeAsync(
+                async () => new Tuple<bool, SyncActionError>(
+                    await SyncHistoryInternalAsync(model),
+                    SyncActionError.None
+                    ),
+                SyncAction.SyncEntityHistory,
+                VerificationOption.CanAccessInternet | VerificationOption.IsAuthenticatedFully
+            );
         }
     }
 }
