@@ -35,7 +35,6 @@
   </PropertyGroup>
   <ItemGroup>
     <!-- A reference to the entire .NET Framework is automatically included -->
-    <Folder Include="ViewModels\" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Api\Communication\Request\HistoryEntityRequest.cs" />
@@ -59,6 +58,7 @@
     <Compile Include="Enums\VerificationOption.cs" />
     <Compile Include="Events\RequestEventArgs.cs" />
     <Compile Include="Helpers\ApiEntityHelper.cs" />
+    <Compile Include="Helpers\EnumHelper.cs" />
     <Compile Include="Helpers\SyncApiHelper.cs" />
     <Compile Include="Models\AbstractSyncModel.cs" />
     <Compile Include="Models\Base\BaseModel.cs" />

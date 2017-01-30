@@ -781,7 +781,7 @@ namespace Famoser.SyncApi.Properties
   /// <example><code>
   /// [ActionName("Foo")]
   /// public ActionResult Login(string returnUrl) {
-  ///   ViewBag.ReturnUrl = Url.Action("Foo"); // OK
+  ///   ViewBag.ReturnUrl = Url.SyncAction("Foo"); // OK
   ///   return RedirectToAction("Bar"); // Error: Cannot resolve action
   /// }
   /// </code></example>

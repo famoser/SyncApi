@@ -1,15 +1,16 @@
 ﻿using System;
 using Famoser.FrameworkEssentials.Models;
 using Famoser.SyncApi.Enums;
+using Famoser.SyncApi.Helpers;
 using Famoser.SyncApi.Models.Interfaces;
 
 namespace Famoser.SyncApi.Models
 {
     public class SyncActionInformation : PropertyChangedModel, ISyncActionInformation
     {
-        public SyncActionInformation(SyncAction action)
+        public SyncActionInformation(SyncAction syncAction)
         {
-            Action = action;
+            SyncAction = syncAction;
         }
 
         public void SetSyncActionResult(SyncActionError result)
@@ -17,6 +18,8 @@ namespace Famoser.SyncApi.Models
             SyncActionError = result;
             IsSuccessful = result == SyncActionError.None;
             IsCompleted = true;
+
+            RaisePropertyChanged(() => FullDescription);
         }
 
         public void SetSyncActionException(Exception exception)
@@ -24,7 +27,26 @@ namespace Famoser.SyncApi.Models
             SyncActionError = SyncActionError.ExecutionFailed;
             IsSuccessful = false;
             IsCompleted = true;
+
+            RaisePropertyChanged(() => FullDescription);
         }
+
+        public string FullDescription
+        {
+            get
+            {
+                if (IsCompleted)
+                {
+                    if (IsSuccessful)
+                    {
+                        return EnumHelper.EnumToString(SyncAction) + " done";
+                    }
+                    return EnumHelper.EnumToString(SyncAction) + " failed (" + EnumHelper.EnumToString(SyncActionError) + ")";
+                }
+                return EnumHelper.EnumToString(SyncAction) + " ...";
+            }
+        }
+
 
         private bool _isCompleted;
         public bool IsCompleted
@@ -42,6 +64,6 @@ namespace Famoser.SyncApi.Models
 
         public SyncActionError SyncActionError { get; private set; }
 
-        public SyncAction Action { get; }
+        public SyncAction SyncAction { get; }
     }
 }

@@ -11,6 +11,7 @@ using Famoser.SyncApi.Models.Information;
 using Famoser.SyncApi.Models.Interfaces;
 using Famoser.SyncApi.Repositories.Base;
 using Famoser.SyncApi.Repositories.Interfaces;
+using Famoser.SyncApi.Services;
 using Famoser.SyncApi.Services.Interfaces;
 using Famoser.SyncApi.Storage.Cache;
 using Famoser.SyncApi.Storage.Roaming;
@@ -25,12 +26,14 @@ namespace Famoser.SyncApi.Repositories
         private readonly ApiClient _authApiClient;
         private readonly IApiStorageService _apiStorageService;
         private readonly IApiConfigurationService _apiConfigurationService;
+        private readonly IApiTraceService _apiTraceService;
 
         public ApiUserRepository(IApiConfigurationService apiConfigurationService, IApiStorageService apiStorageService, IApiTraceService traceService)
             : base(apiConfigurationService, apiStorageService, traceService)
         {
             _apiConfigurationService = apiConfigurationService;
             _apiStorageService = apiStorageService;
+            _apiTraceService = traceService;
 
             _authApiClient = GetAuthApiClient();
         }
@@ -51,6 +54,9 @@ namespace Famoser.SyncApi.Repositories
                     _roaming.UserId = Guid.NewGuid();
                     _roaming.AuthenticationState = AuthenticationState.NotYetAuthenticated;
                     _roaming.CreatedAt = DateTime.Now;
+
+                    var info = _apiTraceService.CreateSyncActionInformation(SyncAction.CreateUser);
+                    info.SetSyncActionResult(SyncActionError.None);
 
                     var random = new Random(ApiInformation.ApplicationSeed);
                     _roaming.PersonalSeed = random.Next();
@@ -79,6 +85,9 @@ namespace Famoser.SyncApi.Repositories
                         };
                         await _apiStorageService.SaveCacheEntityAsync<CacheEntity<TUser>>();
                     }
+
+                    var info = _apiTraceService.CreateSyncActionInformation(SyncAction.FoundUser);
+                    info.SetSyncActionResult(SyncActionError.None);
                 }
                 Manager.Set(CacheEntity.Model);
 

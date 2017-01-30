@@ -124,7 +124,7 @@ namespace Famoser.SyncApi.Repositories
                 }
 
                 return new Tuple<bool, SyncActionError>(true, SyncActionError.None);
-            }, SyncAction.SyncEntity, VerificationOption.CanAccessInternet | VerificationOption.IsAuthenticatedFully);
+            }, SyncAction.SyncEntities, VerificationOption.CanAccessInternet | VerificationOption.IsAuthenticatedFully);
         }
 
         public Task<bool> SaveToCollectionAsync(TModel model, TCollection collection)
@@ -178,7 +178,7 @@ namespace Famoser.SyncApi.Repositories
             {
                 var resp = await RemoveInternalAsync(model);
                 return new Tuple<bool, SyncActionError>(true, resp);
-            }, SyncAction.RemoveCollection, VerificationOption.None);
+            }, SyncAction.RemoveEntity, VerificationOption.None);
         }
 
         public override ObservableCollection<TModel> GetAllLazy()

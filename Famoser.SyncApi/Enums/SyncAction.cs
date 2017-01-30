@@ -26,7 +26,6 @@
         GetCollectionsAsync,
         GetCollectionHistory,
         SyncCollectionHistory,
-        CreateCollection,
         SyncCollection,
         SaveCollection,
         RemoveCollection,
@@ -40,6 +39,6 @@
         GetEntitiesAsync,
         SaveEntity,
         RemoveEntity,
-        SyncEntity
+        SyncEntities
     }
 }

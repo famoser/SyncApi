@@ -30,11 +30,13 @@ namespace Famoser.SyncApi.Repositories
         private readonly IApiStorageService _apiStorageService;
         private readonly IApiConfigurationService _apiConfigurationService;
         private readonly ApiClient _authApiClient;
+        private readonly IApiTraceService _apiTraceService;
         public ApiDeviceRepository(IApiConfigurationService apiConfigurationService, IApiStorageService apiStorageService, IApiTraceService traceService) :
             base(apiConfigurationService, apiStorageService, traceService)
         {
             _apiStorageService = apiStorageService;
             _apiConfigurationService = apiConfigurationService;
+            _apiTraceService = traceService;
 
             _authApiClient = GetAuthApiClient();
         }
@@ -54,6 +56,9 @@ namespace Famoser.SyncApi.Repositories
                 CacheEntity = await _apiStorageService.GetCacheEntityAsync<CacheEntity<TDevice>>(GetModelCacheFilePath());
                 if (CacheEntity.ModelInformation == null)
                 {
+                    var info = _apiTraceService.CreateSyncActionInformation(SyncAction.CreateDevice);
+                    info.SetSyncActionResult(SyncActionError.None);
+
                     CacheEntity.Model = await _apiConfigurationService.GetDeviceObjectAsync<TDevice>();
                     CacheEntity.ModelInformation = new CacheInformations()
                     {
@@ -64,6 +69,11 @@ namespace Famoser.SyncApi.Repositories
                     };
                     CacheEntity.Model.SetId(CacheEntity.ModelInformation.Id);
                     await _apiStorageService.SaveCacheEntityAsync<CacheEntity<TDevice>>();
+                }
+                else
+                {
+                    var info = _apiTraceService.CreateSyncActionInformation(SyncAction.FoundDevice);
+                    info.SetSyncActionResult(SyncActionError.None);
                 }
                 Manager.Set(CacheEntity.Model);
 
