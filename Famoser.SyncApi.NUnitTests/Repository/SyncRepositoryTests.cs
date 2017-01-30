@@ -5,6 +5,7 @@ using Famoser.SyncApi.Api;
 using Famoser.SyncApi.Api.Communication.Response.Base;
 using Famoser.SyncApi.Api.Enums;
 using Famoser.SyncApi.NUnitTests.Helpers;
+using Famoser.SyncApi.NUnitTests.Implementations;
 using Famoser.SyncApi.NUnitTests.Models;
 using Famoser.SyncApi.Services;
 using NUnit.Framework;
@@ -18,17 +19,19 @@ namespace Famoser.SyncApi.NUnitTests.Repository
         public async Task TestSaveAndRetrieveAsync()
         {
             //arrange
-            var testHelper = new TestHelper { CanUserWebConnectionFunc = () => false };
+            var ss = new StorageService();
+            var testHelper = new TestHelper { StorageService = ss };
             var repo = testHelper.SyncApiHelper.ResolveRepository<NoteModel>();
             var model = new NoteModel { Content = "Hallo Welt!" };
-            
-            var testHelper2 = new TestHelper { CanUserWebConnectionFunc = () => false };
+
+            var testHelper2 = new TestHelper { StorageService = testHelper.StorageService };
             var repo2 = testHelper2.SyncApiHelper.ResolveRepository<NoteModel>();
 
 
             //act
             var saveRes = await repo.SaveAsync(model);
             //new instance with empty cache to ensure the notemodel is downloaded
+            ss.ClearCache();
             var model2 = await repo2.GetAllAsync();
 
             //assert
@@ -42,12 +45,13 @@ namespace Famoser.SyncApi.NUnitTests.Repository
         public async Task TestSaveThreeAndRetrieveAsync()
         {
             //arrange
-            var testHelper = new TestHelper { CanUserWebConnectionFunc = () => false };
+            var ss = new StorageService();
+            var testHelper = new TestHelper { StorageService = ss };
             var repo = testHelper.SyncApiHelper.ResolveRepository<NoteModel>();
 
             var model = new NoteModel { Content = "Hallo Welt!" };
 
-            var testHelper2 = new TestHelper { CanUserWebConnectionFunc = () => false };
+            var testHelper2 = new TestHelper { StorageService = testHelper.StorageService };
             var repo2 = testHelper2.SyncApiHelper.ResolveRepository<NoteModel>();
 
 
@@ -58,13 +62,14 @@ namespace Famoser.SyncApi.NUnitTests.Repository
             model.Content = "Hallo Welt 3";
             await repo.SaveAsync(model);
             //new instance with empty cache to ensure the notemodel is downloaded
+            ss.ClearCache();
             var model2 = await repo2.GetAllAsync();
 
             //assert
             Assert.IsTrue(repo.GetAllLazy().Contains(model));
             Assert.IsTrue(model2.Count == 1);
             Assert.IsTrue(model2[0].Content == "Hallo Welt 3");
-            
+
             var history = await repo.GetHistoryAsync(model);
             Assert.IsTrue(history.Count == 3);
             Assert.IsTrue(history[0].Model.Content == "Hallo Welt!");
@@ -87,13 +92,13 @@ namespace Famoser.SyncApi.NUnitTests.Repository
             for (var index = 0; index < methods.Length - 5; index++)
             {
                 var methodInfo = methods[index];
-                var resp = methodInfo.Invoke(client, new object[] {null});
+                var resp = methodInfo.Invoke(client, new object[] { null });
                 var tsk = resp as Task;
                 if (tsk != null)
                 {
                     await tsk;
                     var result = tsk.GetType().GetProperty("Result").GetValue(tsk);
-                    Assert.AreNotEqual(ApiError.ResourceNotFound, ((BaseResponse) result).ApiError);
+                    Assert.AreNotEqual(ApiError.ResourceNotFound, ((BaseResponse)result).ApiError);
                 }
             }
         }

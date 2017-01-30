@@ -307,7 +307,7 @@ namespace Famoser.SyncApi.Repositories
                 device.SetAuthenticationState(AuthenticationState.Authenticated);
                 await _apiStorageService.SaveCacheEntityAsync<CollectionCacheEntity<TDevice>>();
                 return new Tuple<bool, SyncActionError>(true, SyncActionError.None);
-            }, SyncAction.AuthenticateDevice, VerificationOption.IsAuthenticatedFully | VerificationOption.CanAccessInternet);
+            }, SyncAction.AuthenticateDevice, VerificationOption.CanAccessInternet);
         }
 
         public Task<string> CreateNewAuthenticationCodeAsync()

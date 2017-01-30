@@ -202,7 +202,7 @@ namespace Famoser.SyncApi.Repositories
         public async Task<ApiRoamingEntity> GetApiRoamingEntityAsync()
         {
             //double validation for small perf. boost
-            if (CacheEntity.ModelInformation.PendingAction != PendingAction.None)
+            if (CacheEntity?.ModelInformation == null || CacheEntity.ModelInformation.PendingAction != PendingAction.None)
                 await SyncAsync();
 
             return _roaming;

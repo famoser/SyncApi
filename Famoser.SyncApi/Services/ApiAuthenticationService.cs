@@ -28,7 +28,11 @@ namespace Famoser.SyncApi.Services
         public ApiAuthenticationService(IApiConfigurationService apiConfigurationService, IApiUserAuthenticationService apiUserAuthenticationService, IApiDeviceAuthenticationService apiDeviceAuthenticationService)
         {
             _apiUserAuthenticationService = apiUserAuthenticationService;
+            _apiUserAuthenticationService.SetAuthenticationService(this);
+
             _apiDeviceAuthenticationService = apiDeviceAuthenticationService;
+            _apiDeviceAuthenticationService.SetAuthenticationService(this);
+
             _apiInformation = apiConfigurationService.GetApiInformations();
         }
 
@@ -47,7 +51,7 @@ namespace Famoser.SyncApi.Services
         {
             using (await _asyncLock.LockAsync())
             {
-                if (_lastRefresh > DateTime.Now - TimeSpan.FromSeconds(2))
+                if (_lastRefresh < DateTime.Now - TimeSpan.FromSeconds(2))
                 {
                     _apiRoamingEntity = await _apiUserAuthenticationService.GetApiRoamingEntityAsync();
                     _deviceModel = await _apiDeviceAuthenticationService.GetDeviceAsync(_apiRoamingEntity);

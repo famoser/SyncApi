@@ -9,6 +9,7 @@
         InitializationFailed,
         WebAccessDenied,
         NotAuthenticatedFully,
+        AuthenticationServiceNotSet,
         LocalFileAccessFailed,
         EntityAlreadyRemoved
     }

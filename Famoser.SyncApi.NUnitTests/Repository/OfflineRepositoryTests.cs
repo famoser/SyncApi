@@ -71,7 +71,7 @@ namespace Famoser.SyncApi.NUnitTests.Repository
 
             //act
             var saveRes = await repo.SaveAsync(model);
-            var saveRes2 = await repo.SaveAsync(model);
+            var saveRes2 = await repo2.SaveAsync(model);
             var model2 = await repo2.GetAllAsync();
 
             //assert

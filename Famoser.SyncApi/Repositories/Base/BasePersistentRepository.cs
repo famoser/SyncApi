@@ -100,9 +100,20 @@ namespace Famoser.SyncApi.Repositories.Base
                 {
                     ev.SetSyncActionResult(SyncActionError.WebAccessDenied);
                 }
-                else if (verification.HasFlag(VerificationOption.CanAccessInternet) && await _apiAuthenticationService.IsAuthenticatedAsync())
+                else if (verification.HasFlag(VerificationOption.IsAuthenticatedFully))
                 {
-                    ev.SetSyncActionResult(SyncActionError.NotAuthenticatedFully);
+                    if (_apiAuthenticationService == null)
+                    {
+                        ev.SetSyncActionResult(SyncActionError.AuthenticationServiceNotSet);
+                    }
+                    else if (!(await _apiAuthenticationService.IsAuthenticatedAsync()))
+                    {
+                        ev.SetSyncActionResult(SyncActionError.NotAuthenticatedFully);
+                    }
+                    else
+                    {
+                        return await executeReturn(ev);
+                    }
                 }
                 else
                 {
