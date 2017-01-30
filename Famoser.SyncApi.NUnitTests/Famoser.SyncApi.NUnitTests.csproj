@@ -70,8 +70,9 @@
     <Compile Include="Implementations\StorageService.cs" />
     <Compile Include="Models\NoteModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Repository\SyncRepositoryTests.cs" />
-    <Compile Include="Repository\OfflineRepositoryTests.cs" />
+    <Compile Include="Integration Tests\SyncRepositoryTests.cs" />
+    <Compile Include="Integration Tests\OfflineRepositoryTests.cs" />
+    <Compile Include="ServiceTests\TraceServiceTests.cs" />
     <Compile Include="Showcases.cs" />
   </ItemGroup>
   <ItemGroup>

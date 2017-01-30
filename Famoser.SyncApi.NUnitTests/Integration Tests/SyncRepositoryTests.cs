@@ -27,7 +27,6 @@ namespace Famoser.SyncApi.NUnitTests.Repository
             var testHelper2 = new TestHelper { StorageService = testHelper.StorageService };
             var repo2 = testHelper2.SyncApiHelper.ResolveRepository<NoteModel>();
 
-
             //act
             var saveRes = await repo.SaveAsync(model);
             //new instance with empty cache to ensure the notemodel is downloaded
@@ -86,9 +85,8 @@ namespace Famoser.SyncApi.NUnitTests.Repository
             //confirm test is up to date 
             var methods = client.GetType().GetMethods(BindingFlags.Public | BindingFlags.Instance);
             Assert.IsTrue(methods.Length == 15);
-
-
-            //irgnore last five bc Dispose(), ToString() etc
+            
+            //ignore last five bc Dispose(), ToString() etc
             for (var index = 0; index < methods.Length - 5; index++)
             {
                 var methodInfo = methods[index];
