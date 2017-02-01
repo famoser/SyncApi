@@ -5,6 +5,7 @@ using Famoser.SyncApi.Api.Communication.Entities;
 using Famoser.SyncApi.Api.Communication.Request;
 using Famoser.SyncApi.Api.Communication.Request.Base;
 using Famoser.SyncApi.Api.Configuration;
+using Famoser.SyncApi.Api.Enums;
 using Famoser.SyncApi.Enums;
 using Famoser.SyncApi.Helpers;
 using Famoser.SyncApi.Models.Information;
@@ -24,28 +25,38 @@ namespace Famoser.SyncApi.Services
         private readonly IApiDeviceAuthenticationService _apiDeviceAuthenticationService;
         private readonly ApiInformation _apiInformation;
 
-        public ApiAuthenticationService(IApiConfigurationService apiConfigurationService,IApiUserAuthenticationService apiUserAuthenticationService, IApiDeviceAuthenticationService apiDeviceAuthenticationService)
+        public ApiAuthenticationService(IApiConfigurationService apiConfigurationService, IApiUserAuthenticationService apiUserAuthenticationService, IApiDeviceAuthenticationService apiDeviceAuthenticationService)
         {
-            _apiInformation = apiConfigurationService.GetApiInformations();
-
             _apiUserAuthenticationService = apiUserAuthenticationService;
+            _apiUserAuthenticationService.SetAuthenticationService(this);
+
             _apiDeviceAuthenticationService = apiDeviceAuthenticationService;
+            _apiDeviceAuthenticationService.SetAuthenticationService(this);
+
+            _apiInformation = apiConfigurationService.GetApiInformations();
         }
-        
+
         private bool IsAuthenticated()
         {
-            return _apiRoamingEntity?.AuthenticationState == AuthenticationState.Authenticated && _deviceModel?.GetAuthenticationState() == AuthenticationState.Authenticated;
+            return IsInitialized() && _apiRoamingEntity.AuthenticationState == AuthenticationState.Authenticated && _deviceModel.GetAuthenticationState() == AuthenticationState.Authenticated;
         }
 
-        private async Task InitializeAsync()
+        private bool IsInitialized()
+        {
+            return _apiRoamingEntity != null && _deviceModel != null;
+        }
+
+        private DateTime _lastRefresh = DateTime.MinValue;
+        private async Task ReInitializeAsync()
         {
             using (await _asyncLock.LockAsync())
             {
-                if (_apiRoamingEntity == null || _deviceModel == null)
+                if (_lastRefresh < DateTime.Now - TimeSpan.FromSeconds(2))
                 {
                     _apiRoamingEntity = await _apiUserAuthenticationService.GetApiRoamingEntityAsync();
                     _deviceModel = await _apiDeviceAuthenticationService.GetDeviceAsync(_apiRoamingEntity);
-                } 
+                    _lastRefresh = DateTime.Now;
+                }
             }
         }
 
@@ -53,19 +64,24 @@ namespace Famoser.SyncApi.Services
         private IDeviceModel _deviceModel;
         public async Task<bool> IsAuthenticatedAsync()
         {
-            await InitializeAsync();
+            if (IsAuthenticated())
+                return true;
+            await ReInitializeAsync();
             return IsAuthenticated();
         }
 
-        public async Task<T> CreateRequestAsync<T>() where T : BaseRequest, new()
+        public async Task<T> CreateRequestAsync<T>(int messageCount = 0) where T : BaseRequest, new()
         {
-            await IsAuthenticatedAsync();
-            if (!IsAuthenticated())
-                return null;
+            if (!IsInitialized())
+            {
+                await ReInitializeAsync();
+                if (!IsInitialized())
+                    return null;
+            }
 
             var request = new T
             {
-                AuthorizationCode = AuthorizationHelper.GenerateAuthorizationCode(_apiInformation, _apiRoamingEntity),
+                AuthorizationCode = AuthorizationHelper.GenerateAuthorizationCode(_apiInformation, _apiRoamingEntity, messageCount),
                 UserId = _apiRoamingEntity.UserId,
                 DeviceId = _deviceModel.GetId(),
                 ApplicationId = _apiInformation.ApplicationId
@@ -76,8 +92,6 @@ namespace Famoser.SyncApi.Services
 
         public async Task<T> CreateRequestAsync<T, TCollection>() where T : SyncEntityRequest, new() where TCollection : ICollectionModel
         {
-            await InitializeAsync();
-
             var req = await CreateRequestAsync<T>();
             if (_dictionary.ContainsKey(typeof(TCollection)))
             {
@@ -100,7 +114,12 @@ namespace Famoser.SyncApi.Services
 
         public async Task<CacheInformations> CreateModelInformationAsync()
         {
-            await InitializeAsync();
+            if (!IsInitialized())
+            {
+                await ReInitializeAsync();
+                if (!IsInitialized())
+                    return null;
+            }
 
             var mi = new CacheInformations
             {

@@ -1,5 +1,5 @@
 ﻿using System;
-using Famoser.SyncApi.Enums;
+using Famoser.SyncApi.Api.Enums;
 
 namespace Famoser.SyncApi.Api.Communication.Entities.Base
 {

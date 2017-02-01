@@ -1,5 +1,4 @@
 ﻿using System.Threading.Tasks;
-using Famoser.SyncApi.Storage.Cache;
 using Famoser.SyncApi.Storage.Roaming;
 
 namespace Famoser.SyncApi.Services.Interfaces
@@ -13,7 +12,7 @@ namespace Famoser.SyncApi.Services.Interfaces
     {
         /// <summary>
         /// get the roaming entity
-        /// this object should be synced accross all devices of the same user
+        /// this object should be synced across all devices of the same user
         /// 
         /// this object will be unique, each call must return the same instance
         /// </summary>
@@ -23,7 +22,7 @@ namespace Famoser.SyncApi.Services.Interfaces
         /// save the roaming entity
         /// </summary>
         /// <returns></returns>
-        Task<bool> SaveApiRoamingEntityAsync();
+        Task<bool> SaveApiRoamingEntityAsync(ApiRoamingEntity entity);
         /// <summary>
         /// delete the roaming file
         /// </summary>

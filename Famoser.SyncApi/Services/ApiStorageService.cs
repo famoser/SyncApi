@@ -23,44 +23,54 @@ namespace Famoser.SyncApi.Services
 
         private readonly AsyncLock _asyncLock = new AsyncLock();
         private ApiRoamingEntity _apiRoamingEntity;
+        private bool _isAuthenticated = false;
 
         private async Task<bool> InitializeAsync()
         {
             using (await _asyncLock.LockAsync())
             {
+                if (_isAuthenticated)
+                {
+                    return true;
+                }
+
+                _isAuthenticated = true;
                 try
                 {
                     var roamingFilePath = GetApiRoamingFilePath();
                     var json1 = await _storageService.GetRoamingTextFileAsync(roamingFilePath);
-                    var json2 = await _storageService.GetCachedTextFileAsync(roamingFilePath);
-                    if (json1 == json2)
+                    try
                     {
-                        _apiRoamingEntity = JsonConvert.DeserializeObject<ApiRoamingEntity>(json1);
+                        var json2 = await _storageService.GetCachedTextFileAsync(roamingFilePath);
+                        if (json1 != json2)
+                        {
+                            //this is not good.
+                            //szenario 1: roaming did not sync as expected, new installation has overwritten the roaming cache with new infos, user may lost all his data
+                            var roaming1 = JsonConvert.DeserializeObject<ApiRoamingEntity>(json1);
+                            var roaming2 = JsonConvert.DeserializeObject<ApiRoamingEntity>(json2);
+                            if (roaming1.CreatedAt < roaming2.CreatedAt)
+                            {
+                                //hmmmmmm, this is really unecpected. We will not modify the roaming storage, to not introduce more bugs
+                                //we'll just pretend as everything is OK, mabye some other instance of this application can figure out whats going on
+                                _apiRoamingEntity = roaming1;
+                            }
+                            else
+                            {
+                                //szenario 1 happened. too bad! At least we're smart enough to fix it (or not?). Override roaming storage with own storage
+                                await _storageService.SetCachedTextFileAsync(roamingFilePath, json2);
+                                _apiRoamingEntity = roaming2;
+                            }
+                        }
                     }
-                    else
+                    catch (Exception)
                     {
-                        //this is not good.
-                        //szenario 1: roaming did not sync as expected, new installation has overwritten the roaming cache with new infos, user may lost all his data
-                        var roaming1 = JsonConvert.DeserializeObject<ApiRoamingEntity>(json1);
-                        var roaming2 = JsonConvert.DeserializeObject<ApiRoamingEntity>(json2);
-                        if (roaming1.CreatedAt < roaming2.CreatedAt)
-                        {
-                            //hmmmmmm, this is really unecpected. We will not modify the roaming storage, to not introduce more bugs
-                            //we'll just pretend as everything is OK, mabye some other instance of this application can figure out whats going on
-                            _apiRoamingEntity = roaming1;
-                        }
-                        else
-                        {
-                            //szenario 1 happened. too bad! At least we're smart enough to fix it (or not?). Override roaming storage with own storage
-                            await _storageService.SetCachedTextFileAsync(roamingFilePath, json2);
-                            _apiRoamingEntity = roaming2;
-                        }
-
+                        //this happens if installation on new device
                     }
+                    _apiRoamingEntity = JsonConvert.DeserializeObject<ApiRoamingEntity>(json1);
                 }
                 catch (Exception)
                 {
-                    // omited as it can be a new installation
+                    // this happens if its a new installation
                 }
                 if (_apiRoamingEntity == null)
                     _apiRoamingEntity = new ApiRoamingEntity();
@@ -83,13 +93,13 @@ namespace Famoser.SyncApi.Services
 
         public Task<ApiRoamingEntity> GetApiRoamingEntityAsync()
         {
-            return ExecuteSafe(() => _apiRoamingEntity);
+            return ExecuteSafeAsync(() => _apiRoamingEntity);
 
         }
 
-        public Task<bool> SaveApiRoamingEntityAsync()
+        public Task<bool> SaveApiRoamingEntityAsync(ApiRoamingEntity entity)
         {
-            return ExecuteSafe(async () =>
+            return ExecuteSafeAsync(async () =>
             {
                 var json = JsonConvert.SerializeObject(_apiRoamingEntity);
                 var filePath = GetApiRoamingFilePath();
@@ -100,7 +110,7 @@ namespace Famoser.SyncApi.Services
 
         public Task<bool> EraseRoamingAndCacheAsync()
         {
-            return ExecuteSafe(async () =>
+            return ExecuteSafeAsync(async () =>
             {
                 await _storageService.DeleteRoamingFileAsync(GetApiRoamingFilePath());
                 await _storageService.DeleteCachedFileAsync(GetApiStorageFilePath());
@@ -170,7 +180,8 @@ namespace Famoser.SyncApi.Services
             _exceptionLogger = logger;
         }
         private IExceptionLogger _exceptionLogger;
-        protected async Task<T> ExecuteSafe<T>(Func<Task<T>> func)
+
+        protected async Task<T> ExecuteSafeAsync<T>(Func<Task<T>> func)
             where T : new()
         {
             try
@@ -187,7 +198,7 @@ namespace Famoser.SyncApi.Services
             return default(T);
         }
 
-        protected async Task<T> ExecuteSafe<T>(Func<T> func)
+        protected async Task<T> ExecuteSafeAsync<T>(Func<T> func)
             where T : new()
         {
             try

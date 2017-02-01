@@ -1,15 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Famoser.FrameworkEssentials.Logging.Interfaces;
+﻿using Famoser.FrameworkEssentials.Logging.Interfaces;
+using Famoser.SyncApi.Api.Communication.Request.Base;
+using Famoser.SyncApi.Enums;
+using Famoser.SyncApi.Models.Interfaces;
 
 namespace Famoser.SyncApi.Services.Interfaces
 {
     public interface IApiTraceService : IExceptionLogger
     {
-        void TraceSuccessfulRequest(object request, string link);
-        void TraceFailedRequest(object request, string link, string message);
+        ISyncActionInformation CreateSyncActionInformation(SyncAction action);
+        void TraceSuccessfulRequest(BaseRequest request, string link);
+        void TraceFailedRequest(BaseRequest request, string link, string message);
     }
 }

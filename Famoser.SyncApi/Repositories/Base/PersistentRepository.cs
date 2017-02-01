@@ -1,13 +1,8 @@
 ﻿using System;
-using System.Collections.ObjectModel;
 using System.Threading.Tasks;
 using Famoser.SyncApi.Api;
-using Famoser.SyncApi.Api.Communication.Entities;
-using Famoser.SyncApi.Api.Communication.Request;
 using Famoser.SyncApi.Api.Configuration;
 using Famoser.SyncApi.Enums;
-using Famoser.SyncApi.Helpers;
-using Famoser.SyncApi.Managers;
 using Famoser.SyncApi.Managers.Interfaces;
 using Famoser.SyncApi.Models.Information;
 using Famoser.SyncApi.Models.Interfaces.Base;
@@ -15,8 +10,6 @@ using Famoser.SyncApi.Repositories.Interfaces.Base;
 using Famoser.SyncApi.Services.Interfaces;
 using Famoser.SyncApi.Services.Interfaces.Authentication;
 using Famoser.SyncApi.Storage.Cache;
-using Newtonsoft.Json;
-using Nito.AsyncEx;
 
 namespace Famoser.SyncApi.Repositories.Base
 {
@@ -29,13 +22,15 @@ namespace Famoser.SyncApi.Repositories.Base
         private readonly IApiConfigurationService _apiConfigurationService;
         private readonly IApiStorageService _apiStorageService;
         private readonly IApiTraceService _apiTraceService;
+        private readonly IApiAuthenticationService _apiAuthenticationService;
 
-        protected PersistentRepository(IApiConfigurationService apiConfigurationService, IApiStorageService apiStorageService, IApiTraceService traceService)
-            : base(apiConfigurationService, traceService)
+        protected PersistentRepository(IApiConfigurationService apiConfigurationService, IApiStorageService apiStorageService, IApiTraceService traceService, IApiAuthenticationService apiAuthenticationService = null)
+            : base(apiConfigurationService, apiAuthenticationService, traceService)
         {
             _apiConfigurationService = apiConfigurationService;
             _apiStorageService = apiStorageService;
             _apiTraceService = traceService;
+            _apiAuthenticationService = apiAuthenticationService;
 
             Manager = _apiConfigurationService.GetManager<TModel>();
             ApiInformation = apiConfigurationService.GetApiInformations();
@@ -46,63 +41,54 @@ namespace Famoser.SyncApi.Repositories.Base
             return new ApiClient(ApiInformation.Uri, _apiTraceService);
         }
 
-        public Task<TModel> GetAsync()
+        public async Task<TModel> GetInternalAsync()
         {
-            return ExecuteSafeAsync(async () =>
-            {
-                if (_apiConfigurationService.StartSyncAutomatically())
-                    await SyncAsync();
+            if (_apiConfigurationService.StartSyncAutomatically())
+                await SyncAsync();
 
-                return Manager.GetModel();
-            });
+            return Manager.GetModel();
         }
 
-        public Task<bool> SaveAsync()
+        public async Task<bool> SaveInternalAsync()
         {
-            return ExecuteSafeAsync(async () =>
+            if (CacheEntity.ModelInformation.PendingAction == PendingAction.None
+                || CacheEntity.ModelInformation.PendingAction == PendingAction.Delete
+                || CacheEntity.ModelInformation.PendingAction == PendingAction.Read)
             {
-                if (CacheEntity.ModelInformation.PendingAction == PendingAction.None
-                    || CacheEntity.ModelInformation.PendingAction == PendingAction.Delete
-                    || CacheEntity.ModelInformation.PendingAction == PendingAction.Read)
-                {
-                    CacheEntity.ModelInformation.VersionId = Guid.NewGuid();
-                    CacheEntity.ModelInformation.PendingAction = PendingAction.Update;
-                }
-                await SaveCacheAsync();
-                return true;
-            });
-        }
-
-        public Task<bool> RemoveAsync()
-        {
-            return ExecuteSafeAsync(async () =>
-            {
-                if (CacheEntity.ModelInformation.PendingAction != PendingAction.Create)
-                {
-                    CacheEntity.ModelInformation.PendingAction = PendingAction.Create;
-                }
-                await SaveCacheAsync();
-                return true;
-            });
-        }
-
-        protected async Task SaveCacheAsync()
-        {
-            try
-            {
-                await _apiStorageService.SaveCacheEntityAsync<CacheEntity<TModel>>();
-                if (_apiConfigurationService.CanUseWebConnection())
-                    await SyncInternalAsync();
+                CacheEntity.ModelInformation.VersionId = Guid.NewGuid();
+                CacheEntity.ModelInformation.PendingAction = PendingAction.Update;
             }
-            catch (Exception ex)
+
+            await _apiStorageService.SaveCacheEntityAsync<CacheEntity<TModel>>();
+            if (_apiConfigurationService.CanUseWebConnection())
+                await SyncAsync();
+
+            return true;
+        }
+
+        public async Task<bool> RemoveInternalAsync()
+        {
+            if (CacheEntity.ModelInformation.PendingAction != PendingAction.Create)
             {
-                ExceptionLogger?.LogException(ex, this);
+                CacheEntity.ModelInformation.PendingAction = PendingAction.Create;
             }
+
+            await _apiStorageService.SaveCacheEntityAsync<CacheEntity<TModel>>();
+            if (_apiConfigurationService.CanUseWebConnection())
+                await SyncAsync();
+
+            return true;
         }
 
         public CacheInformations GetCacheInformations()
         {
             return CacheEntity.ModelInformation;
         }
+
+        public abstract Task<TModel> GetAsync();
+
+        public abstract Task<bool> SaveAsync();
+
+        public abstract Task<bool> RemoveAsync();
     }
 }

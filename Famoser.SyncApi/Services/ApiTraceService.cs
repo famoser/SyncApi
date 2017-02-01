@@ -1,34 +1,40 @@
-﻿using Famoser.FrameworkEssentials.Logging;
-using Famoser.FrameworkEssentials.Logging.Interfaces;
+﻿using System;
+using System.Collections.ObjectModel;
+using Famoser.SyncApi.Api.Communication.Request.Base;
 using Famoser.SyncApi.Services.Interfaces;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Famoser.SyncApi.Enums;
+using Famoser.SyncApi.Events;
+using Famoser.SyncApi.Models;
+using Famoser.SyncApi.Models.Interfaces;
 
 namespace Famoser.SyncApi.Services
 {
     public class ApiTraceService : IApiTraceService
     {
-        private IExceptionLogger _logger;
-        public ApiTraceService()
+        public ObservableCollection<SyncActionInformation> SyncActionInformations { get; } = new ObservableCollection<SyncActionInformation>();
+
+        public EventHandler<RequestEventArgs> RequestFailed;
+        public EventHandler<RequestEventArgs> RequestSuccessful;
+        public void TraceFailedRequest(BaseRequest request, string link, string message)
         {
-            _logger = new LogHelper();
-        }
-        public void LogException(Exception ex, object from = null)
-        {
-            _logger.LogException(ex, from);
+            RequestFailed?.Invoke(this, new RequestEventArgs(request, link, false,message));
         }
 
-        public void TraceFailedRequest(object request, string link, string message)
+        public void TraceSuccessfulRequest(BaseRequest request, string link)
         {
-            //don't do shit
+            RequestSuccessful?.Invoke(this, new RequestEventArgs(request, link));
         }
 
-        public void TraceSuccessfulRequest(object request, string link)
+        public ISyncActionInformation CreateSyncActionInformation(SyncAction action)
         {
-            //don't do shit
+            var info = new SyncActionInformation(action);
+            SyncActionInformations.Add(info);
+            return info;
+        }
+
+        public void LogException(Exception ex, object @from = null)
+        {
+            //ignore
         }
     }
 }

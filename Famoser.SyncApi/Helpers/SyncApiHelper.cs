@@ -75,7 +75,7 @@ namespace Famoser.SyncApi.Helpers
         public ApiRepository<T, CollectionModel> ResolveRepository<T>()
             where T : ISyncModel
         {
-            return new ApiRepository<T, CollectionModel>(ApiConfigurationService, ApiStorageService, ApiAuthenticationService, ApiTraceService);
+            return new ApiRepository<T, CollectionModel>(ApiCollectionRepository, ApiConfigurationService, ApiStorageService, ApiAuthenticationService, ApiTraceService);
         }
 
         private bool _isDisposed;

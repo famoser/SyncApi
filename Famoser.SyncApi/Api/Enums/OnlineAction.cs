@@ -1,4 +1,4 @@
-﻿namespace Famoser.SyncApi.Enums
+﻿namespace Famoser.SyncApi.Api.Enums
 {
     public enum OnlineAction
     {

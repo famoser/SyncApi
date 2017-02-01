@@ -1,7 +1,6 @@
 ﻿using System.Threading.Tasks;
 using Famoser.SyncApi.Api.Communication.Request;
 using Famoser.SyncApi.Api.Communication.Request.Base;
-using Famoser.SyncApi.Enums;
 using Famoser.SyncApi.Models.Information;
 using Famoser.SyncApi.Models.Interfaces;
 using Famoser.SyncApi.Repositories.Interfaces;
@@ -32,7 +31,7 @@ namespace Famoser.SyncApi.Services.Interfaces.Authentication
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
-        Task<T> CreateRequestAsync<T>() where T : BaseRequest, new();
+        Task<T> CreateRequestAsync<T>(int messageCount = 0) where T : BaseRequest, new();
 
         /// <summary>
         /// create a valid, authenticated request.

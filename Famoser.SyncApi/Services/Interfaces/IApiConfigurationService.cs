@@ -38,7 +38,7 @@ namespace Famoser.SyncApi.Services.Interfaces
         /// <returns></returns>
         Task<TDevice> GetDeviceObjectAsync<TDevice>() where TDevice : class;
         /// <summary>
-        /// Get a collection object. Will be called once if there is no collection present for a specific SyncEntity to be saved
+        /// Get a collection object. Will be called once if there is no collection present for a specific SyncEntities to be saved
         /// </summary>
         /// <typeparam name="TCollection"></typeparam>
         /// <returns></returns>
