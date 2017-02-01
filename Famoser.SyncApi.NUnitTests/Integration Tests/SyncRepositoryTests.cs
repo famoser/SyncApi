@@ -36,6 +36,7 @@ namespace Famoser.SyncApi.NUnitTests.Repository
             //assert
             Assert.IsTrue(saveRes);
             Assert.IsTrue(repo.GetAllLazy().Contains(model));
+
             Assert.IsTrue(model2.Count == 1);
             Assert.IsTrue(model2[0].Content == "Hallo Welt!");
         }
