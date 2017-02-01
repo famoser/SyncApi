@@ -164,7 +164,7 @@ namespace Famoser.SyncApi.Repositories
                     await SyncAsync();
 
                 return new Tuple<bool, SyncActionError>(true, SyncActionError.None);
-            }, SyncAction.SaveEntity, VerificationOption.IsAuthenticatedFully);
+            }, SyncAction.SaveEntity, VerificationOption.None);
         }
 
         public Task<bool> SaveAsync(TModel model)

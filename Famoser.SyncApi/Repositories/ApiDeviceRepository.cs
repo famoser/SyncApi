@@ -212,7 +212,7 @@ namespace Famoser.SyncApi.Repositories
                 await InitializeDevicesAsync().ContinueWith(t => SyncDevicesAsync());
 
                 return new Tuple<ObservableCollection<TDevice>, SyncActionError>(_deviceManager.GetObservableCollection(), SyncActionError.None);
-            }, SyncAction.GetAllDevices, VerificationOption.CanAccessInternet | VerificationOption.IsAuthenticatedFully);
+            }, SyncAction.GetAllDevices, VerificationOption.None);
         }
 
         public Task<bool> SyncDevicesAsync()
