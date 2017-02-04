@@ -153,6 +153,7 @@ namespace Famoser.SyncApi.Repositories.Base
                         else
                         {
                             await executeAction(ev);
+                            ev.SetSyncActionResult(SyncActionError.None);
                         }
                     }
                 });

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 using Famoser.SyncApi.Api;
@@ -39,6 +40,40 @@ namespace Famoser.SyncApi.NUnitTests.Integration_Tests
 
             Assert.IsTrue(model2.Count == 1);
             Assert.IsTrue(model2[0].Content == "Hallo Welt!");
+        }
+
+        [Test]
+        public async Task TestSaveAndRetrieveMessagesAsync()
+        {
+            //arrange
+            var ss = new StorageService();
+            var testHelper = new TestHelper { StorageService = ss };
+            var repo = testHelper.SyncApiHelper.ResolveRepository<NoteModel>();
+            var model = new NoteModel { Content = "Hallo Welt!" };
+
+            var testHelper2 = new TestHelper { StorageService = testHelper.StorageService };
+            var repo2 = testHelper2.SyncApiHelper.ResolveRepository<NoteModel>();
+
+            //act
+            var saveRes = await repo.SaveAsync(model);
+            //new instance with empty cache to ensure the notemodel is downloaded
+            ss.ClearCache();
+            var model2 = await repo2.GetAllAsync();
+
+            //assert
+            Assert.IsTrue(saveRes);
+            Assert.IsTrue(repo.GetAllLazy().Contains(model));
+
+            Assert.IsTrue(model2.Count == 1);
+            Assert.IsTrue(model2[0].Content == "Hallo Welt!");
+
+            var grouped = testHelper2.SyncActionInformations.GroupBy(s => s.SyncAction);
+
+            foreach (var sae in grouped)
+            {
+                Assert.IsTrue(sae.Count() == 1);
+                Assert.IsTrue(sae.First().IsCompleted);
+            }
         }
 
         [Test]
