@@ -192,7 +192,7 @@ namespace Famoser.SyncApi.NUnitTests.Integration_Tests
 
             //confirm test is up to date 
             var methods = client.GetType().GetMethods(BindingFlags.Public | BindingFlags.Instance);
-            Assert.IsTrue(methods.Length == 15);
+            Assert.IsTrue(methods.Length == 16);
             
             //ignore last five bc Dispose(), ToString() etc
             for (var index = 0; index < methods.Length - 5; index++)
