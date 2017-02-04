@@ -21,6 +21,7 @@
         RemoveDevice,
 
         GetAllDevices,
+        CheckAuthentication,
 
         GetCollections,
         GetCollectionsAsync,

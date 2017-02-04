@@ -104,6 +104,16 @@ namespace Famoser.SyncApi.Api
         }
 
         /// <summary>
+        /// authenticate the DeviceEntities
+        /// </summary>
+        /// <param name="entity"></param>
+        /// <returns></returns>
+        public Task<AuthorizationResponse> AuthenticationStatusAsync(AuthRequestEntity entity)
+        {
+            return DoApiRequestAsync<AuthorizationResponse>(entity, "auth/status");
+        }
+
+        /// <summary>
         /// unauthenticate the DeviceEntities
         /// </summary>
         /// <param name="entity"></param>

@@ -8,11 +8,5 @@ namespace Famoser.SyncApi.Models.Information
     {
         public Guid Id { get; set; }
         public PendingAction PendingAction { get; set; }
-        
-        public Guid CreateVersionId()
-        {
-            VersionId = Guid.NewGuid();
-            return VersionId;
-        }
     }
 }

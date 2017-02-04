@@ -60,7 +60,6 @@
     <Compile Include="Helpers\ApiEntityHelper.cs" />
     <Compile Include="Helpers\EnumHelper.cs" />
     <Compile Include="Helpers\SyncApiHelper.cs" />
-    <Compile Include="Models\AbstractSyncModel.cs" />
     <Compile Include="Models\Base\BaseModel.cs" />
     <Compile Include="Models\CollectionModel.cs" />
     <Compile Include="Models\DeviceModel.cs" />

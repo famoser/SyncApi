@@ -10,7 +10,7 @@ using Famoser.SyncApi.NUnitTests.Models;
 using Famoser.SyncApi.Services;
 using NUnit.Framework;
 
-namespace Famoser.SyncApi.NUnitTests.Repository
+namespace Famoser.SyncApi.NUnitTests.Integration_Tests
 {
     [TestFixture]
     public class SyncRepositoryTests
@@ -39,6 +39,43 @@ namespace Famoser.SyncApi.NUnitTests.Repository
 
             Assert.IsTrue(model2.Count == 1);
             Assert.IsTrue(model2[0].Content == "Hallo Welt!");
+        }
+
+        [Test]
+        public async Task TestReauthenticationAsync()
+        {
+            //arrange
+            var ss = new StorageService();
+            var testHelper = new TestHelper { StorageService = ss };
+            var repo = testHelper.SyncApiHelper.ResolveRepository<NoteModel>();
+            var model = new NoteModel { Content = "Hallo Welt!" };
+
+            var testHelper2 = new TestHelper { StorageService = testHelper.StorageService };
+            var repo2 = testHelper2.SyncApiHelper.ResolveRepository<NoteModel>();
+
+            var testHelper3 = new TestHelper { StorageService = testHelper.StorageService };
+            var repo3 = testHelper3.SyncApiHelper.ResolveRepository<NoteModel>();
+
+            //act
+            var saveRes = await repo.SaveAsync(model);
+            //new instance with empty cache to ensure the notemodel is downloaded
+            var model2 = await repo2.GetAllAsync();
+            //new instance with empty cache to ensure the notemodel is downloaded
+            var model3 = await repo3.GetAllAsync();
+
+            //assert
+            Assert.IsTrue(saveRes);
+            Assert.IsTrue(repo.GetAllLazy().Contains(model));
+
+            Assert.IsTrue(model2.Count == 1);
+            Assert.IsTrue(model2[0].Content == "Hallo Welt!");
+
+            Assert.IsTrue(model3.Count == 1);
+            Assert.IsTrue(model3[0].Content == "Hallo Welt!");
+            
+            Assert.IsTrue(testHelper.FailedRequestEventArgs.Count == 1); //failed auth request
+            Assert.IsTrue(testHelper2.FailedRequestEventArgs.Count == 0);
+            Assert.IsTrue(testHelper3.FailedRequestEventArgs.Count == 0);
         }
 
         [Test]

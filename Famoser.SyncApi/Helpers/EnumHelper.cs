@@ -84,6 +84,9 @@ namespace Famoser.SyncApi.Helpers
                     return "removing entity";
                 case SyncAction.SyncEntities:
                     return "syncing entities";
+
+                case SyncAction.CheckAuthentication:
+                    return "checking authentication";
                 default:
                     return "doing stuff";
             }
