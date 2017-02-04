@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Famoser.SyncApi.Enums;
+﻿using Famoser.SyncApi.Enums;
 
 namespace Famoser.SyncApi.Helpers
 {
@@ -84,6 +79,9 @@ namespace Famoser.SyncApi.Helpers
                     return "removing entity";
                 case SyncAction.SyncEntities:
                     return "syncing entities";
+
+                case SyncAction.CheckAuthentication:
+                    return "checking authentication";
                 default:
                     return "doing stuff";
             }

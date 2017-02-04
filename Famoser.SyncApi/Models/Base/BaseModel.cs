@@ -5,15 +5,15 @@ namespace Famoser.SyncApi.Models.Base
 {
     public abstract class BaseModel : IUniqueSyncModel
     {
-        private Guid _userId;
+        public Guid Id { get; set; }
         public Guid GetId()
         {
-            return _userId;
+            return Id;
         }
 
         public void SetId(Guid id)
         {
-            _userId = id;
+            Id = id;
         }
 
         public abstract string GetClassIdentifier();

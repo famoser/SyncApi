@@ -4,7 +4,7 @@ using Famoser.SyncApi.NUnitTests.Helpers;
 using Famoser.SyncApi.NUnitTests.Models;
 using NUnit.Framework;
 
-namespace Famoser.SyncApi.NUnitTests.Repository
+namespace Famoser.SyncApi.NUnitTests.Integration_Tests
 {
     [TestFixture]
     public class OfflineRepositoryTests
@@ -37,7 +37,7 @@ namespace Famoser.SyncApi.NUnitTests.Repository
             var testHelper2 = new TestHelper
             {
                 CanUserWebConnectionFunc = () => false,
-                //preservce storage service to check retrieval of cache files
+                //preserve storage service to check retrieval of cache files
                 StorageService = testHelper.StorageService
             };
             var repo2 = testHelper2.SyncApiHelper.ResolveRepository<NoteModel>();

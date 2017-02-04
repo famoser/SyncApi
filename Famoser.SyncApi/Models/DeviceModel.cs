@@ -11,15 +11,15 @@ namespace Famoser.SyncApi.Models
             return "device";
         }
 
-        private AuthenticationState _authenticationState;
+        public AuthenticationState AuthenticationState { get; set; }
         public AuthenticationState GetAuthenticationState()
         {
-            return _authenticationState;
+            return AuthenticationState;
         }
 
         public void SetAuthenticationState(AuthenticationState authenticationState)
         {
-            _authenticationState = authenticationState;
+            AuthenticationState = authenticationState;
         }
     }
 }

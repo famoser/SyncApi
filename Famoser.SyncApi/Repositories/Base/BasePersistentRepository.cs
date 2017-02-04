@@ -2,7 +2,6 @@
 using System.Threading.Tasks;
 using Famoser.SyncApi.Api;
 using Famoser.SyncApi.Enums;
-using Famoser.SyncApi.Models.Interfaces;
 using Famoser.SyncApi.Models.Interfaces.Base;
 using Famoser.SyncApi.Repositories.Interfaces.Base;
 using Famoser.SyncApi.Services.Interfaces;
@@ -25,65 +24,7 @@ namespace Famoser.SyncApi.Repositories.Base
 
         protected abstract Task<bool> InitializeAsync();
 
-        protected Task<T> ExecuteSafeAsync<T>(Func<Task<Tuple<T, SyncActionError>>> func, SyncAction action, VerificationOption verification)
-        {
-            return ExecuteSafeInternalAsync(() => default(T),
-                async ev =>
-                {
-                    var res = await func();
-                    ev.SetSyncActionResult(res.Item2);
-                    return res.Item1;
-                },
-                action,
-                verification
-            );
-        }
-
-        protected T ExecuteSafeLazy<T>(Func<T> returnExecute, Func<Task<SyncActionError>> func, SyncAction action, VerificationOption verification)
-        {
-            return ExecuteSafeInternalLazy(returnExecute,
-                async ev =>
-                {
-                    var res = await func();
-                    ev.SetSyncActionResult(res);
-                },
-                action,
-                verification
-            );
-        }
-
-        protected Task<T> ExecuteSafeAsync<T>(Func<Tuple<T, SyncActionError>> func, SyncAction action, VerificationOption verification)
-        {
-            return ExecuteSafeInternalAsync(() => default(T),
-#pragma warning disable CS1998 // Async method lacks 'await' operators and will run synchronously
-                //to not have to duplicate code further I will not refactor to also accept a non Task func
-                async ev =>
-                {
-                    var res = func();
-                    ev.SetSyncActionResult(res.Item2);
-                    return res.Item1;
-                },
-#pragma warning restore CS1998 // Async method lacks 'await' operators and will run synchronously
-                action,
-                verification
-            );
-        }
-
-        protected Task ExecuteSafeAsync(Func<Task<SyncActionError>> func, SyncAction action, VerificationOption verification)
-        {
-            return ExecuteSafeInternalAsync(() => false,
-                async ev =>
-                {
-                    var res = await func();
-                    ev.SetSyncActionResult(res);
-                    return true;
-                },
-                action,
-                verification
-            );
-        }
-
-        private async Task<T> ExecuteSafeInternalAsync<T>(Func<T> defaultReturn, Func<ISyncActionInformation, Task<T>> executeReturn, SyncAction action, VerificationOption verification)
+        protected async Task<T> ExecuteSafeAsync<T>(Func<Task<Tuple<T, SyncActionError>>> func, SyncAction action, VerificationOption verification)
         {
             var ev = _apiTraceService.CreateSyncActionInformation(action);
 
@@ -93,7 +34,7 @@ namespace Famoser.SyncApi.Repositories.Base
                 if (!await InitializeAsync())
                 {
                     ev.SetSyncActionResult(SyncActionError.InitializationFailed);
-                    return defaultReturn();
+                    return default(T);
                 }
 
                 if (verification.HasFlag(VerificationOption.CanAccessInternet) && !_apiConfigurationService.CanUseWebConnection())
@@ -112,22 +53,26 @@ namespace Famoser.SyncApi.Repositories.Base
                     }
                     else
                     {
-                        return await executeReturn(ev);
+                        var res = await func();
+                        ev.SetSyncActionResult(res.Item2);
+                        return res.Item1;
                     }
                 }
                 else
                 {
-                    return await executeReturn(ev);
+                    var res = await func();
+                    ev.SetSyncActionResult(res.Item2);
+                    return res.Item1;
                 }
             }
             catch (Exception ex)
             {
                 ev.SetSyncActionException(ex);
             }
-            return defaultReturn();
+            return default(T);
         }
 
-        private T ExecuteSafeInternalLazy<T>(Func<T> returnAction, Func<ISyncActionInformation, Task> executeAction, SyncAction action, VerificationOption verification)
+        protected T ExecuteSafeLazy<T>(Func<T> returnExecute, Func<Task<SyncActionError>> func, SyncAction action, VerificationOption verification)
         {
             var ev = _apiTraceService.CreateSyncActionInformation(action);
 
@@ -146,13 +91,21 @@ namespace Famoser.SyncApi.Repositories.Base
                         {
                             ev.SetSyncActionResult(SyncActionError.WebAccessDenied);
                         }
-                        else if (verification.HasFlag(VerificationOption.CanAccessInternet) &&  await _apiAuthenticationService.IsAuthenticatedAsync())
+                        else if (verification.HasFlag(VerificationOption.CanAccessInternet) && await _apiAuthenticationService.IsAuthenticatedAsync())
                         {
                             ev.SetSyncActionResult(SyncActionError.NotAuthenticatedFully);
                         }
                         else
                         {
-                            await executeAction(ev);
+                            try
+                            {
+                                var res = await func();
+                                ev.SetSyncActionResult(res);
+                            }
+                            catch (Exception exception)
+                            {
+                                ev.SetSyncActionException(exception);
+                            }
                         }
                     }
                 });
@@ -161,7 +114,7 @@ namespace Famoser.SyncApi.Repositories.Base
             {
                 ev.SetSyncActionException(ex);
             }
-            return returnAction();
+            return returnExecute();
         }
 
         protected string GetModelHistoryCacheFilePath(TModel model)
@@ -203,7 +156,7 @@ namespace Famoser.SyncApi.Repositories.Base
         }
 
         private bool _isDisposed;
-        protected virtual void Dispose(bool disposing)
+        private void Dispose(bool disposing)
         {
             if (_isDisposed)
                 if (disposing)
