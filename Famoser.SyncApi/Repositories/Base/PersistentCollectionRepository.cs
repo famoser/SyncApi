@@ -40,15 +40,6 @@ namespace Famoser.SyncApi.Repositories.Base
             CollectionManager = _apiConfigurationService.GetCollectionManager<TCollection>();
         }
 
-        public ObservableCollection<TCollection> GetAllLazyInternal()
-        {
-            if (_apiConfigurationService.StartSyncAutomatically())
-            {
-                SyncAsync();
-            }
-            return CollectionManager.GetObservableCollection();
-        }
-
         public async Task<ObservableCollection<TCollection>> GetAllInternalAsync()
         {
             if (_apiConfigurationService.StartSyncAutomatically())

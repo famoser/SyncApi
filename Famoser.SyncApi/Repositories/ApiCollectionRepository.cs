@@ -212,7 +212,8 @@ namespace Famoser.SyncApi.Repositories
         
         public override ObservableCollection<TCollection> GetAllLazy()
         {
-            return ExecuteSafeLazy(GetAllLazyInternal,
+            return ExecuteSafeLazy(
+            () => CollectionManager.GetObservableCollection(),
                 async () =>
                 {
                     if (_apiConfigurationService.StartSyncAutomatically())

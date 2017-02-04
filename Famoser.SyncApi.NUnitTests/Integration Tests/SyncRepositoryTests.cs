@@ -77,6 +77,41 @@ namespace Famoser.SyncApi.NUnitTests.Integration_Tests
         }
 
         [Test]
+        public async Task TestSaveAndRetrieveMessagesOnNewDeviceAsync()
+        {
+            //arrange
+            var ss = new StorageService();
+            var testHelper = new TestHelper { StorageService = ss };
+            var repo = testHelper.SyncApiHelper.ResolveRepository<NoteModel>();
+            var model = new NoteModel { Content = "Hallo Welt!" };
+           
+
+            //act
+            var saveRes = await repo.SaveAsync(model);
+            //assert
+            Assert.IsTrue(saveRes);
+            Assert.IsTrue(repo.GetAllLazy().Contains(model));
+
+            testHelper.SyncActionInformations.Clear();
+            var testHelper2 = new TestHelper { StorageService = ss };
+            var repo2 = testHelper2.SyncApiHelper.ResolveRepository<NoteModel>();
+            var model2 = repo2.GetAllLazy();
+            await Task.Delay(4000);
+
+            //assert 2
+            Assert.IsTrue(model2.Count == 1);
+            Assert.IsTrue(model2[0].Content == "Hallo Welt!");
+
+            var grouped = testHelper.SyncActionInformations.GroupBy(s => s.SyncAction);
+
+            foreach (var sae in grouped)
+            {
+                Assert.IsTrue(sae.Count() == 1);
+                Assert.IsTrue(sae.First().IsCompleted);
+            }
+        }
+
+        [Test]
         public async Task TestReauthenticationAsync()
         {
             //arrange
