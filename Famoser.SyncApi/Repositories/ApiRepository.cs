@@ -46,10 +46,11 @@ namespace Famoser.SyncApi.Repositories
                     return true;
 
                 CollectionCache = await _apiStorageService.GetCacheEntityAsync<CollectionCacheEntity<TModel>>(GetModelCacheFilePath());
-
-                foreach (var collectionCacheModel in CollectionCache.Models)
+                
+                for (int i = 0; i < CollectionCache.Models.Count; i++)
                 {
-                    CollectionManager.Add(collectionCacheModel);
+                    CollectionCache.Models[i].SetId(CollectionCache.ModelInformations[i].Id);
+                    CollectionManager.Add(CollectionCache.Models[i]);
                 }
 
                 return true;

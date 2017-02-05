@@ -11,6 +11,7 @@ using Famoser.SyncApi.Api.Configuration;
 using Famoser.SyncApi.Api.Enums;
 using Famoser.SyncApi.Enums;
 using Famoser.SyncApi.Helpers;
+using Famoser.SyncApi.Managers;
 using Famoser.SyncApi.Managers.Interfaces;
 using Famoser.SyncApi.Models.Information;
 using Famoser.SyncApi.Models.Interfaces;
@@ -74,6 +75,7 @@ namespace Famoser.SyncApi.Repositories
                 {
                     var info = _apiTraceService.CreateSyncActionInformation(SyncAction.FoundDevice);
                     info.SetSyncActionResult(SyncActionError.None);
+                    CacheEntity.Model.SetId(CacheEntity.ModelInformation.Id);
                 }
                 Manager.Set(CacheEntity.Model);
 
@@ -173,9 +175,11 @@ namespace Famoser.SyncApi.Repositories
 
                 _deviceManager = _apiConfigurationService.GetCollectionManager<TDevice>();
                 _deviceCache = await _apiStorageService.GetCacheEntityAsync<CollectionCacheEntity<TDevice>>(GetDeviceCacheFilePath());
-                foreach (var deviceCacheModel in _deviceCache.Models)
+                
+                for (int i = 0; i < _deviceCache.Models.Count; i++)
                 {
-                    _deviceManager.Add(deviceCacheModel);
+                    _deviceCache.Models[i].SetId(_deviceCache.ModelInformations[i].Id);
+                    _deviceManager.Add(_deviceCache.Models[i]);
                 }
 
                 return true;

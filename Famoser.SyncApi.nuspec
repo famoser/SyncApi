@@ -2,7 +2,7 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2011/08/nuspec.xsd">
     <metadata>
         <id>Famoser.SyncApi</id>
-        <version>0.1.10</version>
+        <version>0.1.11</version>
         <authors>Florian Moser</authors>
         <licenseUrl>http://github.com/famoser/SyncApi/blob/master/LICENSE</licenseUrl>
         <projectUrl>http://github.com/famoser/SyncApi</projectUrl>

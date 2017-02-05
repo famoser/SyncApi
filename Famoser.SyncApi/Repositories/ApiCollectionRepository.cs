@@ -59,9 +59,10 @@ namespace Famoser.SyncApi.Repositories
                     await _apiStorageService.SaveCacheEntityAsync<CollectionCacheEntity<TCollection>>();
                 }
 
-                foreach (var collectionCacheModel in CollectionCache.Models)
+                for (int i = 0; i < CollectionCache.Models.Count; i++)
                 {
-                    CollectionManager.Add(collectionCacheModel);
+                    CollectionCache.Models[i].SetId(CollectionCache.ModelInformations[i].Id);
+                    CollectionManager.Add(CollectionCache.Models[i]);
                 }
 
                 return true;

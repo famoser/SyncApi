@@ -70,6 +70,7 @@ namespace Famoser.SyncApi.Repositories
                         VersionId = Guid.NewGuid(),
                         CreateDateTime = DateTime.Now
                     };
+                    CacheEntity.Model.SetId(CacheEntity.ModelInformation.Id);
                     await _apiStorageService.SaveCacheEntityAsync<CacheEntity<TUser>>();
                 }
                 else
@@ -83,6 +84,10 @@ namespace Famoser.SyncApi.Repositories
                             PendingAction = PendingAction.Read
                         };
                         await _apiStorageService.SaveCacheEntityAsync<CacheEntity<TUser>>();
+                    }
+                    else
+                    {
+                        CacheEntity.Model?.SetId(CacheEntity.ModelInformation.Id);
                     }
 
                     var info = _apiTraceService.CreateSyncActionInformation(SyncAction.FoundUser);
