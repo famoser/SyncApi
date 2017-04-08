@@ -199,7 +199,8 @@ namespace Famoser.SyncApi.UnitTests.Integration_Tests
             {
                 var methodInfo = methods[index];
                 var resp = methodInfo.Invoke(client, new object[] { null });
-                if (resp is Task tsk)
+                var tsk = resp as Task;
+                if (tsk != null)
                 {
                     await tsk;
                     var result = tsk.GetType().GetProperty("Result").GetValue(tsk);
