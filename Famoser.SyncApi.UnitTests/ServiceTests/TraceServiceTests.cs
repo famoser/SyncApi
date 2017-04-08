@@ -1,20 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System.Linq;
 using System.Threading.Tasks;
-using Famoser.SyncApi.NUnitTests.Helpers;
-using Famoser.SyncApi.NUnitTests.Implementations;
-using Famoser.SyncApi.NUnitTests.Models;
-using NUnit.Framework;
-using NUnit.Framework.Internal;
+using Famoser.SyncApi.UnitTests.Helpers;
+using Famoser.SyncApi.UnitTests.Models;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace Famoser.SyncApi.NUnitTests.ServiceTests
+namespace Famoser.SyncApi.UnitTests.ServiceTests
 {
-    [TestFixture]
+    [TestClass]
     public class TraceServiceTests
     {
-        [Test]
+        [TestMethod]
         public async Task TestLogsAsync()
         {
             //arrange

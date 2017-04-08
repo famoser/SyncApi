@@ -2,7 +2,7 @@
 using Famoser.SyncApi.Models.Interfaces;
 using GalaSoft.MvvmLight;
 
-namespace Famoser.SyncApi.NUnitTests.Models
+namespace Famoser.SyncApi.UnitTests.Models
 {
     public class NoteModel : ObservableObject, ISyncModel
     {

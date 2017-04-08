@@ -1,12 +1,12 @@
 ﻿using System;
-using NUnit.Framework;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace Famoser.SyncApi.NUnitTests.CSharpTests
+namespace Famoser.SyncApi.UnitTests.CSharpTests
 {
-    [TestFixture]
+    [TestClass]
     public class UriTests
     {
-        [Test]
+        [TestMethod]
         public void TestAbsoluteUrl()
         {
             var uri = new Uri("http://google.com");

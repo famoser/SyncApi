@@ -1,12 +1,12 @@
-﻿using Famoser.SyncApi.NUnitTests.CSharpTests.Models;
-using NUnit.Framework;
+﻿using Famoser.SyncApi.UnitTests.CSharpTests.Models;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace Famoser.SyncApi.NUnitTests.CSharpTests
+namespace Famoser.SyncApi.UnitTests.CSharpTests
 {
-    [TestFixture]
+    [TestClass]
     public class GenericsTest
     {
-        [Test]
+        [TestMethod]
         public void TestInheritanceBehaviour()
         {
             var model = new ChildModel();

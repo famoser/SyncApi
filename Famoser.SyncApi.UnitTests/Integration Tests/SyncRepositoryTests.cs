@@ -5,18 +5,18 @@ using System.Threading.Tasks;
 using Famoser.SyncApi.Api;
 using Famoser.SyncApi.Api.Communication.Response.Base;
 using Famoser.SyncApi.Api.Enums;
-using Famoser.SyncApi.NUnitTests.Helpers;
-using Famoser.SyncApi.NUnitTests.Implementations;
-using Famoser.SyncApi.NUnitTests.Models;
 using Famoser.SyncApi.Services;
-using NUnit.Framework;
+using Famoser.SyncApi.UnitTests.Helpers;
+using Famoser.SyncApi.UnitTests.Implementations;
+using Famoser.SyncApi.UnitTests.Models;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace Famoser.SyncApi.NUnitTests.Integration_Tests
+namespace Famoser.SyncApi.UnitTests.Integration_Tests
 {
-    [TestFixture]
+    [TestClass]
     public class SyncRepositoryTests
     {
-        [Test]
+        [TestMethod]
         public async Task TestSaveAndRetrieveAsync()
         {
             //arrange
@@ -42,7 +42,7 @@ namespace Famoser.SyncApi.NUnitTests.Integration_Tests
             Assert.IsTrue(model2[0].Content == "Hallo Welt!");
         }
 
-        [Test]
+        [TestMethod]
         public async Task TestSaveAndRetrieveMessagesAsync()
         {
             //arrange
@@ -76,7 +76,7 @@ namespace Famoser.SyncApi.NUnitTests.Integration_Tests
             }
         }
 
-        [Test]
+        [TestMethod]
         public async Task TestSaveAndRetrieveMessagesOnNewDeviceAsync()
         {
             //arrange
@@ -111,7 +111,7 @@ namespace Famoser.SyncApi.NUnitTests.Integration_Tests
             }
         }
 
-        [Test]
+        [TestMethod]
         public async Task TestReauthenticationAsync()
         {
             //arrange
@@ -148,7 +148,7 @@ namespace Famoser.SyncApi.NUnitTests.Integration_Tests
             Assert.IsTrue(testHelper3.FailedRequestEventArgs.Count == 0);
         }
 
-        [Test]
+        [TestMethod]
         public async Task TestSaveThreeAndRetrieveAsync()
         {
             //arrange
@@ -184,7 +184,7 @@ namespace Famoser.SyncApi.NUnitTests.Integration_Tests
             Assert.IsTrue(history[2].Model.Content == "Hallo Welt 3");
         }
 
-        [Test]
+        [TestMethod]
         public async Task TestAllEndpointsAsync()
         {
             var traceService = new ApiTraceService();
@@ -199,8 +199,7 @@ namespace Famoser.SyncApi.NUnitTests.Integration_Tests
             {
                 var methodInfo = methods[index];
                 var resp = methodInfo.Invoke(client, new object[] { null });
-                var tsk = resp as Task;
-                if (tsk != null)
+                if (resp is Task tsk)
                 {
                     await tsk;
                     var result = tsk.GetType().GetProperty("Result").GetValue(tsk);

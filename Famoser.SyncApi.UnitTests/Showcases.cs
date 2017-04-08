@@ -2,10 +2,10 @@
 using System.Threading.Tasks;
 using Famoser.FrameworkEssentials.Services.Interfaces;
 using Famoser.SyncApi.Helpers;
-using Famoser.SyncApi.NUnitTests.Implementations;
-using Famoser.SyncApi.NUnitTests.Models;
+using Famoser.SyncApi.UnitTests.Implementations;
+using Famoser.SyncApi.UnitTests.Models;
 
-namespace Famoser.SyncApi.NUnitTests
+namespace Famoser.SyncApi.UnitTests
 {
     class ShowCases
     {

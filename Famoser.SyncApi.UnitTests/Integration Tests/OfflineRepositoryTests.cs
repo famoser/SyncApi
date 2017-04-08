@@ -1,15 +1,15 @@
 ﻿using System.Linq;
 using System.Threading.Tasks;
-using Famoser.SyncApi.NUnitTests.Helpers;
-using Famoser.SyncApi.NUnitTests.Models;
-using NUnit.Framework;
+using Famoser.SyncApi.UnitTests.Helpers;
+using Famoser.SyncApi.UnitTests.Models;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace Famoser.SyncApi.NUnitTests.Integration_Tests
+namespace Famoser.SyncApi.UnitTests.Integration_Tests
 {
-    [TestFixture]
+    [TestClass]
     public class OfflineRepositoryTests
     {
-        [Test]
+        [TestMethod]
         public async Task TestSaveAsync()
         {
             //arrange
@@ -26,7 +26,7 @@ namespace Famoser.SyncApi.NUnitTests.Integration_Tests
             testHelper.AssertNoErrors();
         }
 
-        [Test]
+        [TestMethod]
         public async Task TestSaveAndRetrieveAsync()
         {
             //arrange
@@ -58,7 +58,7 @@ namespace Famoser.SyncApi.NUnitTests.Integration_Tests
             Assert.IsFalse(testHelper.FailedRequestEventArgs.Any());
         }
 
-        [Test]
+        [TestMethod]
         public async Task TestMultipleSaveAsync()
         {
             //arrange

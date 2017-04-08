@@ -6,12 +6,12 @@ using Famoser.FrameworkEssentials.Services.Interfaces;
 using Famoser.SyncApi.Events;
 using Famoser.SyncApi.Helpers;
 using Famoser.SyncApi.Models;
-using Famoser.SyncApi.NUnitTests.Implementations;
 using Famoser.SyncApi.Services;
 using Famoser.SyncApi.Services.Interfaces;
-using NUnit.Framework;
+using Famoser.SyncApi.UnitTests.Implementations;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace Famoser.SyncApi.NUnitTests.Helpers
+namespace Famoser.SyncApi.UnitTests.Helpers
 {
     public class TestHelper
     {

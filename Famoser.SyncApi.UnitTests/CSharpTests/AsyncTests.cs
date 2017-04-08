@@ -2,13 +2,14 @@
 using System.Net;
 using System.Threading.Tasks;
 using Famoser.SyncApi.Models;
-using NUnit.Framework;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace Famoser.SyncApi.NUnitTests.CSharpTests
+namespace Famoser.SyncApi.UnitTests.CSharpTests
 {
-    [TestFixture]
+    [TestClass]
     public class AsyncTests
     {
+        [TestMethod]
         public async Task CheckForSameInstanceAsync()
         {
             var instance = await GetInstanceAsync();

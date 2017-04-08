@@ -243,3 +243,6 @@ ModelManifest.xml
 
 # code coverage
 SyncApi_coverage.xml
+
+# tests
+TestResults
