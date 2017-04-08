@@ -241,8 +241,5 @@ ModelManifest.xml
 # FAKE - F# Make
 .fake/
 
-# code coverage
-SyncApi_coverage.xml
-
 # tests
 TestResults
