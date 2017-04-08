@@ -1,2 +1,0 @@
-.\packages\OpenCover.4.6.519\tools\OpenCover.Console.exe -register:user -target:"%xunit20%\xunit.console.x86.exe" -targetargs:".\Famoser.SyncApi.NUnitTests\bin\Debug\Famoser.SyncApi.NUnitTests.dll  -noshadow -appveyor" -excludebyattribute:*.ExcludeFromCodeCoverage* -hideskipped:All -output:.\SyncApi_coverage.xml
-pause
