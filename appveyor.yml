@@ -8,9 +8,8 @@ before_build:
 build:
   project: Famoser.SyncApi.sln
   verbosity: minimal
-test_script: 
-  - dir
-  - .\packages\OpenCover.4.6.519\OpenCover.Console.exe -register:user -target:"%xunit20%\xunit.console.x86.exe" -targetargs:".\Famoser.SyncApi.NUnitTests\bin\Debug\Famoser.SyncApi.NUnitTests.dll  -noshadow -appveyor" -filter:"+[SyncApi]*  -[SyncApi]SyncApi.Properties.*" -excludebyattribute:*.ExcludeFromCodeCoverage* -hideskipped:All -output:.\SyncApi_coverage.xml -returntargetcode
+test_script:
+  - .\packages\OpenCover.4.6.519\tools\OpenCover.Console.exe -register:user -target:"%xunit20%\xunit.console.x86.exe" -targetargs:".\Famoser.SyncApi.NUnitTests\bin\Debug\Famoser.SyncApi.NUnitTests.dll  -noshadow -appveyor" -filter:"+[SyncApi]*  -[SyncApi]SyncApi.Properties.*" -excludebyattribute:*.ExcludeFromCodeCoverage* -hideskipped:All -output:.\SyncApi_coverage.xml -returntargetcode
   - "SET PATH=C:\\Python34;C:\\Python34\\Scripts;%PATH%"
   - pip install codecov
   - codecov -f "SyncApi_coverage.xml"
