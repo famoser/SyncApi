@@ -1,5 +1,6 @@
 # SyncApi
 [![Build status](https://ci.appveyor.com/api/projects/status/un5aq493586670k3?svg=true)](https://ci.appveyor.com/project/famoser/syncapi)
+[![codecov](https://codecov.io/gh/famoser/SyncApi/branch/master/graph/badge.svg)](https://codecov.io/gh/famoser/SyncApi)
 
 a nuget portable library to sync entities in a very convenient way.
 
