@@ -141,5 +141,14 @@ namespace Famoser.SyncApi.Services
             else
                 _dictionary.Add(typeof(TCollection), repository);
         }
+
+        public Guid? TryGetDeviceId()
+        {
+            if (IsAuthenticated())
+            {
+                return _deviceModel?.GetId();
+            }
+            return null;
+        }
     }
 }

@@ -68,9 +68,13 @@ namespace Famoser.SyncApi.Repositories.Base
 
         public async Task<bool> RemoveInternalAsync()
         {
-            if (CacheEntity.ModelInformation.PendingAction != PendingAction.Create)
+            if (CacheEntity.ModelInformation.PendingAction == PendingAction.Create)
             {
-                CacheEntity.ModelInformation.PendingAction = PendingAction.Create;
+                CacheEntity.ModelInformation.PendingAction = PendingAction.DeleteLocally;
+            }
+            else
+            {
+                CacheEntity.ModelInformation.PendingAction = PendingAction.Delete;
             }
 
             await _apiStorageService.SaveCacheEntityAsync<CacheEntity<TModel>>();

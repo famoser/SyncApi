@@ -9,9 +9,11 @@ namespace Famoser.SyncApi.UnitTests.Implementations
     public class StorageService : IStorageService
     {
         private Dictionary<string, string> _cachedFiles = new Dictionary<string, string>();
+        private Dictionary<string, byte[]> _cachedBytesFiles = new Dictionary<string, byte[]>();
         public void ClearCache()
         {
             _cachedFiles = new Dictionary<string, string>();
+            _cachedBytesFiles = new Dictionary<string, byte[]>();
         }
 
         public async Task<string> GetCachedTextFileAsync(string filePath)
@@ -25,25 +27,28 @@ namespace Famoser.SyncApi.UnitTests.Implementations
             return true;
         }
 
-        public Task<byte[]> GetCachedFileAsync(string filePath)
+        public async Task<byte[]> GetCachedFileAsync(string filePath)
         {
-            throw new NotImplementedException();
+            return _cachedBytesFiles[filePath];
         }
 
         public async Task<bool> SetCachedFileAsync(string filePath, byte[] content)
         {
-            throw new NotImplementedException();
+            _cachedBytesFiles[filePath] = content;
+            return true;
         }
 
         public async Task<bool> DeleteCachedFileAsync(string filePath)
         {
-            throw new NotImplementedException();
+            return _cachedFiles.Remove(filePath) || _cachedBytesFiles.Remove(filePath);
         }
 
         private Dictionary<string, string> _roamingFiles = new Dictionary<string, string>();
+        private Dictionary<string, byte[]> _roamingByteFiles = new Dictionary<string, byte[]>();
         public void CLearRoaming()
         {
             _roamingFiles = new Dictionary<string, string>();
+            _roamingByteFiles = new Dictionary<string, byte[]>();
         }
         public async Task<string> GetRoamingTextFileAsync(string filePath)
         {
@@ -56,29 +61,30 @@ namespace Famoser.SyncApi.UnitTests.Implementations
             return true;
         }
 
-        public Task<byte[]> GetRoamingFileAsync(string filePath)
+        public async Task<byte[]> GetRoamingFileAsync(string filePath)
         {
-            throw new NotImplementedException();
+            return _roamingByteFiles[filePath];
         }
 
         public async Task<bool> SetRoamingFileAsync(string filePath, byte[] content)
         {
-            throw new NotImplementedException();
+            _roamingByteFiles[filePath] = content;
+            return true;
         }
 
         public async Task<bool> DeleteRoamingFileAsync(string filePath)
         {
-            throw new NotImplementedException();
+            return _roamingFiles.Remove(filePath) || _roamingByteFiles.Remove(filePath);
         }
 
         public async Task<string> GetAssetTextFileAsync(string filePath)
         {
-            throw new NotImplementedException();
+            return "";
         }
 
-        public Task<byte[]> GetAssetFileAsync(string filePath)
+        public async Task<byte[]> GetAssetFileAsync(string filePath)
         {
-            throw new NotImplementedException();
+            return new byte[1];
         }
     }
 }

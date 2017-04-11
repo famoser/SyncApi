@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 using Famoser.SyncApi.Api.Communication.Request;
 using Famoser.SyncApi.Api.Communication.Request.Base;
 using Famoser.SyncApi.Models.Information;
@@ -19,6 +20,12 @@ namespace Famoser.SyncApi.Services.Interfaces.Authentication
         /// </summary>
         /// <returns></returns>
         Task<bool> IsAuthenticatedAsync();
+
+        /// <summary>
+        /// gets the device id if already authenticated, does not try to authenticate automatically
+        /// </summary>
+        /// <returns></returns>
+        Guid? TryGetDeviceId();
 
         /// <summary>
         /// create a valid, authenticated request.

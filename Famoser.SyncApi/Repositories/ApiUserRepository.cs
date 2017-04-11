@@ -164,20 +164,31 @@ namespace Famoser.SyncApi.Repositories
                         return new Tuple<bool, SyncActionError>(false, SyncActionError.RequestUnsuccessful);
                     }
                 }
-                else if (CacheEntity.ModelInformation.PendingAction == PendingAction.Delete)
+                else if (CacheEntity.ModelInformation.PendingAction == PendingAction.Delete || CacheEntity.ModelInformation.PendingAction == PendingAction.DeleteLocally)
                 {
-                    var resp = await _authApiClient.DoSyncRequestAsync(
-                        AuthorizeRequest(ApiInformation, _roaming, new AuthRequestEntity()
+                    if (CacheEntity.ModelInformation.PendingAction == PendingAction.Delete)
+                    {
+                        var req = new AuthRequestEntity()
                         {
                             UserEntity = new UserEntity()
                             {
                                 Id = CacheEntity.ModelInformation.Id,
                                 OnlineAction = OnlineAction.Delete
-                            }
-                        }));
-                    if (resp.RequestFailed)
-                    {
-                        return new Tuple<bool, SyncActionError>(false, SyncActionError.RequestUnsuccessful);
+                            },
+                        };
+
+                        //check if authorized
+                        var service = GetApiAuthenticationService();
+                        var deviceId = service.TryGetDeviceId();
+                        if (deviceId.HasValue)
+                        {
+                            req.DeviceId = deviceId.Value;
+                        }
+                        var resp = await _authApiClient.DoSyncRequestAsync(AuthorizeRequest(ApiInformation, _roaming, req));
+                        if (resp.RequestFailed)
+                        {
+                            return new Tuple<bool, SyncActionError>(false, SyncActionError.RequestUnsuccessful);
+                        }
                     }
 
                     //clean up

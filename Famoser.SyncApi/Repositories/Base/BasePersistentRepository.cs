@@ -176,5 +176,10 @@ namespace Famoser.SyncApi.Repositories.Base
         {
             _apiAuthenticationService = apiAuthenticationService;
         }
+
+        protected IApiAuthenticationService GetApiAuthenticationService()
+        {
+            return _apiAuthenticationService;
+        }
     }
 }

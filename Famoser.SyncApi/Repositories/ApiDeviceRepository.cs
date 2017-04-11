@@ -125,14 +125,14 @@ namespace Famoser.SyncApi.Repositories
                                 Content = JsonConvert.SerializeObject(CacheEntity.Model)
                             }
                         }));
-                }
+                } 
 
                 if (resp != null && resp.RequestFailed)
                 {
                     return new Tuple<bool, SyncActionError>(false, SyncActionError.RequestUnsuccessful);
                 }
 
-                if (CacheEntity.ModelInformation.PendingAction == PendingAction.Delete)
+                if (CacheEntity.ModelInformation.PendingAction == PendingAction.Delete || CacheEntity.ModelInformation.PendingAction == PendingAction.DeleteLocally)
                 {
                     //clean up
                     CacheEntity.ModelInformation.PendingAction = PendingAction.None;
