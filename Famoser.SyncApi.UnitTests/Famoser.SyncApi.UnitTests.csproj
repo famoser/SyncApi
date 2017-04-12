@@ -67,6 +67,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CSharpTests\AsyncTests.cs" />
+    <Compile Include="CSharpTests\GenericCastTest.cs" />
     <Compile Include="CSharpTests\GenericsTest.cs" />
     <Compile Include="CSharpTests\Models\BaseModel.cs" />
     <Compile Include="CSharpTests\Models\ChildModel.cs" />

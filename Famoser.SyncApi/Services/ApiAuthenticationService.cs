@@ -136,7 +136,7 @@ namespace Famoser.SyncApi.Services
         private readonly Dictionary<Type, IApiCollectionRepository<ICollectionModel>> _apiCollectionRepositoryDictionary = new Dictionary<Type, IApiCollectionRepository<ICollectionModel>>();
         public void RegisterCollectionRepository<TCollection>(IApiCollectionRepository<TCollection> repository) where TCollection : ICollectionModel
         {
-            var castedRepo = (IApiCollectionRepository<ICollectionModel>)repository;
+            var castedRepo = repository as IApiCollectionRepository<ICollectionModel>;
             _apiCollectionRepositoryDictionary.Add(typeof(IApiCollectionRepository<TCollection>), castedRepo);
         }
 
@@ -152,7 +152,7 @@ namespace Famoser.SyncApi.Services
         private readonly Dictionary<Type, List<IApiRepository<ISyncModel, ICollectionModel>>> _apiRepositoryDictionary = new Dictionary<Type, List<IApiRepository<ISyncModel, ICollectionModel>>>();
         public void RegisterRepository<TSyncModel, TCollection>(IApiRepository<TSyncModel, TCollection> repository) where TSyncModel : ISyncModel where TCollection : ICollectionModel
         {
-            var castedRepository = (IApiRepository<ISyncModel, ICollectionModel>)repository;
+            var castedRepository = (IApiRepository<ISyncModel, ICollectionModel>)(object)repository;
             if (!_apiRepositoryDictionary.ContainsKey(typeof(TCollection)))
                 _apiRepositoryDictionary.Add(typeof(TCollection), new List<IApiRepository<ISyncModel, ICollectionModel>>());
 
