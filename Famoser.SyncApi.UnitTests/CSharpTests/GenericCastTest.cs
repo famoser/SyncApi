@@ -25,7 +25,7 @@ namespace Famoser.SyncApi.UnitTests.CSharpTests
         {
             var implementation = new MyImplementation<MyModel>();
             var instance = Register(implementation);
-            Assert.IsNotNull(instance);
+            Assert.IsNull(instance);
         }
 
         private object Register<TModel>(IImplementation<TModel> implementation) where TModel : IModel
