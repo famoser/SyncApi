@@ -137,6 +137,8 @@ namespace Famoser.SyncApi.Repositories
                     //clean up
                     CacheEntity.ModelInformation.PendingAction = PendingAction.None;
                     await _apiStorageService.EraseCacheEntityAsync<CacheEntity<TDevice>>();
+                    await GetApiAuthenticationService().CleanUpAfterDeviceRemoveAsync();
+                    await CleanUpAsync();
                 }
                 else
                 {
@@ -323,6 +325,7 @@ namespace Famoser.SyncApi.Repositories
                         var retried = await _authApiClient.AuthenticationStatusAsync(AuthorizeRequest(ApiInformation, _apiRoamingEntity, new AuthRequestEntity()));
                         if (retried.IsSuccessfull)
                         {
+                            //I know its bad, its the only one in the whole project I promise
                             goto Successful;
                         }
                     }
@@ -438,6 +441,17 @@ namespace Famoser.SyncApi.Repositories
                 SyncAction.RemoveDevice,
                 VerificationOption.None
             );
+        }
+
+        public override Task<bool> CleanUpAsync()
+        {
+            CacheEntity = null;
+            return base.CleanUpAsync();
+        }
+
+        public Task<bool> CleanUpDeviceAsync()
+        {
+            return CleanUpAsync();
         }
     }
 }

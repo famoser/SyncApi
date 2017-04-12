@@ -29,6 +29,7 @@ namespace Famoser.SyncApi.UnitTests.ServiceTests
             var saveRes = await repo.SaveAsync(model);
             //remove user & all other stuff
             await testHelper.SyncApiHelper.ApiUserRepository.RemoveAsync();
+            Assert.IsTrue(ss.CountAllCachedFiles() + ss.CountAllRoamingFiles() == 0);
 
             //try to retrieve again
             var model2 = await repo2.GetAllAsync();

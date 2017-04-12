@@ -16,6 +16,16 @@ namespace Famoser.SyncApi.UnitTests.Implementations
             _cachedBytesFiles = new Dictionary<string, byte[]>();
         }
 
+        public int CountAllCachedFiles()
+        {
+            return _cachedFiles.Count + _cachedBytesFiles.Count;
+        }
+
+        public int CountAllRoamingFiles()
+        {
+            return _roamingFiles.Count + _roamingByteFiles.Count;
+        }
+
         public async Task<string> GetCachedTextFileAsync(string filePath)
         {
             return _cachedFiles[filePath];

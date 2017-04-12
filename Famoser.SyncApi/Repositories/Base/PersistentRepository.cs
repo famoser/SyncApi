@@ -94,5 +94,10 @@ namespace Famoser.SyncApi.Repositories.Base
         public abstract Task<bool> SaveAsync();
 
         public abstract Task<bool> RemoveAsync();
+
+        public override async Task<bool> CleanUpAsync()
+        {
+            return await _apiStorageService.EraseCacheEntityAsync<CacheEntity<TModel>>();
+        }
     }
 }

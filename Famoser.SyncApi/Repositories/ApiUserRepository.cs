@@ -196,6 +196,8 @@ namespace Famoser.SyncApi.Repositories
                     _roaming.AuthenticationState = AuthenticationState.UnAuthenticated;
                     CacheEntity.ModelInformation.PendingAction = PendingAction.None;
                     await _apiStorageService.EraseRoamingAndCacheAsync();
+                    await GetApiAuthenticationService().CleanUpAfterUserRemoveAsync();
+                    await CleanUpAsync();
 
                     return new Tuple<bool, SyncActionError>(true, SyncActionError.None);
                 }
@@ -252,6 +254,12 @@ namespace Famoser.SyncApi.Repositories
                 SyncAction.RemoveUser,
                 VerificationOption.None
             );
+        }
+
+        public override Task<bool> CleanUpAsync()
+        {
+            CacheEntity = null;
+            return base.CleanUpAsync();
         }
     }
 }

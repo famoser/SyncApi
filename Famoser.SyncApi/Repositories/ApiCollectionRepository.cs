@@ -186,9 +186,14 @@ namespace Famoser.SyncApi.Repositories
                     else if (respCollectionEntity.OnlineAction == OnlineAction.Delete)
                     {
                         var index = CollectionCache.ModelInformations.FindIndex(d => d.Id == respCollectionEntity.Id);
+                        var mod = CollectionCache.Models[index];
+
                         CollectionManager.Remove(CollectionCache.Models[index]);
                         CollectionCache.ModelInformations.RemoveAt(index);
                         CollectionCache.Models.RemoveAt(index);
+
+                        await GetApiAuthenticationService().CleanUpAfterCollectionRemoveAsync(mod);
+                        await CleanUpAsync();
                     }
                 }
 
@@ -273,6 +278,12 @@ namespace Famoser.SyncApi.Repositories
                 SyncAction.SyncCollectionHistory,
                 VerificationOption.CanAccessInternet | VerificationOption.IsAuthenticatedFully
             );
+        }
+
+        public override Task<bool> CleanUpAsync()
+        {
+            CollectionCache = null;
+            return base.CleanUpAsync();
         }
     }
 }

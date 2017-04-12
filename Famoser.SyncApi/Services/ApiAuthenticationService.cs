@@ -93,9 +93,9 @@ namespace Famoser.SyncApi.Services
         public async Task<T> CreateRequestAsync<T, TCollection>() where T : SyncEntityRequest, new() where TCollection : ICollectionModel
         {
             var req = await CreateRequestAsync<T>();
-            if (_dictionary.ContainsKey(typeof(TCollection)))
+            if (_apiCollectionRepositoryDictionary.ContainsKey(typeof(TCollection)))
             {
-                var ss = _dictionary[typeof(TCollection)] as IApiCollectionRepository<TCollection>;
+                var ss = _apiCollectionRepositoryDictionary[typeof(TCollection)] as IApiCollectionRepository<TCollection>;
                 if (ss != null)
                 {
                     var colls = await ss.GetAllAsync();
@@ -133,13 +133,11 @@ namespace Famoser.SyncApi.Services
             return mi;
         }
 
-        private readonly Dictionary<Type, object> _dictionary = new Dictionary<Type, object>();
+        private readonly Dictionary<Type, IApiCollectionRepository<ICollectionModel>> _apiCollectionRepositoryDictionary = new Dictionary<Type, IApiCollectionRepository<ICollectionModel>>();
         public void RegisterCollectionRepository<TCollection>(IApiCollectionRepository<TCollection> repository) where TCollection : ICollectionModel
         {
-            if (_dictionary.ContainsKey(typeof(TCollection)))
-                _dictionary[typeof(TCollection)] = repository;
-            else
-                _dictionary.Add(typeof(TCollection), repository);
+            var castedRepo = (IApiCollectionRepository<ICollectionModel>)repository;
+            _apiCollectionRepositoryDictionary.Add(typeof(IApiCollectionRepository<TCollection>), castedRepo);
         }
 
         public Guid? TryGetDeviceId()
@@ -149,6 +147,66 @@ namespace Famoser.SyncApi.Services
                 return _deviceModel?.GetId();
             }
             return null;
+        }
+
+        private readonly Dictionary<Type, List<IApiRepository<ISyncModel, ICollectionModel>>> _apiRepositoryDictionary = new Dictionary<Type, List<IApiRepository<ISyncModel, ICollectionModel>>>();
+        public void RegisterRepository<TSyncModel, TCollection>(IApiRepository<TSyncModel, TCollection> repository) where TSyncModel : ISyncModel where TCollection : ICollectionModel
+        {
+            var castedRepository = (IApiRepository<ISyncModel, ICollectionModel>)repository;
+            if (!_apiRepositoryDictionary.ContainsKey(typeof(TCollection)))
+                _apiRepositoryDictionary.Add(typeof(TCollection), new List<IApiRepository<ISyncModel, ICollectionModel>>());
+
+            _apiRepositoryDictionary[typeof(TCollection)].Add(castedRepository);
+        }
+
+        public void UnRegisterCollectionRepository<TCollection>(IApiCollectionRepository<TCollection> repository) where TCollection : ICollectionModel
+        {
+            _apiCollectionRepositoryDictionary.Remove(typeof(TCollection));
+        }
+
+        public void UnRegisterRepository<TSyncModel, TCollection>(IApiRepository<TSyncModel, TCollection> repository) where TSyncModel : ISyncModel where TCollection : ICollectionModel
+        {
+            _apiRepositoryDictionary.Remove(typeof(IApiRepository<TSyncModel, TCollection>));
+        }
+
+        public async Task CleanUpAfterUserRemoveAsync()
+        {
+            await _apiDeviceAuthenticationService.CleanUpDeviceAsync();
+
+            _apiRoamingEntity = null;
+            await CleanUpAfterDeviceRemoveAsync();
+        }
+
+        public async Task CleanUpAfterDeviceRemoveAsync()
+        {
+            foreach (var value in _apiCollectionRepositoryDictionary.Values)
+            {
+                await value.CleanUpAsync();
+            }
+
+            foreach (var value in _apiRepositoryDictionary.Values)
+            {
+                foreach (var apiRepository in value)
+                {
+                    await apiRepository.CleanUpAsync();
+                }
+            }
+
+            //reset all auth
+            _deviceModel = null;
+            _lastRefresh = DateTime.MinValue;
+        }
+
+        public async Task CleanUpAfterCollectionRemoveAsync<TCollection>(TCollection collection) where TCollection : ICollectionModel
+        {
+            if (_apiRepositoryDictionary.ContainsKey(typeof(TCollection)))
+            {
+                var collRepo = _apiRepositoryDictionary[typeof(TCollection)];
+                foreach (var apiRepo in collRepo)
+                {
+                    await apiRepo.RemoveAllFromCollectionAsync(collection);
+                }
+            }
         }
     }
 }

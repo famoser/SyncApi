@@ -35,6 +35,8 @@ namespace Famoser.SyncApi.Repositories
             _apiConfigurationService = apiConfigurationService;
             _apiStorageService = apiStorageService;
             _apiAuthenticationService = apiAuthenticationService;
+
+            _apiAuthenticationService.RegisterRepository(this);
         }
 
         private readonly AsyncLock _asyncLock = new AsyncLock();
@@ -244,6 +246,49 @@ namespace Famoser.SyncApi.Repositories
                 SyncAction.SyncEntityHistory,
                 VerificationOption.CanAccessInternet | VerificationOption.IsAuthenticatedFully
             );
+        }
+
+        public override Task<bool> CleanUpAsync()
+        {
+            CollectionCache = null;
+            return base.CleanUpAsync();
+        }
+
+        public override void Dispose()
+        {
+            _apiAuthenticationService.UnRegisterRepository(this);
+            base.Dispose();
+        }
+
+        public Task<bool> RemoveAllFromCollectionAsync(TCollection collection)
+        {
+            return ExecuteSafeAsync(
+                async () => new Tuple<bool, SyncActionError>(
+                    await RemoveAllFromCollectionInternalAsync(collection),
+                    SyncActionError.None
+                    ),
+                SyncAction.SyncEntityHistory,
+                VerificationOption.None
+            );
+        }
+
+        private async Task<bool> RemoveAllFromCollectionInternalAsync(TCollection collection)
+        {
+            var toRemove = new List<TModel>();
+            for (var index = 0; index < CollectionCache.ModelInformations.Count; index++)
+            {
+                var collectionCacheModelInformation = CollectionCache.ModelInformations[index];
+                if (collectionCacheModelInformation.CollectionId == collection.GetId())
+                {
+                    CollectionCache.ModelInformations.Remove(collectionCacheModelInformation);
+                    var model =
+                        CollectionCache.Models.First(d => d.GetId() == collectionCacheModelInformation.Id);
+                    toRemove.Add(model);
+                    CollectionCache.Models.Remove(model);
+                }
+            }
+            var res = await RemoveHistoryInternalAsync(toRemove);
+            return await _apiStorageService.SaveCacheEntityAsync<CollectionCacheEntity<TModel>>() && res;
         }
     }
 }

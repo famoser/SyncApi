@@ -164,7 +164,7 @@ namespace Famoser.SyncApi.Repositories.Base
             _isDisposed = true;
         }
 
-        public void Dispose()
+        public virtual void Dispose()
         {
             Dispose(true);
             GC.SuppressFinalize(this);
@@ -181,5 +181,7 @@ namespace Famoser.SyncApi.Repositories.Base
         {
             return _apiAuthenticationService;
         }
+
+        public abstract Task<bool> CleanUpAsync();
     }
 }
