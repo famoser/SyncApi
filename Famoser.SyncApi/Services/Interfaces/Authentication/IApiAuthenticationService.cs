@@ -2,10 +2,8 @@
 using System.Threading.Tasks;
 using Famoser.SyncApi.Api.Communication.Request;
 using Famoser.SyncApi.Api.Communication.Request.Base;
-using Famoser.SyncApi.Enums;
 using Famoser.SyncApi.Models.Information;
 using Famoser.SyncApi.Models.Interfaces;
-using Famoser.SyncApi.Properties;
 using Famoser.SyncApi.Repositories.Interfaces;
 
 namespace Famoser.SyncApi.Services.Interfaces.Authentication

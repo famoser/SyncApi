@@ -132,7 +132,9 @@ namespace Famoser.SyncApi.Repositories.Base
             if (_apiConfigurationService.StartSyncAutomatically())
                 SyncHistoryAsync(model);
             else
+#pragma warning disable 4014
                 InitializeHistoryAsync(model);
+#pragma warning restore 4014
 
             return HistoryCollectionManagers[model].GetObservableCollection();
         }

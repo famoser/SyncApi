@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Famoser.SyncApi.UnitTests.CSharpTests
 {
-    [TestClass, Ignore]
+    [TestClass]
     public class GenericCastTest
     {
         interface IModel { }

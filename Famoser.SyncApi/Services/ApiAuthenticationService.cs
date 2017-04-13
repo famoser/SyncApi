@@ -1,11 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 using Famoser.SyncApi.Api.Communication.Entities;
 using Famoser.SyncApi.Api.Communication.Request;
 using Famoser.SyncApi.Api.Communication.Request.Base;
 using Famoser.SyncApi.Api.Configuration;
 using Famoser.SyncApi.Api.Enums;
+using Famoser.SyncApi.Containers;
 using Famoser.SyncApi.Enums;
 using Famoser.SyncApi.Helpers;
 using Famoser.SyncApi.Models.Information;
@@ -93,13 +93,13 @@ namespace Famoser.SyncApi.Services
         public async Task<T> CreateRequestAsync<T, TCollection>() where T : SyncEntityRequest, new() where TCollection : ICollectionModel
         {
             var req = await CreateRequestAsync<T>();
-            if (_apiCollectionRepositoryDictionary.ContainsKey(typeof(TCollection)))
+            if (_apiCollectionRepositoryContainer.Contains<TCollection>())
             {
-                var ss = _apiCollectionRepositoryDictionary[typeof(TCollection)] as IApiCollectionRepository<TCollection>;
+                var ss = _apiCollectionRepositoryContainer.Get<TCollection>();
                 if (ss != null)
                 {
-                    var colls = await ss.GetAllAsync();
-                    foreach (var collection in colls)
+                    var collections = await ss.GetAllAsync();
+                    foreach (var collection in collections)
                     {
                         req.CollectionEntities.Add(new CollectionEntity()
                         {
@@ -133,11 +133,10 @@ namespace Famoser.SyncApi.Services
             return mi;
         }
 
-        private readonly Dictionary<Type, IApiCollectionRepository<ICollectionModel>> _apiCollectionRepositoryDictionary = new Dictionary<Type, IApiCollectionRepository<ICollectionModel>>();
+        private readonly ApiCollectionRepositoryContainer _apiCollectionRepositoryContainer = new ApiCollectionRepositoryContainer();
         public void RegisterCollectionRepository<TCollection>(IApiCollectionRepository<TCollection> repository) where TCollection : ICollectionModel
         {
-            var castedRepo = repository as IApiCollectionRepository<ICollectionModel>;
-            _apiCollectionRepositoryDictionary.Add(typeof(IApiCollectionRepository<TCollection>), castedRepo);
+            _apiCollectionRepositoryContainer.Add(repository);
         }
 
         public Guid? TryGetDeviceId()
@@ -149,24 +148,20 @@ namespace Famoser.SyncApi.Services
             return null;
         }
 
-        private readonly Dictionary<Type, List<IApiRepository<ISyncModel, ICollectionModel>>> _apiRepositoryDictionary = new Dictionary<Type, List<IApiRepository<ISyncModel, ICollectionModel>>>();
+        private readonly ApiRepositoryContainer _apiRepositoryContainer = new ApiRepositoryContainer();
         public void RegisterRepository<TSyncModel, TCollection>(IApiRepository<TSyncModel, TCollection> repository) where TSyncModel : ISyncModel where TCollection : ICollectionModel
         {
-            var castedRepository = (IApiRepository<ISyncModel, ICollectionModel>)repository;
-            if (!_apiRepositoryDictionary.ContainsKey(typeof(TCollection)))
-                _apiRepositoryDictionary.Add(typeof(TCollection), new List<IApiRepository<ISyncModel, ICollectionModel>>());
-
-            _apiRepositoryDictionary[typeof(TCollection)].Add(castedRepository);
+            _apiRepositoryContainer.Add(repository);
         }
 
         public void UnRegisterCollectionRepository<TCollection>(IApiCollectionRepository<TCollection> repository) where TCollection : ICollectionModel
         {
-            _apiCollectionRepositoryDictionary.Remove(typeof(TCollection));
+            _apiCollectionRepositoryContainer.Remove<TCollection>();
         }
 
         public void UnRegisterRepository<TSyncModel, TCollection>(IApiRepository<TSyncModel, TCollection> repository) where TSyncModel : ISyncModel where TCollection : ICollectionModel
         {
-            _apiRepositoryDictionary.Remove(typeof(IApiRepository<TSyncModel, TCollection>));
+            _apiRepositoryContainer.Remove<TSyncModel, TCollection>();
         }
 
         public async Task CleanUpAfterUserRemoveAsync()
@@ -179,17 +174,16 @@ namespace Famoser.SyncApi.Services
 
         public async Task CleanUpAfterDeviceRemoveAsync()
         {
-            foreach (var value in _apiCollectionRepositoryDictionary.Values)
+            foreach (var value in _apiCollectionRepositoryContainer.GetAll())
             {
-                await value.CleanUpAsync();
+                dynamic repo = value;
+                await repo.CleanUpAsync();
             }
 
-            foreach (var value in _apiRepositoryDictionary.Values)
+            foreach (var value in _apiRepositoryContainer.GetAll())
             {
-                foreach (var apiRepository in value)
-                {
-                    await apiRepository.CleanUpAsync();
-                }
+                dynamic repo = value;
+                await repo.CleanUpAsync();
             }
 
             //reset all auth
@@ -199,13 +193,10 @@ namespace Famoser.SyncApi.Services
 
         public async Task CleanUpAfterCollectionRemoveAsync<TCollection>(TCollection collection) where TCollection : ICollectionModel
         {
-            if (_apiRepositoryDictionary.ContainsKey(typeof(TCollection)))
+            foreach (var value in _apiRepositoryContainer.GetAll<TCollection>())
             {
-                var collRepo = _apiRepositoryDictionary[typeof(TCollection)];
-                foreach (var apiRepo in collRepo)
-                {
-                    await apiRepo.RemoveAllFromCollectionAsync(collection);
-                }
+                dynamic repo = value;
+                await repo.CleanUpAsync();
             }
         }
     }

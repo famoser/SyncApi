@@ -68,7 +68,9 @@
   <ItemGroup>
     <Compile Include="CSharpTests\AsyncTests.cs" />
     <Compile Include="CSharpTests\GenericCastTest.cs" />
+    <Compile Include="CSharpTests\GenericPassTest.cs" />
     <Compile Include="CSharpTests\GenericsTest.cs" />
+    <Compile Include="CSharpTests\LinqTests.cs" />
     <Compile Include="CSharpTests\Models\BaseModel.cs" />
     <Compile Include="CSharpTests\Models\ChildModel.cs" />
     <Compile Include="CSharpTests\UriTests.cs" />
@@ -80,7 +82,6 @@
     <Compile Include="ServiceTests\ApiStorageTests.cs" />
     <Compile Include="ServiceTests\TraceServiceTests.cs" />
     <Compile Include="Showcases.cs" />
-    <Compile Include="UnitTest1.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

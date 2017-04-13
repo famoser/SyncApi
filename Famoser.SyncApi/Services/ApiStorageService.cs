@@ -113,6 +113,7 @@ namespace Famoser.SyncApi.Services
             return ExecuteSafeAsync(async () =>
             {
                 await _storageService.DeleteRoamingFileAsync(GetApiRoamingFilePath());
+                await _storageService.DeleteCachedFileAsync(GetApiRoamingFilePath());
                 await _storageService.DeleteCachedFileAsync(GetApiStorageFilePath());
 
                 //invalidate userId

@@ -53,6 +53,8 @@
     <Compile Include="Api\Communication\Response\Base\BaseResponse.cs" />
     <Compile Include="Api\Communication\Request\CollectionEntityRequest.cs" />
     <Compile Include="Api\Communication\Response\SyncEntityResponse.cs" />
+    <Compile Include="Containers\ApiCollectionRepositoryContainer.cs" />
+    <Compile Include="Containers\ApiRepositoryContainer.cs" />
     <Compile Include="Enums\CleanUpAction.cs" />
     <Compile Include="Enums\SyncAction.cs" />
     <Compile Include="Enums\SyncActionError.cs" />

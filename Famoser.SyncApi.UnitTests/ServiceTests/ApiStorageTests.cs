@@ -13,7 +13,7 @@ namespace Famoser.SyncApi.UnitTests.ServiceTests
     [TestClass]
     public class ApiStorageTests
     {
-        [TestMethod, Ignore]
+        [TestMethod]
         public async Task TestCleanUpSuccessfullAsnyc()
         {
             //arrange
