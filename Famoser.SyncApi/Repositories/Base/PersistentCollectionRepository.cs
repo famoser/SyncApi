@@ -57,9 +57,11 @@ namespace Famoser.SyncApi.Repositories.Base
             {
                 return SyncActionError.EntityAlreadyRemoved;
             }
+
+            CollectionManager.Remove(model);
+
             if (info.PendingAction == PendingAction.Create)
             {
-                CollectionManager.Remove(model);
                 CollectionCache.ModelInformations.Remove(info);
                 CollectionCache.Models.Remove(model);
 

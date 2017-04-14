@@ -196,7 +196,7 @@ namespace Famoser.SyncApi.Services
             foreach (var value in _apiRepositoryContainer.GetAll<TCollection>())
             {
                 dynamic repo = value;
-                await repo.CleanUpAsync();
+                await repo.RemoveAllFromCollectionAsync(collection);
             }
         }
     }

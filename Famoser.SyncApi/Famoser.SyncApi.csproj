@@ -37,6 +37,7 @@
     <!-- A reference to the entire .NET Framework is automatically included -->
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Api\Communication\Request\DeviceEntityRequest.cs" />
     <Compile Include="Api\Communication\Request\HistoryEntityRequest.cs" />
     <Compile Include="Api\Communication\Request\SyncEntityRequest.cs" />
     <Compile Include="Api\Communication\Response\DeviceEntityResponse.cs" />

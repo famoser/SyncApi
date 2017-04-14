@@ -68,7 +68,7 @@ namespace Famoser.SyncApi.Repositories
 
                 var client = GetApiClient();
 
-                var synced = new List<int>();
+                var synced = new List<CacheInformations>();
                 //first: push local data. This potentially will overwrite data from other devices, but with the VersionId we'll be able to revert back if things go wrong
                 for (int index = 0; index < CollectionCache.ModelInformations.Count; index++)
                 {
@@ -78,7 +78,7 @@ namespace Famoser.SyncApi.Repositories
                     if (mdl != null)
                     {
                         req.SyncEntities.Add(mdl);
-                        synced.Add(index);
+                        synced.Add(CollectionCache.ModelInformations[index]);
                     }
                 }
                 var resp = await client.DoSyncRequestAsync(req);
@@ -86,7 +86,19 @@ namespace Famoser.SyncApi.Repositories
                     return new Tuple<bool, SyncActionError>(false, SyncActionError.RequestUnsuccessful);
 
                 foreach (var modelInformation in synced)
-                    CollectionCache.ModelInformations[modelInformation].PendingAction = PendingAction.None;
+                {
+                    if (modelInformation.PendingAction == PendingAction.Delete ||
+                        modelInformation.PendingAction == PendingAction.DeleteLocally)
+                    {
+                        var index = CollectionCache.ModelInformations.IndexOf(modelInformation);
+                        CollectionCache.ModelInformations.RemoveAt(index);
+                        CollectionCache.Models.RemoveAt(index);
+                    }
+                    else
+                    {
+                        modelInformation.PendingAction = PendingAction.None;
+                    }
+                }
 
                 foreach (var syncEntity in resp.SyncEntities)
                 {
@@ -281,10 +293,10 @@ namespace Famoser.SyncApi.Repositories
                 if (collectionCacheModelInformation.CollectionId == collection.GetId())
                 {
                     CollectionCache.ModelInformations.Remove(collectionCacheModelInformation);
-                    var model =
-                        CollectionCache.Models.First(d => d.GetId() == collectionCacheModelInformation.Id);
+                    var model = CollectionCache.Models.First(d => d.GetId() == collectionCacheModelInformation.Id);
                     toRemove.Add(model);
                     CollectionCache.Models.Remove(model);
+                    CollectionManager.Remove(model);
                 }
             }
             var res = await RemoveHistoryInternalAsync(toRemove);

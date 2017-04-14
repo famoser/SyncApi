@@ -211,11 +211,11 @@ namespace Famoser.SyncApi.Repositories
                 await InitializeDevicesAsync();
 
                 //sync devices
-                var req = new CollectionEntityRequest();
+                var req = new DeviceEntityRequest();
                 // this will return missing, updated & removed entities
                 foreach (var collectionCacheModelInformation in _deviceCache.ModelInformations)
                 {
-                    req.CollectionEntities.Add(new SyncEntity()
+                    req.CollectionEntities.Add(new DeviceEntity()
                     {
                         Id = collectionCacheModelInformation.Id,
                         VersionId = collectionCacheModelInformation.VersionId,
@@ -411,6 +411,12 @@ namespace Famoser.SyncApi.Repositories
 
         private CollectionEntityRequest AuthorizeRequest(ApiInformation apiInformation,
             ApiRoamingEntity apiRoamingInfo, CollectionEntityRequest request)
+        {
+            return AuthorizeRequestBase(apiInformation, apiRoamingInfo, request);
+        }
+
+        private DeviceEntityRequest AuthorizeRequest(ApiInformation apiInformation,
+            ApiRoamingEntity apiRoamingInfo, DeviceEntityRequest request)
         {
             return AuthorizeRequestBase(apiInformation, apiRoamingInfo, request);
         }

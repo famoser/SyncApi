@@ -33,10 +33,20 @@ namespace Famoser.SyncApi.Helpers
 
         public static CollectionEntity CreateCollectionEntity(CacheInformations info, string identifier, Func<object> getModelFunc)
         {
-            var collEntity =  CreateApiEntity<CollectionEntity>(info, identifier, getModelFunc);
+            var collEntity = CreateApiEntity<CollectionEntity>(info, identifier, getModelFunc);
             if (collEntity != null)
             {
                 collEntity.DeviceId = info.DeviceId;
+                collEntity.UserId = info.UserId;
+            }
+            return collEntity;
+        }
+
+        public static DeviceEntity CreateDeviceEntity(CacheInformations info, string identifier, Func<object> getModelFunc)
+        {
+            var collEntity = CreateApiEntity<DeviceEntity>(info, identifier, getModelFunc);
+            if (collEntity != null)
+            {
                 collEntity.UserId = info.UserId;
             }
             return collEntity;
@@ -46,7 +56,11 @@ namespace Famoser.SyncApi.Helpers
         {
             var mdl = CreateApiEntity<SyncEntity>(info, identifier, getModelFunc);
             if (mdl != null)
+            {
                 mdl.CollectionId = info.CollectionId;
+                mdl.DeviceId = info.DeviceId;
+                mdl.UserId = info.UserId;
+            }
             return mdl;
         }
 
