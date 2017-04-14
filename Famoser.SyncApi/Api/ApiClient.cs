@@ -88,9 +88,9 @@ namespace Famoser.SyncApi.Api
         /// </summary>
         /// <param name="entity"></param>
         /// <returns></returns>
-        public Task<CollectionEntityResponse> GetDevicesAsync(CollectionEntityRequest entity)
+        public Task<DeviceEntityResponse> GetDevicesAsync(CollectionEntityRequest entity)
         {
-            return DoApiRequestAsync<CollectionEntityResponse>(entity, "devices/get");
+            return DoApiRequestAsync<DeviceEntityResponse>(entity, "devices/get");
         }
 
         /// <summary>

@@ -39,6 +39,7 @@
   <ItemGroup>
     <Compile Include="Api\Communication\Request\HistoryEntityRequest.cs" />
     <Compile Include="Api\Communication\Request\SyncEntityRequest.cs" />
+    <Compile Include="Api\Communication\Response\DeviceEntityResponse.cs" />
     <Compile Include="Api\Communication\Response\CollectionEntityResponse.cs" />
     <Compile Include="Api\ApiClient.cs" />
     <Compile Include="Api\Base\BaseApiClient.cs" />

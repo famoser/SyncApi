@@ -156,7 +156,7 @@ namespace Famoser.SyncApi.Repositories
         private string _deviceCacheFilePath;
         private string GetDeviceCacheFilePath()
         {
-            if (_deviceCacheFilePath == null)
+            if (_deviceCacheFilePath != null)
                 return _deviceCacheFilePath;
 
             _deviceCacheFilePath = _apiConfigurationService.GetFileName(GetModelIdentifier() + "_col.json", typeof(TDevice));
@@ -188,7 +188,7 @@ namespace Famoser.SyncApi.Repositories
         public ObservableCollection<TDevice> GetAllLazy()
         {
 #pragma warning disable 4014
-            InitializeDevicesAsync().ContinueWith((t) => SyncDevicesAsync());
+            SyncDevicesAsync();
 #pragma warning restore 4014
 
             return _deviceManager.GetObservableCollection();
@@ -198,7 +198,7 @@ namespace Famoser.SyncApi.Repositories
         {
             return ExecuteSafeAsync(async () =>
             {
-                await InitializeDevicesAsync().ContinueWith(t => SyncDevicesAsync());
+                await SyncDevicesAsync();
 
                 return new Tuple<ObservableCollection<TDevice>, SyncActionError>(_deviceManager.GetObservableCollection(), SyncActionError.None);
             }, SyncAction.GetAllDevices, VerificationOption.None);
@@ -226,7 +226,7 @@ namespace Famoser.SyncApi.Repositories
                 if (!resp.IsSuccessfull)
                     return new Tuple<bool, SyncActionError>(false, SyncActionError.RequestUnsuccessful);
 
-                foreach (var syncEntity in resp.SyncEntities)
+                foreach (var syncEntity in resp.CollectionEntities)
                 {
                     //new!
                     if (syncEntity.OnlineAction == OnlineAction.Create)
@@ -258,7 +258,7 @@ namespace Famoser.SyncApi.Repositories
                     }
                 }
 
-                if (resp.SyncEntities.Any())
+                if (resp.CollectionEntities.Any())
                 {
                     await _apiStorageService.SaveCacheEntityAsync<CollectionCacheEntity<TDevice>>();
                 }

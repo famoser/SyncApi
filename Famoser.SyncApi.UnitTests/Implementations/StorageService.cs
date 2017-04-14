@@ -55,7 +55,7 @@ namespace Famoser.SyncApi.UnitTests.Implementations
 
         private Dictionary<string, string> _roamingFiles = new Dictionary<string, string>();
         private Dictionary<string, byte[]> _roamingByteFiles = new Dictionary<string, byte[]>();
-        public void CLearRoaming()
+        public void ClearRoaming()
         {
             _roamingFiles = new Dictionary<string, string>();
             _roamingByteFiles = new Dictionary<string, byte[]>();

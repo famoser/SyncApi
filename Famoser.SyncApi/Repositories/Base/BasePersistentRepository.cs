@@ -158,7 +158,7 @@ namespace Famoser.SyncApi.Repositories.Base
         private bool _isDisposed;
         private void Dispose(bool disposing)
         {
-            if (_isDisposed)
+            if (!_isDisposed)
                 if (disposing)
                     _apiClient.Dispose();
             _isDisposed = true;

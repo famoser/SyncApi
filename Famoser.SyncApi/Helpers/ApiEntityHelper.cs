@@ -78,18 +78,20 @@ namespace Famoser.SyncApi.Helpers
             return existing;
         }
 
-        public static T CreateCacheInformation<T>(CollectionEntity entity, T exisiting = null)
+        public static T CreateCacheInformation<T>(DeviceEntity entity, T exisiting = null)
             where T : CacheInformations, new()
         {
             var mi = CreateCacheInformation(entity as BaseEntity, exisiting);
             mi.UserId = entity.UserId;
-            mi.DeviceId = entity.DeviceId;
             return mi;
         }
 
-        public static HistoryInformations<T> CreateHistoryInformation<T>(CollectionEntity entity)
+        public static T CreateCacheInformation<T>(CollectionEntity entity, T exisiting = null)
+            where T : CacheInformations, new()
         {
-            return CreateCacheInformation(entity, new HistoryInformations<T>());
+            var mi = CreateCacheInformation(entity as DeviceEntity, exisiting);
+            mi.DeviceId = entity.DeviceId;
+            return mi;
         }
 
         public static T CreateCacheInformation<T>(SyncEntity entity, T existing = null)
@@ -98,6 +100,11 @@ namespace Famoser.SyncApi.Helpers
             var mi = CreateCacheInformation(entity as CollectionEntity, existing);
             mi.CollectionId = entity.CollectionId;
             return mi;
+        }
+
+        public static HistoryInformations<T> CreateHistoryInformation<T>(CollectionEntity entity)
+        {
+            return CreateCacheInformation(entity, new HistoryInformations<T>());
         }
         #endregion
     }
