@@ -42,35 +42,34 @@ namespace Famoser.SyncApi.UnitTests.Helpers
                 _apiTraceService = trace;
                 return _apiTraceService;
             }
-            set { _apiTraceService = value; }
+            set => _apiTraceService = value;
         }
 
         private IStorageService _storageService;
         public IStorageService StorageService
         {
-            get { return _storageService ?? (_storageService = new StorageService()); }
-            set { _storageService = value; }
+            get => _storageService ?? (_storageService = new StorageService());
+            set => _storageService = value;
         }
 
         private Func<bool> _canUseWebConnectionFunc;
         public Func<bool> CanUserWebConnectionFunc
         {
-            get { return _canUseWebConnectionFunc ?? (_canUseWebConnectionFunc = () => true); }
-            set { _canUseWebConnectionFunc = value; }
+            private get { return _canUseWebConnectionFunc ?? (_canUseWebConnectionFunc = () => true); }
+            set => _canUseWebConnectionFunc = value;
         }
 
 
         private SyncApiHelper _syncApiHelper;
         public SyncApiHelper SyncApiHelper
         {
-            get { return _syncApiHelper ?? (_syncApiHelper =
-                    new SyncApiHelper(StorageService, _applicationId, _testUri)
-                    {
-                        ApiConfigurationService = new ApiConfigurationService(_applicationId, _testUri, CanUserWebConnectionFunc),
-                        ApiTraceService = ApiTraceService
-                    });
-            }
-            set { _syncApiHelper = value; }
+            get => _syncApiHelper ?? (_syncApiHelper =
+                       new SyncApiHelper(StorageService, _applicationId, _testUri)
+                       {
+                           ApiConfigurationService = new ApiConfigurationService(_applicationId, _testUri, CanUserWebConnectionFunc),
+                           ApiTraceService = ApiTraceService
+                       });
+            set => _syncApiHelper = value;
         }
 
         public void AssertNoFailedRequests()

@@ -237,7 +237,7 @@ namespace Famoser.SyncApi.Repositories
                     await GetAllInternalAsync(),
                     SyncActionError.None
                     ),
-                SyncAction.GetCollectionsAsync,
+                SyncAction.GetCollections,
                 VerificationOption.None
                 );
         }

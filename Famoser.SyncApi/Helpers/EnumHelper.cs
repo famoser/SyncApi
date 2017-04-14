@@ -22,7 +22,7 @@ namespace Famoser.SyncApi.Helpers
                     return "removing user";
 
                 case SyncAction.GetDevice:
-                    return "getting user";
+                    return "getting device";
                 case SyncAction.CreateDevice:
                     return "creating device";
                 case SyncAction.FoundDevice:
@@ -46,8 +46,6 @@ namespace Famoser.SyncApi.Helpers
                     return "getting all devices";
 
                 case SyncAction.GetCollections:
-                    return "getting collections";
-                case SyncAction.GetCollectionsAsync:
                     return "getting collections";
                 case SyncAction.GetCollectionHistory:
                     return "getting collection history";
