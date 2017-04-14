@@ -83,6 +83,7 @@
     <Compile Include="Integration Tests\OfflineRepositoryTests.cs" />
     <Compile Include="Integration Tests\SyncRepositoryTests.cs" />
     <Compile Include="Models\NoteModel.cs" />
+    <Compile Include="ModelTests\SyncApiInformationModelTests.cs" />
     <Compile Include="ServiceTests\ApiStorageTests.cs" />
     <Compile Include="ServiceTests\TraceServiceTests.cs" />
     <Compile Include="Showcases.cs" />
