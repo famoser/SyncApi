@@ -160,7 +160,7 @@ namespace Famoser.SyncApi.Repositories.Base
         {
             if (!_isDisposed)
                 if (disposing)
-                    _apiClient.Dispose();
+                    _apiClient?.Dispose();
             _isDisposed = true;
         }
 
