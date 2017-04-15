@@ -54,6 +54,10 @@ namespace Famoser.SyncApi.UnitTests.ServiceTests
 
             //act
             var saveRes = await repo.SaveAsync(model);
+
+            var device = await testHelper.SyncApiHelper.ApiDeviceRepository.GetAsync();
+            var user = await testHelper.SyncApiHelper.ApiUserRepository.GetAsync();
+
             //remove device & other stuff
             await testHelper.SyncApiHelper.ApiDeviceRepository.RemoveAsync();
             //three files: user & roaming x2
@@ -61,6 +65,18 @@ namespace Famoser.SyncApi.UnitTests.ServiceTests
 
             //try to retrieve again
             var model2 = await repo2.GetAllAsync();
+            var device2 = await testHelper2.SyncApiHelper.ApiDeviceRepository.GetAsync();
+            var user2 = await testHelper.SyncApiHelper.ApiUserRepository.GetAsync();
+
+            Assert.AreNotEqual(device, device2);
+            Assert.AreNotEqual(device.GetId(), device2.GetId());
+
+            Assert.AreEqual(user.GetId(), user2.GetId());
+
+            var devices = await testHelper2.SyncApiHelper.ApiDeviceRepository.GetAllAsync();
+            //todo: this is wrong!
+            Assert.IsTrue(devices.Count == 1);
+
 
             //assert
             Assert.IsTrue(saveRes);
@@ -79,6 +95,9 @@ namespace Famoser.SyncApi.UnitTests.ServiceTests
 
             var testHelper2 = new TestHelper { StorageService = testHelper.StorageService };
             var repo2 = testHelper2.SyncApiHelper.ResolveRepository<NoteModel>();
+
+            var testHelper3 = new TestHelper { StorageService = testHelper.StorageService };
+            var repo3 = testHelper3.SyncApiHelper.ResolveRepository<NoteModel>();
 
             //act
             var saveRes = await repo.SaveAsync(model);
