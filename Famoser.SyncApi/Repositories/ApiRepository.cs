@@ -62,7 +62,7 @@ namespace Famoser.SyncApi.Repositories
         {
             return ExecuteSafeAsync(async () =>
             {
-                var req = await _apiAuthenticationService.CreateRequestAsync<SyncEntityRequest, TCollection>();
+                var req = await _apiAuthenticationService.CreateRequestAsync<SyncEntityRequest, TCollection>(GetModelIdentifier());
                 if (req == null)
                     return new Tuple<bool, SyncActionError>(false, SyncActionError.RequestCreationFailed);
 

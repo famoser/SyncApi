@@ -82,6 +82,7 @@
     <Compile Include="Implementations\StorageService.cs" />
     <Compile Include="Integration Tests\OfflineRepositoryTests.cs" />
     <Compile Include="Integration Tests\SyncRepositoryTests.cs" />
+    <Compile Include="Models\Note2Model.cs" />
     <Compile Include="Models\NoteModel.cs" />
     <Compile Include="ModelTests\SyncApiInformationModelTests.cs" />
     <Compile Include="RepositoryTests\DeviceRepositoryTests.cs" />

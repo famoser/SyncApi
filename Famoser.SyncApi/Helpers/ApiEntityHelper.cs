@@ -18,7 +18,8 @@ namespace Famoser.SyncApi.Helpers
             {
                 Id = info.Id,
                 VersionId = info.VersionId,
-                OnlineAction = Convert(info.PendingAction)
+                OnlineAction = Convert(info.PendingAction),
+                Identifier = identifier
             };
             if (info.PendingAction == PendingAction.Create || info.PendingAction == PendingAction.Update)
             {

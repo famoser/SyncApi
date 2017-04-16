@@ -184,6 +184,30 @@ namespace Famoser.SyncApi.UnitTests.Integration_Tests
             Assert.IsTrue(history[2].Model.Content == "Hallo Welt 3");
         }
 
+        [TestMethod, Ignore]
+        public async Task TestMultipleModelsSaveAndRetrieveAsync()
+        {
+            //arrange
+            var ss = new StorageService();
+            var testHelper = new TestHelper { StorageService = ss };
+            var repo = testHelper.SyncApiHelper.ResolveRepository<NoteModel>();
+            var repo2 = testHelper.SyncApiHelper.ResolveRepository<Note2Model>();
+
+            var model = new NoteModel { Content = "Hallo Welt!" };
+            var model2 = new Note2Model { Content = "Hallo Welt2!" };
+
+
+            //act
+            await repo.SaveAsync(model);
+            await repo2.SaveAsync(model2);
+            var resModels = await repo2.GetAllAsync();
+            var resModels2 = await repo2.GetAllAsync();
+
+            //assert
+            Assert.IsTrue(resModels.Count == 1);
+            Assert.IsTrue(resModels2.Count == 1);
+        }
+
         [TestMethod]
         public async Task TestAllEndpointsAsync()
         {

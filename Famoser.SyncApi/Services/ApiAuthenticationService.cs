@@ -70,7 +70,7 @@ namespace Famoser.SyncApi.Services
             return IsAuthenticated();
         }
 
-        public async Task<T> CreateRequestAsync<T>(int messageCount = 0) where T : BaseRequest, new()
+        public async Task<T> CreateRequestAsync<T>(string identifier, int messageCount = 0) where T : BaseRequest, new()
         {
             if (!IsInitialized())
             {
@@ -84,15 +84,16 @@ namespace Famoser.SyncApi.Services
                 AuthorizationCode = AuthorizationHelper.GenerateAuthorizationCode(_apiInformation, _apiRoamingEntity, messageCount),
                 UserId = _apiRoamingEntity.UserId,
                 DeviceId = _deviceModel.GetId(),
-                ApplicationId = _apiInformation.ApplicationId
+                ApplicationId = _apiInformation.ApplicationId,
+                Identifier = identifier
             };
 
             return request;
         }
 
-        public async Task<T> CreateRequestAsync<T, TCollection>() where T : SyncEntityRequest, new() where TCollection : ICollectionModel
+        public async Task<T> CreateRequestAsync<T, TCollection>(string identifier) where T : SyncEntityRequest, new() where TCollection : ICollectionModel
         {
-            var req = await CreateRequestAsync<T>();
+            var req = await CreateRequestAsync<T>(identifier);
             if (_apiCollectionRepositoryContainer.Contains<TCollection>())
             {
                 var ss = _apiCollectionRepositoryContainer.Get<TCollection>();
