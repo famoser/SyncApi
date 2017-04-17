@@ -217,6 +217,7 @@ namespace Famoser.SyncApi.Repositories
             request.ApplicationId = apiInformation.ApplicationId;
             request.AuthorizationCode = AuthorizationHelper.GenerateAuthorizationCode(apiInformation, apiRoamingInfo);
             request.UserId = _roaming.UserId;
+            request.Identifier = GetModelIdentifier();
             return request;
         }
 

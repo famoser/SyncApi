@@ -40,7 +40,7 @@ namespace Famoser.SyncApi.UnitTests.ServiceTests
             Assert.IsTrue(model2.Count == 0);
         }
 
-        [TestMethod]
+        [TestMethod, Ignore]
         public async Task TestRemoveDeviceAsync()
         {
             //arrange

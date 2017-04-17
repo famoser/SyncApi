@@ -400,6 +400,7 @@ namespace Famoser.SyncApi.Repositories
             request.UserId = _apiRoamingEntity.UserId;
             request.DeviceId = CacheEntity.Model.GetId();
             request.ApplicationId = apiInformation.ApplicationId;
+            request.Identifier = GetModelIdentifier();
             return request;
         }
 

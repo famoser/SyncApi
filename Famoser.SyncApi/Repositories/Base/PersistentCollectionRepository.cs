@@ -167,6 +167,7 @@ namespace Famoser.SyncApi.Repositories.Base
                 return false;
 
             req.Id = model.GetId();
+            req.Identifier = model.GetClassIdentifier();
             // this will return missing entities
             foreach (var cacheModelInformation in cache.ModelInformations)
             {
