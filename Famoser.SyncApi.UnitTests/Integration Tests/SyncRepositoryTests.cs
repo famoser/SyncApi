@@ -184,7 +184,7 @@ namespace Famoser.SyncApi.UnitTests.Integration_Tests
             Assert.IsTrue(history[2].Model.Content == "Hallo Welt 3");
         }
 
-        [TestMethod, Ignore]
+        [TestMethod]
         public async Task TestMultipleModelsSaveAndRetrieveAsync()
         {
             //arrange

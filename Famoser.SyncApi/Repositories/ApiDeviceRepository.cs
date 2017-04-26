@@ -65,7 +65,8 @@ namespace Famoser.SyncApi.Repositories
                         Id = Guid.NewGuid(),
                         UserId = _apiRoamingEntity.UserId,
                         PendingAction = PendingAction.Create,
-                        VersionId = Guid.NewGuid()
+                        VersionId = Guid.NewGuid(),
+                        CreateDateTime = DateTime.Now
                     };
                     CacheEntity.Model.SetId(CacheEntity.ModelInformation.Id);
                     await _apiStorageService.SaveCacheEntityAsync<CacheEntity<TDevice>>();
@@ -108,7 +109,9 @@ namespace Famoser.SyncApi.Repositories
                                 Id = CacheEntity.ModelInformation.Id,
                                 OnlineAction = OnlineAction.Create,
                                 VersionId = CacheEntity.ModelInformation.VersionId,
-                                Content = JsonConvert.SerializeObject(CacheEntity.Model)
+                                Content = JsonConvert.SerializeObject(CacheEntity.Model),
+                                Identifier = GetModelIdentifier(),
+                                CreateDateTime = CacheEntity.ModelInformation.CreateDateTime
                             }
                         }));
                 }

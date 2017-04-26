@@ -40,7 +40,7 @@ namespace Famoser.SyncApi.UnitTests.ServiceTests
             Assert.IsTrue(model2.Count == 0);
         }
 
-        [TestMethod, Ignore]
+        [TestMethod]
         public async Task TestRemoveDeviceAsync()
         {
             //arrange
@@ -58,6 +58,9 @@ namespace Famoser.SyncApi.UnitTests.ServiceTests
             var device = await testHelper.SyncApiHelper.ApiDeviceRepository.GetAsync();
             var user = await testHelper.SyncApiHelper.ApiUserRepository.GetAsync();
 
+            var devices = await testHelper.SyncApiHelper.ApiDeviceRepository.GetAllAsync();
+            Assert.IsTrue(devices.Count == 1);
+
             //remove device & other stuff
             await testHelper.SyncApiHelper.ApiDeviceRepository.RemoveAsync();
             //three files: user & roaming x2
@@ -73,9 +76,8 @@ namespace Famoser.SyncApi.UnitTests.ServiceTests
 
             Assert.AreEqual(user.GetId(), user2.GetId());
 
-            var devices = await testHelper2.SyncApiHelper.ApiDeviceRepository.GetAllAsync();
-            //todo: this is wrong!
-            Assert.IsTrue(devices.Count == 1);
+            devices = await testHelper2.SyncApiHelper.ApiDeviceRepository.GetAllAsync();
+            Assert.IsTrue(devices.Count == 0);
 
 
             //assert
