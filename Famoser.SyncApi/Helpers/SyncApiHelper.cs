@@ -81,7 +81,7 @@ namespace Famoser.SyncApi.Helpers
         private bool _isDisposed;
         protected virtual void Dispose(bool disposing)
         {
-            if (_isDisposed)
+            if (!_isDisposed)
                 if (disposing)
                 {
                     ApiUserRepository.Dispose();

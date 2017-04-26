@@ -10,5 +10,6 @@ namespace Famoser.SyncApi.Repositories.Interfaces
     {
         Task<bool> SaveAsync(TModel model);
         Task<bool> SaveToCollectionAsync(TModel model, TCollection collection);
+        Task<bool> RemoveAllFromCollectionAsync(TCollection collection);
     }
 }

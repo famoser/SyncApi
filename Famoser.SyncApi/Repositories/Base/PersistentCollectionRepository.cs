@@ -19,7 +19,7 @@ using Nito.AsyncEx;
 namespace Famoser.SyncApi.Repositories.Base
 {
     public abstract class PersistentCollectionRepository<TCollection> : BasePersistentRepository<TCollection>,
-            IPersistentCollectionRespository<TCollection>
+        IPersistentCollectionRespository<TCollection>
         where TCollection : IUniqueSyncModel
     {
         protected ICollectionManager<TCollection> CollectionManager;
@@ -30,7 +30,8 @@ namespace Famoser.SyncApi.Repositories.Base
         private readonly IApiAuthenticationService _apiAuthenticationService;
 
         protected PersistentCollectionRepository(IApiConfigurationService apiConfigurationService,
-            IApiStorageService apiStorageService, IApiAuthenticationService apiAuthenticationService, IApiTraceService traceService)
+            IApiStorageService apiStorageService, IApiAuthenticationService apiAuthenticationService,
+            IApiTraceService traceService)
             : base(apiConfigurationService, apiAuthenticationService, traceService)
         {
             _apiAuthenticationService = apiAuthenticationService;
@@ -56,17 +57,19 @@ namespace Famoser.SyncApi.Repositories.Base
             {
                 return SyncActionError.EntityAlreadyRemoved;
             }
+
+            CollectionManager.Remove(model);
+
             if (info.PendingAction == PendingAction.Create)
             {
-                CollectionManager.Remove(model);
                 CollectionCache.ModelInformations.Remove(info);
                 CollectionCache.Models.Remove(model);
 
                 await _apiStorageService.SaveCacheEntityAsync<CollectionCacheEntity<TCollection>>();
             }
             else if (info.PendingAction == PendingAction.None
-                || info.PendingAction == PendingAction.Update
-                || info.PendingAction == PendingAction.Read)
+                     || info.PendingAction == PendingAction.Update
+                     || info.PendingAction == PendingAction.Read)
             {
                 info.PendingAction = PendingAction.Delete;
 
@@ -92,12 +95,14 @@ namespace Famoser.SyncApi.Repositories.Base
         {
             if (!_historyCollectionManagers.ContainsKey(model))
             {
-                _historyCollectionManagers.Add(model, _apiConfigurationService.GetCollectionManager<HistoryInformations<TCollection>>());
-                _historyCacheEntities.Add(model, null);
+                HistoryCollectionManagers.Add(model,
+                    _apiConfigurationService.GetCollectionManager<HistoryInformations<TCollection>>());
+                HistoryCacheEntities.Add(model, null);
             }
         }
 
         private readonly AsyncLock _asyncLock = new AsyncLock();
+
         private async Task InitializeHistoryAsync(TCollection model)
         {
             using (await _asyncLock.LockAsync())
@@ -106,9 +111,11 @@ namespace Famoser.SyncApi.Repositories.Base
                 {
                     try
                     {
-                        _historyCacheEntities[model] = await _apiStorageService.GetCacheEntityAsync<CollectionCacheEntity<HistoryInformations<TCollection>>>(GetModelHistoryCacheFilePath(model));
-                        
-                        for (int i = 0; i < _historyCacheEntities[model].Models.Count; i++)
+                        HistoryCacheEntities[model] = await _apiStorageService
+                            .GetCacheEntityAsync<CollectionCacheEntity<HistoryInformations<TCollection>>>(
+                                GetModelHistoryCacheFilePath(model)
+                            );
+                        foreach (var historyInformationse in HistoryCacheEntities[model].Models)
                         {
                             CollectionCache.Models[i].SetId(_historyCacheEntities[model].ModelInformations[i].Id);
                             _historyCacheEntities[model].Models.Add(_historyCacheEntities[model].Models[i]);
@@ -128,12 +135,15 @@ namespace Famoser.SyncApi.Repositories.Base
             if (_apiConfigurationService.StartSyncAutomatically())
                 SyncHistoryAsync(model);
             else
+#pragma warning disable 4014
                 InitializeHistoryAsync(model);
+#pragma warning restore 4014
 
             return _historyCollectionManagers[model].GetObservableCollection();
         }
 
-        protected async Task<ObservableCollection<HistoryInformations<TCollection>>> GetHistoryInternalAsync(TCollection model)
+        public async Task<ObservableCollection<HistoryInformations<TCollection>>> GetHistoryInternalAsync(
+            TCollection model)
         {
             EnsureExistanceOfHistoryManager(model);
 
@@ -153,11 +163,12 @@ namespace Famoser.SyncApi.Repositories.Base
             var cache = _historyCacheEntities[model];
             var manager = _historyCollectionManagers[model];
 
-            var req = await _apiAuthenticationService.CreateRequestAsync<HistoryEntityRequest>();
+            var req = await _apiAuthenticationService.CreateRequestAsync<HistoryEntityRequest>(GetModelIdentifier());
             if (req == null)
                 return false;
 
             req.Id = model.GetId();
+            req.Identifier = model.GetClassIdentifier();
             // this will return missing entities
             foreach (var cacheModelInformation in cache.ModelInformations)
             {
@@ -184,9 +195,21 @@ namespace Famoser.SyncApi.Repositories.Base
             }
 
             if (resp.CollectionEntities.Any())
-                await _apiStorageService.SaveCacheEntityAsync<CollectionCacheEntity<HistoryInformations<TCollection>>>();
+                return await _apiStorageService.SaveCacheEntityAsync<CollectionCacheEntity<HistoryInformations<TCollection>>>();
 
             return true;
+        }
+
+
+        protected async Task<bool> RemoveHistoryInternalAsync(IEnumerable<TCollection> models)
+        {
+            foreach (var model in models)
+            {
+                HistoryCacheEntities.Remove(model);
+                HistoryCollectionManagers.Remove(model);
+            }
+
+            return await _apiStorageService.SaveCacheEntityAsync<CollectionCacheEntity<HistoryInformations<TCollection>>>();
         }
 
         public CacheInformations GetCacheInformations(TCollection model)
@@ -215,5 +238,13 @@ namespace Famoser.SyncApi.Repositories.Base
         public abstract Task<ObservableCollection<HistoryInformations<TCollection>>> GetHistoryAsync(TCollection model);
 
         public abstract Task<bool> SyncHistoryAsync(TCollection model);
+
+        public override async Task<bool> CleanUpAsync()
+        {
+            var res =
+                await _apiStorageService.EraseCacheEntityAsync<CollectionCacheEntity<HistoryInformations<TCollection>>>();
+            res &= await _apiStorageService.EraseCacheEntityAsync<CollectionCacheEntity<TCollection>>();
+            return res;
+        }
     }
 }

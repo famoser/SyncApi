@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 using Famoser.SyncApi.Api.Communication.Request;
 using Famoser.SyncApi.Api.Communication.Request.Base;
 using Famoser.SyncApi.Models.Information;
@@ -21,6 +22,12 @@ namespace Famoser.SyncApi.Services.Interfaces.Authentication
         Task<bool> IsAuthenticatedAsync();
 
         /// <summary>
+        /// gets the device id if already authenticated, does not try to authenticate automatically
+        /// </summary>
+        /// <returns></returns>
+        Guid? TryGetDeviceId();
+
+        /// <summary>
         /// create a valid, authenticated request.
         /// Will only return a request if authenticated
         /// sets:
@@ -31,7 +38,7 @@ namespace Famoser.SyncApi.Services.Interfaces.Authentication
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
-        Task<T> CreateRequestAsync<T>(int messageCount = 0) where T : BaseRequest, new();
+        Task<T> CreateRequestAsync<T>(string identifier, int messageCount = 0) where T : BaseRequest, new();
 
         /// <summary>
         /// create a valid, authenticated request.
@@ -47,7 +54,7 @@ namespace Famoser.SyncApi.Services.Interfaces.Authentication
         /// <typeparam name="T"></typeparam>
         /// <typeparam name="TCollection"></typeparam>
         /// <returns></returns>
-        Task<T> CreateRequestAsync<T, TCollection>() where T : SyncEntityRequest, new()
+        Task<T> CreateRequestAsync<T, TCollection>(string identifier) where T : SyncEntityRequest, new()
              where TCollection : ICollectionModel;
 
         /// <summary>
@@ -64,11 +71,58 @@ namespace Famoser.SyncApi.Services.Interfaces.Authentication
         Task<CacheInformations> CreateModelInformationAsync();
 
         /// <summary>
-        /// Regisiter a collection repository, so proper requests for Models can be constructued
+        /// Register a collection repository
         /// </summary>
         /// <typeparam name="TCollection"></typeparam>
         /// <param name="repository"></param>
         void RegisterCollectionRepository<TCollection>(IApiCollectionRepository<TCollection> repository)
+            where TCollection : ICollectionModel;
+
+        /// <summary>
+        /// UnRegister a collection repository
+        /// </summary>
+        /// <typeparam name="TCollection"></typeparam>
+        /// <param name="repository"></param>
+        void UnRegisterCollectionRepository<TCollection>(IApiCollectionRepository<TCollection> repository)
+            where TCollection : ICollectionModel;
+
+        /// <summary>
+        /// Register a sync repository
+        /// </summary>
+        /// <typeparam name="TCollection"></typeparam>
+        /// <typeparam name="TSyncModel"></typeparam>
+        /// <param name="repository"></param>
+        void RegisterRepository<TSyncModel, TCollection>(IApiRepository<TSyncModel, TCollection> repository)
+            where TSyncModel : ISyncModel
+            where TCollection : ICollectionModel;
+
+        /// <summary>
+        /// Register a sync repository
+        /// </summary>
+        /// <typeparam name="TCollection"></typeparam>
+        /// <typeparam name="TSyncModel"></typeparam>
+        /// <param name="repository"></param>
+        void UnRegisterRepository<TSyncModel, TCollection>(IApiRepository<TSyncModel, TCollection> repository)
+            where TSyncModel : ISyncModel
+            where TCollection : ICollectionModel;
+
+        /// <summary>
+        /// call this after you've removed an user
+        /// </summary>
+        /// <returns></returns>
+        Task CleanUpAfterUserRemoveAsync();
+
+        /// <summary>
+        /// call this after you've removed a device
+        /// </summary>
+        /// <returns></returns>
+        Task CleanUpAfterDeviceRemoveAsync();
+
+        /// <summary>
+        /// call this after you've removed a collection
+        /// </summary>
+        /// <returns></returns>
+        Task CleanUpAfterCollectionRemoveAsync<TCollection>(TCollection collection)
             where TCollection : ICollectionModel;
     }
 }

@@ -6,6 +6,7 @@
         Read = 1,
         Update = 2,
         Delete = 3,
-        None = 4
+        None = 4,
+        DeleteLocally = 5
     }
 }

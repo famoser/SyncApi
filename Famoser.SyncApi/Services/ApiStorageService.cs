@@ -45,13 +45,13 @@ namespace Famoser.SyncApi.Services
                         if (json1 != json2)
                         {
                             //this is not good.
-                            //szenario 1: roaming did not sync as expected, new installation has overwritten the roaming cache with new infos, user may lost all his data
+                            //scenario 1: roaming did not sync as expected, new installation has overwritten the roaming cache with new infos, user may lost all his data
                             var roaming1 = JsonConvert.DeserializeObject<ApiRoamingEntity>(json1);
                             var roaming2 = JsonConvert.DeserializeObject<ApiRoamingEntity>(json2);
                             if (roaming1.CreatedAt < roaming2.CreatedAt)
                             {
-                                //hmmmmmm, this is really unecpected. We will not modify the roaming storage, to not introduce more bugs
-                                //we'll just pretend as everything is OK, mabye some other instance of this application can figure out whats going on
+                                //hmmmmmm, this is unexpected. We will not modify the roaming storage, to not introduce more bugs
+                                //we'll just pretend as everything is OK, maybe some other instance of this application can figure out whats going on
                                 _apiRoamingEntity = roaming1;
                             }
                             else
@@ -113,6 +113,7 @@ namespace Famoser.SyncApi.Services
             return ExecuteSafeAsync(async () =>
             {
                 await _storageService.DeleteRoamingFileAsync(GetApiRoamingFilePath());
+                await _storageService.DeleteCachedFileAsync(GetApiRoamingFilePath());
                 await _storageService.DeleteCachedFileAsync(GetApiStorageFilePath());
 
                 //invalidate userId

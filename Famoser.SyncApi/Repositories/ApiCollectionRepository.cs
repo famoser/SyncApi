@@ -73,7 +73,7 @@ namespace Famoser.SyncApi.Repositories
         {
             return ExecuteSafeAsync(async () =>
             {
-                var req = await _apiAuthenticationService.CreateRequestAsync<AuthRequestEntity>();
+                var req = await _apiAuthenticationService.CreateRequestAsync<AuthRequestEntity>(GetModelIdentifier());
                 req.CollectionEntity = new CollectionEntity()
                 {
                     Id = collection.GetId()
@@ -133,7 +133,7 @@ namespace Famoser.SyncApi.Repositories
             {
                 var client = GetApiClient();
 
-                var synced = new List<int>();
+                var synced = new List<CacheInformations>();
                 var entities = new List<CollectionEntity>();
                 //first: push local data. This potentially will overwrite data from other devices, but with the VersionId we'll be able to revert back at any time
                 for (int index = 0; index < CollectionCache.ModelInformations.Count; index++)
@@ -145,11 +145,11 @@ namespace Famoser.SyncApi.Repositories
                     if (mdl != null)
                     {
                         entities.Add(mdl);
-                        synced.Add(index);
+                        synced.Add(CollectionCache.ModelInformations[index]);
                     }
                 }
 
-                var req = await _apiAuthenticationService.CreateRequestAsync<CollectionEntityRequest>();
+                var req = await _apiAuthenticationService.CreateRequestAsync<CollectionEntityRequest>(GetModelIdentifier());
                 if (req == null)
                     return new Tuple<bool, SyncActionError>(false, SyncActionError.RequestCreationFailed);
 
@@ -159,7 +159,21 @@ namespace Famoser.SyncApi.Repositories
                     return new Tuple<bool, SyncActionError>(false, SyncActionError.RequestUnsuccessful);
 
                 foreach (var modelInformation in synced)
-                    CollectionCache.ModelInformations[modelInformation].PendingAction = PendingAction.None;
+                {
+                    if (modelInformation.PendingAction == PendingAction.Delete ||
+                        modelInformation.PendingAction == PendingAction.DeleteLocally)
+                    {
+                        var index = CollectionCache.ModelInformations.IndexOf(modelInformation);
+                        await GetApiAuthenticationService().CleanUpAfterCollectionRemoveAsync(CollectionCache.Models[index]);
+
+                        CollectionCache.ModelInformations.RemoveAt(index);
+                        CollectionCache.Models.RemoveAt(index);
+                    }
+                    else
+                    {
+                        modelInformation.PendingAction = PendingAction.None;
+                    }
+                }
 
                 foreach (var respCollectionEntity in resp.CollectionEntities)
                 {
@@ -187,9 +201,13 @@ namespace Famoser.SyncApi.Repositories
                     else if (respCollectionEntity.OnlineAction == OnlineAction.Delete)
                     {
                         var index = CollectionCache.ModelInformations.FindIndex(d => d.Id == respCollectionEntity.Id);
+                        var mod = CollectionCache.Models[index];
+
                         CollectionManager.Remove(CollectionCache.Models[index]);
                         CollectionCache.ModelInformations.RemoveAt(index);
                         CollectionCache.Models.RemoveAt(index);
+
+                        await GetApiAuthenticationService().CleanUpAfterCollectionRemoveAsync(mod);
                     }
                 }
 
@@ -233,7 +251,7 @@ namespace Famoser.SyncApi.Repositories
                     await GetAllInternalAsync(),
                     SyncActionError.None
                     ),
-                SyncAction.GetCollectionsAsync,
+                SyncAction.GetCollections,
                 VerificationOption.None
                 );
         }
@@ -274,6 +292,12 @@ namespace Famoser.SyncApi.Repositories
                 SyncAction.SyncCollectionHistory,
                 VerificationOption.CanAccessInternet | VerificationOption.IsAuthenticatedFully
             );
+        }
+
+        public override Task<bool> CleanUpAsync()
+        {
+            CollectionCache = null;
+            return base.CleanUpAsync();
         }
     }
 }

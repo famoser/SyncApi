@@ -52,14 +52,14 @@ namespace Famoser.SyncApi.Models
         public bool IsCompleted
         {
             get { return _isCompleted; }
-            set { Set(ref _isCompleted, value); }
+            private set { Set(ref _isCompleted, value); }
         }
 
         private bool _isSuccessful;
         public bool IsSuccessful
         {
             get { return _isSuccessful; }
-            set { Set(ref _isSuccessful, value); }
+            private set { Set(ref _isSuccessful, value); }
         }
 
         public SyncActionError SyncActionError { get; private set; }

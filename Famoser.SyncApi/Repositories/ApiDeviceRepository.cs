@@ -66,7 +66,8 @@ namespace Famoser.SyncApi.Repositories
                         Id = Guid.NewGuid(),
                         UserId = _apiRoamingEntity.UserId,
                         PendingAction = PendingAction.Create,
-                        VersionId = Guid.NewGuid()
+                        VersionId = Guid.NewGuid(),
+                        CreateDateTime = DateTime.Now
                     };
                     CacheEntity.Model.SetId(CacheEntity.ModelInformation.Id);
                     await _apiStorageService.SaveCacheEntityAsync<CacheEntity<TDevice>>();
@@ -110,7 +111,9 @@ namespace Famoser.SyncApi.Repositories
                                 Id = CacheEntity.ModelInformation.Id,
                                 OnlineAction = OnlineAction.Create,
                                 VersionId = CacheEntity.ModelInformation.VersionId,
-                                Content = JsonConvert.SerializeObject(CacheEntity.Model)
+                                Content = JsonConvert.SerializeObject(CacheEntity.Model),
+                                Identifier = GetModelIdentifier(),
+                                CreateDateTime = CacheEntity.ModelInformation.CreateDateTime
                             }
                         }));
                 }
@@ -127,18 +130,20 @@ namespace Famoser.SyncApi.Repositories
                                 Content = JsonConvert.SerializeObject(CacheEntity.Model)
                             }
                         }));
-                }
+                } 
 
                 if (resp != null && resp.RequestFailed)
                 {
                     return new Tuple<bool, SyncActionError>(false, SyncActionError.RequestUnsuccessful);
                 }
 
-                if (CacheEntity.ModelInformation.PendingAction == PendingAction.Delete)
+                if (CacheEntity.ModelInformation.PendingAction == PendingAction.Delete || CacheEntity.ModelInformation.PendingAction == PendingAction.DeleteLocally)
                 {
                     //clean up
                     CacheEntity.ModelInformation.PendingAction = PendingAction.None;
                     await _apiStorageService.EraseCacheEntityAsync<CacheEntity<TDevice>>();
+                    await GetApiAuthenticationService().CleanUpAfterDeviceRemoveAsync();
+                    await CleanUpAsync();
                 }
                 else
                 {
@@ -156,7 +161,7 @@ namespace Famoser.SyncApi.Repositories
         private string _deviceCacheFilePath;
         private string GetDeviceCacheFilePath()
         {
-            if (_deviceCacheFilePath == null)
+            if (_deviceCacheFilePath != null)
                 return _deviceCacheFilePath;
 
             _deviceCacheFilePath = _apiConfigurationService.GetFileName(GetModelIdentifier() + "_col.json", typeof(TDevice));
@@ -190,7 +195,7 @@ namespace Famoser.SyncApi.Repositories
         public ObservableCollection<TDevice> GetAllLazy()
         {
 #pragma warning disable 4014
-            InitializeDevicesAsync().ContinueWith((t) => SyncDevicesAsync());
+            SyncDevicesAsync();
 #pragma warning restore 4014
 
             return _deviceManager.GetObservableCollection();
@@ -200,7 +205,7 @@ namespace Famoser.SyncApi.Repositories
         {
             return ExecuteSafeAsync(async () =>
             {
-                await InitializeDevicesAsync().ContinueWith(t => SyncDevicesAsync());
+                await SyncDevicesAsync();
 
                 return new Tuple<ObservableCollection<TDevice>, SyncActionError>(_deviceManager.GetObservableCollection(), SyncActionError.None);
             }, SyncAction.GetAllDevices, VerificationOption.None);
@@ -213,11 +218,11 @@ namespace Famoser.SyncApi.Repositories
                 await InitializeDevicesAsync();
 
                 //sync devices
-                var req = new CollectionEntityRequest();
+                var req = new DeviceEntityRequest();
                 // this will return missing, updated & removed entities
                 foreach (var collectionCacheModelInformation in _deviceCache.ModelInformations)
                 {
-                    req.CollectionEntities.Add(new SyncEntity()
+                    req.CollectionEntities.Add(new DeviceEntity()
                     {
                         Id = collectionCacheModelInformation.Id,
                         VersionId = collectionCacheModelInformation.VersionId,
@@ -228,7 +233,7 @@ namespace Famoser.SyncApi.Repositories
                 if (!resp.IsSuccessfull)
                     return new Tuple<bool, SyncActionError>(false, SyncActionError.RequestUnsuccessful);
 
-                foreach (var syncEntity in resp.SyncEntities)
+                foreach (var syncEntity in resp.CollectionEntities)
                 {
                     //new!
                     if (syncEntity.OnlineAction == OnlineAction.Create)
@@ -260,7 +265,7 @@ namespace Famoser.SyncApi.Repositories
                     }
                 }
 
-                if (resp.SyncEntities.Any())
+                if (resp.CollectionEntities.Any())
                 {
                     await _apiStorageService.SaveCacheEntityAsync<CollectionCacheEntity<TDevice>>();
                 }
@@ -327,6 +332,7 @@ namespace Famoser.SyncApi.Repositories
                         var retried = await _authApiClient.AuthenticationStatusAsync(AuthorizeRequest(ApiInformation, _apiRoamingEntity, new AuthRequestEntity()));
                         if (retried.IsSuccessfull)
                         {
+                            //I know its bad, its the only one in the whole project I promise
                             goto Successful;
                         }
                     }
@@ -401,6 +407,7 @@ namespace Famoser.SyncApi.Repositories
             request.UserId = _apiRoamingEntity.UserId;
             request.DeviceId = CacheEntity.Model.GetId();
             request.ApplicationId = apiInformation.ApplicationId;
+            request.Identifier = GetModelIdentifier();
             return request;
         }
 
@@ -412,6 +419,12 @@ namespace Famoser.SyncApi.Repositories
 
         private CollectionEntityRequest AuthorizeRequest(ApiInformation apiInformation,
             ApiRoamingEntity apiRoamingInfo, CollectionEntityRequest request)
+        {
+            return AuthorizeRequestBase(apiInformation, apiRoamingInfo, request);
+        }
+
+        private DeviceEntityRequest AuthorizeRequest(ApiInformation apiInformation,
+            ApiRoamingEntity apiRoamingInfo, DeviceEntityRequest request)
         {
             return AuthorizeRequestBase(apiInformation, apiRoamingInfo, request);
         }
@@ -442,6 +455,17 @@ namespace Famoser.SyncApi.Repositories
                 SyncAction.RemoveDevice,
                 VerificationOption.None
             );
+        }
+
+        public override Task<bool> CleanUpAsync()
+        {
+            CacheEntity = null;
+            return base.CleanUpAsync();
+        }
+
+        public Task<bool> CleanUpDeviceAsync()
+        {
+            return CleanUpAsync();
         }
     }
 }

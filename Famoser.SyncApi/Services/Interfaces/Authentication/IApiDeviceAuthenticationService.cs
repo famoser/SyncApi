@@ -21,5 +21,11 @@ namespace Famoser.SyncApi.Services.Interfaces.Authentication
         /// </summary>
         /// <param name="apiAuthenticationService"></param>
         void SetAuthenticationService(IApiAuthenticationService apiAuthenticationService);
+
+        /// <summary>
+        /// clean up the service. This is called once the user is removed
+        /// </summary>
+        /// <returns></returns>
+        Task<bool> CleanUpDeviceAsync();
     }
 }

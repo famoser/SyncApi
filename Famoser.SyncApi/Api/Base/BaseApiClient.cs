@@ -60,9 +60,9 @@ namespace Famoser.SyncApi.Api.Base
         }
 
         private bool _isDisposed;
-        protected virtual void Dispose(bool disposing)
+        private void Dispose(bool disposing)
         {
-            if (_isDisposed)
+            if (!_isDisposed)
                 if (disposing)
                     _restService.Dispose();
             _isDisposed = true;

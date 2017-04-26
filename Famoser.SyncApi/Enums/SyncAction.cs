@@ -24,7 +24,6 @@
         CheckAuthentication,
 
         GetCollections,
-        GetCollectionsAsync,
         GetCollectionHistory,
         SyncCollectionHistory,
         SyncCollection,
