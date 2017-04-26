@@ -95,9 +95,9 @@ namespace Famoser.SyncApi.Repositories.Base
         {
             if (!_historyCollectionManagers.ContainsKey(model))
             {
-                HistoryCollectionManagers.Add(model,
+                _historyCollectionManagers.Add(model,
                     _apiConfigurationService.GetCollectionManager<HistoryInformations<TCollection>>());
-                HistoryCacheEntities.Add(model, null);
+                _historyCacheEntities.Add(model, null);
             }
         }
 
@@ -111,14 +111,14 @@ namespace Famoser.SyncApi.Repositories.Base
                 {
                     try
                     {
-                        HistoryCacheEntities[model] = await _apiStorageService
+                        _historyCacheEntities[model] = await _apiStorageService
                             .GetCacheEntityAsync<CollectionCacheEntity<HistoryInformations<TCollection>>>(
                                 GetModelHistoryCacheFilePath(model)
                             );
-                        foreach (var historyInformationse in HistoryCacheEntities[model].Models)
+                        for (var index = 0; index < _historyCacheEntities[model].Models.Count; index++)
                         {
-                            CollectionCache.Models[i].SetId(_historyCacheEntities[model].ModelInformations[i].Id);
-                            _historyCacheEntities[model].Models.Add(_historyCacheEntities[model].Models[i]);
+                            CollectionCache.Models[index].SetId(_historyCacheEntities[model].ModelInformations[index].Id);
+                            _historyCacheEntities[model].Models.Add(_historyCacheEntities[model].Models[index]);
                         }
                     }
                     catch //thrown if file not found
@@ -205,8 +205,8 @@ namespace Famoser.SyncApi.Repositories.Base
         {
             foreach (var model in models)
             {
-                HistoryCacheEntities.Remove(model);
-                HistoryCollectionManagers.Remove(model);
+                _historyCacheEntities.Remove(model);
+                _historyCollectionManagers.Remove(model);
             }
 
             return await _apiStorageService.SaveCacheEntityAsync<CollectionCacheEntity<HistoryInformations<TCollection>>>();

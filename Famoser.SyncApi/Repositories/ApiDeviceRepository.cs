@@ -130,7 +130,7 @@ namespace Famoser.SyncApi.Repositories
                                 Content = JsonConvert.SerializeObject(CacheEntity.Model)
                             }
                         }));
-                } 
+                }
 
                 if (resp != null && resp.RequestFailed)
                 {
@@ -180,7 +180,7 @@ namespace Famoser.SyncApi.Repositories
 
                 _deviceManager = _apiConfigurationService.GetCollectionManager<TDevice>();
                 _deviceCache = await _apiStorageService.GetCacheEntityAsync<CollectionCacheEntity<TDevice>>(GetDeviceCacheFilePath());
-                
+
                 for (int i = 0; i < _deviceCache.Models.Count; i++)
                 {
                     _deviceCache.Models[i].SetId(_deviceCache.ModelInformations[i].Id);
@@ -233,7 +233,7 @@ namespace Famoser.SyncApi.Repositories
                 if (!resp.IsSuccessfull)
                     return new Tuple<bool, SyncActionError>(false, SyncActionError.RequestUnsuccessful);
 
-                foreach (var syncEntity in resp.CollectionEntities)
+                foreach (var syncEntity in resp.DeviceEntities)
                 {
                     //new!
                     if (syncEntity.OnlineAction == OnlineAction.Create)
@@ -265,7 +265,7 @@ namespace Famoser.SyncApi.Repositories
                     }
                 }
 
-                if (resp.CollectionEntities.Any())
+                if (resp.DeviceEntities.Any())
                 {
                     await _apiStorageService.SaveCacheEntityAsync<CollectionCacheEntity<TDevice>>();
                 }
@@ -451,7 +451,11 @@ namespace Famoser.SyncApi.Repositories
         public override Task<bool> RemoveAsync()
         {
             return ExecuteSafeAsync(
-                async () => new Tuple<bool, SyncActionError>(await RemoveInternalAsync(), SyncActionError.None),
+                async () =>
+                {
+                    await _apiStorageService.EraseCacheEntityAsync<CollectionCacheEntity<TDevice>>();
+                    return new Tuple<bool, SyncActionError>(await RemoveInternalAsync(), SyncActionError.None);
+                },
                 SyncAction.RemoveDevice,
                 VerificationOption.None
             );

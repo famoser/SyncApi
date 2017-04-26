@@ -77,7 +77,8 @@ namespace Famoser.SyncApi.Repositories.Base
                 CacheEntity.ModelInformation.PendingAction = PendingAction.Delete;
             }
 
-            await _apiStorageService.SaveCacheEntityAsync<CacheEntity<TModel>>();
+            await _apiStorageService.EraseCacheEntityAsync<CacheEntity<TModel>>();
+
             if (_apiConfigurationService.CanUseWebConnection())
                 await SyncAsync();
 
