@@ -6,6 +6,6 @@ namespace Famoser.SyncApi.Api.Communication.Request
 {
     public class DeviceEntityRequest : BaseRequest
     {
-        public List<DeviceEntity> CollectionEntities { get; set; } = new List<DeviceEntity>();
+        public List<DeviceEntity> DeviceEntities { get; set; } = new List<DeviceEntity>();
     }
 }

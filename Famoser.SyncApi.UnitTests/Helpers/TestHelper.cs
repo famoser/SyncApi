@@ -17,7 +17,7 @@ namespace Famoser.SyncApi.UnitTests.Helpers
     {
         private static string _applicationId = "test_appl";
         private static long _applicationSeed = 1341451215173;
-        private static string _testUri = "http://localhost/";
+        private static string _testUri = "https://dev.syncapi.famoser.ch/";
 
         public static string TestUri => _testUri;
         public List<RequestEventArgs> FailedRequestEventArgs { get; } = new List<RequestEventArgs>();

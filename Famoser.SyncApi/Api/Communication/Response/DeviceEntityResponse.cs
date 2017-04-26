@@ -6,8 +6,6 @@ namespace Famoser.SyncApi.Api.Communication.Response
 {
     public class DeviceEntityResponse : BaseResponse
     {
-        //todo: rename in api to DeviceEntities
-        //todo: use DeviceEntity in api
-        public List<DeviceEntity> CollectionEntities { get; set; } = new List<DeviceEntity>();
+        public List<DeviceEntity> DeviceEntities { get; set; } = new List<DeviceEntity>();
     }
 }

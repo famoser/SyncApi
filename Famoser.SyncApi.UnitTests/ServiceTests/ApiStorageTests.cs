@@ -76,8 +76,9 @@ namespace Famoser.SyncApi.UnitTests.ServiceTests
 
             Assert.AreEqual(user.GetId(), user2.GetId());
 
-            devices = await testHelper2.SyncApiHelper.ApiDeviceRepository.GetAllAsync();
-            Assert.IsTrue(devices.Count == 0);
+            var newDevices = await testHelper2.SyncApiHelper.ApiDeviceRepository.GetAllAsync();
+            Assert.IsTrue(newDevices.Count == 1);
+            Assert.IsTrue(newDevices[0].GetId() != devices[0].GetId());
 
 
             //assert

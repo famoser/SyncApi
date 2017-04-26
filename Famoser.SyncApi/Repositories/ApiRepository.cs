@@ -48,10 +48,11 @@ namespace Famoser.SyncApi.Repositories
                     return true;
 
                 CollectionCache = await _apiStorageService.GetCacheEntityAsync<CollectionCacheEntity<TModel>>(GetModelCacheFilePath());
-
-                foreach (var collectionCacheModel in CollectionCache.Models)
+                
+                for (int i = 0; i < CollectionCache.Models.Count; i++)
                 {
-                    CollectionManager.Add(collectionCacheModel);
+                    CollectionCache.Models[i].SetId(CollectionCache.ModelInformations[i].Id);
+                    CollectionManager.Add(CollectionCache.Models[i]);
                 }
 
                 return true;
@@ -213,10 +214,12 @@ namespace Famoser.SyncApi.Repositories
         public override Task<ObservableCollection<TModel>> GetAllAsync()
         {
             return ExecuteSafeAsync(
-                async () => new Tuple<ObservableCollection<TModel>, SyncActionError>(
-                    await GetAllInternalAsync(),
-                    SyncActionError.None
-                    ),
+                async () =>
+                {
+                    return new Tuple<ObservableCollection<TModel>, SyncActionError>(
+                        await GetAllInternalAsync(), SyncActionError.None
+                    );
+                },
                 SyncAction.GetEntitiesAsync,
                 VerificationOption.None
                 );

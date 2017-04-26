@@ -30,6 +30,15 @@ namespace Famoser.SyncApi.Repositories.Base
 
             try
             {
+                if (verification.HasFlag(VerificationOption.AuthenticateBeforeInitialize))
+                {
+                    var res = await _apiAuthenticationService.IsAuthenticatedAsync();
+                    if (verification.HasFlag(VerificationOption.IsAuthenticatedFully) && !res)
+                    {
+                        ev.SetSyncActionResult(SyncActionError.NotAuthenticatedFully);
+                        return default(T);
+                    }
+                }
                 //very similar logic in ExecuteSafeInternalLazy
                 if (!await InitializeAsync())
                 {
@@ -47,7 +56,7 @@ namespace Famoser.SyncApi.Repositories.Base
                     {
                         ev.SetSyncActionResult(SyncActionError.AuthenticationServiceNotSet);
                     }
-                    else if (!(await _apiAuthenticationService.IsAuthenticatedAsync()))
+                    else if (!verification.HasFlag(VerificationOption.AuthenticateBeforeInitialize) && !(await _apiAuthenticationService.IsAuthenticatedAsync()))
                     {
                         ev.SetSyncActionResult(SyncActionError.NotAuthenticatedFully);
                     }

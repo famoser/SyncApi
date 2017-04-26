@@ -41,7 +41,7 @@ namespace Famoser.SyncApi.Repositories.Base
             CollectionManager = _apiConfigurationService.GetCollectionManager<TCollection>();
         }
 
-        public async Task<ObservableCollection<TCollection>> GetAllInternalAsync()
+        protected async Task<ObservableCollection<TCollection>> GetAllInternalAsync()
         {
             if (_apiConfigurationService.StartSyncAutomatically())
             {
@@ -83,21 +83,21 @@ namespace Famoser.SyncApi.Repositories.Base
 
         public abstract Task<bool> RemoveAsync(TCollection model);
 
-        protected readonly Dictionary<TCollection, ICollectionManager<HistoryInformations<TCollection>>>
-            HistoryCollectionManagers
+        private readonly Dictionary<TCollection, ICollectionManager<HistoryInformations<TCollection>>>
+            _historyCollectionManagers
                 = new Dictionary<TCollection, ICollectionManager<HistoryInformations<TCollection>>>();
 
-        protected readonly Dictionary<TCollection, CollectionCacheEntity<HistoryInformations<TCollection>>>
-            HistoryCacheEntities
+        private readonly Dictionary<TCollection, CollectionCacheEntity<HistoryInformations<TCollection>>>
+            _historyCacheEntities
                 = new Dictionary<TCollection, CollectionCacheEntity<HistoryInformations<TCollection>>>();
 
         private void EnsureExistanceOfHistoryManager(TCollection model)
         {
-            if (!HistoryCollectionManagers.ContainsKey(model))
+            if (!_historyCollectionManagers.ContainsKey(model))
             {
-                HistoryCollectionManagers.Add(model,
+                _historyCollectionManagers.Add(model,
                     _apiConfigurationService.GetCollectionManager<HistoryInformations<TCollection>>());
-                HistoryCacheEntities.Add(model, null);
+                _historyCacheEntities.Add(model, null);
             }
         }
 
@@ -107,28 +107,29 @@ namespace Famoser.SyncApi.Repositories.Base
         {
             using (await _asyncLock.LockAsync())
             {
-                if (HistoryCacheEntities[model] == null)
+                if (_historyCacheEntities[model] == null)
                 {
                     try
                     {
-                        HistoryCacheEntities[model] = await _apiStorageService
+                        _historyCacheEntities[model] = await _apiStorageService
                             .GetCacheEntityAsync<CollectionCacheEntity<HistoryInformations<TCollection>>>(
                                 GetModelHistoryCacheFilePath(model)
                             );
-                        foreach (var historyInformationse in HistoryCacheEntities[model].Models)
+                        for (var index = 0; index < _historyCacheEntities[model].Models.Count; index++)
                         {
-                            HistoryCollectionManagers[model].Add(historyInformationse);
+                            CollectionCache.Models[index].SetId(_historyCacheEntities[model].ModelInformations[index].Id);
+                            _historyCacheEntities[model].Models.Add(_historyCacheEntities[model].Models[index]);
                         }
                     }
                     catch //thrown if file not found
                     {
-                        HistoryCacheEntities[model] = new CollectionCacheEntity<HistoryInformations<TCollection>>();
+                        _historyCacheEntities[model] = new CollectionCacheEntity<HistoryInformations<TCollection>>();
                     }
                 }
             }
         }
 
-        public ObservableCollection<HistoryInformations<TCollection>> GetHistoryInternalLazy(TCollection model)
+        protected ObservableCollection<HistoryInformations<TCollection>> GetHistoryInternalLazy(TCollection model)
         {
             EnsureExistanceOfHistoryManager(model);
             if (_apiConfigurationService.StartSyncAutomatically())
@@ -138,7 +139,7 @@ namespace Famoser.SyncApi.Repositories.Base
                 InitializeHistoryAsync(model);
 #pragma warning restore 4014
 
-            return HistoryCollectionManagers[model].GetObservableCollection();
+            return _historyCollectionManagers[model].GetObservableCollection();
         }
 
         public async Task<ObservableCollection<HistoryInformations<TCollection>>> GetHistoryInternalAsync(
@@ -151,7 +152,7 @@ namespace Famoser.SyncApi.Repositories.Base
             else
                 await InitializeHistoryAsync(model);
 
-            return HistoryCollectionManagers[model].GetObservableCollection();
+            return _historyCollectionManagers[model].GetObservableCollection();
         }
 
         protected async Task<bool> SyncHistoryInternalAsync(TCollection model)
@@ -159,8 +160,8 @@ namespace Famoser.SyncApi.Repositories.Base
             await InitializeHistoryAsync(model);
 
             var client = GetApiClient();
-            var cache = HistoryCacheEntities[model];
-            var manager = HistoryCollectionManagers[model];
+            var cache = _historyCacheEntities[model];
+            var manager = _historyCollectionManagers[model];
 
             var req = await _apiAuthenticationService.CreateRequestAsync<HistoryEntityRequest>(GetModelIdentifier());
             if (req == null)
@@ -204,8 +205,8 @@ namespace Famoser.SyncApi.Repositories.Base
         {
             foreach (var model in models)
             {
-                HistoryCacheEntities.Remove(model);
-                HistoryCollectionManagers.Remove(model);
+                _historyCacheEntities.Remove(model);
+                _historyCollectionManagers.Remove(model);
             }
 
             return await _apiStorageService.SaveCacheEntityAsync<CollectionCacheEntity<HistoryInformations<TCollection>>>();
