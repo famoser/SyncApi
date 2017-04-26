@@ -132,6 +132,9 @@ namespace Famoser.SyncApi.Repositories
                         }));
                 }
 
+                //refresh auth status
+                await RefreshAuthenticationStatusAsync(false);
+
                 if (resp != null && resp.RequestFailed)
                 {
                     return new Tuple<bool, SyncActionError>(false, SyncActionError.RequestUnsuccessful);
@@ -191,7 +194,7 @@ namespace Famoser.SyncApi.Repositories
             }
         }
 
-        private ICollectionManager<TDevice> _deviceManager;
+        private ICollectionManager<TDevice> _deviceManager = new CollectionManager<TDevice>();
         public ObservableCollection<TDevice> GetAllLazy()
         {
 #pragma warning disable 4014
@@ -208,7 +211,7 @@ namespace Famoser.SyncApi.Repositories
                 await SyncDevicesAsync();
 
                 return new Tuple<ObservableCollection<TDevice>, SyncActionError>(_deviceManager.GetObservableCollection(), SyncActionError.None);
-            }, SyncAction.GetAllDevices, VerificationOption.None);
+            }, SyncAction.GetAllDevices, VerificationOption.AuthenticateBeforeInitialize);
         }
 
         public Task<bool> SyncDevicesAsync()
@@ -222,7 +225,7 @@ namespace Famoser.SyncApi.Repositories
                 // this will return missing, updated & removed entities
                 foreach (var collectionCacheModelInformation in _deviceCache.ModelInformations)
                 {
-                    req.CollectionEntities.Add(new DeviceEntity()
+                    req.DeviceEntities.Add(new DeviceEntity()
                     {
                         Id = collectionCacheModelInformation.Id,
                         VersionId = collectionCacheModelInformation.VersionId,
@@ -270,7 +273,7 @@ namespace Famoser.SyncApi.Repositories
                     await _apiStorageService.SaveCacheEntityAsync<CollectionCacheEntity<TDevice>>();
                 }
                 return new Tuple<bool, SyncActionError>(true, SyncActionError.None);
-            }, SyncAction.GetAllDevices, VerificationOption.CanAccessInternet | VerificationOption.IsAuthenticatedFully);
+            }, SyncAction.GetAllDevices, VerificationOption.CanAccessInternet | VerificationOption.IsAuthenticatedFully | VerificationOption.AuthenticateBeforeInitialize);
 
         }
         #endregion
@@ -293,7 +296,7 @@ namespace Famoser.SyncApi.Repositories
                 device.SetAuthenticationState(AuthenticationState.UnAuthenticated);
                 await _apiStorageService.SaveCacheEntityAsync<CollectionCacheEntity<TDevice>>();
                 return new Tuple<bool, SyncActionError>(true, SyncActionError.None);
-            }, SyncAction.UnAuthenticateDevice, VerificationOption.IsAuthenticatedFully | VerificationOption.CanAccessInternet);
+            }, SyncAction.UnAuthenticateDevice, VerificationOption.IsAuthenticatedFully | VerificationOption.CanAccessInternet | VerificationOption.AuthenticateBeforeInitialize);
         }
 
         public Task<bool> AuthenticateAsync(TDevice device)
@@ -313,10 +316,10 @@ namespace Famoser.SyncApi.Repositories
                 device.SetAuthenticationState(AuthenticationState.Authenticated);
                 await _apiStorageService.SaveCacheEntityAsync<CollectionCacheEntity<TDevice>>();
                 return new Tuple<bool, SyncActionError>(true, SyncActionError.None);
-            }, SyncAction.AuthenticateDevice, VerificationOption.CanAccessInternet);
+            }, SyncAction.AuthenticateDevice, VerificationOption.CanAccessInternet | VerificationOption.AuthenticateBeforeInitialize);
         }
 
-        private Task<bool> RefreshAuthenticationStatusAsync()
+        private Task<bool> RefreshAuthenticationStatusAsync(bool canSync = true)
         {
             return ExecuteSafeAsync(async () =>
             {
@@ -327,13 +330,18 @@ namespace Famoser.SyncApi.Repositories
                     //not authenticated!
                     if (CacheEntity.ModelInformation.PendingAction != PendingAction.None)
                     {
-                        //apply pending change and check status again
-                        await SyncAsync();
-                        var retried = await _authApiClient.AuthenticationStatusAsync(AuthorizeRequest(ApiInformation, _apiRoamingEntity, new AuthRequestEntity()));
-                        if (retried.IsSuccessfull)
+                        //apply pending change iff possible and check status again
+                        if (canSync)
                         {
-                            //I know its bad, its the only one in the whole project I promise
-                            goto Successful;
+                            await SyncAsync();
+                            var retried =
+                                await _authApiClient.AuthenticationStatusAsync(AuthorizeRequest(ApiInformation,
+                                    _apiRoamingEntity, new AuthRequestEntity()));
+                            if (retried.IsSuccessfull)
+                            {
+                                //I know its bad, its the only one in the whole project I promise
+                                goto Successful;
+                            }
                         }
                     }
 
@@ -369,14 +377,17 @@ namespace Famoser.SyncApi.Repositories
                 }
 
                 return new Tuple<string, SyncActionError>(resp.ServerMessage, SyncActionError.None);
-            }, SyncAction.CreateAuthCode, VerificationOption.IsAuthenticatedFully | VerificationOption.CanAccessInternet);
+            }, SyncAction.CreateAuthCode, VerificationOption.IsAuthenticatedFully | VerificationOption.CanAccessInternet | VerificationOption.AuthenticateBeforeInitialize);
         }
 
         public Task<bool> TryUseAuthenticationCodeAsync(string authenticationCode)
         {
             return ExecuteSafeAsync(async () =>
             {
-                var resp = await _authApiClient.CreateAuthorizationCodeAsync(AuthorizeRequest(ApiInformation, _apiRoamingEntity, new AuthRequestEntity()));
+                var resp = await _authApiClient.UseAuthenticationCodeAsync(AuthorizeRequest(ApiInformation, _apiRoamingEntity, new AuthRequestEntity()
+                {
+                    ClientMessage = authenticationCode
+                }));
 
                 if (resp.RequestFailed)
                 {
@@ -387,7 +398,7 @@ namespace Famoser.SyncApi.Repositories
                 await _apiStorageService.SaveCacheEntityAsync<CacheEntity<TDevice>>();
 
                 return new Tuple<bool, SyncActionError>(true, SyncActionError.None);
-            }, SyncAction.UseAuthCode, VerificationOption.CanAccessInternet);
+            }, SyncAction.UseAuthCode, VerificationOption.CanAccessInternet | VerificationOption.AuthenticateBeforeInitialize);
         }
         #endregion
 
@@ -435,7 +446,7 @@ namespace Famoser.SyncApi.Repositories
             return ExecuteSafeAsync(
                 async () => new Tuple<TDevice, SyncActionError>(await GetInternalAsync(), SyncActionError.None),
                 SyncAction.GetDevice,
-                VerificationOption.None
+                VerificationOption.AuthenticateBeforeInitialize
             );
         }
 
@@ -444,7 +455,7 @@ namespace Famoser.SyncApi.Repositories
             return ExecuteSafeAsync(
                 async () => new Tuple<bool, SyncActionError>(await SaveInternalAsync(), SyncActionError.None),
                 SyncAction.SaveDevice,
-                VerificationOption.None
+                VerificationOption.AuthenticateBeforeInitialize
             );
         }
 
@@ -457,7 +468,7 @@ namespace Famoser.SyncApi.Repositories
                     return new Tuple<bool, SyncActionError>(await RemoveInternalAsync(), SyncActionError.None);
                 },
                 SyncAction.RemoveDevice,
-                VerificationOption.None
+                VerificationOption.AuthenticateBeforeInitialize
             );
         }
 

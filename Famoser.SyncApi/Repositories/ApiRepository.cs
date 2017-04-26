@@ -214,10 +214,12 @@ namespace Famoser.SyncApi.Repositories
         public override Task<ObservableCollection<TModel>> GetAllAsync()
         {
             return ExecuteSafeAsync(
-                async () => new Tuple<ObservableCollection<TModel>, SyncActionError>(
-                    await GetAllInternalAsync(),
-                    SyncActionError.None
-                    ),
+                async () =>
+                {
+                    return new Tuple<ObservableCollection<TModel>, SyncActionError>(
+                        await GetAllInternalAsync(), SyncActionError.None
+                    );
+                },
                 SyncAction.GetEntitiesAsync,
                 VerificationOption.None
                 );

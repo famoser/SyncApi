@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
@@ -24,14 +25,20 @@ namespace Famoser.SyncApi.UnitTests.Integration_Tests
             var testHelper = new TestHelper { StorageService = ss };
             var repo = testHelper.SyncApiHelper.ResolveRepository<NoteModel>();
             var model = new NoteModel { Content = "Hallo Welt!" };
+            var authCode = await testHelper.SyncApiHelper.ApiDeviceRepository.CreateNewAuthenticationCodeAsync();
 
-            var testHelper2 = new TestHelper { StorageService = testHelper.StorageService };
+            var testHelper2 = new TestHelper { StorageService = ss };
             var repo2 = testHelper2.SyncApiHelper.ResolveRepository<NoteModel>();
 
             //act
             var saveRes = await repo.SaveAsync(model);
-            //new instance with empty cache to ensure the notemodel is downloaded
+            //new instance with empty cache to ensure the NoteModel is downloaded
             ss.ClearCache();
+
+            //try sync to initialize cache again
+            var authReq = await testHelper2.SyncApiHelper.ApiDeviceRepository.TryUseAuthenticationCodeAsync(authCode);
+            Assert.IsTrue(authReq);
+
             var model2 = await repo2.GetAllAsync();
 
             //assert
@@ -50,9 +57,12 @@ namespace Famoser.SyncApi.UnitTests.Integration_Tests
             var testHelper = new TestHelper { StorageService = ss };
             var repo = testHelper.SyncApiHelper.ResolveRepository<NoteModel>();
             var model = new NoteModel { Content = "Hallo Welt!" };
+            var authCode = await testHelper.SyncApiHelper.ApiDeviceRepository.CreateNewAuthenticationCodeAsync();
 
             var testHelper2 = new TestHelper { StorageService = testHelper.StorageService };
             var repo2 = testHelper2.SyncApiHelper.ResolveRepository<NoteModel>();
+            var auth = await testHelper2.SyncApiHelper.ApiDeviceRepository.TryUseAuthenticationCodeAsync(authCode);
+            Assert.IsTrue(auth);
 
             //act
             var saveRes = await repo.SaveAsync(model);
@@ -155,12 +165,15 @@ namespace Famoser.SyncApi.UnitTests.Integration_Tests
             var ss = new StorageService();
             var testHelper = new TestHelper { StorageService = ss };
             var repo = testHelper.SyncApiHelper.ResolveRepository<NoteModel>();
+            var authCode = await testHelper.SyncApiHelper.ApiDeviceRepository.CreateNewAuthenticationCodeAsync();
+
 
             var model = new NoteModel { Content = "Hallo Welt!" };
 
             var testHelper2 = new TestHelper { StorageService = testHelper.StorageService };
             var repo2 = testHelper2.SyncApiHelper.ResolveRepository<NoteModel>();
-
+            var auth = await testHelper2.SyncApiHelper.ApiDeviceRepository.TryUseAuthenticationCodeAsync(authCode);
+            Assert.IsTrue(auth);
 
             //act
             await repo.SaveAsync(model);

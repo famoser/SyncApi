@@ -7,6 +7,7 @@ namespace Famoser.SyncApi.Enums
     {
         None = 0,
         CanAccessInternet = 1,
-        IsAuthenticatedFully = 2
+        IsAuthenticatedFully = 2,
+        AuthenticateBeforeInitialize = 4
     }
 }
