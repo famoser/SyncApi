@@ -76,8 +76,6 @@ namespace Famoser.SyncApi.UnitTests.RepositoryTests
             //get unAuth device from new repo
             unAuthenticated = await testHelper3.SyncApiHelper.ApiDeviceRepository.GetAsync();
             Assert.IsTrue(unAuthenticated.AuthenticationState == AuthenticationState.Authenticated);
-
-
         }
     }
 }
