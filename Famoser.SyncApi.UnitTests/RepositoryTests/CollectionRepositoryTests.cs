@@ -14,7 +14,7 @@ namespace Famoser.SyncApi.UnitTests.RepositoryTests
     [TestClass]
     public class CollectionRepositoryTests
     {
-        [TestMethod, Ignore]
+        [TestMethod]
         public async Task TestUserAddAsync()
         {
             var testHelper = new TestHelper { StorageService = new StorageService() };
@@ -41,13 +41,13 @@ namespace Famoser.SyncApi.UnitTests.RepositoryTests
             Assert.IsTrue(res3);
             var models = await repo2.GetAllAsync();
             Assert.IsTrue(models.Count == 1);
-            Assert.IsTrue(models.First().Content == "Hallo Welt");
+            Assert.IsTrue(models.First().Content == "Hallo Welt!");
         }
 
-        [TestMethod, Ignore]
+        [TestMethod]
         public async Task TestCollectionDefaultBehaviorAsync()
         {
-            //BEHAVIOR 1: use existing collection as parent if already exists
+            //use default coll
             var testHelper = new TestHelper { StorageService = new StorageService() };
             var repo = testHelper.SyncApiHelper.ResolveRepository<NoteModel>();
             var collRepo = testHelper.SyncApiHelper.ApiCollectionRepository;
@@ -60,11 +60,11 @@ namespace Famoser.SyncApi.UnitTests.RepositoryTests
             Assert.IsTrue(res2);
 
             var colls = await collRepo.GetAllAsync();
-            Assert.IsTrue(colls.Count == 1);
+            Assert.IsTrue(colls.Count == 2);
             var cinfos = repo.GetCacheInformations(nm);
             Assert.IsTrue(cinfos?.CollectionId == colls[0].GetId());
 
-            //BEHAVIOR 2: use default created as parent if already exists
+            //BEHAVIOR 2: use default as parent
             var testHelper2 = new TestHelper { StorageService = new StorageService() };
             var repo2 = testHelper2.SyncApiHelper.ResolveRepository<NoteModel>();
             var collRepo2 = testHelper2.SyncApiHelper.ApiCollectionRepository;
@@ -81,10 +81,19 @@ namespace Famoser.SyncApi.UnitTests.RepositoryTests
             Assert.IsTrue(colls2[0].GetId() != colls2[1].GetId());
         }
 
+        /// <summary>
+        /// Check additional corner cases:
+        /// - Remove all collections; you must create a new default collection
+        /// - check that entities are removed once the collection is removed
+        /// 
+        /// "solution is left as an exercise to the reader"
+        /// </summary>
+        /// <returns></returns>
         [TestMethod, Ignore]
         public async Task TestCollectionRemoveBehaviorAsync()
         {
-            //BEHAVIOR 1: use existing collection as parent if already exists
+            //todo: what happens if I remove all collections?
+
             var testHelper = new TestHelper { StorageService = new StorageService() };
             var repo = testHelper.SyncApiHelper.ResolveRepository<NoteModel>();
             var collRepo = testHelper.SyncApiHelper.ApiCollectionRepository;
@@ -99,7 +108,7 @@ namespace Famoser.SyncApi.UnitTests.RepositoryTests
             Assert.IsTrue(repoInhalt.Count == 1);
 
             var colls = await collRepo.GetAllAsync();
-            Assert.IsTrue(colls.Count == 1);
+            Assert.IsTrue(colls.Count == 2);
             var cinfos = repo.GetCacheInformations(nm);
             Assert.IsTrue(cinfos?.CollectionId == colls[0].GetId());
 
@@ -132,6 +141,13 @@ namespace Famoser.SyncApi.UnitTests.RepositoryTests
             Assert.IsTrue(sync2.Count == 0);
         }
 
+        /// <summary>
+        /// history disabled for collections
+        /// changes needed:
+        ///  - CollectionRepository: Call different url for collections
+        ///  - Api: implement SyncHistory in CollectionController
+        /// </summary>
+        /// <returns></returns>
         [TestMethod, Ignore]
         public async Task TestCollectionHistoryAsync()
         {
