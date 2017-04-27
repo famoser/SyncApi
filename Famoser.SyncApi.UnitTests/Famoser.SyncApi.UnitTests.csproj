@@ -38,6 +38,15 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'LocalDebug|AnyCPU'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\LocalDebug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DebugType>full</DebugType>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="Famoser.FrameworkEssentials, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Famoser.FrameworkEssentials.2.7.6\lib\dotnet\Famoser.FrameworkEssentials.dll</HintPath>
@@ -85,7 +94,9 @@
     <Compile Include="Models\Note2Model.cs" />
     <Compile Include="Models\NoteModel.cs" />
     <Compile Include="ModelTests\SyncApiInformationModelTests.cs" />
+    <Compile Include="RepositoryTests\CollectionRepositoryTests.cs" />
     <Compile Include="RepositoryTests\DeviceRepositoryTests.cs" />
+    <Compile Include="RepositoryTests\EntityRepositoryTests.cs" />
     <Compile Include="ServiceTests\ApiStorageTests.cs" />
     <Compile Include="ServiceTests\TraceServiceTests.cs" />
     <Compile Include="Showcases.cs" />
