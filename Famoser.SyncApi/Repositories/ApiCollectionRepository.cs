@@ -8,6 +8,7 @@ using Famoser.SyncApi.Api.Communication.Request;
 using Famoser.SyncApi.Api.Enums;
 using Famoser.SyncApi.Enums;
 using Famoser.SyncApi.Helpers;
+using Famoser.SyncApi.Managers;
 using Famoser.SyncApi.Models.Information;
 using Famoser.SyncApi.Models.Interfaces;
 using Famoser.SyncApi.Repositories.Base;

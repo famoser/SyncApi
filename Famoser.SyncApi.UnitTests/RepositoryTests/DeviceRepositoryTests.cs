@@ -23,7 +23,7 @@ namespace Famoser.SyncApi.UnitTests.RepositoryTests
             var repo2 = testHelper2.SyncApiHelper.ResolveRepository<NoteModel>();
             var repo3 = testHelper3.SyncApiHelper.ResolveRepository<NoteModel>();
             var model = new NoteModel { Content = "Hallo Welt!" };
-            
+
             //ensure device authenticated
             Assert.IsTrue(await repo.SaveAsync(model));
 
@@ -37,7 +37,7 @@ namespace Famoser.SyncApi.UnitTests.RepositoryTests
             Assert.IsTrue(resp);
             var resp2 = await devRepo.TryUseAuthenticationCodeAsync(authCode);
             Assert.IsFalse(resp2);
-            
+
             ss.ClearCache();
             var resp3 = await repo2.SaveAsync(model);
             Assert.IsTrue(resp3);
@@ -61,7 +61,7 @@ namespace Famoser.SyncApi.UnitTests.RepositoryTests
             Assert.IsTrue(res5);
             var unAuthenticated = await testHelper3.SyncApiHelper.ApiDeviceRepository.GetAsync();
             Assert.IsTrue(unAuthenticated.AuthenticationState == AuthenticationState.UnAuthenticated);
-            
+
             //check older device
             var device3 = await testHelper2.SyncApiHelper.ApiDeviceRepository.GetAllAsync();
             //get all

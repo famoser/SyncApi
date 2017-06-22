@@ -34,5 +34,10 @@ namespace Famoser.SyncApi.Managers
            var index = _collection.IndexOf(oldOne);
             _collection[index] = newOne;
         }
+
+        public void Clear()
+        {
+            _collection.Clear();
+        }
     }
 }

@@ -342,6 +342,7 @@ namespace Famoser.SyncApi.Repositories
                                 //I know its bad, its the only one in the whole project I promise
                                 goto Successful;
                             }
+                            Manager.GetModel().SetAuthenticationState(AuthenticationState.UnAuthenticated);
                         }
                     }
 
@@ -350,8 +351,7 @@ namespace Famoser.SyncApi.Repositories
                         Manager.GetModel().SetAuthenticationState(AuthenticationState.UnAuthenticated);
                         await _apiStorageService.SaveCacheEntityAsync<CacheEntity<TDevice>>();
                     }
-
-                    Manager.GetModel().SetAuthenticationState(AuthenticationState.UnAuthenticated);
+                    
                     return new Tuple<bool, SyncActionError>(false, SyncActionError.RequestUnsuccessful);
 
                 }
@@ -475,6 +475,7 @@ namespace Famoser.SyncApi.Repositories
         public override Task<bool> CleanUpAsync()
         {
             CacheEntity = null;
+            Manager.Set(null);
             return base.CleanUpAsync();
         }
 

@@ -2,7 +2,7 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2011/08/nuspec.xsd">
     <metadata>
         <id>Famoser.SyncApi</id>
-        <version>0.3.12</version>
+        <version>0.3.13</version>
         <authors>Florian Moser</authors>
         <licenseUrl>http://github.com/famoser/SyncApi/blob/master/LICENSE</licenseUrl>
         <projectUrl>http://github.com/famoser/SyncApi</projectUrl>
@@ -13,9 +13,9 @@ For information about this project and how to use the library, please go to gith
 	</description>
         <releaseNotes>initial release</releaseNotes>
 		<dependencies>
-			<dependency id="Famoser.FrameworkEssentials" version="2.4.3" />
+			<dependency id="Famoser.FrameworkEssentials" version="2.7.6" />
 			<dependency id="Nito.AsyncEx" version="3.0.1" />
-			<dependency id="Newtonsoft.Json" version="9.0.1" />
+			<dependency id="Newtonsoft.Json" version="10.0.3" />
 			<dependency id="SQLite.Net.Core-PCL" version="3.1.1" />
 			<dependency id="SQLite.Net.Async-PCL" version="3.1.1" />
 		</dependencies>

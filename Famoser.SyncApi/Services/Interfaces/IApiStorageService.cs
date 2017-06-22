@@ -22,7 +22,7 @@ namespace Famoser.SyncApi.Services.Interfaces
         /// save the roaming entity
         /// </summary>
         /// <returns></returns>
-        Task<bool> SaveApiRoamingEntityAsync(ApiRoamingEntity entity);
+        Task<bool> SaveApiRoamingEntityAsync();
         /// <summary>
         /// delete the roaming file
         /// </summary>

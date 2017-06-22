@@ -94,10 +94,9 @@ namespace Famoser.SyncApi.Services
         public Task<ApiRoamingEntity> GetApiRoamingEntityAsync()
         {
             return ExecuteSafeAsync(() => _apiRoamingEntity);
-
         }
 
-        public Task<bool> SaveApiRoamingEntityAsync(ApiRoamingEntity entity)
+        public Task<bool> SaveApiRoamingEntityAsync()
         {
             return ExecuteSafeAsync(async () =>
             {
@@ -118,10 +117,6 @@ namespace Famoser.SyncApi.Services
 
                 //invalidate userId
                 _apiRoamingEntity.UserId = Guid.Empty;
-
-                //new entities
-                _apiRoamingEntity = new ApiRoamingEntity();
-
                 return true;
             });
         }

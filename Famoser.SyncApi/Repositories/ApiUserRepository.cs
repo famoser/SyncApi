@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
+using Famoser.FrameworkEssentials.Logging;
 using Famoser.SyncApi.Api;
 using Famoser.SyncApi.Api.Communication.Entities;
 using Famoser.SyncApi.Api.Communication.Request;
@@ -59,7 +60,7 @@ namespace Famoser.SyncApi.Repositories
 
                     var random = new Random(ApiInformation.ApplicationSeed);
                     _roaming.PersonalSeed = random.Next();
-                    await _apiStorageService.SaveApiRoamingEntityAsync(_roaming);
+                    await _apiStorageService.SaveApiRoamingEntityAsync();
 
                     CacheEntity = await _apiStorageService.GetCacheEntityAsync<CacheEntity<TUser>>(GetModelCacheFilePath());
                     CacheEntity.Model = await _apiConfigurationService.GetUserObjectAsync<TUser>();
@@ -97,6 +98,22 @@ namespace Famoser.SyncApi.Repositories
 
                 return true;
             }
+        }
+
+        public async Task<bool> ReplaceUserAsync(TUser newUser)
+        {
+            try
+            {
+                await RemoveAsync();
+                _roaming.UserId = newUser.GetId();
+                _roaming.AuthenticationState = AuthenticationState.Authenticated;
+                return true;
+            }
+            catch (Exception ex)
+            {
+                LogHelper.Instance.LogException(ex);
+            }
+            return false;
         }
 
         public override Task<bool> SyncAsync()
@@ -200,16 +217,17 @@ namespace Famoser.SyncApi.Repositories
                     _roaming.UserId = Guid.Empty;
                     _roaming.AuthenticationState = AuthenticationState.UnAuthenticated;
                     CacheEntity.ModelInformation.PendingAction = PendingAction.None;
+                    CacheEntity = null;
                     await _apiStorageService.EraseRoamingAndCacheAsync();
                     await GetApiAuthenticationService().CleanUpAfterUserRemoveAsync();
                     await CleanUpAsync();
-
+                    
                     return new Tuple<bool, SyncActionError>(true, SyncActionError.None);
                 }
 
                 CacheEntity.ModelInformation.PendingAction = PendingAction.None;
                 await _apiStorageService.SaveCacheEntityAsync<CacheEntity<TUser>>();
-                await _apiStorageService.SaveApiRoamingEntityAsync(_roaming);
+                await _apiStorageService.SaveApiRoamingEntityAsync();
 
                 return new Tuple<bool, SyncActionError>(true, SyncActionError.None);
             }, SyncAction.SyncUser, VerificationOption.CanAccessInternet);
@@ -265,6 +283,7 @@ namespace Famoser.SyncApi.Repositories
         public override Task<bool> CleanUpAsync()
         {
             CacheEntity = null;
+            Manager.Set(null);
             return base.CleanUpAsync();
         }
     }

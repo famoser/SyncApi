@@ -241,9 +241,10 @@ namespace Famoser.SyncApi.Repositories.Base
 
         public override async Task<bool> CleanUpAsync()
         {
-            var res =
-                await _apiStorageService.EraseCacheEntityAsync<CollectionCacheEntity<HistoryInformations<TCollection>>>();
+            var res = await _apiStorageService.EraseCacheEntityAsync<CollectionCacheEntity<HistoryInformations<TCollection>>>();
             res &= await _apiStorageService.EraseCacheEntityAsync<CollectionCacheEntity<TCollection>>();
+            CollectionManager.Clear();
+            CollectionCache = new CollectionCacheEntity<TCollection>();
             return res;
         }
     }
