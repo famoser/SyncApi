@@ -107,6 +107,7 @@ namespace Famoser.SyncApi.Repositories
                 await RemoveAsync();
                 _roaming.UserId = newUser.GetId();
                 _roaming.AuthenticationState = AuthenticationState.Authenticated;
+                await _apiStorageService.SaveApiRoamingEntityAsync();
                 return true;
             }
             catch (Exception ex)

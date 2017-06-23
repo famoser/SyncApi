@@ -44,6 +44,13 @@ namespace Famoser.SyncApi.UnitTests.RepositoryTests
             //ensure model is now in repo2
             var models = await repo2.GetAllAsync();
             Assert.IsTrue(models.Count == 1);
+
+            //ensure it is a persistent change
+            testHelper2 = new TestHelper { StorageService = ss2 };
+            repo2 = testHelper2.SyncApiHelper.ResolveRepository<NoteModel>();
+            models = await repo2.GetAllAsync();
+            Assert.IsTrue(models.Count == 1);
+            //todo: add backup / recovery
         }
     }
 }
