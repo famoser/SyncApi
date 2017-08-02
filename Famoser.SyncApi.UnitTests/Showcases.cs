@@ -10,12 +10,12 @@ namespace Famoser.SyncApi.UnitTests
     class ShowCases
     {
         /// <summary>
-        /// Usecase: I want to save a NoteModel presistently, and want to be able to retrieve it on all the devices of the user.
+        /// Usecase: I want to persist a NoteModel, and want to be able to retrieve it on all the devices of the user.
         /// </summary>
         /// <returns></returns>
         public static async Task SimpleUseCase()
         {
-            //construct the api helper (storage service is implementated in Famoser.UniversalEssentials for UWP)
+            //construct the api helper (storage service is implemented in Famoser.UniversalEssentials for UWP)
             IStorageService ss = new StorageService();
             var helper = new SyncApiHelper(ss, "my_application_name", "https://api.mywebpage.ch");
 
